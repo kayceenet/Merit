@@ -10,7 +10,6 @@ import com.example.data.model.LessonProgress
 import com.example.data.model.StudyNote
 import com.example.data.model.UserProfile
 import com.example.data.repository.MeritPrepRepository
-import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -29,8 +28,8 @@ sealed interface UiState<out T> {
 
 class MeritPrepViewModel(
   private val repository: MeritPrepRepository,
-  private val currentUserId: String,
-  private val initialDisplayName: String,
+  private val currentUserId: String = UserProfile.DEFAULT_PROFILE_ID,
+  private val initialDisplayName: String = "Scholar",
 ) : ViewModel() {
 
   private val _statusMessage = MutableStateFlow<String?>(null)
@@ -47,9 +46,9 @@ class MeritPrepViewModel(
       .observeProfile(currentUserId)
       .map<UserProfile?, UiState<UserProfile?>> { UiState.Success(it) }
       .catch { error ->
-        val root = unwrapFirestoreErrorOrRethrow(error)
-        Log.w(TAG, "Error observing profile", root)
-        emit(UiState.Error(root.message ?: "Unable to load profile"))
+        if (error is CancellationException) throw error
+        Log.w(TAG, "Error observing profile", error)
+        emit(UiState.Error(error.message ?: "Unable to load profile"))
       }
       .stateIn(
         scope = viewModelScope,
@@ -62,9 +61,9 @@ class MeritPrepViewModel(
       .observeLessonProgress(currentUserId)
       .map<List<LessonProgress>, UiState<List<LessonProgress>>> { UiState.Success(it) }
       .catch { error ->
-        val root = unwrapFirestoreErrorOrRethrow(error)
-        Log.w(TAG, "Error observing progress", root)
-        emit(UiState.Error(root.message ?: "Unable to load lesson progress"))
+        if (error is CancellationException) throw error
+        Log.w(TAG, "Error observing progress", error)
+        emit(UiState.Error(error.message ?: "Unable to load lesson progress"))
       }
       .stateIn(
         scope = viewModelScope,
@@ -77,9 +76,9 @@ class MeritPrepViewModel(
       .observeExamAttempts(currentUserId)
       .map<List<ExamAttempt>, UiState<List<ExamAttempt>>> { UiState.Success(it) }
       .catch { error ->
-        val root = unwrapFirestoreErrorOrRethrow(error)
-        Log.w(TAG, "Error observing exam attempts", root)
-        emit(UiState.Error(root.message ?: "Unable to load exam analytics"))
+        if (error is CancellationException) throw error
+        Log.w(TAG, "Error observing exam attempts", error)
+        emit(UiState.Error(error.message ?: "Unable to load exam analytics"))
       }
       .stateIn(
         scope = viewModelScope,
@@ -92,9 +91,9 @@ class MeritPrepViewModel(
       .observeStudyNotes(currentUserId)
       .map<List<StudyNote>, UiState<List<StudyNote>>> { UiState.Success(it) }
       .catch { error ->
-        val root = unwrapFirestoreErrorOrRethrow(error)
-        Log.w(TAG, "Error observing study notes", root)
-        emit(UiState.Error(root.message ?: "Unable to load study notes"))
+        if (error is CancellationException) throw error
+        Log.w(TAG, "Error observing study notes", error)
+        emit(UiState.Error(error.message ?: "Unable to load study notes"))
       }
       .stateIn(
         scope = viewModelScope,
@@ -226,15 +225,6 @@ class MeritPrepViewModel(
       val res = repository.deleteStudyNote(currentUserId, noteId)
       _statusMessage.value = if (res.isSuccess) "Note deleted" else "Could not delete note"
     }
-  }
-
-  private fun unwrapFirestoreErrorOrRethrow(error: Throwable): Throwable {
-    val firestoreError =
-      generateSequence(error) { it.cause }
-        .filterIsInstance<FirebaseFirestoreException>()
-        .firstOrNull()
-    if (firestoreError == null && error is CancellationException) throw error
-    return firestoreError ?: error
   }
 
   private companion object {

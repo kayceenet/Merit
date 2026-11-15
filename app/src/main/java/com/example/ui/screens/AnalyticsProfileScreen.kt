@@ -19,13 +19,9 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
@@ -59,7 +55,6 @@ fun AnalyticsProfileScreen(
   attempts: List<ExamAttempt>,
   progressList: List<LessonProgress>,
   onUpdateGoal: (displayName: String, targetExam: String, targetScore: Long) -> Unit,
-  onSignOut: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
   var displayName by remember(profile?.displayName) {
@@ -253,14 +248,6 @@ fun AnalyticsProfileScreen(
       }
 
       item {
-        OutlinedButton(
-          onClick = onSignOut,
-          modifier = Modifier.fillMaxWidth().height(50.dp).testTag("sign_out_button"),
-          shape = RoundedCornerShape(14.dp),
-        ) {
-          Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null)
-          Text("  Sign Out", style = MaterialTheme.typography.labelLarge)
-        }
         Spacer(modifier = Modifier.height(16.dp))
       }
     }

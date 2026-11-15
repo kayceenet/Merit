@@ -42,16 +42,12 @@ jobs:
               -dname "CN=Android Debug,O=Android,C=US"
           fi
 
-      - name: Restore google-services.json
+      - name: Restore google-services.json if present
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
           if [ ! -s app/google-services.json ] && [ -n "$GOOGLE_SERVICES_JSON" ]; then
             printf '%s\n' "$GOOGLE_SERVICES_JSON" > app/google-services.json
-          fi
-          if [ ! -s app/google-services.json ]; then
-            echo "::error::Missing app/google-services.json. Copy the contents of app/google-services.json from AI Studio and add it as a GitHub Actions repository secret named GOOGLE_SERVICES_JSON (Settings -> Secrets and variables -> Actions -> New repository secret)."
-            exit 1
           fi
 
       - name: Build Debug APK

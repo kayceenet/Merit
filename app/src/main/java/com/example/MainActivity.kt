@@ -32,27 +32,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import androidx.credentials.CredentialManager
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.data.curriculum.CurriculumCatalog
 import com.example.data.curriculum.Lesson
+import com.example.data.model.UserProfile
 import com.example.data.repository.MeritPrepRepository
-import com.example.ui.auth.AuthScreen
-import com.example.ui.auth.signOut
 import com.example.ui.screens.AnalyticsProfileScreen
 import com.example.ui.screens.CatalogScreen
 import com.example.ui.screens.ExamSimulatorScreen
@@ -62,14 +56,6 @@ import com.example.ui.screens.NotebookScreen
 import com.example.ui.theme.MeritPrepTheme
 import com.example.ui.viewmodel.MeritPrepViewModel
 import com.example.ui.viewmodel.UiState
-import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.auth
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 
 private enum class TopTab(
   val label: String,
@@ -83,51 +69,23 @@ private enum class TopTab(
   ANALYTICS("Analytics", Icons.Filled.Analytics, Icons.Outlined.Analytics),
 }
 
-internal fun FirebaseAuth.authStateFlow(): Flow<FirebaseUser?> = callbackFlow {
-  val listener = FirebaseAuth.AuthStateListener { auth -> trySend(auth.currentUser) }
-  addAuthStateListener(listener)
-  awaitClose { removeAuthStateListener(listener) }
-}
-
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
     setContent {
       MeritPrepTheme {
-        AppNavigation()
+        MeritPrepAppShell()
       }
     }
   }
 }
 
 @Composable
-fun AppNavigation(auth: FirebaseAuth = Firebase.auth) {
-  val currentUser by
-    auth.authStateFlow().collectAsStateWithLifecycle(initialValue = auth.currentUser)
-  val user = currentUser
-
-  if (user == null) {
-    AuthScreen(onAuthSuccess = {})
-  } else {
-    key(user.uid) {
-      MeritPrepAppShell(
-        currentUserId = user.uid,
-        displayName = user.displayName ?: user.email?.substringBefore("@") ?: "Scholar",
-      )
-    }
-  }
-}
-
-@Composable
 private fun MeritPrepAppShell(
-  currentUserId: String,
-  displayName: String,
+  currentUserId: String = UserProfile.DEFAULT_PROFILE_ID,
+  displayName: String = "Scholar",
 ) {
-  val context = LocalContext.current
-  val coroutineScope = rememberCoroutineScope()
-  val credentialManager = remember { CredentialManager.create(context) }
-
   val viewModel: MeritPrepViewModel =
     viewModel(
       key = currentUserId,
@@ -138,9 +96,7 @@ private fun MeritPrepAppShell(
               checkNotNull(this[APPLICATION_KEY]) {
                 "APPLICATION_KEY missing from CreationExtras"
               }
-            val databaseId = app.getString(R.string.firestore_database_id)
-            val db = FirebaseFirestore.getInstance(databaseId)
-            MeritPrepViewModel(MeritPrepRepository(db), currentUserId, displayName)
+            MeritPrepViewModel(MeritPrepRepository(app), currentUserId, displayName)
           }
         },
     )
@@ -287,9 +243,6 @@ private fun MeritPrepAppShell(
               attempts = attempts,
               progressList = progressList,
               onUpdateGoal = { name, exam, score -> viewModel.updateGoal(name, exam, score) },
-              onSignOut = {
-                signOut(credentialManager = credentialManager, scope = coroutineScope)
-              },
               modifier = Modifier.weight(1f),
             )
         }

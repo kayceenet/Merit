@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">MeritPrep</string>
     <string name="tagline_academic">Systematic UTME &amp; SSCE Mastery</string>
-    <string name="sign_in_google">Sign in with Google</string>
     <string name="nav_home">Learn</string>
     <string name="nav_catalog">Tracks</string>
     <string name="nav_exams">Exam Lab</string>
