@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">MeritPrep</string>
+    <string name="tagline_academic">Systematic UTME &amp; SSCE Mastery</string>
+    <string name="sign_in_google">Sign in with Google</string>
+    <string name="nav_home">Learn</string>
+    <string name="nav_catalog">Tracks</string>
+    <string name="nav_exams">Exam Lab</string>
+    <string name="nav_notes">Notebook</string>
+    <string name="nav_profile">Analytics</string>
+    <string name="error_generic">Something went wrong. Please try again.</string>
+</resources>

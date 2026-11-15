@@ -1,0 +1,203 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Learner profile, JAMB/WAEC goal settings, XP, and daily study streak.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the student."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Student display name."
+        },
+        "targetExam": {
+          "type": "string",
+          "enum": ["BOTH", "JAMB", "WAEC"],
+          "description": "Primary exam focus."
+        },
+        "targetScore": {
+          "type": "integer",
+          "description": "Target UTME score between 160 and 400."
+        },
+        "streakDays": {
+          "type": "integer",
+          "description": "Consecutive active study days."
+        },
+        "totalXp": {
+          "type": "integer",
+          "description": "Cumulative mastery XP earned across lessons and exams."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when profile was created (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when profile was last updated (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": ["userId", "displayName", "targetExam", "targetScore", "streakDays", "totalXp", "createdAt", "updatedAt"]
+    },
+    "LessonProgress": {
+      "title": "LessonProgress",
+      "description": "Per-lesson systematic pillar progress and inline exercise mastery.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Owner Firebase Auth UID."
+        },
+        "lessonId": {
+          "type": "string",
+          "description": "Curriculum lesson identifier."
+        },
+        "subjectId": {
+          "type": "string",
+          "description": "Subject track identifier."
+        },
+        "moduleId": {
+          "type": "string",
+          "description": "Module identifier."
+        },
+        "completedSteps": {
+          "type": "array",
+          "description": "Completed pedagogical pillars (concept, examples, scenario, lab, exercise)."
+        },
+        "exerciseScore": {
+          "type": "integer",
+          "description": "Percentage score (0-100) on the lesson check-your-grasp quiz."
+        },
+        "isCompleted": {
+          "type": "boolean",
+          "description": "Whether the student has completed the lesson mastery check."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of first lesson progress (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of latest update (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": ["userId", "lessonId", "subjectId", "moduleId", "completedSteps", "exerciseScore", "isCompleted", "createdAt", "updatedAt"]
+    },
+    "ExamAttempt": {
+      "title": "ExamAttempt",
+      "description": "Immutable record of a completed JAMB CBT or WAEC mock exam session.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Owner Firebase Auth UID."
+        },
+        "examType": {
+          "type": "string",
+          "enum": ["JAMB", "WAEC"],
+          "description": "Exam board format."
+        },
+        "subjectId": {
+          "type": "string",
+          "description": "Subject track identifier."
+        },
+        "subjectTitle": {
+          "type": "string",
+          "description": "Human-readable subject title."
+        },
+        "correctCount": {
+          "type": "integer",
+          "description": "Number of questions answered correctly."
+        },
+        "totalQuestions": {
+          "type": "integer",
+          "description": "Total questions in the mock attempt."
+        },
+        "percentage": {
+          "type": "integer",
+          "description": "Score percentage (0-100)."
+        },
+        "durationSeconds": {
+          "type": "integer",
+          "description": "Time spent in seconds."
+        },
+        "weakTopics": {
+          "type": "array",
+          "description": "List of topics missed during the mock session."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when exam was submitted (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": ["userId", "examType", "subjectId", "subjectTitle", "correctCount", "totalQuestions", "percentage", "durationSeconds", "weakTopics", "createdAt"]
+    },
+    "StudyNote": {
+      "title": "StudyNote",
+      "description": "Personal study note or bookmarked formula card linked to a lesson.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Owner Firebase Auth UID."
+        },
+        "lessonId": {
+          "type": "string",
+          "description": "Linked lesson ID."
+        },
+        "subjectId": {
+          "type": "string",
+          "description": "Linked subject ID."
+        },
+        "title": {
+          "type": "string",
+          "description": "Note heading."
+        },
+        "content": {
+          "type": "string",
+          "description": "Formula, mnemonic, or revision note body."
+        },
+        "isBookmarked": {
+          "type": "boolean",
+          "description": "Whether the note is pinned for quick revision."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": ["userId", "lessonId", "subjectId", "title", "content", "isBookmarked", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Student profile and study streak/goal metrics."
+    },
+    "/users/{userId}/lessonProgress/{lessonId}": {
+      "schema": { "$ref": "#/entities/LessonProgress" },
+      "description": "Per-lesson pillar completion and exercise score."
+    },
+    "/users/{userId}/examAttempts/{attemptId}": {
+      "schema": { "$ref": "#/entities/ExamAttempt" },
+      "description": "Completed JAMB CBT and WAEC mock exam logs."
+    },
+    "/users/{userId}/studyNotes/{noteId}": {
+      "schema": { "$ref": "#/entities/StudyNote" },
+      "description": "Student-authored revision notes and pinned formula cards."
+    }
+  }
+}
