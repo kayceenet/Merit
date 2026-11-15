@@ -8,6 +8,8 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialCancellationException
+import androidx.credentials.exceptions.GetCredentialProviderConfigurationException
+import androidx.credentials.exceptions.GetCredentialUnsupportedException
 import com.example.R
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
@@ -15,6 +17,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
 import com.google.firebase.Firebase
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.OAuthProvider
 import com.google.firebase.auth.auth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
@@ -33,6 +36,21 @@ fun attemptAutoSignIn(
     onAuthSuccess()
     return
   }
+
+  val pendingResult = Firebase.auth.pendingAuthResult
+  if (pendingResult != null) {
+    scope.launch {
+      try {
+        pendingResult.await()
+        onAuthSuccess()
+      } catch (e: Exception) {
+        Log.w("Auth", "Pending OAuth sign-in failed: ${e.message}", e)
+        onUnauthenticated()
+      }
+    }
+    return
+  }
+
   val clientId =
     try {
       context.getString(R.string.default_web_client_id)
@@ -108,9 +126,53 @@ fun onGoogleSignInClicked(
     } catch (e: GetCredentialCancellationException) {
       Log.w("Auth", "Google Sign-In flow cancelled or dismissed: ${e.message}", e)
       onAuthCancelled()
+    } catch (e: GetCredentialProviderConfigurationException) {
+      Log.w(
+        "Auth",
+        "Credential Manager provider unavailable on device; falling back to Firebase Google OAuth",
+        e,
+      )
+      signInWithFirebaseGoogleOAuth(activity, onAuthSuccess, onAuthError, onAuthCancelled)
+    } catch (e: GetCredentialUnsupportedException) {
+      Log.w(
+        "Auth",
+        "Credential Manager unsupported on device; falling back to Firebase Google OAuth",
+        e,
+      )
+      signInWithFirebaseGoogleOAuth(activity, onAuthSuccess, onAuthError, onAuthCancelled)
     } catch (e: Exception) {
       Log.e("Auth", "Google Sign-In failed", e)
       onAuthError(e.localizedMessage ?: "Sign in failed. Please try again.")
+    }
+  }
+}
+
+private suspend fun signInWithFirebaseGoogleOAuth(
+  activity: Activity,
+  onAuthSuccess: () -> Unit,
+  onAuthError: (String) -> Unit,
+  onAuthCancelled: () -> Unit,
+) {
+  try {
+    val auth = Firebase.auth
+    val pendingResult = auth.pendingAuthResult
+    if (pendingResult != null) {
+      pendingResult.await()
+      onAuthSuccess()
+      return
+    }
+    val provider = OAuthProvider.newBuilder("google.com").build()
+    auth.startActivityForSignInWithProvider(activity, provider).await()
+    onAuthSuccess()
+  } catch (e: Exception) {
+    Log.e("Auth", "Firebase Google OAuth fallback failed", e)
+    val msg = e.localizedMessage ?: "Sign in failed."
+    if (msg.contains("canceled", ignoreCase = true) || msg.contains("cancelled", ignoreCase = true)) {
+      onAuthCancelled()
+    } else {
+      onAuthError(
+        "Google Sign-In could not start on this device ($msg). Make sure Google Play Services or a browser is available and try again."
+      )
     }
   }
 }
