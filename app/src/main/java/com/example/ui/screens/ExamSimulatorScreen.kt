@@ -57,6 +57,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.R
 import com.example.data.curriculum.CurriculumCatalog
+import com.example.ui.components.ScientificText
 import com.example.ui.theme.JetBrainsMonoFontFamily
 import com.example.ui.theme.UdacityCyan
 import com.example.ui.theme.UdacityCyanInk
@@ -464,7 +465,7 @@ fun ExamSimulatorScreen(
                   }
                 }
 
-                Text(
+                ScientificText(
                   text = question.question,
                   style = MaterialTheme.typography.titleMedium,
                   color = MaterialTheme.colorScheme.onSurface,
@@ -511,7 +512,7 @@ fun ExamSimulatorScreen(
                         fontWeight = FontWeight.Bold,
                       )
                     }
-                    Text(
+                    ScientificText(
                       text = optText,
                       style = MaterialTheme.typography.bodyLarge,
                       color =

@@ -2,22 +2,22 @@ package com.example.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -51,10 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.data.curriculum.CurriculumCatalog
 import com.example.data.model.StudyNote
-import com.example.ui.theme.CodeFormulaText
-import com.example.ui.theme.CodeSurface
-import com.example.ui.theme.JetBrainsMonoFontFamily
-import com.example.ui.theme.UdacityCyan
+import com.example.ui.components.EquationDisplayCard
 
 @Composable
 fun NotebookScreen(
@@ -219,21 +216,7 @@ fun NotebookScreen(
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
               )
-              Row(
-                modifier =
-                  Modifier.fillMaxWidth()
-                    .height(IntrinsicSize.Min)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(CodeSurface),
-              ) {
-                Box(modifier = Modifier.width(4.dp).fillMaxHeight().background(UdacityCyan))
-                Text(
-                  text = note.content,
-                  style = MaterialTheme.typography.bodyMedium.copy(fontFamily = JetBrainsMonoFontFamily),
-                  color = CodeFormulaText,
-                  modifier = Modifier.padding(12.dp),
-                )
-              }
+              EquationDisplayCard(formula = note.content)
             }
           }
           item { Spacer(modifier = Modifier.height(72.dp)) }
@@ -283,10 +266,47 @@ fun NotebookScreen(
           OutlinedTextField(
             value = content,
             onValueChange = { content = it },
-            label = { Text("Formula or Key Explanation") },
+            label = { Text("LaTeX, AsciiMath, Chem or Text Formula") },
+            placeholder = { Text("e.g. \\frac{u^2 \\sin^2\\theta}{2g} or 6.02e23") },
             minLines = 3,
             modifier = Modifier.fillMaxWidth(),
           )
+          Row(
+            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+          ) {
+            listOf(
+              "10^{n}" to "10^{-3}",
+              "frac" to "\\frac{a}{b}",
+              "sqrt" to "\\sqrt{x}",
+              "H₂O" to "H_2O",
+              "θ" to "\\theta",
+              "Δ" to "\\Delta",
+              "→" to "->",
+              "⇌" to "<=>",
+            ).forEach { (chipLabel, snippet) ->
+              Surface(
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shape = RoundedCornerShape(8.dp),
+                modifier =
+                  Modifier.clip(RoundedCornerShape(8.dp))
+                    .clickable { content = if (content.isBlank()) snippet else "$content $snippet" },
+              ) {
+                Text(
+                  text = chipLabel,
+                  style = MaterialTheme.typography.labelSmall,
+                  color = MaterialTheme.colorScheme.onSurfaceVariant,
+                  modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+                )
+              }
+            }
+          }
+          if (content.isNotBlank()) {
+            EquationDisplayCard(
+              formula = content,
+              badgeLabel = "LIVE PREVIEW",
+            )
+          }
         }
       },
       confirmButton = {

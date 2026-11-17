@@ -63,10 +63,9 @@ import com.example.data.curriculum.Lesson
 import com.example.data.curriculum.LessonPillar
 import com.example.data.curriculum.PracticeQuestion
 import com.example.data.model.LessonProgress
+import com.example.ui.components.EquationDisplayCard
+import com.example.ui.components.ScientificText
 import com.example.ui.labs.PracticalLabWorkspace
-import com.example.ui.theme.CodeFormulaText
-import com.example.ui.theme.CodeSurface
-import com.example.ui.theme.JetBrainsMonoFontFamily
 import com.example.ui.theme.UdacityCyan
 import com.example.ui.theme.semanticColors
 
@@ -434,7 +433,7 @@ private fun LessonPillarBody(
           lesson.learningOutcomes.forEach { outcome ->
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
               Text("•", color = MaterialTheme.colorScheme.onPrimaryContainer, fontWeight = FontWeight.Bold)
-              Text(
+              ScientificText(
                 text = outcome,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -458,28 +457,16 @@ private fun LessonPillarBody(
               style = MaterialTheme.typography.titleMedium,
               color = MaterialTheme.colorScheme.onSurface,
             )
-            Text(
+            ScientificText(
               text = block.explanation,
               style = MaterialTheme.typography.bodyLarge,
               color = MaterialTheme.colorScheme.onSurface,
             )
             if (!block.keyFormula.isNullOrBlank()) {
-              Row(
-                modifier =
-                  Modifier.fillMaxWidth()
-                    .height(IntrinsicSize.Min)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(CodeSurface),
-              ) {
-                Box(modifier = Modifier.width(4.dp).fillMaxHeight().background(UdacityCyan))
-                Text(
-                  text = block.keyFormula,
-                  style = MaterialTheme.typography.bodyMedium.copy(fontFamily = JetBrainsMonoFontFamily),
-                  color = CodeFormulaText,
-                  fontWeight = FontWeight.Bold,
-                  modifier = Modifier.padding(14.dp),
-                )
-              }
+              EquationDisplayCard(
+                formula = block.keyFormula,
+                badgeLabel = "SCIENTIFIC FORMULA",
+              )
             }
             Row(
               modifier =
@@ -496,7 +483,7 @@ private fun LessonPillarBody(
                 tint = MaterialTheme.colorScheme.onTertiaryContainer,
                 modifier = Modifier.size(18.dp),
               )
-              Text(
+              ScientificText(
                 text = "Examiner Tip: ${block.examTip}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onTertiaryContainer,
@@ -535,7 +522,7 @@ private fun LessonPillarBody(
               style = MaterialTheme.typography.titleMedium,
               color = MaterialTheme.colorScheme.onSurface,
             )
-            Text(
+            ScientificText(
               text = example.problemStatement,
               style = MaterialTheme.typography.bodyLarge,
               color = MaterialTheme.colorScheme.onSurface,
@@ -550,7 +537,7 @@ private fun LessonPillarBody(
               verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
               example.steps.forEach { step ->
-                Text(
+                ScientificText(
                   text = step,
                   style = MaterialTheme.typography.bodyMedium,
                   color = MaterialTheme.colorScheme.onSurface,
@@ -564,9 +551,9 @@ private fun LessonPillarBody(
                 Modifier.fillMaxWidth()
                   .border(1.dp, semantics.success, RoundedCornerShape(12.dp)),
             ) {
-              Text(
+              ScientificText(
                 text = "Final Answer: ${example.finalAnswer}",
-                style = MaterialTheme.typography.titleSmall.copy(fontFamily = JetBrainsMonoFontFamily),
+                style = MaterialTheme.typography.titleSmall,
                 color = semantics.onSuccessContainer,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(12.dp),
@@ -587,7 +574,7 @@ private fun LessonPillarBody(
                 tint = MaterialTheme.colorScheme.onErrorContainer,
                 modifier = Modifier.size(18.dp),
               )
-              Text(
+              ScientificText(
                 text = "Common Trap: ${example.examinerTrap}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onErrorContainer,
@@ -630,7 +617,7 @@ private fun LessonPillarBody(
               style = MaterialTheme.typography.titleMedium,
               color = MaterialTheme.colorScheme.onSurface,
             )
-            Text(
+            ScientificText(
               text = scenario.narrative,
               style = MaterialTheme.typography.bodyLarge,
               color = MaterialTheme.colorScheme.onSurface,
@@ -642,7 +629,7 @@ private fun LessonPillarBody(
                 Modifier.fillMaxWidth()
                   .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp)),
             ) {
-              Text(
+              ScientificText(
                 text = "Exam Connection: ${scenario.examConnection}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -701,7 +688,7 @@ private fun InlineExerciseSection(
           color = MaterialTheme.colorScheme.primary,
           fontWeight = FontWeight.Bold,
         )
-        Text(
+        ScientificText(
           text = q.question,
           style = MaterialTheme.typography.titleMedium,
           color = MaterialTheme.colorScheme.onSurface,
@@ -761,7 +748,7 @@ private fun InlineExerciseSection(
                 fontWeight = FontWeight.Bold,
               )
             }
-            Text(
+            ScientificText(
               text = optText,
               style = MaterialTheme.typography.bodyMedium,
               color = optionTextColor,
@@ -780,7 +767,7 @@ private fun InlineExerciseSection(
               shape = RoundedCornerShape(10.dp),
               modifier = Modifier.fillMaxWidth(),
             ) {
-              Text(
+              ScientificText(
                 text = "Hint: ${q.hint}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onTertiaryContainer,
@@ -801,13 +788,13 @@ private fun InlineExerciseSection(
                 color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Bold,
               )
-              Text(
+              ScientificText(
                 text = q.stepByStepSolution,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface,
               )
               if (!q.waecMarkingScheme.isNullOrBlank()) {
-                Text(
+                ScientificText(
                   text = "WAEC Marking Scheme: ${q.waecMarkingScheme}",
                   style = MaterialTheme.typography.labelSmall,
                   color = MaterialTheme.colorScheme.primary,

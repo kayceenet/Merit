@@ -53,6 +53,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.ui.components.ScientificText
 import com.example.ui.theme.JetBrainsMonoFontFamily
 import com.example.ui.theme.UdacityCyan
 import com.example.ui.theme.UdacityCyanInk
@@ -491,7 +492,7 @@ private fun QuestionReviewCard(item: QuestionReviewItem) {
       )
     }
 
-    Text(
+    ScientificText(
       text = q.question,
       style = MaterialTheme.typography.titleSmall,
       color = MaterialTheme.colorScheme.onSurface,
@@ -524,7 +525,7 @@ private fun QuestionReviewCard(item: QuestionReviewItem) {
           tint = userFg,
           modifier = Modifier.size(18.dp),
         )
-        Text(
+        ScientificText(
           text = "Your Answer (${'A' + userIdx}): ${q.options[userIdx]}",
           style = MaterialTheme.typography.bodyMedium,
           color = userFg,
@@ -566,7 +567,7 @@ private fun QuestionReviewCard(item: QuestionReviewItem) {
           tint = semantics.onSuccessContainer,
           modifier = Modifier.size(18.dp),
         )
-        Text(
+        ScientificText(
           text = "Correct Answer (${'A' + q.correctIndex}): ${q.options[q.correctIndex]}",
           style = MaterialTheme.typography.bodyMedium,
           color = semantics.onSuccessContainer,
@@ -590,13 +591,13 @@ private fun QuestionReviewCard(item: QuestionReviewItem) {
         color = MaterialTheme.colorScheme.onSurface,
         fontWeight = FontWeight.Bold,
       )
-      Text(
+      ScientificText(
         text = q.stepByStepSolution,
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
       if (!q.waecMarkingScheme.isNullOrBlank()) {
-        Text(
+        ScientificText(
           text = "WAEC Marking Scheme: ${q.waecMarkingScheme}",
           style = MaterialTheme.typography.labelSmall,
           color = MaterialTheme.colorScheme.primary,

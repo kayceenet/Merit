@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.data.curriculum.PracticalLabType
+import com.example.ui.components.ScientificText
 import com.example.ui.theme.JetBrainsMonoFontFamily
 import com.example.ui.theme.semanticColors
 import kotlin.math.PI
@@ -81,7 +82,7 @@ fun PracticalLabWorkspace(
         )
       }
       Text(text = labType.title, style = MaterialTheme.typography.titleLarge)
-      Text(
+      ScientificText(
         text = labBrief,
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -113,13 +114,13 @@ private fun LabMetricTile(
         .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(12.dp))
         .padding(horizontal = 10.dp, vertical = 8.dp),
   ) {
-    Text(
+    ScientificText(
       text = label,
       style = MaterialTheme.typography.labelSmall,
       color = MaterialTheme.colorScheme.onSurfaceVariant,
       fontWeight = FontWeight.Bold,
     )
-    Text(
+    ScientificText(
       text = value,
       style = MaterialTheme.typography.titleSmall.copy(fontFamily = JetBrainsMonoFontFamily),
       color = MaterialTheme.colorScheme.primary,
@@ -207,7 +208,7 @@ private fun ProjectileKinematicsLab() {
     }
 
     Column {
-      Text(
+      ScientificText(
         text = "Initial Velocity u = ${speed.toInt()} m/s   (u_x = ${String.format("%.1f", ux)}, u_y = ${String.format("%.1f", uy)})",
         style = MaterialTheme.typography.labelMedium,
       )
@@ -400,7 +401,7 @@ private fun QuadraticTangentLab() {
       LabMetricTile("y(x₀)", String.format("%.2f", yAtX0), Modifier.weight(1f))
     }
 
-    Text(
+    ScientificText(
       text = "y = ${String.format("%.1f", a)}x² + (${String.format("%.1f", b)})x + (${String.format("%.1f", c)})   |   x₀ = ${String.format("%.1f", x0)}",
       style = MaterialTheme.typography.labelSmall,
     )
