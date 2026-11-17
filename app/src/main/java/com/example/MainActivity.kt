@@ -4,7 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,7 +35,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -50,6 +51,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.data.curriculum.Lesson
+import com.example.data.local.ThemeMode
 import com.example.data.model.UserProfile
 import com.example.data.repository.MeritPrepRepository
 import com.example.ui.screens.AnalyticsProfileScreen
@@ -79,15 +81,13 @@ class MainActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
     setContent {
-      MeritPrepTheme {
-        MeritPrepAppShell()
-      }
+      MeritPrepAppRoot()
     }
   }
 }
 
 @Composable
-private fun MeritPrepAppShell(
+private fun MeritPrepAppRoot(
   currentUserId: String = UserProfile.DEFAULT_PROFILE_ID,
   displayName: String = "Scholar",
 ) {
@@ -106,11 +106,40 @@ private fun MeritPrepAppShell(
         },
     )
 
+  val themePreferences by viewModel.themePreferences.collectAsStateWithLifecycle()
+  val systemDark = isSystemInDarkTheme()
+  val effectiveDarkTheme =
+    when (themePreferences.themeMode) {
+      ThemeMode.SYSTEM -> systemDark
+      ThemeMode.LIGHT -> false
+      ThemeMode.DARK -> true
+    }
+
+  MeritPrepTheme(
+    darkTheme = effectiveDarkTheme,
+    dynamicColor = themePreferences.useDynamicColor,
+  ) {
+    MeritPrepAppShell(
+      viewModel = viewModel,
+      isDarkTheme = effectiveDarkTheme,
+    )
+  }
+}
+
+@Composable
+private fun MeritPrepAppShell(
+  viewModel: MeritPrepViewModel,
+  isDarkTheme: Boolean,
+) {
   val profileState by viewModel.profileState.collectAsStateWithLifecycle()
   val progressState by viewModel.progressState.collectAsStateWithLifecycle()
   val attemptsState by viewModel.attemptsState.collectAsStateWithLifecycle()
   val notesState by viewModel.notesState.collectAsStateWithLifecycle()
   val statusMessage by viewModel.statusMessage.collectAsStateWithLifecycle()
+  val structuredModules by viewModel.structuredModules.collectAsStateWithLifecycle()
+  val offlineSnapshot by viewModel.offlineSnapshot.collectAsStateWithLifecycle()
+  val themePreferences by viewModel.themePreferences.collectAsStateWithLifecycle()
+  val cbtState by viewModel.cbtState.collectAsStateWithLifecycle()
 
   val profile = (profileState as? UiState.Success)?.data
   val progressList = (progressState as? UiState.Success)?.data ?: emptyList()
@@ -222,8 +251,11 @@ private fun MeritPrepAppShell(
           TopTab.HOME ->
             HomeDashboardScreen(
               profile = profile,
+              structuredModules = structuredModules,
               progressList = progressList,
               attempts = attempts,
+              isDarkTheme = isDarkTheme,
+              onToggleDarkTheme = { viewModel.toggleDarkTheme(isDarkTheme) },
               onOpenLesson = { lesson -> activeLesson = lesson },
               onOpenTrack = { track ->
                 selectedCatalogSubjectId = track.id
@@ -239,6 +271,7 @@ private fun MeritPrepAppShell(
           TopTab.CATALOG ->
             CatalogScreen(
               initialSubjectId = selectedCatalogSubjectId,
+              structuredModules = structuredModules,
               progressList = progressList,
               onOpenLesson = { lesson -> activeLesson = lesson },
               modifier = Modifier.weight(1f),
@@ -247,9 +280,19 @@ private fun MeritPrepAppShell(
           TopTab.EXAMS ->
             ExamSimulatorScreen(
               initialSubjectId = selectedExamSubjectId,
-              onRecordExamAttempt = { examType, subjectId, subjectTitle, correct, total, dur, weak ->
-                viewModel.recordMockExam(examType, subjectId, subjectTitle, correct, total, dur, weak)
-              },
+              cbtState = cbtState,
+              onSelectSubject = viewModel::selectExamSubject,
+              onSelectBoard = viewModel::selectExamBoard,
+              onStartExam = viewModel::startMockExam,
+              onSelectAnswer = viewModel::selectCbtAnswer,
+              onToggleFlag = viewModel::toggleFlagCbtQuestion,
+              onGoToQuestion = viewModel::goToCbtQuestion,
+              onNextQuestion = viewModel::nextCbtQuestion,
+              onPreviousQuestion = viewModel::previousCbtQuestion,
+              onTogglePauseTimer = viewModel::togglePauseCbtTimer,
+              onSubmitExam = viewModel::submitCbtExam,
+              onRetakeExam = viewModel::retakeLastMock,
+              onReturnToSetup = viewModel::returnToCbtSetup,
               modifier = Modifier.weight(1f),
             )
 
@@ -269,6 +312,14 @@ private fun MeritPrepAppShell(
               profile = profile,
               attempts = attempts,
               progressList = progressList,
+              offlineSnapshot = offlineSnapshot,
+              themePreferences = themePreferences,
+              onSetThemeMode = viewModel::setThemeMode,
+              onSetUseDynamicColor = viewModel::setUseDynamicColor,
+              onPracticeWeakSubject = { subjectId ->
+                selectedExamSubjectId = subjectId
+                activeTab = TopTab.EXAMS
+              },
               onUpdateGoal = { name, exam, score -> viewModel.updateGoal(name, exam, score) },
               modifier = Modifier.weight(1f),
             )

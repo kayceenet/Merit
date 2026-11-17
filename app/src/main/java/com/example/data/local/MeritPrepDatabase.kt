@@ -11,7 +11,10 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.example.data.model.ExamAttempt
+import com.example.data.model.LearningChapterEntity
+import com.example.data.model.LearningModuleEntity
 import com.example.data.model.LessonProgress
+import com.example.data.model.PastQuestionEntity
 import com.example.data.model.StudyNote
 import com.example.data.model.UserProfile
 import kotlinx.coroutines.flow.Flow
@@ -72,11 +75,57 @@ interface MeritPrepDao {
 
   @Query("DELETE FROM study_notes WHERE id = :id AND userId = :userId")
   suspend fun deleteStudyNote(userId: String, id: String)
+
+  // Structured Learning Modules & Chapters
+  @Query("SELECT * FROM learning_modules ORDER BY subjectId ASC, orderIndex ASC")
+  fun observeAllModules(): Flow<List<LearningModuleEntity>>
+
+  @Query("SELECT * FROM learning_chapters ORDER BY subjectId ASC, orderIndex ASC")
+  fun observeAllChapters(): Flow<List<LearningChapterEntity>>
+
+  @Query("SELECT COUNT(*) FROM learning_modules")
+  suspend fun getModuleCount(): Int
+
+  @Query("SELECT COUNT(*) FROM learning_chapters")
+  suspend fun getChapterCount(): Int
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertModules(modules: List<LearningModuleEntity>)
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertChapters(chapters: List<LearningChapterEntity>)
+
+  // Local Past Questions Bank for CBT Engine
+  @Query("SELECT COUNT(*) FROM past_questions")
+  suspend fun getPastQuestionCount(): Int
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun insertPastQuestions(questions: List<PastQuestionEntity>)
+
+  @Query(
+    "SELECT * FROM past_questions WHERE subjectId = :subjectId AND LOWER(examType) = LOWER(:examType) ORDER BY orderIndex ASC"
+  )
+  suspend fun getPastQuestionsBySubjectAndBoard(
+    subjectId: String,
+    examType: String,
+  ): List<PastQuestionEntity>
+
+  @Query("SELECT * FROM past_questions WHERE subjectId = :subjectId ORDER BY orderIndex ASC")
+  suspend fun getPastQuestionsBySubject(subjectId: String): List<PastQuestionEntity>
 }
 
 @Database(
-  entities = [UserProfile::class, LessonProgress::class, ExamAttempt::class, StudyNote::class],
-  version = 1,
+  entities =
+    [
+      UserProfile::class,
+      LessonProgress::class,
+      ExamAttempt::class,
+      StudyNote::class,
+      LearningModuleEntity::class,
+      LearningChapterEntity::class,
+      PastQuestionEntity::class,
+    ],
+  version = 2,
   exportSchema = false,
 )
 @TypeConverters(StringListConverters::class)
@@ -95,6 +144,7 @@ abstract class MeritPrepDatabase : RoomDatabase() {
               MeritPrepDatabase::class.java,
               "meritprep.db",
             )
+              .fallbackToDestructiveMigration(dropAllTables = true)
               .build()
               .also { instance = it }
         }

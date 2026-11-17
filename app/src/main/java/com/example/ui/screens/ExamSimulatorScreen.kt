@@ -22,33 +22,29 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.OutlinedFlag
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,104 +57,46 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.R
 import com.example.data.curriculum.CurriculumCatalog
-import com.example.data.curriculum.PracticeQuestion
 import com.example.ui.theme.JetBrainsMonoFontFamily
 import com.example.ui.theme.UdacityCyan
 import com.example.ui.theme.UdacityCyanInk
 import com.example.ui.theme.UdacityNavy
 import com.example.ui.theme.semanticColors
-import kotlinx.coroutines.delay
-
-private enum class ExamStage {
-  SETUP,
-  RUNNING,
-  RESULTS,
-}
+import com.example.ui.viewmodel.CbtExamStage
+import com.example.ui.viewmodel.CbtExamState
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ExamSimulatorScreen(
   initialSubjectId: String?,
-  onRecordExamAttempt: (
-    examType: String,
-    subjectId: String,
-    subjectTitle: String,
-    correctCount: Long,
-    totalQuestions: Long,
-    durationSeconds: Long,
-    weakTopics: List<String>,
-  ) -> Unit,
+  cbtState: CbtExamState,
+  onSelectSubject: (String) -> Unit,
+  onSelectBoard: (String) -> Unit,
+  onStartExam: (subjectId: String, examBoard: String) -> Unit,
+  onSelectAnswer: (questionIndex: Int, optionIndex: Int) -> Unit,
+  onToggleFlag: (Int) -> Unit,
+  onGoToQuestion: (Int) -> Unit,
+  onNextQuestion: () -> Unit,
+  onPreviousQuestion: () -> Unit,
+  onTogglePauseTimer: () -> Unit,
+  onSubmitExam: () -> Unit,
+  onRetakeExam: () -> Unit,
+  onReturnToSetup: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
-  var selectedSubjectId by remember(initialSubjectId) {
-    mutableStateOf(initialSubjectId ?: CurriculumCatalog.tracks.first().id)
+  LaunchedEffect(initialSubjectId) {
+    if (!initialSubjectId.isNullOrBlank() && cbtState.stage == CbtExamStage.SETUP) {
+      onSelectSubject(initialSubjectId)
+    }
   }
-  var selectedExamBoard by remember { mutableStateOf("JAMB") }
-  var stage by remember { mutableStateOf(ExamStage.SETUP) }
 
-  var activeQuestions by remember { mutableStateOf<List<PracticeQuestion>>(emptyList()) }
-  var currentIndex by rememberIntStateOfZero()
-  val selectedAnswers = remember { mutableStateMapOf<Int, Int>() }
-  val flaggedQuestions = remember { mutableStateMapOf<Int, Boolean>() }
-  var remainingSeconds by remember { mutableIntStateOf(300) }
-  var totalAllowedSeconds by remember { mutableIntStateOf(300) }
   val semantics = MaterialTheme.semanticColors
 
-  fun launchMock() {
-    val allForSubject = CurriculumCatalog.pastQuestionsFor(selectedSubjectId, selectedExamBoard)
-    val fallback =
-      if (allForSubject.isNotEmpty()) allForSubject
-      else CurriculumCatalog.pastQuestionsFor(selectedSubjectId, "ALL")
-    activeQuestions = fallback
-    selectedAnswers.clear()
-    flaggedQuestions.clear()
-    currentIndex = 0
-    totalAllowedSeconds = (fallback.size * 75).coerceAtLeast(180)
-    remainingSeconds = totalAllowedSeconds
-    stage = ExamStage.RUNNING
-  }
-
-  fun submitMock() {
-    if (stage != ExamStage.RUNNING) return
-    val track = CurriculumCatalog.trackById(selectedSubjectId)
-    val correctCount =
-      activeQuestions.indices.count { i -> selectedAnswers[i] == activeQuestions[i].correctIndex }
-    val weakTopics =
-      activeQuestions.indices
-        .filter { i -> selectedAnswers[i] != activeQuestions[i].correctIndex }
-        .map { i -> activeQuestions[i].topic }
-        .distinct()
-    val elapsed = (totalAllowedSeconds - remainingSeconds).coerceAtLeast(1)
-    onRecordExamAttempt(
-      selectedExamBoard,
-      selectedSubjectId,
-      track?.shortName ?: selectedSubjectId,
-      correctCount.toLong(),
-      activeQuestions.size.toLong().coerceAtLeast(1L),
-      elapsed.toLong(),
-      weakTopics,
-    )
-    stage = ExamStage.RESULTS
-  }
-
-  if (stage == ExamStage.RUNNING) {
-    BackHandler { stage = ExamStage.SETUP }
-    LaunchedEffect(stage) {
-      while (stage == ExamStage.RUNNING && remainingSeconds > 0) {
-        delay(1000L)
-        remainingSeconds--
-      }
-      if (stage == ExamStage.RUNNING && remainingSeconds <= 0) {
-        submitMock()
-      }
-    }
-  } else if (stage == ExamStage.RESULTS) {
-    BackHandler { stage = ExamStage.SETUP }
-  }
-
   Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-    when (stage) {
-      ExamStage.SETUP -> {
+    when (cbtState.stage) {
+      CbtExamStage.SETUP -> {
+        val selectedSubjectId = cbtState.selectedSubjectId
+        val selectedExamBoard = cbtState.selectedExamBoard
         val previewQuestions = CurriculumCatalog.pastQuestionsFor(selectedSubjectId, selectedExamBoard)
         val effectiveCount =
           if (previewQuestions.isNotEmpty()) previewQuestions.size
@@ -199,7 +137,7 @@ fun ExamSimulatorScreen(
               ) {
                 Surface(color = UdacityCyan, shape = RoundedCornerShape(6.dp)) {
                   Text(
-                    text = "TIMED CBT & WAEC STUDIO",
+                    text = "TIMED CBT & WAEC ENGINE",
                     style = MaterialTheme.typography.labelSmall,
                     color = UdacityCyanInk,
                     fontWeight = FontWeight.Bold,
@@ -213,7 +151,7 @@ fun ExamSimulatorScreen(
                   color = Color.White,
                 )
                 Text(
-                  text = "Timed Computer-Based Test grid, Flag-for-Review, and WAEC Marking Schemes.",
+                  text = "Local Room past-question bank, state-managed timer, and detailed post-exam summary.",
                   style = MaterialTheme.typography.bodySmall,
                   color = Color(0xFFE2E8F0),
                 )
@@ -244,7 +182,7 @@ fun ExamSimulatorScreen(
                   val selected = selectedExamBoard == board
                   FilterChip(
                     selected = selected,
-                    onClick = { selectedExamBoard = board },
+                    onClick = { onSelectBoard(board) },
                     label = {
                       Text(
                         text = if (board == "JAMB") "JAMB UTME CBT" else "WAEC SSCE + Marking Scheme",
@@ -276,7 +214,7 @@ fun ExamSimulatorScreen(
                   val selected = selectedSubjectId == track.id
                   FilterChip(
                     selected = selected,
-                    onClick = { selectedSubjectId = track.id },
+                    onClick = { onSelectSubject(track.id) },
                     label = {
                       Text(
                         text = track.shortName,
@@ -304,16 +242,16 @@ fun ExamSimulatorScreen(
               ) {
                 Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                   Text(
-                    text = "Paper Blueprint: $effectiveCount Authentic Past Questions",
+                    text = "Offline Paper Blueprint: $effectiveCount Local Past Questions",
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                   )
                   Text(
                     text =
                       if (selectedExamBoard == "JAMB")
-                        "Includes official CBT countdown clock, question status grid, and instant UTME analytics."
+                        "Fetched from local Room SQLite bank with live countdown clock, per-question timing & post-exam review."
                       else
-                        "Includes WAEC Objective + Method/Accuracy (M1/A1) examiner marking schemes.",
+                        "Includes WAEC Objective + Method/Accuracy (M1/A1) examiner marking schemes & offline DataStore sync.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                   )
@@ -321,73 +259,122 @@ fun ExamSimulatorScreen(
               }
 
               Button(
-                onClick = { launchMock() },
-                enabled = effectiveCount > 0,
+                onClick = { onStartExam(selectedSubjectId, selectedExamBoard) },
+                enabled = effectiveCount > 0 && !cbtState.isLoadingQuestions,
                 modifier = Modifier.fillMaxWidth().height(54.dp).testTag("start_mock_exam_button"),
                 shape = RoundedCornerShape(14.dp),
               ) {
-                Icon(Icons.Filled.PlayArrow, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Start Timed Mock Exam", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                if (cbtState.isLoadingQuestions) {
+                  CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = 2.dp,
+                  )
+                  Spacer(modifier = Modifier.width(8.dp))
+                  Text("Loading Paper...", fontWeight = FontWeight.Bold)
+                } else {
+                  Icon(Icons.Filled.PlayArrow, contentDescription = null)
+                  Spacer(modifier = Modifier.width(8.dp))
+                  Text(
+                    "Start Timed Mock Exam",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                  )
+                }
               }
             }
           }
         }
       }
 
-      ExamStage.RUNNING -> {
-        val question = activeQuestions[currentIndex]
-        val minutes = remainingSeconds / 60
-        val seconds = remainingSeconds % 60
-        val isFlagged = flaggedQuestions[currentIndex] == true
+      CbtExamStage.RUNNING -> {
+        BackHandler(onBack = onReturnToSetup)
+
+        val questions = cbtState.questions
+        if (questions.isEmpty()) return@Box
+        val currentIndex = cbtState.currentIndex.coerceIn(0, questions.lastIndex)
+        val question = questions[currentIndex]
+        val minutes = cbtState.remainingSeconds / 60
+        val seconds = cbtState.remainingSeconds % 60
+        val isFlagged = currentIndex in cbtState.flaggedQuestions
+        val timerProgress =
+          if (cbtState.totalAllowedSeconds > 0) {
+            cbtState.remainingSeconds / cbtState.totalAllowedSeconds.toFloat()
+          } else 1f
 
         Column(
           modifier = Modifier.widthIn(max = 880.dp).fillMaxSize().padding(16.dp),
           verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-          // Top CBT Timer & Submit Header
-          Row(
+          // Top CBT State-Managed Timer & Controls Header
+          Column(
             modifier =
               Modifier.fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp))
-                .background(semantics.classroomBar)
-                .padding(horizontal = 14.dp, vertical = 10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+                .background(semantics.classroomBar),
           ) {
             Row(
+              modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 10.dp),
+              horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-              Icon(
-                Icons.Filled.Timer,
-                contentDescription = "Remaining time",
-                tint = if (remainingSeconds < 60) Color(0xFFFCA5A5) else UdacityCyan,
-              )
+              Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+              ) {
+                Icon(
+                  Icons.Filled.Timer,
+                  contentDescription = "Remaining time",
+                  tint = if (cbtState.remainingSeconds < 60) Color(0xFFFCA5A5) else UdacityCyan,
+                )
+                Text(
+                  text = String.format("%02d:%02d", minutes, seconds),
+                  style = MaterialTheme.typography.titleMedium.copy(fontFamily = JetBrainsMonoFontFamily),
+                  color = if (cbtState.remainingSeconds < 60) Color(0xFFFCA5A5) else Color.White,
+                  fontWeight = FontWeight.Bold,
+                  modifier = Modifier.testTag("cbt_timer_text"),
+                )
+                IconButton(
+                  onClick = onTogglePauseTimer,
+                  modifier = Modifier.size(36.dp).testTag("cbt_pause_timer_button"),
+                ) {
+                  Icon(
+                    imageVector = if (cbtState.isTimerPaused) Icons.Filled.PlayArrow else Icons.Filled.Pause,
+                    contentDescription = if (cbtState.isTimerPaused) "Resume timer" else "Pause timer",
+                    tint = Color.White,
+                    modifier = Modifier.size(18.dp),
+                  )
+                }
+              }
+
               Text(
-                text = String.format("%02d:%02d", minutes, seconds),
-                style = MaterialTheme.typography.titleMedium.copy(fontFamily = JetBrainsMonoFontFamily),
-                color = if (remainingSeconds < 60) Color(0xFFFCA5A5) else Color.White,
+                text =
+                  if (cbtState.isTimerPaused) "PAUSED"
+                  else "${cbtState.selectedAnswers.size}/${questions.size} Answered",
+                style = MaterialTheme.typography.labelMedium,
+                color = if (cbtState.isTimerPaused) Color(0xFFFDE68A) else semantics.classroomSubtext,
                 fontWeight = FontWeight.Bold,
               )
+
+              Button(
+                onClick = onSubmitExam,
+                shape = RoundedCornerShape(10.dp),
+                colors =
+                  ButtonDefaults.buttonColors(
+                    containerColor = UdacityCyan,
+                    contentColor = UdacityCyanInk,
+                  ),
+                modifier = Modifier.testTag("submit_cbt_button"),
+              ) {
+                Text("Submit", fontWeight = FontWeight.Bold)
+              }
             }
-            Text(
-              text = "${selectedAnswers.size}/${activeQuestions.size} Answered",
-              style = MaterialTheme.typography.labelMedium,
-              color = semantics.classroomSubtext,
+            LinearProgressIndicator(
+              progress = { timerProgress.coerceIn(0f, 1f) },
+              modifier = Modifier.fillMaxWidth().height(4.dp),
+              color = if (cbtState.remainingSeconds < 60) Color(0xFFFCA5A5) else UdacityCyan,
+              trackColor = Color(0xFF1E3A6E),
             )
-            Button(
-              onClick = { submitMock() },
-              shape = RoundedCornerShape(10.dp),
-              colors =
-                ButtonDefaults.buttonColors(
-                  containerColor = UdacityCyan,
-                  contentColor = UdacityCyanInk,
-                ),
-              modifier = Modifier.testTag("submit_cbt_button"),
-            ) {
-              Text("Submit", fontWeight = FontWeight.Bold)
-            }
           }
 
           // CBT Question Navigator Grid
@@ -395,9 +382,9 @@ fun ExamSimulatorScreen(
             modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
           ) {
-            activeQuestions.indices.forEach { i ->
-              val answered = selectedAnswers.containsKey(i)
-              val flagged = flaggedQuestions[i] == true
+            questions.indices.forEach { i ->
+              val answered = cbtState.selectedAnswers.containsKey(i)
+              val flagged = i in cbtState.flaggedQuestions
               val active = i == currentIndex
               val pillBg =
                 when {
@@ -422,11 +409,11 @@ fun ExamSimulatorScreen(
                 }
               Box(
                 modifier =
-                  Modifier.size(42.dp)
+                  Modifier.size(44.dp)
                     .clip(RoundedCornerShape(10.dp))
                     .background(pillBg)
                     .border(1.5.dp, pillBorder, RoundedCornerShape(10.dp))
-                    .clickable { currentIndex = i },
+                    .clickable { onGoToQuestion(i) },
                 contentAlignment = Alignment.Center,
               ) {
                 Text(
@@ -439,7 +426,7 @@ fun ExamSimulatorScreen(
             }
           }
 
-          // Question Card
+          // Single Question Card (One-by-One Display)
           LazyColumn(
             modifier = Modifier.weight(1f).fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -460,12 +447,13 @@ fun ExamSimulatorScreen(
                   verticalAlignment = Alignment.CenterVertically,
                 ) {
                   Text(
-                    text = "Q${currentIndex + 1} • ${question.examType} ${question.year} • ${question.topic}",
+                    text = "Q${currentIndex + 1}/${questions.size} • ${question.examType} ${question.year} • ${question.topic}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f),
                   )
-                  IconButton(onClick = { flaggedQuestions[currentIndex] = !isFlagged }) {
+                  IconButton(onClick = { onToggleFlag(currentIndex) }) {
                     Icon(
                       imageVector = if (isFlagged) Icons.Filled.Flag else Icons.Filled.OutlinedFlag,
                       contentDescription = "Flag question for review",
@@ -483,7 +471,7 @@ fun ExamSimulatorScreen(
                 )
 
                 question.options.forEachIndexed { optIdx, optText ->
-                  val chosen = selectedAnswers[currentIndex] == optIdx
+                  val chosen = cbtState.selectedAnswers[currentIndex] == optIdx
                   Row(
                     modifier =
                       Modifier.fillMaxWidth()
@@ -498,7 +486,8 @@ fun ExamSimulatorScreen(
                           else MaterialTheme.colorScheme.outline,
                           RoundedCornerShape(12.dp),
                         )
-                        .clickable { selectedAnswers[currentIndex] = optIdx }
+                        .clickable { onSelectAnswer(currentIndex, optIdx) }
+                        .testTag("cbt_option_$optIdx")
                         .padding(14.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -539,22 +528,22 @@ fun ExamSimulatorScreen(
           // Prev / Next Controls
           Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             OutlinedButton(
-              onClick = { if (currentIndex > 0) currentIndex-- },
+              onClick = onPreviousQuestion,
               enabled = currentIndex > 0,
-              modifier = Modifier.weight(1f).height(50.dp),
+              modifier = Modifier.weight(1f).height(50.dp).testTag("cbt_prev_button"),
               shape = RoundedCornerShape(14.dp),
             ) {
               Text("← Previous")
             }
             Button(
               onClick = {
-                if (currentIndex < activeQuestions.lastIndex) currentIndex++ else submitMock()
+                if (currentIndex < questions.lastIndex) onNextQuestion() else onSubmitExam()
               },
-              modifier = Modifier.weight(1f).height(50.dp),
+              modifier = Modifier.weight(1f).height(50.dp).testTag("cbt_next_button"),
               shape = RoundedCornerShape(14.dp),
             ) {
               Text(
-                text = if (currentIndex < activeQuestions.lastIndex) "Next →" else "Finish & Grade",
+                text = if (currentIndex < questions.lastIndex) "Next →" else "Finish & Grade",
                 fontWeight = FontWeight.Bold,
               )
             }
@@ -562,122 +551,17 @@ fun ExamSimulatorScreen(
         }
       }
 
-      ExamStage.RESULTS -> {
-        val correctCount =
-          activeQuestions.indices.count { i -> selectedAnswers[i] == activeQuestions[i].correctIndex }
-        val pct =
-          if (activeQuestions.isEmpty()) 0
-          else (correctCount * 100) / activeQuestions.size
-
-        LazyColumn(
-          modifier = Modifier.widthIn(max = 880.dp).fillMaxSize(),
-          contentPadding = PaddingValues(16.dp),
-          verticalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
-          item {
-            Column(
-              modifier =
-                Modifier.fillMaxWidth()
-                  .clip(RoundedCornerShape(22.dp))
-                  .background(semantics.classroomBar)
-                  .border(1.5.dp, Color(0xFF28427B), RoundedCornerShape(22.dp))
-                  .padding(20.dp),
-              verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-              Text(
-                text = "EXAM DIAGNOSTIC REPORT",
-                style = MaterialTheme.typography.labelSmall,
-                color = UdacityCyan,
-                fontWeight = FontWeight.Bold,
-              )
-              Text(
-                text = "$correctCount / ${activeQuestions.size} Correct ($pct%)",
-                style = MaterialTheme.typography.headlineMedium.copy(fontFamily = JetBrainsMonoFontFamily),
-                color = Color.White,
-              )
-              Text(
-                text = "Saved to your local analytics. Review step-by-step derivations below:",
-                style = MaterialTheme.typography.bodySmall,
-                color = semantics.classroomSubtext,
-              )
-              Spacer(modifier = Modifier.height(4.dp))
-              Button(
-                onClick = { stage = ExamStage.SETUP },
-                shape = RoundedCornerShape(12.dp),
-                colors =
-                  ButtonDefaults.buttonColors(
-                    containerColor = UdacityCyan,
-                    contentColor = UdacityCyanInk,
-                  ),
-              ) {
-                Text("Take Another Mock Paper", fontWeight = FontWeight.Bold)
-              }
-            }
-          }
-
-          itemsIndexed(activeQuestions) { idx, q ->
-            val userChoice = selectedAnswers[idx]
-            val isCorrect = userChoice == q.correctIndex
-            Column(
-              modifier =
-                Modifier.fillMaxWidth()
-                  .clip(RoundedCornerShape(18.dp))
-                  .background(MaterialTheme.colorScheme.surface)
-                  .border(
-                    1.5.dp,
-                    if (isCorrect) semantics.success else MaterialTheme.colorScheme.error,
-                    RoundedCornerShape(18.dp),
-                  )
-                  .padding(16.dp),
-              verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-              Surface(
-                color =
-                  if (isCorrect) semantics.successContainer
-                  else MaterialTheme.colorScheme.errorContainer,
-                shape = RoundedCornerShape(99.dp),
-              ) {
-                Text(
-                  text = "Q${idx + 1} (${q.examType} ${q.year}) • ${if (isCorrect) "CORRECT" else "MISSED"}",
-                  style = MaterialTheme.typography.labelSmall,
-                  color =
-                    if (isCorrect) semantics.onSuccessContainer
-                    else MaterialTheme.colorScheme.onErrorContainer,
-                  fontWeight = FontWeight.Bold,
-                  modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                )
-              }
-              Text(
-                text = q.question,
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurface,
-              )
-              Text(
-                text = "Correct Option (${'A' + q.correctIndex}): ${q.options[q.correctIndex]}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = semantics.success,
-                fontWeight = FontWeight.Bold,
-              )
-              Text(
-                text = "Derivation: ${q.stepByStepSolution}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-              )
-              if (!q.waecMarkingScheme.isNullOrBlank()) {
-                Text(
-                  text = "WAEC Marking Scheme: ${q.waecMarkingScheme}",
-                  style = MaterialTheme.typography.labelSmall,
-                  color = MaterialTheme.colorScheme.primary,
-                  fontWeight = FontWeight.Bold,
-                )
-              }
-            }
-          }
+      CbtExamStage.SUMMARY -> {
+        val summary = cbtState.resultSummary
+        if (summary != null) {
+          PostExamSummaryScreen(
+            summary = summary,
+            onRetakeMock = onRetakeExam,
+            onBackToSetup = onReturnToSetup,
+            modifier = Modifier.fillMaxSize(),
+          )
         }
       }
     }
   }
 }
-
-@Composable
-private fun rememberIntStateOfZero() = remember { mutableIntStateOf(0) }

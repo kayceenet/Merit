@@ -47,6 +47,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.data.curriculum.CourseModule
 import com.example.data.curriculum.CurriculumCatalog
 import com.example.data.curriculum.Lesson
 import com.example.data.curriculum.LessonPillar
@@ -60,6 +61,7 @@ import kotlin.math.roundToInt
 @Composable
 fun CatalogScreen(
   initialSubjectId: String?,
+  structuredModules: List<CourseModule>,
   progressList: List<LessonProgress>,
   onOpenLesson: (Lesson) -> Unit,
   modifier: Modifier = Modifier,
@@ -68,10 +70,15 @@ fun CatalogScreen(
     mutableStateOf(initialSubjectId ?: CurriculumCatalog.tracks.first().id)
   }
   val activeTrack = CurriculumCatalog.trackById(selectedSubjectId) ?: CurriculumCatalog.tracks.first()
+  val modulesForTrack =
+    remember(structuredModules, activeTrack.id) {
+      val fromDb = structuredModules.filter { it.subjectId == activeTrack.id }
+      if (fromDb.isNotEmpty()) fromDb else activeTrack.modules
+    }
   val progressMap = remember(progressList) { progressList.associateBy { it.lessonId } }
   val semantics = MaterialTheme.semanticColors
 
-  val trackLessons = activeTrack.allLessons
+  val trackLessons = remember(modulesForTrack) { modulesForTrack.flatMap { it.lessons } }
   val masteredCount = trackLessons.count { progressMap[it.id]?.isCompleted == true }
   val trackRatio = if (trackLessons.isEmpty()) 0f else masteredCount / trackLessons.size.toFloat()
   val continueLesson = trackLessons.firstOrNull { progressMap[it.id]?.isCompleted != true } ?: trackLessons.firstOrNull()
@@ -143,7 +150,7 @@ fun CatalogScreen(
             ) {
               Surface(color = UdacityCyan, shape = RoundedCornerShape(6.dp)) {
                 Text(
-                  text = "${activeTrack.modules.size} MODULES • ${trackLessons.size} LESSONS",
+                  text = "${modulesForTrack.size} MODULES • ${trackLessons.size} CHAPTERS",
                   style = MaterialTheme.typography.labelSmall,
                   color = UdacityCyanInk,
                   fontWeight = FontWeight.Bold,
@@ -168,7 +175,7 @@ fun CatalogScreen(
               color = Color(0xFFE2E8F0),
             )
             Text(
-              text = "${activeTrack.examCoverage} • ${activeTrack.pastQuestions.size} archived past questions",
+              text = "${activeTrack.examCoverage} • ${activeTrack.pastQuestions.size} archived past questions (stored offline in Room)",
               style = MaterialTheme.typography.labelSmall,
               color = semantics.classroomSubtext,
             )
@@ -202,8 +209,8 @@ fun CatalogScreen(
           }
         }
 
-        // Udacity-Style Module Parts with Numbered Lesson Timeline
-        itemsIndexed(activeTrack.modules, key = { _, m -> m.id }) { partIndex, courseModule ->
+        // Udacity-Style Module Parts with Room-Backed Chapter Cards
+        itemsIndexed(modulesForTrack, key = { _, m -> m.id }) { partIndex, courseModule ->
           val partMastered = courseModule.lessons.count { progressMap[it.id]?.isCompleted == true }
           Column(
             modifier =

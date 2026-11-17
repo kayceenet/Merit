@@ -61,3 +61,47 @@ data class StudyNote(
   val createdAt: Long = System.currentTimeMillis(),
   val updatedAt: Long = System.currentTimeMillis(),
 )
+
+@Entity(tableName = "learning_modules")
+data class LearningModuleEntity(
+  @PrimaryKey val id: String,
+  val subjectId: String,
+  val indexLabel: String,
+  val title: String,
+  val summary: String,
+  val orderIndex: Int,
+)
+
+@Entity(tableName = "learning_chapters")
+data class LearningChapterEntity(
+  @PrimaryKey val id: String,
+  val moduleId: String,
+  val subjectId: String,
+  val title: String,
+  val durationMinutes: Int,
+  val syllabusTag: String,
+  val labTypeKey: String,
+  val labBrief: String,
+  val orderIndex: Int,
+  val learningOutcomesJson: String,
+  val conceptsJson: String,
+  val workedExamplesJson: String,
+  val scenariosJson: String,
+  val exercisesJson: String,
+)
+
+@Entity(tableName = "past_questions")
+data class PastQuestionEntity(
+  @PrimaryKey val id: String,
+  val subjectId: String,
+  val topic: String,
+  val examType: String,
+  val year: Int,
+  val question: String,
+  val optionsJson: String,
+  val correctIndex: Int,
+  val hint: String,
+  val stepByStepSolution: String,
+  val waecMarkingScheme: String?,
+  val orderIndex: Int,
+)

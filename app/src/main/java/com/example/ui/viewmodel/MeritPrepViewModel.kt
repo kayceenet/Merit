@@ -3,14 +3,21 @@ package com.example.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.data.curriculum.CourseModule
+import com.example.data.curriculum.CurriculumCatalog
 import com.example.data.curriculum.Lesson
 import com.example.data.curriculum.LessonPillar
+import com.example.data.local.OfflineProgressSnapshot
+import com.example.data.local.ThemeMode
+import com.example.data.local.ThemePreferences
 import com.example.data.model.ExamAttempt
 import com.example.data.model.LessonProgress
 import com.example.data.model.StudyNote
 import com.example.data.model.UserProfile
 import com.example.data.repository.MeritPrepRepository
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +25,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 sealed interface UiState<out T> {
@@ -35,11 +44,44 @@ class MeritPrepViewModel(
   private val _statusMessage = MutableStateFlow<String?>(null)
   val statusMessage: StateFlow<String?> = _statusMessage.asStateFlow()
 
+  private val _cbtState = MutableStateFlow(CbtExamState())
+  val cbtState: StateFlow<CbtExamState> = _cbtState.asStateFlow()
+
+  private var examTimerJob: Job? = null
+
   init {
     viewModelScope.launch {
+      repository.seedCurriculumIfNeeded()
       repository.ensureProfile(currentUserId, initialDisplayName)
     }
   }
+
+  val themePreferences: StateFlow<ThemePreferences> =
+    repository.themePreferences.stateIn(
+      scope = viewModelScope,
+      started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
+      initialValue = ThemePreferences(),
+    )
+
+  val offlineSnapshot: StateFlow<OfflineProgressSnapshot> =
+    repository.offlineSnapshot.stateIn(
+      scope = viewModelScope,
+      started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
+      initialValue = OfflineProgressSnapshot(),
+    )
+
+  val structuredModules: StateFlow<List<CourseModule>> =
+    repository
+      .observeStructuredModules()
+      .catch { error ->
+        if (error is CancellationException) throw error
+        emit(CurriculumCatalog.tracks.flatMap { it.modules })
+      }
+      .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
+        initialValue = CurriculumCatalog.tracks.flatMap { it.modules },
+      )
 
   val profileState: StateFlow<UiState<UserProfile?>> =
     repository
@@ -104,6 +146,249 @@ class MeritPrepViewModel(
   fun clearStatusMessage() {
     _statusMessage.value = null
   }
+
+  fun toggleDarkTheme(currentlyDark: Boolean) {
+    viewModelScope.launch { repository.toggleDarkTheme(currentlyDark) }
+  }
+
+  fun setThemeMode(mode: ThemeMode) {
+    viewModelScope.launch { repository.setThemeMode(mode) }
+  }
+
+  fun setUseDynamicColor(enabled: Boolean) {
+    viewModelScope.launch { repository.setUseDynamicColor(enabled) }
+  }
+
+  // --- CBT Mock Exam Engine (Room-backed Questions + State-Managed Timer) ---
+
+  fun selectExamSubject(subjectId: String) {
+    _cbtState.update {
+      if (it.stage == CbtExamStage.SETUP) it.copy(selectedSubjectId = subjectId) else it
+    }
+  }
+
+  fun selectExamBoard(board: String) {
+    _cbtState.update {
+      if (it.stage == CbtExamStage.SETUP) it.copy(selectedExamBoard = board) else it
+    }
+  }
+
+  fun startMockExam(subjectId: String? = null, examBoard: String? = null) {
+    examTimerJob?.cancel()
+    val targetSubject = subjectId ?: _cbtState.value.selectedSubjectId
+    val targetBoard = examBoard ?: _cbtState.value.selectedExamBoard
+
+    _cbtState.update {
+      it.copy(
+        selectedSubjectId = targetSubject,
+        selectedExamBoard = targetBoard,
+        isLoadingQuestions = true,
+      )
+    }
+
+    viewModelScope.launch {
+      val questions = repository.fetchPastQuestionsForCbt(targetSubject, targetBoard)
+      if (questions.isEmpty()) {
+        _cbtState.update { it.copy(isLoadingQuestions = false) }
+        _statusMessage.value = "No past questions found for this track."
+        return@launch
+      }
+      val totalAllowed = (questions.size * 75).coerceAtLeast(180)
+      _cbtState.value =
+        CbtExamState(
+          stage = CbtExamStage.RUNNING,
+          selectedSubjectId = targetSubject,
+          selectedExamBoard = targetBoard,
+          questions = questions,
+          currentIndex = 0,
+          selectedAnswers = emptyMap(),
+          flaggedQuestions = emptySet(),
+          perQuestionSeconds = emptyMap(),
+          remainingSeconds = totalAllowed,
+          elapsedSeconds = 0,
+          totalAllowedSeconds = totalAllowed,
+          isTimerPaused = false,
+          isLoadingQuestions = false,
+          resultSummary = null,
+        )
+      launchExamTimer()
+    }
+  }
+
+  private fun launchExamTimer() {
+    examTimerJob?.cancel()
+    examTimerJob =
+      viewModelScope.launch {
+        while (isActive) {
+          delay(1000L)
+          val snapshot = _cbtState.value
+          if (snapshot.stage != CbtExamStage.RUNNING) break
+          if (snapshot.isTimerPaused) continue
+
+          val nextRemaining = (snapshot.remainingSeconds - 1).coerceAtLeast(0)
+          val nextElapsed = snapshot.elapsedSeconds + 1
+          val currentQ = snapshot.currentIndex
+          val updatedPerQ = snapshot.perQuestionSeconds.toMutableMap()
+          updatedPerQ[currentQ] = (updatedPerQ[currentQ] ?: 0) + 1
+
+          _cbtState.update {
+            it.copy(
+              remainingSeconds = nextRemaining,
+              elapsedSeconds = nextElapsed,
+              perQuestionSeconds = updatedPerQ,
+            )
+          }
+
+          if (nextRemaining <= 0) {
+            submitCbtExam()
+            break
+          }
+        }
+      }
+  }
+
+  fun togglePauseCbtTimer() {
+    _cbtState.update { state ->
+      if (state.stage == CbtExamStage.RUNNING) state.copy(isTimerPaused = !state.isTimerPaused)
+      else state
+    }
+  }
+
+  fun goToCbtQuestion(index: Int) {
+    _cbtState.update { state ->
+      if (state.stage == CbtExamStage.RUNNING && index in state.questions.indices) {
+        state.copy(currentIndex = index)
+      } else {
+        state
+      }
+    }
+  }
+
+  fun nextCbtQuestion() {
+    _cbtState.update { state ->
+      if (state.stage == CbtExamStage.RUNNING && state.currentIndex < state.questions.lastIndex) {
+        state.copy(currentIndex = state.currentIndex + 1)
+      } else {
+        state
+      }
+    }
+  }
+
+  fun previousCbtQuestion() {
+    _cbtState.update { state ->
+      if (state.stage == CbtExamStage.RUNNING && state.currentIndex > 0) {
+        state.copy(currentIndex = state.currentIndex - 1)
+      } else {
+        state
+      }
+    }
+  }
+
+  fun selectCbtAnswer(questionIndex: Int, optionIndex: Int) {
+    _cbtState.update { state ->
+      if (state.stage != CbtExamStage.RUNNING || questionIndex !in state.questions.indices) {
+        state
+      } else {
+        val nextAnswers = state.selectedAnswers.toMutableMap()
+        nextAnswers[questionIndex] = optionIndex
+        state.copy(selectedAnswers = nextAnswers)
+      }
+    }
+  }
+
+  fun toggleFlagCbtQuestion(questionIndex: Int) {
+    _cbtState.update { state ->
+      if (state.stage != CbtExamStage.RUNNING) return@update state
+      val updated = state.flaggedQuestions.toMutableSet()
+      if (questionIndex in updated) updated.remove(questionIndex) else updated.add(questionIndex)
+      state.copy(flaggedQuestions = updated)
+    }
+  }
+
+  fun submitCbtExam() {
+    val state = _cbtState.value
+    if (state.stage != CbtExamStage.RUNNING) return
+    examTimerJob?.cancel()
+
+    val questions = state.questions
+    val total = questions.size.coerceAtLeast(1)
+    val reviewItems =
+      questions.mapIndexed { idx, q ->
+        QuestionReviewItem(
+          questionIndex = idx,
+          question = q,
+          selectedOptionIndex = state.selectedAnswers[idx],
+          timeSpentSeconds = state.perQuestionSeconds[idx] ?: 0,
+        )
+      }
+
+    val correctCount = reviewItems.count { it.isCorrect }
+    val unansweredCount = reviewItems.count { it.isUnanswered }
+    val wrongCount = total - correctCount - unansweredCount
+    val percentage = ((correctCount * 100) / total).coerceIn(0, 100)
+    val timeTaken = state.elapsedSeconds.coerceAtLeast(1)
+    val weakTopics =
+      reviewItems
+        .filter { !it.isCorrect }
+        .map { it.question.topic }
+        .distinct()
+    val xpEarned = 30L + (correctCount * 10L)
+    val trackTitle =
+      CurriculumCatalog.trackById(state.selectedSubjectId)?.shortName ?: state.selectedSubjectId
+
+    val summary =
+      ExamResultSummary(
+        examBoard = state.selectedExamBoard,
+        subjectId = state.selectedSubjectId,
+        subjectTitle = trackTitle,
+        correctCount = correctCount,
+        wrongCount = wrongCount,
+        unansweredCount = unansweredCount,
+        totalQuestions = questions.size,
+        percentage = percentage,
+        timeTakenSeconds = timeTaken,
+        totalAllowedSeconds = state.totalAllowedSeconds,
+        xpEarned = xpEarned,
+        weakTopics = weakTopics,
+        reviewItems = reviewItems,
+      )
+
+    _cbtState.update {
+      it.copy(
+        stage = CbtExamStage.SUMMARY,
+        isTimerPaused = false,
+        resultSummary = summary,
+      )
+    }
+
+    recordMockExam(
+      examType = state.selectedExamBoard,
+      subjectId = state.selectedSubjectId,
+      subjectTitle = trackTitle,
+      correctCount = correctCount.toLong(),
+      totalQuestions = total.toLong(),
+      durationSeconds = timeTaken.toLong(),
+      weakTopics = weakTopics,
+    )
+  }
+
+  fun returnToCbtSetup() {
+    examTimerJob?.cancel()
+    _cbtState.update {
+      it.copy(
+        stage = CbtExamStage.SETUP,
+        isTimerPaused = false,
+        resultSummary = null,
+      )
+    }
+  }
+
+  fun retakeLastMock() {
+    val state = _cbtState.value
+    startMockExam(state.selectedSubjectId, state.selectedExamBoard)
+  }
+
+  // --- Learning Modules & Progress ---
 
   fun markPillarCompleted(
     lesson: Lesson,
@@ -225,6 +510,11 @@ class MeritPrepViewModel(
       val res = repository.deleteStudyNote(currentUserId, noteId)
       _statusMessage.value = if (res.isSuccess) "Note deleted" else "Could not delete note"
     }
+  }
+
+  override fun onCleared() {
+    examTimerJob?.cancel()
+    super.onCleared()
   }
 
   private companion object {

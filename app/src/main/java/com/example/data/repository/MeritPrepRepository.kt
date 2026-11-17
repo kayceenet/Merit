@@ -1,19 +1,101 @@
 package com.example.data.repository
 
 import android.content.Context
+import com.example.data.curriculum.CourseModule
+import com.example.data.curriculum.CurriculumCatalog
+import com.example.data.curriculum.CurriculumEntityMapper
+import com.example.data.curriculum.PracticeQuestion
+import com.example.data.local.CachedExamResultSnapshot
 import com.example.data.local.MeritPrepDao
 import com.example.data.local.MeritPrepDatabase
+import com.example.data.local.OfflinePreferencesRepository
+import com.example.data.local.OfflineProgressSnapshot
+import com.example.data.local.ThemeMode
+import com.example.data.local.ThemePreferences
 import com.example.data.model.ExamAttempt
 import com.example.data.model.LessonProgress
 import com.example.data.model.StudyNote
 import com.example.data.model.UserProfile
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
 import java.util.UUID
 
-class MeritPrepRepository(private val dao: MeritPrepDao) {
+class MeritPrepRepository(
+  private val dao: MeritPrepDao,
+  private val preferencesRepository: OfflinePreferencesRepository? = null,
+) {
 
-  constructor(context: Context) : this(MeritPrepDatabase.getInstance(context).meritPrepDao())
+  constructor(context: Context) : this(
+    dao = MeritPrepDatabase.getInstance(context).meritPrepDao(),
+    preferencesRepository = OfflinePreferencesRepository(context),
+  )
+
+  val themePreferences: Flow<ThemePreferences> =
+    preferencesRepository?.themePreferences ?: flowOf(ThemePreferences())
+
+  val offlineSnapshot: Flow<OfflineProgressSnapshot> =
+    preferencesRepository?.offlineSnapshot ?: flowOf(OfflineProgressSnapshot())
+
+  suspend fun setThemeMode(mode: ThemeMode) {
+    preferencesRepository?.setThemeMode(mode)
+  }
+
+  suspend fun toggleDarkTheme(currentlyDark: Boolean) {
+    preferencesRepository?.toggleDarkTheme(currentlyDark)
+  }
+
+  suspend fun setUseDynamicColor(enabled: Boolean) {
+    preferencesRepository?.setUseDynamicColor(enabled)
+  }
+
+  suspend fun seedCurriculumIfNeeded() {
+    try {
+      if (dao.getModuleCount() == 0) {
+        dao.insertModules(CurriculumEntityMapper.buildModuleEntities())
+      }
+      if (dao.getChapterCount() == 0) {
+        dao.insertChapters(CurriculumEntityMapper.buildChapterEntities())
+      }
+      if (dao.getPastQuestionCount() == 0) {
+        dao.insertPastQuestions(CurriculumEntityMapper.buildPastQuestionEntities())
+      }
+    } catch (e: CancellationException) {
+      throw e
+    } catch (_: Exception) {
+      // Fallback safely if database initialization fails on first frame
+    }
+  }
+
+  fun observeStructuredModules(): Flow<List<CourseModule>> =
+    combine(dao.observeAllModules(), dao.observeAllChapters()) { modules, chapters ->
+      if (modules.isEmpty() || chapters.isEmpty()) {
+        CurriculumCatalog.tracks.flatMap { it.modules }
+      } else {
+        CurriculumEntityMapper.toDomainModules(modules, chapters)
+      }
+    }
+
+  suspend fun fetchPastQuestionsForCbt(
+    subjectId: String,
+    examBoard: String,
+  ): List<PracticeQuestion> {
+    seedCurriculumIfNeeded()
+    val fromDb =
+      if (examBoard.equals("ALL", ignoreCase = true)) {
+        dao.getPastQuestionsBySubject(subjectId)
+      } else {
+        val boardSpecific = dao.getPastQuestionsBySubjectAndBoard(subjectId, examBoard)
+        if (boardSpecific.isNotEmpty()) boardSpecific else dao.getPastQuestionsBySubject(subjectId)
+      }
+    return if (fromDb.isNotEmpty()) {
+      fromDb.map(CurriculumEntityMapper::toDomainQuestion)
+    } else {
+      val fallback = CurriculumCatalog.pastQuestionsFor(subjectId, examBoard)
+      if (fallback.isNotEmpty()) fallback else CurriculumCatalog.pastQuestionsFor(subjectId, "ALL")
+    }
+  }
 
   fun observeProfile(userId: String): Flow<UserProfile?> = dao.observeProfile(userId)
 
@@ -89,6 +171,12 @@ class MeritPrepRepository(private val dao: MeritPrepDao) {
           updatedAt = now,
         )
       )
+      preferencesRepository?.recordLessonSnapshot(
+        lessonId = "",
+        isCompleted = false,
+        totalXp = updatedXp,
+        streakDays = safeStreak,
+      )
       Result.success(Unit)
     } catch (e: CancellationException) {
       throw e
@@ -129,6 +217,10 @@ class MeritPrepRepository(private val dao: MeritPrepDao) {
           updatedAt = now,
         )
       )
+      preferencesRepository?.recordLessonSnapshot(
+        lessonId = lessonId,
+        isCompleted = isCompleted,
+      )
       Result.success(Unit)
     } catch (e: CancellationException) {
       throw e
@@ -156,6 +248,8 @@ class MeritPrepRepository(private val dao: MeritPrepDao) {
       val percentage = ((safeCorrect * 100L) / safeTotal).coerceIn(0L, 100L)
       val safeExamType = if (examType == "WAEC") "WAEC" else "JAMB"
       val safeWeakTopics = weakTopics.distinct().map { it.take(64) }.take(10)
+      val now = System.currentTimeMillis()
+      val safeDuration = durationSeconds.coerceIn(0L, 18000L)
 
       dao.insertExamAttempt(
         ExamAttempt(
@@ -167,9 +261,21 @@ class MeritPrepRepository(private val dao: MeritPrepDao) {
           correctCount = safeCorrect,
           totalQuestions = safeTotal,
           percentage = percentage,
-          durationSeconds = durationSeconds.coerceIn(0L, 18000L),
+          durationSeconds = safeDuration,
           weakTopics = safeWeakTopics,
-          createdAt = System.currentTimeMillis(),
+          createdAt = now,
+        )
+      )
+      preferencesRepository?.recordExamResultSnapshot(
+        CachedExamResultSnapshot(
+          subjectId = subjectId.take(64),
+          subjectTitle = subjectTitle.take(100),
+          examBoard = safeExamType,
+          correctCount = safeCorrect.toInt(),
+          totalQuestions = safeTotal.toInt(),
+          percentage = percentage.toInt(),
+          timeTakenSeconds = safeDuration.toInt(),
+          timestampMs = now,
         )
       )
       Result.success(attemptId)

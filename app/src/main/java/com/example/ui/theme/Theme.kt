@@ -1,8 +1,10 @@
 package com.example.ui.theme
 
+import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
@@ -12,10 +14,13 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
 
 @Immutable
 data class MeritSemanticColors(
@@ -125,22 +130,62 @@ val MeritPrepShapes =
     extraLarge = RoundedCornerShape(28.dp),
   )
 
+/**
+ * Ensures dynamic Material 3 palettes retain crisp borders and surface separation for readability.
+ */
+private fun ColorScheme.withHighContrastAccessibility(darkTheme: Boolean): ColorScheme =
+  if (darkTheme) {
+    copy(
+      background = ObservatoryBackground,
+      surface = ObservatorySurface,
+      onBackground = ObservatoryOnBackground,
+      onSurface = ObservatoryOnBackground,
+      onSurfaceVariant = ObservatoryOnSurfaceVariant,
+      outline = ObservatoryOutline,
+      outlineVariant = ObservatoryOutlineVariant,
+    )
+  } else {
+    copy(
+      background = PearlBackground,
+      surface = PureSurface,
+      onBackground = SlateOnBackground,
+      onSurface = SlateOnBackground,
+      onSurfaceVariant = MutedSlateOnSurfaceVariant,
+      outline = HairlineOutline,
+      outlineVariant = SubtleOutlineVariant,
+    )
+  }
+
 @Composable
 fun MeritPrepTheme(
   darkTheme: Boolean = isSystemInDarkTheme(),
-  dynamicColor: Boolean = false,
+  dynamicColor: Boolean = true,
   content: @Composable () -> Unit,
 ) {
   val colorScheme =
     when {
       dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
         val context = LocalContext.current
-        if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        val dynamic =
+          if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        dynamic.withHighContrastAccessibility(darkTheme)
       }
       darkTheme -> DarkColorScheme
       else -> LightColorScheme
     }
   val semantics = if (darkTheme) DarkSemanticColors else LightSemanticColors
+
+  val view = LocalView.current
+  if (!view.isInEditMode) {
+    SideEffect {
+      val window = (view.context as? Activity)?.window
+      if (window != null) {
+        val controller = WindowCompat.getInsetsController(window, view)
+        controller.isAppearanceLightStatusBars = !darkTheme
+        controller.isAppearanceLightNavigationBars = !darkTheme
+      }
+    }
+  }
 
   CompositionLocalProvider(LocalMeritSemanticColors provides semantics) {
     MaterialTheme(

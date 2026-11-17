@@ -28,6 +28,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.PlayArrow
@@ -39,11 +41,13 @@ import androidx.compose.material.icons.outlined.Biotech
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,6 +61,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.R
+import com.example.data.curriculum.CourseModule
 import com.example.data.curriculum.CurriculumCatalog
 import com.example.data.curriculum.Lesson
 import com.example.data.curriculum.LessonPillar
@@ -76,14 +81,21 @@ import kotlin.math.roundToInt
 @Composable
 fun HomeDashboardScreen(
   profile: UserProfile?,
+  structuredModules: List<CourseModule>,
   progressList: List<LessonProgress>,
   attempts: List<ExamAttempt>,
+  isDarkTheme: Boolean,
+  onToggleDarkTheme: () -> Unit,
   onOpenLesson: (Lesson) -> Unit,
   onOpenTrack: (SubjectTrack) -> Unit,
   onOpenExamLab: (String) -> Unit,
   modifier: Modifier = Modifier,
 ) {
-  val allLessons = CurriculumCatalog.allLessons()
+  val allLessons =
+    remember(structuredModules) {
+      val dbLessons = structuredModules.flatMap { it.lessons }
+      if (dbLessons.isNotEmpty()) dbLessons else CurriculumCatalog.allLessons()
+    }
   val completedIds = progressList.filter { it.isCompleted }.map { it.lessonId }.toSet()
   val nextLesson = allLessons.firstOrNull { it.id !in completedIds } ?: allLessons.first()
   val nextLessonProgress = progressList.find { it.lessonId == nextLesson.id }
@@ -107,7 +119,7 @@ fun HomeDashboardScreen(
       contentPadding = PaddingValues(bottom = 24.dp),
       verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-      // Udacity-Style Dark Navy Studio Top Header
+      // Udacity-Style Dark Navy Studio Top Header + Dark Theme Quick Toggle
       item {
         Column(
           modifier =
@@ -136,12 +148,15 @@ fun HomeDashboardScreen(
                 overflow = TextOverflow.Ellipsis,
               )
               Text(
-                text = "UTME Target ${profile?.targetScore ?: 320}/400 • ${completedIds.size}/${allLessons.size} lessons mastered",
+                text = "UTME Target ${profile?.targetScore ?: 320}/400 • ${completedIds.size}/${allLessons.size} chapters mastered",
                 style = MaterialTheme.typography.bodySmall,
                 color = semantics.classroomSubtext,
               )
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+              horizontalArrangement = Arrangement.spacedBy(6.dp),
+              verticalAlignment = Alignment.CenterVertically,
+            ) {
               StatBadge(
                 icon = Icons.Filled.LocalFireDepartment,
                 text = "${profile?.streakDays ?: 1}d",
@@ -156,6 +171,22 @@ fun HomeDashboardScreen(
                 contentColor = Color(0xFF7DD3FC),
                 borderColor = UdacityCyan,
               )
+              IconButton(
+                onClick = onToggleDarkTheme,
+                modifier =
+                  Modifier.size(40.dp)
+                    .clip(CircleShape)
+                    .background(UdacityNavyElevated)
+                    .border(1.dp, Color(0xFF334155), CircleShape)
+                    .testTag("home_dark_theme_toggle"),
+              ) {
+                Icon(
+                  imageVector = if (isDarkTheme) Icons.Filled.LightMode else Icons.Filled.DarkMode,
+                  contentDescription = if (isDarkTheme) "Switch to Light Theme" else "Switch to Dark Theme",
+                  tint = if (isDarkTheme) Color(0xFFFDE68A) else Color(0xFF7DD3FC),
+                  modifier = Modifier.size(20.dp),
+                )
+              }
             }
           }
         }
@@ -409,7 +440,7 @@ fun HomeDashboardScreen(
             color = MaterialTheme.colorScheme.onBackground,
           )
           Text(
-            text = "Structured modules with interactive labs & past questions",
+            text = "Structured Room-backed modules with interactive labs & past questions",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
@@ -417,7 +448,9 @@ fun HomeDashboardScreen(
       }
 
       items(CurriculumCatalog.tracks, key = { it.id }) { track ->
-        val trackLessons = track.allLessons
+        val dbTrackLessons =
+          structuredModules.filter { it.subjectId == track.id }.flatMap { it.lessons }
+        val trackLessons = if (dbTrackLessons.isNotEmpty()) dbTrackLessons else track.allLessons
         val doneCount = trackLessons.count { it.id in completedIds }
         val ratio = if (trackLessons.isEmpty()) 0f else doneCount / trackLessons.size.toFloat()
 
@@ -617,7 +650,7 @@ fun SubjectTrackCard(
           verticalAlignment = Alignment.CenterVertically,
         ) {
           Text(
-            text = "$completedLessons / $totalLessons lessons mastered",
+            text = "$completedLessons / $totalLessons chapters mastered",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
