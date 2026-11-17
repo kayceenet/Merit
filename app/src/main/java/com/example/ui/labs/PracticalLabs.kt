@@ -43,7 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.data.curriculum.PracticalLabType
 import com.example.ui.theme.JetBrainsMonoFontFamily
-import com.example.ui.theme.MasteryEmerald
+import com.example.ui.theme.semanticColors
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
@@ -109,13 +109,15 @@ private fun LabMetricTile(
     modifier =
       modifier
         .clip(RoundedCornerShape(12.dp))
-        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.65f))
+        .background(MaterialTheme.colorScheme.background)
+        .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(12.dp))
         .padding(horizontal = 10.dp, vertical = 8.dp),
   ) {
     Text(
       text = label,
       style = MaterialTheme.typography.labelSmall,
       color = MaterialTheme.colorScheme.onSurfaceVariant,
+      fontWeight = FontWeight.Bold,
     )
     Text(
       text = value,
@@ -573,6 +575,7 @@ private fun MendelianGeneticsLab() {
     }
 
     // 2x2 Punnett Grid
+    val semantics = MaterialTheme.semanticColors
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
       for (row in 0..1) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -580,21 +583,29 @@ private fun MendelianGeneticsLab() {
             val child = combos[row * 2 + col]
             val bg =
               when (child) {
-                "AA" -> MasteryEmerald.copy(alpha = 0.16f)
+                "AA" -> semantics.successContainer
                 "AS" -> MaterialTheme.colorScheme.tertiaryContainer
                 else -> MaterialTheme.colorScheme.errorContainer
+              }
+            val fg =
+              when (child) {
+                "AA" -> semantics.onSuccessContainer
+                "AS" -> MaterialTheme.colorScheme.onTertiaryContainer
+                else -> MaterialTheme.colorScheme.onErrorContainer
               }
             Box(
               modifier =
                 Modifier.weight(1f)
                   .clip(RoundedCornerShape(14.dp))
                   .background(bg)
+                  .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(14.dp))
                   .padding(vertical = 14.dp),
               contentAlignment = Alignment.Center,
             ) {
               Text(
                 text = "Hb$child",
                 style = MaterialTheme.typography.titleMedium.copy(fontFamily = JetBrainsMonoFontFamily),
+                color = fg,
                 fontWeight = FontWeight.Bold,
               )
             }

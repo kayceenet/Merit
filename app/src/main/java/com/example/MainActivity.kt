@@ -20,15 +20,20 @@ import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material.icons.outlined.Quiz
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -150,21 +155,32 @@ private fun MeritPrepAppShell(
       snackbarHost = { SnackbarHost(snackbarHostState) },
       bottomBar = {
         if (!useRail) {
-          NavigationBar {
-            TopTab.entries.forEach { tab ->
-              val selected = tab == activeTab
-              NavigationBarItem(
-                selected = selected,
-                onClick = { activeTab = tab },
-                icon = {
-                  Icon(
-                    imageVector = if (selected) tab.activeIcon else tab.inactiveIcon,
-                    contentDescription = tab.label,
-                  )
-                },
-                label = { Text(tab.label) },
-                modifier = Modifier.testTag("nav_${tab.name.lowercase()}"),
-              )
+          Column {
+            HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
+            NavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
+              TopTab.entries.forEach { tab ->
+                val selected = tab == activeTab
+                NavigationBarItem(
+                  selected = selected,
+                  onClick = { activeTab = tab },
+                  icon = {
+                    Icon(
+                      imageVector = if (selected) tab.activeIcon else tab.inactiveIcon,
+                      contentDescription = tab.label,
+                    )
+                  },
+                  label = { Text(tab.label) },
+                  colors =
+                    NavigationBarItemDefaults.colors(
+                      selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                      selectedTextColor = MaterialTheme.colorScheme.primary,
+                      indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                      unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                      unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    ),
+                  modifier = Modifier.testTag("nav_${tab.name.lowercase()}"),
+                )
+              }
             }
           }
         }
@@ -172,7 +188,10 @@ private fun MeritPrepAppShell(
     ) { innerPadding ->
       Row(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
         if (useRail) {
-          NavigationRail(modifier = Modifier.fillMaxHeight()) {
+          NavigationRail(
+            modifier = Modifier.fillMaxHeight(),
+            containerColor = MaterialTheme.colorScheme.surface,
+          ) {
             TopTab.entries.forEach { tab ->
               val selected = tab == activeTab
               NavigationRailItem(
@@ -185,6 +204,14 @@ private fun MeritPrepAppShell(
                   )
                 },
                 label = { Text(tab.label) },
+                colors =
+                  NavigationRailItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                  ),
                 modifier = Modifier.testTag("rail_${tab.name.lowercase()}"),
               )
             }

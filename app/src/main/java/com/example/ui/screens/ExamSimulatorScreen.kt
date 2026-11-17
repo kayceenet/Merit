@@ -32,7 +32,9 @@ import androidx.compose.material.icons.filled.OutlinedFlag
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -60,9 +62,11 @@ import androidx.compose.ui.unit.dp
 import com.example.R
 import com.example.data.curriculum.CurriculumCatalog
 import com.example.data.curriculum.PracticeQuestion
-import com.example.ui.theme.DeepNavyBanner
 import com.example.ui.theme.JetBrainsMonoFontFamily
-import com.example.ui.theme.MasteryEmerald
+import com.example.ui.theme.UdacityCyan
+import com.example.ui.theme.UdacityCyanInk
+import com.example.ui.theme.UdacityNavy
+import com.example.ui.theme.semanticColors
 import kotlinx.coroutines.delay
 
 private enum class ExamStage {
@@ -93,11 +97,12 @@ fun ExamSimulatorScreen(
   var stage by remember { mutableStateOf(ExamStage.SETUP) }
 
   var activeQuestions by remember { mutableStateOf<List<PracticeQuestion>>(emptyList()) }
-  var currentIndex by remember { mutableIntStateOf(0) }
+  var currentIndex by rememberIntStateOfZero()
   val selectedAnswers = remember { mutableStateMapOf<Int, Int>() }
   val flaggedQuestions = remember { mutableStateMapOf<Int, Boolean>() }
   var remainingSeconds by remember { mutableIntStateOf(300) }
   var totalAllowedSeconds by remember { mutableIntStateOf(300) }
+  val semantics = MaterialTheme.semanticColors
 
   fun launchMock() {
     val allForSubject = CurriculumCatalog.pastQuestionsFor(selectedSubjectId, selectedExamBoard)
@@ -121,7 +126,7 @@ fun ExamSimulatorScreen(
     val weakTopics =
       activeQuestions.indices
         .filter { i -> selectedAnswers[i] != activeQuestions[i].correctIndex }
-        .map { i -> activeQuestions[itOrIndex(i)].topic }
+        .map { i -> activeQuestions[i].topic }
         .distinct()
     val elapsed = (totalAllowedSeconds - remainingSeconds).coerceAtLeast(1)
     onRecordExamAttempt(
@@ -168,9 +173,10 @@ fun ExamSimulatorScreen(
             Box(
               modifier =
                 Modifier.fillMaxWidth()
-                  .height(170.dp)
-                  .clip(RoundedCornerShape(22.dp))
-                  .background(DeepNavyBanner),
+                  .height(175.dp)
+                  .clip(RoundedCornerShape(20.dp))
+                  .background(UdacityNavy)
+                  .border(1.5.dp, Color(0xFF28427B), RoundedCornerShape(20.dp)),
             ) {
               Image(
                 painter = painterResource(id = R.drawable.img_cbt_banner_1794740699279),
@@ -183,7 +189,7 @@ fun ExamSimulatorScreen(
                   Modifier.fillMaxSize()
                     .background(
                       Brush.horizontalGradient(
-                        listOf(Color(0xEB071430), Color(0x990A1D45), Color(0x220A1D45))
+                        listOf(Color(0xF507122B), Color(0xD90B1633), Color(0x880B1633))
                       )
                     )
               )
@@ -191,15 +197,25 @@ fun ExamSimulatorScreen(
                 modifier = Modifier.fillMaxSize().padding(18.dp),
                 verticalArrangement = Arrangement.Bottom,
               ) {
+                Surface(color = UdacityCyan, shape = RoundedCornerShape(6.dp)) {
+                  Text(
+                    text = "TIMED CBT & WAEC STUDIO",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = UdacityCyanInk,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                  )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                  text = "JAMB CBT & WAEC Exam Studio",
+                  text = "JAMB CBT & WAEC Exam Lab",
                   style = MaterialTheme.typography.headlineSmall,
                   color = Color.White,
                 )
                 Text(
                   text = "Timed Computer-Based Test grid, Flag-for-Review, and WAEC Marking Schemes.",
                   style = MaterialTheme.typography.bodySmall,
-                  color = Color(0xFFD6E2FF),
+                  color = Color(0xFFE2E8F0),
                 )
               }
             }
@@ -211,48 +227,86 @@ fun ExamSimulatorScreen(
                 Modifier.fillMaxWidth()
                   .clip(RoundedCornerShape(20.dp))
                   .background(MaterialTheme.colorScheme.surface)
-                  .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp))
+                  .border(1.5.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp))
                   .padding(16.dp),
               verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-              Text("1. Select Exam Board Mode", style = MaterialTheme.typography.titleMedium)
-              Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+              Text(
+                text = "1. Select Exam Board Mode",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+              )
+              FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+              ) {
                 listOf("JAMB", "WAEC").forEach { board ->
+                  val selected = selectedExamBoard == board
                   FilterChip(
-                    selected = selectedExamBoard == board,
+                    selected = selected,
                     onClick = { selectedExamBoard = board },
                     label = {
-                      Text(if (board == "JAMB") "JAMB UTME CBT" else "WAEC SSCE + Marking Scheme")
+                      Text(
+                        text = if (board == "JAMB") "JAMB UTME CBT" else "WAEC SSCE + Marking Scheme",
+                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                      )
                     },
+                    colors =
+                      FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MaterialTheme.colorScheme.primary,
+                        selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                        containerColor = MaterialTheme.colorScheme.background,
+                        labelColor = MaterialTheme.colorScheme.onSurface,
+                      ),
                     modifier = Modifier.testTag("exam_board_$board"),
                   )
                 }
               }
 
-              Text("2. Select Subject Paper", style = MaterialTheme.typography.titleMedium)
+              Text(
+                text = "2. Select Subject Paper",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+              )
               FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
               ) {
                 CurriculumCatalog.tracks.forEach { track ->
+                  val selected = selectedSubjectId == track.id
                   FilterChip(
-                    selected = selectedSubjectId == track.id,
+                    selected = selected,
                     onClick = { selectedSubjectId = track.id },
-                    label = { Text(track.shortName) },
+                    label = {
+                      Text(
+                        text = track.shortName,
+                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                      )
+                    },
+                    colors =
+                      FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MaterialTheme.colorScheme.primary,
+                        selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                        containerColor = MaterialTheme.colorScheme.background,
+                        labelColor = MaterialTheme.colorScheme.onSurface,
+                      ),
                     modifier = Modifier.testTag("exam_subject_${track.id}"),
                   )
                 }
               }
 
               Surface(
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.65f),
+                color = MaterialTheme.colorScheme.primaryContainer,
                 shape = RoundedCornerShape(14.dp),
-                modifier = Modifier.fillMaxWidth(),
+                modifier =
+                  Modifier.fillMaxWidth()
+                    .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(14.dp)),
               ) {
                 Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                   Text(
                     text = "Paper Blueprint: $effectiveCount Authentic Past Questions",
                     style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                   )
                   Text(
                     text =
@@ -261,7 +315,7 @@ fun ExamSimulatorScreen(
                       else
                         "Includes WAEC Objective + Method/Accuracy (M1/A1) examiner marking schemes.",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                   )
                 }
               }
@@ -274,7 +328,7 @@ fun ExamSimulatorScreen(
               ) {
                 Icon(Icons.Filled.PlayArrow, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Start Timed Mock Exam", style = MaterialTheme.typography.titleMedium)
+                Text("Start Timed Mock Exam", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
               }
             }
           }
@@ -296,8 +350,7 @@ fun ExamSimulatorScreen(
             modifier =
               Modifier.fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.surface)
-                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
+                .background(semantics.classroomBar)
                 .padding(horizontal = 14.dp, vertical = 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
@@ -309,29 +362,31 @@ fun ExamSimulatorScreen(
               Icon(
                 Icons.Filled.Timer,
                 contentDescription = "Remaining time",
-                tint =
-                  if (remainingSeconds < 60) MaterialTheme.colorScheme.error
-                  else MaterialTheme.colorScheme.primary,
+                tint = if (remainingSeconds < 60) Color(0xFFFCA5A5) else UdacityCyan,
               )
               Text(
                 text = String.format("%02d:%02d", minutes, seconds),
                 style = MaterialTheme.typography.titleMedium.copy(fontFamily = JetBrainsMonoFontFamily),
-                color =
-                  if (remainingSeconds < 60) MaterialTheme.colorScheme.error
-                  else MaterialTheme.colorScheme.primary,
+                color = if (remainingSeconds < 60) Color(0xFFFCA5A5) else Color.White,
                 fontWeight = FontWeight.Bold,
               )
             }
             Text(
               text = "${selectedAnswers.size}/${activeQuestions.size} Answered",
               style = MaterialTheme.typography.labelMedium,
+              color = semantics.classroomSubtext,
             )
             Button(
               onClick = { submitMock() },
               shape = RoundedCornerShape(10.dp),
+              colors =
+                ButtonDefaults.buttonColors(
+                  containerColor = UdacityCyan,
+                  contentColor = UdacityCyanInk,
+                ),
               modifier = Modifier.testTag("submit_cbt_button"),
             ) {
-              Text("Submit")
+              Text("Submit", fontWeight = FontWeight.Bold)
             }
           }
 
@@ -348,21 +403,29 @@ fun ExamSimulatorScreen(
                 when {
                   active -> MaterialTheme.colorScheme.primary
                   flagged -> MaterialTheme.colorScheme.tertiaryContainer
-                  answered -> MasteryEmerald.copy(alpha = 0.20f)
-                  else -> MaterialTheme.colorScheme.surfaceVariant
+                  answered -> semantics.successContainer
+                  else -> MaterialTheme.colorScheme.surface
+                }
+              val pillBorder =
+                when {
+                  active -> MaterialTheme.colorScheme.primary
+                  flagged -> MaterialTheme.colorScheme.tertiary
+                  answered -> semantics.success
+                  else -> MaterialTheme.colorScheme.outline
                 }
               val pillText =
                 when {
                   active -> MaterialTheme.colorScheme.onPrimary
                   flagged -> MaterialTheme.colorScheme.onTertiaryContainer
-                  answered -> MasteryEmerald
-                  else -> MaterialTheme.colorScheme.onSurfaceVariant
+                  answered -> semantics.onSuccessContainer
+                  else -> MaterialTheme.colorScheme.onSurface
                 }
               Box(
                 modifier =
-                  Modifier.size(40.dp)
+                  Modifier.size(42.dp)
                     .clip(RoundedCornerShape(10.dp))
                     .background(pillBg)
+                    .border(1.5.dp, pillBorder, RoundedCornerShape(10.dp))
                     .clickable { currentIndex = i },
                 contentAlignment = Alignment.Center,
               ) {
@@ -387,7 +450,7 @@ fun ExamSimulatorScreen(
                   Modifier.fillMaxWidth()
                     .clip(RoundedCornerShape(20.dp))
                     .background(MaterialTheme.colorScheme.surface)
-                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp))
+                    .border(1.5.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp))
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
               ) {
@@ -399,7 +462,8 @@ fun ExamSimulatorScreen(
                   Text(
                     text = "Q${currentIndex + 1} • ${question.examType} ${question.year} • ${question.topic}",
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.secondary,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
                   )
                   IconButton(onClick = { flaggedQuestions[currentIndex] = !isFlagged }) {
                     Icon(
@@ -412,7 +476,11 @@ fun ExamSimulatorScreen(
                   }
                 }
 
-                Text(text = question.question, style = MaterialTheme.typography.titleMedium)
+                Text(
+                  text = question.question,
+                  style = MaterialTheme.typography.titleMedium,
+                  color = MaterialTheme.colorScheme.onSurface,
+                )
 
                 question.options.forEachIndexed { optIdx, optText ->
                   val chosen = selectedAnswers[currentIndex] == optIdx
@@ -421,13 +489,13 @@ fun ExamSimulatorScreen(
                       Modifier.fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
                         .background(
-                          if (chosen) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.65f)
+                          if (chosen) MaterialTheme.colorScheme.primaryContainer
                           else MaterialTheme.colorScheme.background
                         )
                         .border(
                           1.5.dp,
                           if (chosen) MaterialTheme.colorScheme.primary
-                          else MaterialTheme.colorScheme.outlineVariant,
+                          else MaterialTheme.colorScheme.outline,
                           RoundedCornerShape(12.dp),
                         )
                         .clickable { selectedAnswers[currentIndex] = optIdx }
@@ -437,7 +505,7 @@ fun ExamSimulatorScreen(
                   ) {
                     Box(
                       modifier =
-                        Modifier.size(26.dp)
+                        Modifier.size(28.dp)
                           .clip(CircleShape)
                           .background(
                             if (chosen) MaterialTheme.colorScheme.primary
@@ -450,10 +518,18 @@ fun ExamSimulatorScreen(
                         style = MaterialTheme.typography.labelMedium,
                         color =
                           if (chosen) MaterialTheme.colorScheme.onPrimary
-                          else MaterialTheme.colorScheme.onSurfaceVariant,
+                          else MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold,
                       )
                     }
-                    Text(text = optText, style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                      text = optText,
+                      style = MaterialTheme.typography.bodyLarge,
+                      color =
+                        if (chosen) MaterialTheme.colorScheme.onPrimaryContainer
+                        else MaterialTheme.colorScheme.onSurface,
+                      fontWeight = if (chosen) FontWeight.SemiBold else FontWeight.Normal,
+                    )
                   }
                 }
               }
@@ -477,7 +553,10 @@ fun ExamSimulatorScreen(
               modifier = Modifier.weight(1f).height(50.dp),
               shape = RoundedCornerShape(14.dp),
             ) {
-              Text(if (currentIndex < activeQuestions.lastIndex) "Next →" else "Finish & Grade")
+              Text(
+                text = if (currentIndex < activeQuestions.lastIndex) "Next →" else "Finish & Grade",
+                fontWeight = FontWeight.Bold,
+              )
             }
           }
         }
@@ -500,31 +579,38 @@ fun ExamSimulatorScreen(
               modifier =
                 Modifier.fillMaxWidth()
                   .clip(RoundedCornerShape(22.dp))
-                  .background(MaterialTheme.colorScheme.primaryContainer)
+                  .background(semantics.classroomBar)
+                  .border(1.5.dp, Color(0xFF28427B), RoundedCornerShape(22.dp))
                   .padding(20.dp),
-              verticalArrangement = Arrangement.spacedBy(6.dp),
+              verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
               Text(
                 text = "EXAM DIAGNOSTIC REPORT",
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.primary,
+                color = UdacityCyan,
+                fontWeight = FontWeight.Bold,
               )
               Text(
                 text = "$correctCount / ${activeQuestions.size} Correct ($pct%)",
                 style = MaterialTheme.typography.headlineMedium.copy(fontFamily = JetBrainsMonoFontFamily),
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = Color.White,
               )
               Text(
-                text = "Recorded to your cloud analytics. Review step-by-step derivations below:",
+                text = "Saved to your local analytics. Review step-by-step derivations below:",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = semantics.classroomSubtext,
               )
-              Spacer(modifier = Modifier.height(6.dp))
+              Spacer(modifier = Modifier.height(4.dp))
               Button(
                 onClick = { stage = ExamStage.SETUP },
                 shape = RoundedCornerShape(12.dp),
+                colors =
+                  ButtonDefaults.buttonColors(
+                    containerColor = UdacityCyan,
+                    contentColor = UdacityCyanInk,
+                  ),
               ) {
-                Text("Take Another Mock Paper")
+                Text("Take Another Mock Paper", fontWeight = FontWeight.Bold)
               }
             }
           }
@@ -539,25 +625,38 @@ fun ExamSimulatorScreen(
                   .background(MaterialTheme.colorScheme.surface)
                   .border(
                     1.5.dp,
-                    if (isCorrect) MasteryEmerald.copy(alpha = 0.5f)
-                    else MaterialTheme.colorScheme.error.copy(alpha = 0.5f),
+                    if (isCorrect) semantics.success else MaterialTheme.colorScheme.error,
                     RoundedCornerShape(18.dp),
                   )
                   .padding(16.dp),
               verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
+              Surface(
+                color =
+                  if (isCorrect) semantics.successContainer
+                  else MaterialTheme.colorScheme.errorContainer,
+                shape = RoundedCornerShape(99.dp),
+              ) {
+                Text(
+                  text = "Q${idx + 1} (${q.examType} ${q.year}) • ${if (isCorrect) "CORRECT" else "MISSED"}",
+                  style = MaterialTheme.typography.labelSmall,
+                  color =
+                    if (isCorrect) semantics.onSuccessContainer
+                    else MaterialTheme.colorScheme.onErrorContainer,
+                  fontWeight = FontWeight.Bold,
+                  modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                )
+              }
               Text(
-                text = "Q${idx + 1} (${q.examType} ${q.year}) • ${if (isCorrect) "CORRECT" else "MISSED"}",
-                style = MaterialTheme.typography.labelSmall,
-                color = if (isCorrect) MasteryEmerald else MaterialTheme.colorScheme.error,
-                fontWeight = FontWeight.Bold,
+                text = q.question,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
               )
-              Text(text = q.question, style = MaterialTheme.typography.titleSmall)
               Text(
                 text = "Correct Option (${'A' + q.correctIndex}): ${q.options[q.correctIndex]}",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MasteryEmerald,
-                fontWeight = FontWeight.SemiBold,
+                color = semantics.success,
+                fontWeight = FontWeight.Bold,
               )
               Text(
                 text = "Derivation: ${q.stepByStepSolution}",
@@ -568,7 +667,8 @@ fun ExamSimulatorScreen(
                 Text(
                   text = "WAEC Marking Scheme: ${q.waecMarkingScheme}",
                   style = MaterialTheme.typography.labelSmall,
-                  color = MaterialTheme.colorScheme.secondary,
+                  color = MaterialTheme.colorScheme.primary,
+                  fontWeight = FontWeight.Bold,
                 )
               }
             }
@@ -579,4 +679,5 @@ fun ExamSimulatorScreen(
   }
 }
 
-private fun itOrIndex(i: Int): Int = i
+@Composable
+private fun rememberIntStateOfZero() = remember { mutableIntStateOf(0) }

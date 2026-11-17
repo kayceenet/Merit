@@ -5,13 +5,16 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,9 +25,11 @@ import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.EditNote
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,10 +47,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.data.curriculum.CurriculumCatalog
 import com.example.data.model.StudyNote
+import com.example.ui.theme.CodeFormulaText
+import com.example.ui.theme.CodeSurface
 import com.example.ui.theme.JetBrainsMonoFontFamily
+import com.example.ui.theme.UdacityCyan
 
 @Composable
 fun NotebookScreen(
@@ -56,28 +65,64 @@ fun NotebookScreen(
   modifier: Modifier = Modifier,
 ) {
   var onlyBookmarked by remember { mutableStateOf(false) }
+  var searchQuery by remember { mutableStateOf("") }
   var showCreateDialog by remember { mutableStateOf(false) }
-  val displayed = remember(notes, onlyBookmarked) {
-    if (onlyBookmarked) notes.filter { it.isBookmarked } else notes
+
+  val displayed = remember(notes, onlyBookmarked, searchQuery) {
+    notes
+      .filter { !onlyBookmarked || it.isBookmarked }
+      .filter {
+        searchQuery.isBlank() ||
+          it.title.contains(searchQuery, ignoreCase = true) ||
+          it.content.contains(searchQuery, ignoreCase = true) ||
+          it.subjectId.contains(searchQuery, ignoreCase = true)
+      }
   }
 
   Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
     Column(modifier = Modifier.widthIn(max = 880.dp).fillMaxSize()) {
       Column(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier =
+          Modifier.fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant)
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
       ) {
-        Text("Formula & Revision Notebook", style = MaterialTheme.typography.headlineMedium)
+        Text(
+          text = "Formula & Revision Notebook",
+          style = MaterialTheme.typography.headlineMedium,
+          color = MaterialTheme.colorScheme.onSurface,
+        )
+        OutlinedTextField(
+          value = searchQuery,
+          onValueChange = { searchQuery = it },
+          placeholder = { Text("Search formulas, topics, or subjects...") },
+          leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+          singleLine = true,
+          modifier = Modifier.fillMaxWidth(),
+          shape = RoundedCornerShape(14.dp),
+        )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
           FilterChip(
             selected = !onlyBookmarked,
             onClick = { onlyBookmarked = false },
-            label = { Text("All Notes (${notes.size})") },
+            label = { Text("All Notes (${notes.size})", fontWeight = FontWeight.SemiBold) },
+            colors =
+              FilterChipDefaults.filterChipColors(
+                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+              ),
           )
           FilterChip(
             selected = onlyBookmarked,
             onClick = { onlyBookmarked = true },
-            label = { Text("Pinned (${notes.count { it.isBookmarked }})") },
+            label = { Text("Pinned (${notes.count { it.isBookmarked }})", fontWeight = FontWeight.SemiBold) },
+            colors =
+              FilterChipDefaults.filterChipColors(
+                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+              ),
           )
         }
       }
@@ -88,6 +133,12 @@ fun NotebookScreen(
           contentAlignment = Alignment.Center,
         ) {
           Column(
+            modifier =
+              Modifier.fillMaxWidth()
+                .clip(RoundedCornerShape(20.dp))
+                .background(MaterialTheme.colorScheme.surface)
+                .border(1.5.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp))
+                .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp),
           ) {
@@ -95,11 +146,14 @@ fun NotebookScreen(
               Icons.Filled.EditNote,
               contentDescription = null,
               tint = MaterialTheme.colorScheme.primary,
-              modifier = Modifier.padding(bottom = 4.dp),
             )
-            Text("No revision cards saved yet", style = MaterialTheme.typography.titleMedium)
             Text(
-              text = "Tap + to save key equations, mnemonics, or WAEC definitions synced to your cloud account.",
+              text = if (notes.isEmpty()) "No revision cards saved yet" else "No matching notes",
+              style = MaterialTheme.typography.titleMedium,
+              color = MaterialTheme.colorScheme.onSurface,
+            )
+            Text(
+              text = "Tap + to save key equations, mnemonics, or WAEC definitions locally on your device.",
               style = MaterialTheme.typography.bodySmall,
               color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -108,7 +162,7 @@ fun NotebookScreen(
       } else {
         LazyColumn(
           modifier = Modifier.weight(1f).fillMaxWidth(),
-          contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+          contentPadding = PaddingValues(16.dp),
           verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
           items(displayed, key = { it.id }) { note ->
@@ -117,7 +171,7 @@ fun NotebookScreen(
                 Modifier.fillMaxWidth()
                   .clip(RoundedCornerShape(18.dp))
                   .background(MaterialTheme.colorScheme.surface)
-                  .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(18.dp))
+                  .border(1.5.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(18.dp))
                   .padding(16.dp),
               verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
@@ -129,12 +183,14 @@ fun NotebookScreen(
                 Surface(
                   color = MaterialTheme.colorScheme.secondaryContainer,
                   shape = RoundedCornerShape(99.dp),
+                  modifier = Modifier.border(1.dp, MaterialTheme.colorScheme.secondary, RoundedCornerShape(99.dp)),
                 ) {
                   Text(
                     text = note.subjectId.uppercase(),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                   )
                 }
                 Row {
@@ -158,15 +214,23 @@ fun NotebookScreen(
                   }
                 }
               }
-              Text(text = note.title, style = MaterialTheme.typography.titleMedium)
-              Surface(
-                color = MaterialTheme.colorScheme.background,
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth(),
+              Text(
+                text = note.title,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+              )
+              Row(
+                modifier =
+                  Modifier.fillMaxWidth()
+                    .height(IntrinsicSize.Min)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(CodeSurface),
               ) {
+                Box(modifier = Modifier.width(4.dp).fillMaxHeight().background(UdacityCyan))
                 Text(
                   text = note.content,
                   style = MaterialTheme.typography.bodyMedium.copy(fontFamily = JetBrainsMonoFontFamily),
+                  color = CodeFormulaText,
                   modifier = Modifier.padding(12.dp),
                 )
               }

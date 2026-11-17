@@ -10,8 +10,56 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+
+@Immutable
+data class MeritSemanticColors(
+  val success: Color,
+  val onSuccess: Color,
+  val successContainer: Color,
+  val onSuccessContainer: Color,
+  val classroomBar: Color,
+  val onClassroomBar: Color,
+  val classroomSubtext: Color,
+  val classroomAccent: Color,
+  val onClassroomAccent: Color,
+)
+
+private val LightSemanticColors =
+  MeritSemanticColors(
+    success = MasteryEmerald,
+    onSuccess = Color.White,
+    successContainer = MasteryEmeraldLight,
+    onSuccessContainer = Color(0xFF022C22),
+    classroomBar = UdacityNavy,
+    onClassroomBar = Color.White,
+    classroomSubtext = Color(0xFFBAE6FD),
+    classroomAccent = UdacityCyan,
+    onClassroomAccent = UdacityCyanInk,
+  )
+
+private val DarkSemanticColors =
+  MeritSemanticColors(
+    success = MasteryEmeraldBright,
+    onSuccess = Color(0xFF022C22),
+    successContainer = MasteryEmeraldDarkContainer,
+    onSuccessContainer = Color(0xFFD1FAE5),
+    classroomBar = UdacityNavy,
+    onClassroomBar = Color.White,
+    classroomSubtext = Color(0xFFBAE6FD),
+    classroomAccent = UdacityCyan,
+    onClassroomAccent = UdacityCyanInk,
+  )
+
+val LocalMeritSemanticColors = staticCompositionLocalOf { LightSemanticColors }
+
+val MaterialTheme.semanticColors: MeritSemanticColors
+  @Composable get() = LocalMeritSemanticColors.current
 
 private val DarkColorScheme =
   darkColorScheme(
@@ -27,6 +75,10 @@ private val DarkColorScheme =
     onTertiary = DarkAmberOnTertiary,
     tertiaryContainer = DarkAmberContainer,
     onTertiaryContainer = DarkAmberOnContainer,
+    error = DarkError,
+    onError = DarkOnError,
+    errorContainer = DarkErrorContainer,
+    onErrorContainer = DarkOnErrorContainer,
     background = ObservatoryBackground,
     onBackground = ObservatoryOnBackground,
     surface = ObservatorySurface,
@@ -34,7 +86,7 @@ private val DarkColorScheme =
     surfaceVariant = ObservatorySurfaceVariant,
     onSurfaceVariant = ObservatoryOnSurfaceVariant,
     outline = ObservatoryOutline,
-    outlineVariant = ObservatorySurfaceVariant,
+    outlineVariant = ObservatoryOutlineVariant,
   )
 
 private val LightColorScheme =
@@ -51,6 +103,10 @@ private val LightColorScheme =
     onTertiary = ScholarAmberOnTertiary,
     tertiaryContainer = ScholarAmberContainer,
     onTertiaryContainer = ScholarAmberOnTertiaryContainer,
+    error = LightError,
+    onError = LightOnError,
+    errorContainer = LightErrorContainer,
+    onErrorContainer = LightOnErrorContainer,
     background = PearlBackground,
     onBackground = SlateOnBackground,
     surface = PureSurface,
@@ -84,11 +140,14 @@ fun MeritPrepTheme(
       darkTheme -> DarkColorScheme
       else -> LightColorScheme
     }
+  val semantics = if (darkTheme) DarkSemanticColors else LightSemanticColors
 
-  MaterialTheme(
-    colorScheme = colorScheme,
-    typography = Typography,
-    shapes = MeritPrepShapes,
-    content = content,
-  )
+  CompositionLocalProvider(LocalMeritSemanticColors provides semantics) {
+    MaterialTheme(
+      colorScheme = colorScheme,
+      typography = Typography,
+      shapes = MeritPrepShapes,
+      content = content,
+    )
+  }
 }
