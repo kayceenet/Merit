@@ -373,6 +373,6 @@ class MeritPrepRepository(
   }
 
   private companion object {
-    const val CURRENT_CURRICULUM_VERSION = 3
+    const val CURRENT_CURRICULUM_VERSION = 4
   }
 }

@@ -66,9 +66,12 @@ import com.example.data.curriculum.CurriculumProgression
 import com.example.data.curriculum.Lesson
 import com.example.data.curriculum.LessonPillar
 import com.example.data.curriculum.PracticeQuestion
+import com.example.data.curriculum.QuestionShuffler
 import com.example.data.model.LessonProgress
 import com.example.ui.components.EquationDisplayCard
 import com.example.ui.components.ScientificText
+import com.example.ui.components.SubjectHeroGraphic
+import com.example.ui.components.TopicDiagramCard
 import com.example.ui.labs.PracticalLabWorkspace
 import com.example.ui.theme.CourseraAzureAccent
 import com.example.ui.theme.semanticColors
@@ -527,6 +530,9 @@ private fun LessonPillarBody(
           }
         }
 
+        SubjectHeroGraphic(subjectId = lesson.subjectId)
+        TopicDiagramCard(lesson = lesson)
+
         lesson.concepts.forEachIndexed { idx, block ->
           Column(
             modifier =
@@ -740,6 +746,7 @@ private fun LessonPillarBody(
 
       LessonPillar.LAB -> {
         PracticalLabWorkspace(
+          lessonId = lesson.id,
           labType = lesson.labType,
           labBrief = lesson.labBrief,
         )
@@ -774,10 +781,38 @@ private fun InlineExerciseSection(
   val hintShown = remember(lessonId) { mutableStateMapOf<String, Boolean>() }
   var submitted by remember(lessonId) { mutableStateOf(false) }
   var attemptCount by remember(lessonId) { mutableIntStateOf(0) }
+  var retryNonce by remember(lessonId) { mutableIntStateOf(0) }
+  var seenIds by remember(lessonId) { mutableStateOf(emptySet<String>()) }
+  var lastRoundIds by remember(lessonId) { mutableStateOf(emptySet<String>()) }
+  val batchSize = minOf(3, questions.size).coerceAtLeast(1)
+  val activeQuestions =
+    remember(lessonId, retryNonce, questions) {
+      QuestionShuffler.prepareFreshQuestionSet(
+        pool = questions,
+        count = batchSize,
+        previouslySeenIds = seenIds,
+        lastRoundIds = lastRoundIds,
+      )
+    }
   val semantics = MaterialTheme.semanticColors
 
   Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-    questions.forEachIndexed { idx, q ->
+    Surface(
+      color = MaterialTheme.colorScheme.surfaceVariant,
+      shape = RoundedCornerShape(10.dp),
+      modifier = Modifier.fillMaxWidth(),
+    ) {
+      Text(
+        text =
+          "Attempt #${attemptCount + 1} • ${activeQuestions.size} Fresh Questions (Bank: ${questions.size}) • Shuffled A–D",
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        fontWeight = FontWeight.SemiBold,
+        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+      )
+    }
+
+    activeQuestions.forEachIndexed { idx, q ->
       val chosen = selectedAnswers[q.id]
       Column(
         modifier =
@@ -918,19 +953,23 @@ private fun InlineExerciseSection(
         onClick = {
           submitted = true
           attemptCount++
-          val correct = questions.count { selectedAnswers[it.id] == it.correctIndex }
-          val pct = if (questions.isEmpty()) 100L else ((correct * 100L) / questions.size)
+          val roundIds = activeQuestions.map { it.id }.toSet()
+          val updatedSeen = seenIds + roundIds
+          seenIds = if (updatedSeen.size >= questions.size) roundIds else updatedSeen
+          lastRoundIds = roundIds
+          val correct = activeQuestions.count { selectedAnswers[it.id] == it.correctIndex }
+          val pct = if (activeQuestions.isEmpty()) 100L else ((correct * 100L) / activeQuestions.size)
           onGraded(pct)
         },
-        enabled = selectedAnswers.size == questions.size,
+        enabled = selectedAnswers.size == activeQuestions.size,
         modifier = Modifier.fillMaxWidth().height(52.dp).testTag("submit_inline_exercise"),
         shape = RoundedCornerShape(12.dp),
       ) {
         Text("Check Answers & Grade Quiz (≥60% to Unlock)", fontWeight = FontWeight.Bold)
       }
     } else {
-      val correct = questions.count { selectedAnswers[it.id] == it.correctIndex }
-      val pct = if (questions.isEmpty()) 100L else ((correct * 100L) / questions.size)
+      val correct = activeQuestions.count { selectedAnswers[it.id] == it.correctIndex }
+      val pct = if (activeQuestions.isEmpty()) 100L else ((correct * 100L) / activeQuestions.size)
       val passed = pct >= CurriculumProgression.PASS_THRESHOLD_PERCENT || isAlreadyMastered
 
       Column(
@@ -949,9 +988,9 @@ private fun InlineExerciseSection(
         Text(
           text =
             if (passed) {
-              "Lesson Mastered • $correct / ${questions.size} (${pct}%)"
+              "Lesson Mastered • $correct / ${activeQuestions.size} (${pct}%)"
             } else {
-              "Not Mastered Yet • $correct / ${questions.size} (${pct}%)"
+              "Not Mastered Yet • $correct / ${activeQuestions.size} (${pct}%)"
             },
           style = MaterialTheme.typography.titleMedium,
           color = if (passed) semantics.onSuccessContainer else MaterialTheme.colorScheme.onErrorContainer,
@@ -963,7 +1002,7 @@ private fun InlineExerciseSection(
               if (nextLesson != null) "Next lesson unlocked: \"${nextLesson.title}\""
               else "Final lesson in this track completed! You are ready for timed Exam Lab mocks."
             } else {
-              "Score at least 60% (${(questions.size * 6 + 9) / 10}/${questions.size}) to master this lesson and unlock the next one."
+              "Score at least 60% (${(activeQuestions.size * 6 + 9) / 10}/${activeQuestions.size}) to master this lesson. Tap Retry for fresh unseen questions!"
             },
           style = MaterialTheme.typography.bodySmall,
           color = if (passed) semantics.onSuccessContainer else MaterialTheme.colorScheme.onErrorContainer,
@@ -984,18 +1023,39 @@ private fun InlineExerciseSection(
             Spacer(modifier = Modifier.width(6.dp))
             Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, modifier = Modifier.size(18.dp))
           }
-        } else if (!passed) {
-          Button(
+          OutlinedButton(
             onClick = {
               selectedAnswers.clear()
+              hintShown.clear()
               submitted = false
+              retryNonce++
             },
             modifier = Modifier.fillMaxWidth().height(48.dp).testTag("retry_inline_exercise"),
             shape = RoundedCornerShape(10.dp),
           ) {
             Icon(Icons.Filled.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
             Spacer(modifier = Modifier.width(6.dp))
-            Text("Retry Mastery Quiz (Attempt #${attemptCount + 1})", fontWeight = FontWeight.Bold)
+            Text("Practice ${activeQuestions.size} Fresh Questions", fontWeight = FontWeight.SemiBold)
+          }
+        } else {
+          Button(
+            onClick = {
+              selectedAnswers.clear()
+              hintShown.clear()
+              submitted = false
+              retryNonce++
+            },
+            modifier = Modifier.fillMaxWidth().height(48.dp).testTag("retry_inline_exercise"),
+            shape = RoundedCornerShape(10.dp),
+          ) {
+            Icon(Icons.Filled.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+              text =
+                if (passed) "Practice ${activeQuestions.size} Fresh Questions"
+                else "Retry with Fresh Questions (Attempt #${attemptCount + 1})",
+              fontWeight = FontWeight.Bold,
+            )
           }
         }
       }

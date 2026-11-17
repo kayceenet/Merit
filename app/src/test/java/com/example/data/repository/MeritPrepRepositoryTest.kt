@@ -7,6 +7,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.example.data.curriculum.CurriculumCatalog
 import com.example.data.curriculum.CurriculumProgression
 import com.example.data.curriculum.LessonPillar
+import com.example.data.curriculum.QuestionShuffler
 import com.example.data.local.MeritPrepDatabase
 import com.example.data.local.OfflinePreferencesRepository
 import com.example.data.local.ThemeMode
@@ -238,10 +239,10 @@ class MeritPrepRepositoryTest {
       repository.seedCurriculumIfNeeded()
 
       val modules = repository.observeStructuredModules().first()
-      assertEquals(20, modules.size)
+      assertEquals(25, modules.size)
       val lessons = modules.flatMap { it.lessons }
-      assertEquals(55, lessons.size)
-      assertTrue(lessons.all { it.concepts.isNotEmpty() && it.exercises.size >= 3 })
+      assertEquals(76, lessons.size)
+      assertTrue(lessons.all { it.concepts.isNotEmpty() && it.exercises.size >= 6 })
 
       // Verify every subject has combined multi-year past questions (including >= 2024/2025)
       CurriculumCatalog.tracks.forEach { track ->
@@ -265,8 +266,8 @@ class MeritPrepRepositoryTest {
       prefsRepo.setCurriculumVersion(1)
       repository.seedCurriculumIfNeeded()
 
-      assertEquals(3, prefsRepo.getCurriculumVersion())
-      assertEquals(55, repository.observeStructuredModules().first().flatMap { it.lessons }.size)
+      assertEquals(4, prefsRepo.getCurriculumVersion())
+      assertEquals(76, repository.observeStructuredModules().first().flatMap { it.lessons }.size)
       val preserved =
         repository.observeLessonProgress(UserProfile.DEFAULT_PROFILE_ID).first()
           .firstOrNull { it.lessonId == firstLesson.id }
@@ -363,6 +364,45 @@ class MeritPrepRepositoryTest {
       assertEquals(CbtExamStage.RUNNING, running.stage)
       assertEquals("ALL", running.selectedExamBoard)
       assertEquals(10, running.questions.size)
+      viewModel.returnToCbtSetup()
+    }
+
+  @Test
+  fun `question shuffler and cbt retake serve fresh non-repeating questions and preserve option truth`() =
+    runTest(testDispatcher) {
+      repository.seedCurriculumIfNeeded()
+      val lesson = CurriculumCatalog.lessonById("phys_01_units")!!
+      val round1 = QuestionShuffler.prepareFreshQuestionSet(lesson.exercises, count = 3)
+      val round2 =
+        QuestionShuffler.prepareFreshQuestionSet(
+          pool = lesson.exercises,
+          count = 3,
+          previouslySeenIds = round1.map { it.id }.toSet(),
+          lastRoundIds = round1.map { it.id }.toSet(),
+        )
+      assertEquals(3, round1.size)
+      assertEquals(3, round2.size)
+      assertTrue((round1.map { it.id }.toSet() intersect round2.map { it.id }.toSet()).isEmpty())
+
+      round1.forEach { shuffled ->
+        val orig = lesson.exercises.first { it.id == shuffled.id }
+        assertEquals(orig.options[orig.correctIndex], shuffled.options[shuffled.correctIndex])
+      }
+
+      val viewModel = MeritPrepViewModel(repository)
+      runCurrent()
+
+      viewModel.startMockExam(subjectId = "physics", examBoard = "ALL", questionLimit = 10)
+      awaitStage(viewModel, CbtExamStage.RUNNING)
+      val attempt1Ids = viewModel.cbtState.value.questions.map { it.id }.toSet()
+      viewModel.submitCbtExam()
+      awaitStage(viewModel, CbtExamStage.SUMMARY)
+
+      viewModel.retakeLastMock()
+      awaitStage(viewModel, CbtExamStage.RUNNING)
+      val attempt2Ids = viewModel.cbtState.value.questions.map { it.id }.toSet()
+      assertEquals(10, attempt2Ids.size)
+      assertTrue((attempt1Ids intersect attempt2Ids).isEmpty())
       viewModel.returnToCbtSetup()
     }
 }

@@ -8,6 +8,7 @@ import com.example.data.curriculum.CurriculumCatalog
 import com.example.data.curriculum.CurriculumProgression
 import com.example.data.curriculum.Lesson
 import com.example.data.curriculum.LessonPillar
+import com.example.data.curriculum.QuestionShuffler
 import com.example.data.local.OfflineProgressSnapshot
 import com.example.data.local.ThemeMode
 import com.example.data.local.ThemePreferences
@@ -49,6 +50,8 @@ class MeritPrepViewModel(
   val cbtState: StateFlow<CbtExamState> = _cbtState.asStateFlow()
 
   private var examTimerJob: Job? = null
+  private val seenCbtIdsByTrack = mutableMapOf<String, MutableSet<String>>()
+  private val lastCbtRoundIdsByTrack = mutableMapOf<String, Set<String>>()
 
   init {
     viewModelScope.launch {
@@ -201,16 +204,28 @@ class MeritPrepViewModel(
 
     viewModelScope.launch {
       val allQuestions = repository.fetchPastQuestionsForCbt(targetSubject, targetBoard)
+      val limit = if (targetLimit > 0) minOf(targetLimit, allQuestions.size) else allQuestions.size
+      val trackKey = "${targetSubject}_${targetBoard}"
+      val seen = seenCbtIdsByTrack.getOrPut(trackKey) { mutableSetOf() }
+      val lastRound = lastCbtRoundIdsByTrack[trackKey].orEmpty()
       val questions =
-        if (targetLimit > 0 && allQuestions.size > targetLimit) {
-          allQuestions.sortedByDescending { it.year }.take(targetLimit)
-        } else {
-          allQuestions
-        }
+        QuestionShuffler.prepareFreshQuestionSet(
+          pool = allQuestions,
+          count = limit,
+          previouslySeenIds = seen,
+          lastRoundIds = lastRound,
+        )
       if (questions.isEmpty()) {
         _cbtState.update { it.copy(isLoadingQuestions = false) }
         _statusMessage.value = "No past questions found for this track."
         return@launch
+      }
+      val pickedIds = questions.map { it.id }.toSet()
+      seen.addAll(pickedIds)
+      lastCbtRoundIdsByTrack[trackKey] = pickedIds
+      if (seen.size >= allQuestions.size) {
+        seen.clear()
+        seen.addAll(pickedIds)
       }
       val totalAllowed = (questions.size * 75).coerceAtLeast(180)
       _cbtState.value =

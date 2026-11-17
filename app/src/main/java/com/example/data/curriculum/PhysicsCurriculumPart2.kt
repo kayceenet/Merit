@@ -2,251 +2,597 @@ package com.example.data.curriculum
 
 object PhysicsCurriculumPart2 {
 
-  val modules: List<CourseModule> =
+  val module3And4: List<CourseModule> =
     listOf(
       CourseModule(
         id = "phys_mod_3",
         subjectId = "physics",
         indexLabel = "Module 03",
-        title = "Waves, Sound & Geometrical Optics",
-        summary = "Explore SHM, wave interference, resonance in pipes, Snell's refraction law, and mirrors/lenses.",
+        title = "Thermal Physics, Gas Laws, Waves & Optics",
+        summary = "Understand temperature, expansion, specific/latent heat, sound harmonics in pipes, mirrors, lenses & total internal reflection.",
         lessons =
           listOf(
             Lesson(
-              id = "phys_07_waves_shm",
+              id = "phys_08_heat_expansion",
               moduleId = "phys_mod_3",
               subjectId = "physics",
-              title = "SHM, Progressive Waves & Sound Resonance",
-              durationMinutes = 20,
-              syllabusTag = "JAMB Sec. 5.1–5.5 • WAEC Waves",
+              title = "Temperature Scales, Thermal Expansion & Gas Laws",
+              durationMinutes = 18,
+              syllabusTag = "JAMB Sec. 5.1–5.4 • WAEC Thermal Expansion",
               learningOutcomes =
                 listOf(
-                  "Apply v = fλ and y = A·sin(2πft − 2πx/λ) to progressive waves.",
-                  "Distinguish open vs closed pipe harmonics and Doppler/echo calculations.",
+                  "Calibrate ungraduated thermometers using Ice Point (0°C) and Steam Point (100°C).",
+                  "Compute linear/area/volume thermal expansion (γ = 3α, β = 2α) and General Gas Law PV/T.",
                 ),
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "Step 1 (From Scratch): Waves Transfer Energy, Not Matter",
+                    heading = "1. Why Bridges Have Tiny Metal Gaps in Hot Sun",
                     explanation =
-                      "When a pebble drops into a pond, water particles bob up and down locally while the ripple carries energy outward. Amplitude A is max crest height; Wavelength λ is crest-to-crest distance; Frequency f (Hz) is waves per second.",
-                    keyFormula = "v = f\\lambda   |   T = \\frac{1}{f}   |   T_{pendulum} = 2\\pi\\sqrt{\\frac{L}{g}}",
+                      "Heat makes atoms jiggle violently and push slightly farther apart—so steel rails and bridges grow longer in the afternoon sun! Engineers leave small expansion gaps so tracks don't buckle. Volume expansion coefficient γ is always THREE times linear expansivity α (γ = 3α), and area expansion β = 2α!",
+                    keyFormula = "\\Delta L = \\alpha L_1 \\Delta\\theta   |   \\beta = 2\\alpha   |   \\gamma = 3\\alpha   |   \\theta(^{\\circ}C) = \\frac{X_\\theta - X_0}{X_{100} - X_0} \\times 100",
                     examTip =
-                      "Pendulum period T depends ONLY on length L and gravity g — NOT on bob mass! Quadrupling L doubles T.",
+                      "ALWAYS convert Celsius to Kelvin (T = °C + 273) before dividing in ANY Gas Law formula PV/T = constant!",
                   ),
                   ConceptBlock(
-                    heading = "Step 2: Stationary Waves & Air Columns",
+                    heading = "2. Pressure, Volume & Kelvin Temperature of Trapped Gas",
                     explanation =
-                      "In an air pipe, a closed end forces a displacement Node (N) while an open end creates an Antinode (A). A CLOSED pipe resonates only at ODD harmonics (f₀, 3f₀, 5f₀) with L = λ/4 at fundamental. An OPEN pipe resonates at ALL harmonics (f₀, 2f₀, 3f₀) with L = λ/2.",
-                    keyFormula = "f_{closed} = \\frac{v}{4L}   |   f_{open} = \\frac{v}{2L}   |   v_{echo} = \\frac{2d}{t}",
+                      "Squeeze a bicycle pump with your thumb blocking the nozzle: smaller volume packs air molecules closer so Pressure jumps up (Boyle's Law: P₁V₁ = P₂V₂). Heat a sealed balloon: faster molecules push walls outward so Volume expands with Kelvin T (Charles' Law: V₁/T₁ = V₂/T₂).",
+                    keyFormula = "\\frac{P_1 V_1}{T_1} = \\frac{P_2 V_2}{T_2}   \\quad (T \\text{ strictly in Kelvin!})",
                     examTip =
-                      "In echo problems sound goes TO the cliff and BACK, so total distance is 2d!",
+                      "Water shrinks between 0°C and 4°C (anomalous expansion)—so ice floats at 0°C while 4°C water sinks, keeping fish alive below frozen lakes!",
                   ),
                 ),
               workedExamples =
                 listOf(
                   WorkedExample(
-                    title = "Harmonic Progressive Wave Equation",
-                    examSource = "JAMB UTME 2024 • Physics Q25",
+                    title = "Finding Unknown Temperature on Uncalibrated Thermometer",
+                    examSource = "JAMB UTME 2024 • Physics Q18",
                     problemStatement =
-                      "A transverse wave is given by y = 0.05·sin(40πt − 0.5πx) where x and y are in metres. Find (a) wavelength and (b) wave speed.",
+                      "A mercury thread measures 4.0 cm at 0°C and 24.0 cm at 100°C. What temperature gives length 14.0 cm?",
                     steps =
                       listOf(
-                        "Step 1 — Match to y = A·sin(2πft − 2πx/λ).",
-                        "Step 2 — 2πf = 40π => f = 20 Hz; 2π/λ = 0.5π => λ = 4.0 m.",
-                        "Step 3 — Wave speed: v = fλ = 20 × 4.0 = 80 m/s.",
+                        "Step 1 — Span from 0°C to 100°C = 24.0 − 4.0 = 20.0 cm.",
+                        "Step 2 — θ = [(14.0 − 4.0) / 20.0] × 100 = (10 / 20) × 100 = 50°C.",
                       ),
-                    finalAnswer = "λ = 4.0 m, v = 80 m/s",
-                    examinerTrap = "Always factor out 2π inside the sine bracket before reading f and λ!",
+                    finalAnswer = "50°C",
+                    examinerTrap = "Remember to subtract the 0°C ice-point reading from BOTH numerator and denominator!",
                   ),
                   WorkedExample(
-                    title = "Closed Pipe Fundamental & Resonance",
-                    examSource = "WAEC SSCE 2022 • Paper 2 Q7",
+                    title = "Gas Cylinder Heated at Constant Pressure",
+                    examSource = "WAEC SSCE 2023 • Paper 2 Q5",
                     problemStatement =
-                      "A closed organ pipe of length 0.85 m resonates at its fundamental frequency when speed of sound is 340 m/s. Find the fundamental and first overtone frequencies.",
+                      "Gas occupies 300 cm³ at 27°C. What volume does it occupy at 127°C if pressure stays constant?",
                     steps =
                       listOf(
-                        "Step 1 — Fundamental: f₀ = v / (4L) = 340 / (4 × 0.85) = 340 / 3.4 = 100 Hz.",
-                        "Step 2 — Closed pipe omits even harmonics, so 1st overtone = 3rd harmonic = 3 × 100 = 300 Hz.",
+                        "Step 1 — Convert to Kelvin: T₁ = 27 + 273 = 300 K; T₂ = 127 + 273 = 400 K.",
+                        "Step 2 — V₂ = V₁(T₂/T₁) = 300 × (400/300) = 400 cm³.",
                       ),
-                    finalAnswer = "f₀ = 100 Hz, 1st overtone = 300 Hz",
-                    examinerTrap = "Closed pipes have NO 2f₀ overtone; the first overtone is 3f₀!",
+                    finalAnswer = "400 cm³",
+                    examinerTrap = "Never compute 300 × (127/27) using Celsius!",
                   ),
                 ),
               scenarios =
                 listOf(
                   RealLifeScenario(
-                    title = "Ultrasonic Echo Depth Sounders on Fishing Trawlers",
-                    industryDomain = "Marine Acoustics",
+                    title = "Bimetallic Strip Electric Kettle Thermostat",
+                    industryDomain = "Home Appliances",
                     narrative =
-                      "Trawlers pulse high-frequency sound downward and time the returning seabed echo t to map depth d = ½·v·t safely.",
-                    examConnection = "Direct match for sonar/echo distance questions in WAEC.",
-                  ),
-                  RealLifeScenario(
-                    title = "Guitar String Tension Tuning",
-                    industryDomain = "Musical Acoustics",
-                    narrative =
-                      "Tightening a guitar peg raises string tension T, increasing fundamental frequency f = (1/2L)√(T/μ).",
-                    examConnection = "Tests f ∝ √T in JAMB stationary wave questions.",
+                      "Brass glued to steel bends when hot because brass expands faster (larger α), snapping the electric circuit open automatically when boiled.",
+                    examConnection = "Classic WAEC application of unequal linear expansivities.",
                   ),
                 ),
-              labType = PracticalLabType.WAVE_OPTICS_BENCH,
+              labType = PracticalLabType.THERMAL_EXPANSION_CALORIMETRY,
               labBrief =
-                "Adjust Wave Frequency in the Wave & Optics Bench below to inspect how wavelength λ shrinks inversely as frequency rises in a medium of fixed speed.",
+                "Adjust temperature, rod linear expansivity α, and gas piston Kelvin temperature below to watch metal expansion and gas volume respond!",
               exercises =
                 listOf(
                   PracticeQuestion(
-                    id = "ex_phys_w1",
-                    topic = "Waves",
+                    id = "ex_phy_08_1",
+                    topic = "Linear Expansion",
                     examType = "JAMB",
-                    year = 2025,
-                    question = "A simple pendulum has a period of 2.0 s. What is its new period if its length is made 4 times longer?",
-                    options = listOf("1.0 s", "4.0 s", "8.0 s", "16.0 s"),
+                    year = 2024,
+                    question = "A 2.0 m steel rod (α = 1.2 × 10⁻⁵ K⁻¹) heats by 50 K. Find its increase in length.",
+                    options = listOf("0.0006 m", "0.0012 m", "0.0024 m", "0.012 m"),
                     correctIndex = 1,
-                    hint = "T ∝ √L.",
-                    stepByStepSolution = "T₂ = T₁√4 = 2.0 × 2 = 4.0 s.",
+                    hint = "ΔL = α L Δθ.",
+                    stepByStepSolution = "ΔL = 1.2×10⁻⁵ × 2.0 × 50 = 1.2 × 10⁻³ m = 0.0012 m (1.2 mm).",
                   ),
                   PracticeQuestion(
-                    id = "ex_phys_w2",
-                    topic = "Sound & Echo",
+                    id = "ex_phy_08_2",
+                    topic = "Cubic Expansivity",
                     examType = "WAEC",
                     year = 2023,
-                    question = "A man standing 510 m from a high wall claps his hands. How soon does he hear the echo if speed of sound is 340 m/s?",
-                    options = listOf("1.5 s", "2.0 s", "3.0 s", "4.0 s"),
+                    question = "If linear expansivity of copper is α, its cubic (volume) expansivity γ equals:",
+                    options = listOf("α/3", "2α", "3α", "α³"),
                     correctIndex = 2,
-                    hint = "Total sound travel = 2 × 510 m.",
-                    stepByStepSolution = "t = 2d / v = (2 × 510) / 340 = 1020 / 340 = 3.0 s.",
-                    waecMarkingScheme = "M1: t = 2d/v; A1: 3.0 s.",
+                    hint = "Length, breadth, and height all expand.",
+                    stepByStepSolution = "γ = 3α.",
+                    waecMarkingScheme = "A1: 3α.",
                   ),
                   PracticeQuestion(
-                    id = "ex_phys_w3",
-                    topic = "Waves",
+                    id = "ex_phy_08_3",
+                    topic = "Gas Laws",
                     examType = "JAMB",
+                    year = 2025,
+                    question = "At constant temperature, a gas at 2.0 atm occupies 150 cm³. What volume does it take at 6.0 atm?",
+                    options = listOf("50 cm³", "75 cm³", "300 cm³", "450 cm³"),
+                    correctIndex = 0,
+                    hint = "P₁V₁ = P₂V₂ (Boyle's Law).",
+                    stepByStepSolution = "V₂ = (2 × 150) / 6 = 50 cm³.",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_08_4",
+                    topic = "Thermometers",
+                    examType = "WAEC",
                     year = 2022,
-                    question = "Which property distinguishes transverse waves from longitudinal waves?",
-                    options = listOf("Refraction", "Diffraction", "Polarization", "Interference"),
+                    question = "Why is alcohol preferred over mercury for measuring Arctic temperatures around −60°C?",
+                    options = listOf("Alcohol conducts heat faster", "Alcohol freezes much lower (−115°C) than mercury (−39°C)", "Alcohol doesn't wet glass", "Alcohol boils higher"),
+                    correctIndex = 1,
+                    hint = "Mercury freezes solid below −39°C.",
+                    stepByStepSolution = "Mercury solidifies at −39°C, whereas alcohol stays liquid down to −115°C.",
+                    waecMarkingScheme = "A1: Lower freezing point (−115°C vs −39°C).",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_08_5",
+                    topic = "Anomalous Water",
+                    examType = "JAMB",
+                    year = 2021,
+                    question = "Water reaches its MAXIMUM density at approximately:",
+                    options = listOf("0°C", "4°C", "37°C", "100°C"),
+                    correctIndex = 1,
+                    hint = "Liquid water contracts on warming from 0°C up to this temperature.",
+                    stepByStepSolution = "Water achieves maximum density (1,000 kg/m³) at 4°C.",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_08_6",
+                    topic = "Thermometer Calibration",
+                    examType = "JAMB",
+                    year = 2020,
+                    question = "A resistance thermometer reads 10 Ω at 0°C, 30 Ω at 100°C, and 22 Ω in warm oil. Find oil temperature.",
+                    options = listOf("40°C", "50°C", "60°C", "72°C"),
                     correctIndex = 2,
-                    hint = "Only waves vibrating perpendicular to travel direction can be polarized.",
-                    stepByStepSolution = "Polarization is unique to transverse waves (light, EM waves); sound (longitudinal) cannot be polarized.",
+                    hint = "θ = [(22 − 10) / (30 − 10)] × 100.",
+                    stepByStepSolution = "(12 / 20) × 100 = 60°C.",
                   ),
                 ),
             ),
             Lesson(
-              id = "phys_08_optics",
+              id = "phys_09_calorimetry_heat_transfer",
               moduleId = "phys_mod_3",
               subjectId = "physics",
-              title = "Refraction, Snell's Law, Mirrors & Lenses",
-              durationMinutes = 22,
-              syllabusTag = "JAMB Sec. 5.6–5.10 • WAEC Optics",
+              title = "Specific & Latent Heat, Vapors & Heat Transfer",
+              durationMinutes = 18,
+              syllabusTag = "JAMB Sec. 5.5–5.8 • WAEC Heat & Vapors",
               learningOutcomes =
                 listOf(
-                  "Apply Snell's Law n₁sin(i) = n₂sin(r), refractive index n = c/v, and real/apparent depth.",
-                  "Solve spherical mirror and thin lens problems using the Real-Is-Positive sign convention.",
+                  "Calculate heating & melting energies with Q = mcΔθ and Q = mL.",
+                  "Explain boiling point pressure effects, relative humidity, and vacuum flask insulation.",
                 ),
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "Step 1: Why Light Bends (Refraction & Critical Angle)",
+                    heading = "1. Climbing Temperature vs Flat Phase-Change Stops",
                     explanation =
-                      "Light slows down when entering a denser optical medium like glass or water, bending TOWARD the normal line. Frequency NEVER changes during refraction; only speed v and wavelength λ change! Leaving glass into air at angles beyond Critical Angle c causes Total Internal Reflection (TIR).",
-                    keyFormula = "n = \\frac{\\sin i}{\\sin r} = \\frac{c}{v} = \\frac{\\text{Real Depth}}{\\text{Apparent Depth}}   |   \\sin c = \\frac{1}{n}",
+                      "Put an ice cube on a stove. While ice melts into water at 0°C—or water boils into steam at 100°C—the thermometer FREEZES flat! Heat added there doesn't raise temperature; instead, it breaks bonds holding molecules tight (Latent = 'Hidden' Heat, Q = mL).",
+                    keyFormula = "Q_{\\text{temp rise}} = m c \\Delta\\theta   |   Q_{\\text{phase change}} = m L   |   \\text{Electrical Heat } = I V t",
                     examTip =
-                      "Total Internal Reflection happens ONLY when light travels from DENSER -> LESS DENSE medium AND i > c!",
+                      "Cooling by evaporation (sweating or alcohol on skin) works because escaping fast molecules steal latent heat of vaporization from your skin!",
                   ),
                   ConceptBlock(
-                    heading = "Step 2: Real-Is-Positive Mirror & Lens Formula",
+                    heading = "2. Conduction, Convection, Radiation & Vacuum Flasks",
                     explanation =
-                      "Use the unified focal equation 1/f = 1/u + 1/v. Real objects, real images, converging lenses, and concave mirrors have POSITIVE f and v. Virtual images (upright!), diverging lenses, and convex mirrors have NEGATIVE f or v.",
-                    keyFormula = "\\frac{1}{f} = \\frac{1}{u} + \\frac{1}{v}   |   m = \\frac{v}{u} = \\frac{h_i}{h_o}   |   P(D) = \\frac{1}{f(m)}",
+                      "Heat travels three ways: passed hand-to-hand along a metal spoon (Conduction—stopped by vacuum/plastic), carried upward by rising warm fluid loops (Convection—why AC sits high & kettle heaters sit at the bottom), and beaming across empty space from the Sun as infrared waves (Radiation—black dull surfaces absorb/emit best, shiny silver reflects!).",
+                    keyFormula = "\\text{Relative Humidity} = \\frac{\\text{SVP at Dew Point}}{\\text{SVP at Room Temp}} \\times 100\\%",
                     examTip =
-                      "Optical Power in Dioptres (D) requires focal length f in METRES! A +20 cm converging lens has Power = 1 / 0.20 = +5.0 D.",
+                      "Pressure cookers trap steam to raise pressure above 1 atm, lifting water's boiling point above 100°C so tough beans cook way faster!",
                   ),
                 ),
               workedExamples =
                 listOf(
                   WorkedExample(
-                    title = "Converging Lens Real Image Projection",
-                    examSource = "JAMB UTME 2023 • Physics Q28",
+                    title = "Method of Mixtures Calorimetry",
+                    examSource = "JAMB UTME 2024 • Physics Q20",
                     problemStatement =
-                      "An object is placed 30 cm in front of a converging lens of focal length 12 cm. Find the image position and magnification.",
+                      "A 100 W immersion heater supplies heat for 210 s to warm 0.5 kg of water (c = 4,200 J/kg·K). Find temperature rise Δθ.",
                     steps =
                       listOf(
-                        "Step 1 — Converging lens => f = +12 cm, real object => u = +30 cm.",
-                        "Step 2 — 1/v = 1/12 − 1/30 = (5 − 2)/60 = 3/60 = 1/20 => v = +20 cm (real, inverted).",
-                        "Step 3 — Magnification m = v / u = 20 / 30 = 0.67.",
+                        "Step 1 — Electrical heat Q = P × t = 100 × 210 = 21,000 J.",
+                        "Step 2 — 21,000 = m c Δθ = 0.5 × 4,200 × Δθ = 2,100 Δθ.",
+                        "Step 3 — Δθ = 21,000 / 2,100 = 10 K (10°C).",
                       ),
-                    finalAnswer = "20 cm behind lens (Real), m = 2/3",
-                    examinerTrap = "Always check sign of v: + means Real & Inverted; − means Virtual & Upright!",
+                    finalAnswer = "10°C (10 K)",
+                    examinerTrap = "Never divide watts by minutes—convert time strictly to SECONDS!",
                   ),
                   WorkedExample(
-                    title = "Apparent Depth of a Swimming Pool",
-                    examSource = "WAEC SSCE 2021 • Paper 1 Q29",
+                    title = "Total Energy to Melt Ice and Warm Water",
+                    examSource = "WAEC SSCE 2022 • Paper 2 Q6",
                     problemStatement =
-                      "A coin lies at the bottom of a pool 2.0 m deep. If water has refractive index 4/3, how deep does the coin appear from straight above?",
+                      "How much heat converts 0.2 kg of ice at 0°C completely into water at 20°C? (L_f = 336,000 J/kg, c = 4,200 J/kg·K)",
                     steps =
                       listOf(
-                        "Step 1 — n = Real Depth / Apparent Depth => Apparent Depth = 2.0 / (4/3).",
-                        "Step 2 — Apparent Depth = 2.0 × 3 / 4 = 1.5 m (apparent upward shift = 0.5 m).",
+                        "Step 1 — Melt ice at 0°C: Q₁ = mL = 0.2 × 336,000 = 67,200 J.",
+                        "Step 2 — Warm liquid water 0°C → 20°C: Q₂ = mcΔθ = 0.2 × 4,200 × 20 = 16,800 J.",
+                        "Step 3 — Total = 67,200 + 16,800 = 84,000 J (84 kJ).",
                       ),
-                    finalAnswer = "1.5 m",
-                    examinerTrap = "Apparent depth is ALWAYS shallower than real depth!",
+                    finalAnswer = "84,000 J (84 kJ)",
+                    examinerTrap = "Add BOTH melting latent heat AND warming sensible heat!",
                   ),
                 ),
               scenarios =
                 listOf(
                   RealLifeScenario(
-                    title = "Fibre-Optic Submarine Internet Cables",
-                    industryDomain = "Telecommunications",
+                    title = "Vacuum Thermos Flask Engineering",
+                    industryDomain = "Thermal Design",
                     narrative =
-                      "Undersea internet cables landing in Lagos bounce laser pulses miles underwater inside silica glass cores using Total Internal Reflection (sin c = 1/n).",
-                    examConnection = "Standard WAEC practical application of TIR & critical angle.",
+                      "Silvered inner glass reflects radiant heat, double-wall vacuum kills conduction and convection, and a plastic cork stops heat escape.",
+                    examConnection = "Favorite WAEC Paper 2 diagram question.",
                   ),
+                ),
+              labType = PracticalLabType.THERMAL_EXPANSION_CALORIMETRY,
+              labBrief =
+                "Switch to Calorimetry Heating Curve Mode below to add Joules of heat to ice and observe the flat melting (0°C) & boiling (100°C) latent plateaus!",
+              exercises =
+                listOf(
+                  PracticeQuestion(
+                    id = "ex_phy_09_1",
+                    topic = "Specific Heat",
+                    examType = "JAMB",
+                    year = 2024,
+                    question = "Which property makes water ideal as a car radiator coolant?",
+                    options = listOf("Low boiling point", "High specific heat capacity", "High density", "Transparent color"),
+                    correctIndex = 1,
+                    hint = "It absorbs massive Joules per °C rise.",
+                    stepByStepSolution = "Water's high specific heat capacity (4,200 J/kg·K) lets it carry away lots of heat smoothly.",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_09_2",
+                    topic = "Boiling & Pressure",
+                    examType = "WAEC",
+                    year = 2023,
+                    question = "Water boils at LESS than 100°C high on Mount Cameroon primarily because:",
+                    options = listOf("Air is colder", "Atmospheric pressure is lower at high altitude", "Gravity decreases", "Sunlight is stronger"),
+                    correctIndex = 1,
+                    hint = "Lower pressure lets vapor bubbles escape sooner.",
+                    stepByStepSolution = "Reduced atmospheric pressure lowers water's boiling point below 100°C.",
+                    waecMarkingScheme = "A1: Lower atmospheric pressure.",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_09_3",
+                    topic = "Latent Heat",
+                    examType = "JAMB",
+                    year = 2025,
+                    question = "Why does 100°C steam burn skin far worse than 100°C boiling water?",
+                    options = listOf("Steam moves faster", "Steam releases huge latent heat of vaporization upon condensing", "Steam is heavier", "Water conducts poorly"),
+                    correctIndex = 1,
+                    hint = "2,260,000 J/kg extra hidden heat releases during condensation.",
+                    stepByStepSolution = "Condensing 100°C steam dumps specific latent heat of vaporization directly onto skin before cooling.",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_09_4",
+                    topic = "Vacuum Flask",
+                    examType = "WAEC",
+                    year = 2022,
+                    question = "In a thermos flask, heat loss by RADIATION is minimized primarily by:",
+                    options = listOf("Vacuum space", "Silvered glass walls", "Plastic stopper", "Foam pad"),
+                    correctIndex = 1,
+                    hint = "Shiny mirrors reflect infrared electromagnetic waves.",
+                    stepByStepSolution = "Silvered walls are poor emitters and good reflectors of infrared radiation.",
+                    waecMarkingScheme = "A1: Silvered surfaces.",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_09_5",
+                    topic = "Calorimetry",
+                    examType = "JAMB",
+                    year = 2021,
+                    question = "How much heat is required to warm 2 kg of aluminum (c = 900 J/kg·K) from 20°C to 70°C?",
+                    options = listOf("36 kJ", "90 kJ", "126 kJ", "180 kJ"),
+                    correctIndex = 1,
+                    hint = "Q = m c (70 − 20).",
+                    stepByStepSolution = "Q = 2 × 900 × 50 = 90,000 J = 90 kJ.",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_09_6",
+                    topic = "Evaporation",
+                    examType = "JAMB",
+                    year = 2020,
+                    question = "Which condition SLOWS down the rate of evaporation from an open bowl of water?",
+                    options = listOf("Wind blowing across surface", "Higher temperature", "Higher air humidity", "Wider surface area"),
+                    correctIndex = 2,
+                    hint = "Saturated damp air leaves nowhere for fresh vapor molecules to escape.",
+                    stepByStepSolution = "High relative humidity reduces net evaporation rate.",
+                  ),
+                ),
+            ),
+            Lesson(
+              id = "phys_10_waves_sound",
+              moduleId = "phys_mod_3",
+              subjectId = "physics",
+              title = "Waves, Standing Harmonics, Sound & Resonance",
+              durationMinutes = 20,
+              syllabusTag = "JAMB Sec. 6.1–6.5 • WAEC Waves & Acoustics",
+              learningOutcomes =
+                listOf(
+                  "Distinguish transverse vs longitudinal waves and use v = fλ cleanly.",
+                  "Solve open/closed pipe fundamental harmonics (v/4L vs v/2L) and echo distances.",
+                ),
+              concepts =
+                listOf(
+                  ConceptBlock(
+                    heading = "1. Waves Move Energy Without Moving Water Forward",
+                    explanation =
+                      "Drop a pebble in a pond: ripples spread outward carrying energy, while a floating cork just bobs up and down (Transverse wave—light, water, EM waves). Sound travels by squishing air back-and-forth along the travel arrow (Longitudinal wave—needs air/solids, ZERO sound in space vacuum!).",
+                    keyFormula = "v = f\\lambda   |   v_{\\text{echo}} = \\frac{2d}{t}   |   \\text{Progressive: } y = A\\sin\\left(2\\pi ft - \\frac{2\\pi x}{\\lambda}\\right)",
+                    examTip =
+                      "Echo time t includes BOTH there and back, so distance to cliff d = (v × t) / 2! Sound travels FASTEST in steel solids, slower in water, slowest in air.",
+                  ),
+                  ConceptBlock(
+                    heading = "2. Musical Pipes, Beats & Overtones",
+                    explanation =
+                      "Blow across a closed soda bottle vs an open flute pipe. A CLOSED pipe forces a still air node at the bottom so ¼ wavelength fits inside -> fundamental frequency f₀ = v / (4L) (only ODD harmonics: f₀, 3f₀, 5f₀). An OPEN pipe fits ½ wavelength inside -> f₀ = v / (2L) (ALL harmonics: f₀, 2f₀, 3f₀).",
+                    keyFormula = "f_{\\text{closed}} = \\frac{v}{4L} \\; (1, 3, 5\\dots)   |   f_{\\text{open}} = \\frac{v}{2L} \\; (1, 2, 3\\dots)   |   f_{\\text{beat}} = |f_1 - f_2|",
+                    examTip =
+                      "Pitch depends on Frequency; Loudness depends on Amplitude; Quality (Timbre) depends on Overtones/Harmonics!",
+                  ),
+                ),
+              workedExamples =
+                listOf(
+                  WorkedExample(
+                    title = "Closed Organ Pipe Fundamental & First Overtone",
+                    examSource = "JAMB UTME 2024 • Physics Q23",
+                    problemStatement =
+                      "A pipe closed at one end is 0.25 m long. If sound speed in air is 340 m/s, find fundamental frequency f₀ and first overtone f₁.",
+                    steps =
+                      listOf(
+                        "Step 1 — Closed pipe fundamental: f₀ = v / (4L) = 340 / (4 × 0.25) = 340 / 1.0 = 340 Hz.",
+                        "Step 2 — Closed pipes only allow ODD harmonics, so first overtone = 3 × f₀ = 3 × 340 = 1,020 Hz.",
+                      ),
+                    finalAnswer = "f₀ = 340 Hz  |  First Overtone = 1,020 Hz",
+                    examinerTrap = "Don't multiply closed pipe f₀ by 2—first overtone of a closed pipe is 3f₀!",
+                  ),
+                  WorkedExample(
+                    title = "Extracting Frequency & Wavelength from Wave Equation",
+                    examSource = "WAEC SSCE 2023 • Paper 1 Q20",
+                    problemStatement =
+                      "A wave is given by y = 5 sin(20π t − 0.4π x) in SI units. Find its frequency and wavelength.",
+                    steps =
+                      listOf(
+                        "Step 1 — Compare with y = A sin(2π f t − 2π x / λ).",
+                        "Step 2 — 2π f = 20π => f = 10 Hz.",
+                        "Step 3 — 2π / λ = 0.4π => λ = 2 / 0.4 = 5.0 m.",
+                      ),
+                    finalAnswer = "f = 10 Hz  |  λ = 5.0 m",
+                    examinerTrap = "Read coefficients carefully before π cancels cleanly.",
+                  ),
+                ),
+              scenarios =
+                listOf(
                   RealLifeScenario(
-                    title = "Optometry Spectacle Correction",
-                    industryDomain = "Clinical Vision Science",
+                    title = "Hospital Ultrasound & Ship Sonar Depth Mapping",
+                    industryDomain = "Medical Imaging & Ocean Mapping",
                     narrative =
-                      "Short-sightedness (myopia) is corrected with a diverging concave lens (−D), while long-sightedness (hypermetropia) uses a converging convex lens (+D).",
-                    examConnection = "Frequently tested eye-defect lens matching in JAMB & WAEC.",
+                      "Ships time underwater ultrasound bounces to map ocean trenches without touching the seabed, using d = vt / 2.",
+                    examConnection = "Classic application of wave reflection (echo) in JAMB.",
                   ),
                 ),
               labType = PracticalLabType.WAVE_OPTICS_BENCH,
               labBrief =
-                "Switch between Water (1.33), Glass (1.50), and Diamond (2.42) in the Optics Bench below and drag Incidence Angle i to watch refraction ray bending and critical angle c!",
+                "Switch to Sound Harmonics & Standing Waves inside the Bench below: adjust frequency f and pipe length L to see standing nodes & antinodes!",
               exercises =
                 listOf(
                   PracticeQuestion(
-                    id = "ex_phys_op1",
-                    topic = "Optics",
+                    id = "ex_phy_10_1",
+                    topic = "Wave Equation",
                     examType = "JAMB",
                     year = 2024,
-                    question = "What is the critical angle for light traveling from a medium of refractive index √2 into air?",
-                    options = listOf("30°", "45°", "60°", "90°"),
+                    question = "A radio station broadcasts at 100 MHz (1.0 × 10⁸ Hz). Using c = 3.0 × 10⁸ m/s, find the wavelength.",
+                    options = listOf("0.33 m", "3.0 m", "30 m", "300 m"),
                     correctIndex = 1,
-                    hint = "sin(c) = 1 / n.",
-                    stepByStepSolution = "sin(c) = 1 / √2 => c = 45°.",
+                    hint = "λ = c / f.",
+                    stepByStepSolution = "λ = (3.0 × 10⁸) / (1.0 × 10⁸) = 3.0 m.",
                   ),
                   PracticeQuestion(
-                    id = "ex_phys_op2",
-                    topic = "Lenses",
+                    id = "ex_phy_10_2",
+                    topic = "Polarization",
                     examType = "WAEC",
                     year = 2023,
-                    question = "To correct myopia (short-sightedness), a doctor prescribes spectacles made of:",
-                    options = listOf("Convex lenses", "Concave lenses", "Cylindrical lenses", "Plane glass"),
-                    correctIndex = 1,
-                    hint = "Myopic eyes focus parallel rays too early (in front of retina) and need divergence.",
-                    stepByStepSolution = "Concave (diverging) lenses spread incoming rays slightly so they focus right on the retina.",
-                    waecMarkingScheme = "A1: Concave / diverging lens.",
+                    question = "Which property distinguishes Transverse waves (like light) from Longitudinal waves (like sound)?",
+                    options = listOf("Reflection", "Refraction", "Polarization", "Diffraction"),
+                    correctIndex = 2,
+                    hint = "Only sideways-vibrating waves can be filtered in one plane.",
+                    stepByStepSolution = "Only transverse waves can undergo Polarization; longitudinal waves vibrate parallel to propagation.",
+                    waecMarkingScheme = "A1: Polarization.",
                   ),
                   PracticeQuestion(
-                    id = "ex_phys_op3",
-                    topic = "Mirrors",
+                    id = "ex_phy_10_3",
+                    topic = "Echoes",
+                    examType = "JAMB",
+                    year = 2025,
+                    question = "A boy claps near a tall cliff and hears an echo 1.5 s later. If sound speed is 340 m/s, how far is the cliff?",
+                    options = listOf("255 m", "340 m", "510 m", "1,020 m"),
+                    correctIndex = 0,
+                    hint = "d = v t / 2.",
+                    stepByStepSolution = "d = (340 × 1.5) / 2 = 510 / 2 = 255 m.",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_10_4",
+                    topic = "Beats",
                     examType = "JAMB",
                     year = 2022,
-                    question = "An object placed 10 cm from a concave mirror of focal length 15 cm produces an image that is:",
-                    options = listOf("Real and diminished", "Real and magnified", "Virtual and magnified", "Virtual and diminished"),
+                    question = "Tuning forks of 256 Hz and 260 Hz are sounded together. How many beats are heard per second?",
+                    options = listOf("2 Hz", "4 Hz", "258 Hz", "516 Hz"),
+                    correctIndex = 1,
+                    hint = "f_beat = |f₁ − f₂|.",
+                    stepByStepSolution = "|260 − 256| = 4 beats per second (4 Hz).",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_10_5",
+                    topic = "Closed Pipe Harmonics",
+                    examType = "WAEC",
+                    year = 2021,
+                    question = "An open pipe and a closed pipe have the SAME fundamental frequency. The ratio of open length to closed length is:",
+                    options = listOf("1 : 2", "2 : 1", "1 : 4", "4 : 1"),
+                    correctIndex = 1,
+                    hint = "Equate v / (2L_open) = v / (4L_closed).",
+                    stepByStepSolution = "2L_open = 4L_closed => L_open / L_closed = 2 : 1.",
+                    waecMarkingScheme = "M1: v/2Lo = v/4Lc; A1: 2 : 1.",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_10_6",
+                    topic = "Sound Medium",
+                    examType = "JAMB",
+                    year = 2020,
+                    question = "In which medium does sound travel FASTEST at room temperature?",
+                    options = listOf("Vacuum", "Dry air", "Fresh water", "Steel rail"),
+                    correctIndex = 3,
+                    hint = "Tightly packed stiff atomic bonds pass vibrations quickest.",
+                    stepByStepSolution = "Sound travels fastest in stiff solids like steel (~5,000 m/s), slower in water (~1,500 m/s), slowest in air (~340 m/s).",
+                  ),
+                ),
+            ),
+            Lesson(
+              id = "phys_11_optics_lenses",
+              moduleId = "phys_mod_3",
+              subjectId = "physics",
+              title = "Optics: Mirrors, Refraction (TIR), Lenses & Eye Defects",
+              durationMinutes = 22,
+              syllabusTag = "JAMB Sec. 7.1–7.6 • WAEC Light & Optics",
+              learningOutcomes =
+                listOf(
+                  "Apply Snell's Law (n = sin i / sin r) and Critical Angle (sin c = 1/n).",
+                  "Use Mirror/Lens equation (1/u + 1/v = 1/f) and diagnose Myopia vs Hypermetropia.",
+                ),
+              concepts =
+                listOf(
+                  ConceptBlock(
+                    heading = "1. Refraction & Total Internal Reflection (Why Diamonds Sparkle)",
+                    explanation =
+                      "Light slows down when stepping from air into glass or water—so it bends TOWARD the normal line! Leaving glass back into air at a shallow steep angle larger than Critical Angle c bounces 100% of the light back inside (Total Internal Reflection)—powering fiber-optic internet cables and diamond sparkle!",
+                    keyFormula = "n = \\frac{\\sin i}{\\sin r} = \\frac{c_{\\text{air}}}{v_{\\text{medium}}} = \\frac{\\text{Real Depth}}{\\text{Apparent Depth}}   |   \\sin c = \\frac{1}{n}",
+                    examTip =
+                      "Critical angle ONLY happens going from a DENSE medium (glass/water) toward a LESS dense medium (air)—never from air into glass!",
+                  ),
+                  ConceptBlock(
+                    heading = "2. Lenses, Mirrors & Fixing Blurry Vision",
+                    explanation =
+                      "Magnifying glasses use Converging (Convex) lenses with f > 0. Under 'Real Is Positive', virtual images have negative v. Near-sighted (MYOPIA—can't see far) focuses too early in front of the retina -> fix with Diverging (Concave) lens. Far-sighted (HYPERMETROPIA—can't read close) focuses behind retina -> fix with Converging (Convex) lens!",
+                    keyFormula = "\\frac{1}{u} + \\frac{1}{v} = \\frac{1}{f}   |   m = \\frac{v}{u}   |   P_{\\text{dioptres}} = \\frac{1}{f(\\text{m})}",
+                    examTip =
+                      "Convex mirrors ALWAYS give upright, diminished virtual images with wide field of view (perfect for car side mirrors!).",
+                  ),
+                ),
+              workedExamples =
+                listOf(
+                  WorkedExample(
+                    title = "Converging Lens Real Image Distance",
+                    examSource = "JAMB UTME 2024 • Physics Q25",
+                    problemStatement =
+                      "An object sits 30 cm in front of a convex lens of focal length 10 cm. Locate image v and magnification m.",
+                    steps =
+                      listOf(
+                        "Step 1 — 1/v = 1/f − 1/u = 1/10 − 1/30 = (3 − 1)/30 = 2/30 = 1/15.",
+                        "Step 2 — v = +15 cm (Real, inverted, on opposite side).",
+                        "Step 3 — m = v / u = 15 / 30 = 0.5.",
+                      ),
+                    finalAnswer = "v = +15 cm (Real)  |  m = 0.5",
+                    examinerTrap = "For a diverging (concave) lens, ALWAYS plug negative focal length (−f)!",
+                  ),
+                  WorkedExample(
+                    title = "Apparent Depth of Coin in Swimming Pool",
+                    examSource = "WAEC SSCE 2023 • Paper 1 Q24",
+                    problemStatement =
+                      "A coin sits at the bottom of a 2.0 m deep water tank (n = 1.33 ≈ 4/3). How deep does it appear from directly above?",
+                    steps =
+                      listOf(
+                        "Step 1 — n = Real Depth / Apparent Depth.",
+                        "Step 2 — Apparent Depth = 2.0 / (4/3) = 2.0 × 0.75 = 1.50 m.",
+                      ),
+                    finalAnswer = "1.50 m",
+                    examinerTrap = "Water ALWAYS makes pool floors look SHALLOWER (Apparent < Real)!",
+                  ),
+                ),
+              scenarios =
+                listOf(
+                  RealLifeScenario(
+                    title = "Undersea Fiber-Optic Internet Cables",
+                    industryDomain = "Telecommunications",
+                    narrative =
+                      "Subsea glass fibers bounce laser data pulses miles through curves using Total Internal Reflection with almost zero signal loss.",
+                    examConnection = "Directly tests critical angle sin c = 1/n.",
+                  ),
+                ),
+              labType = PracticalLabType.WAVE_OPTICS_BENCH,
+              labBrief =
+                "Use the Snell's Refraction & Lens Ray Bench below: bend incident angle i past Critical Angle c to trigger Total Internal Reflection!",
+              exercises =
+                listOf(
+                  PracticeQuestion(
+                    id = "ex_phy_11_1",
+                    topic = "Eye Defects",
+                    examType = "JAMB",
+                    year = 2024,
+                    question = "Short-sightedness (Myopia), where distant objects focus in front of the retina, is corrected with a:",
+                    options = listOf("Convex lens", "Concave (diverging) lens", "Cylindrical lens", "Plane mirror"),
+                    correctIndex = 1,
+                    hint = "Rays converge too strongly—spread them slightly before entering the eye.",
+                    stepByStepSolution = "A concave (diverging) lens diverges incoming parallel rays so they focus cleanly onto the retina.",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_11_2",
+                    topic = "Critical Angle",
+                    examType = "WAEC",
+                    year = 2023,
+                    question = "A glass block has refractive index n = 2.0. Find its critical angle in air.",
+                    options = listOf("30°", "42°", "45°", "60°"),
+                    correctIndex = 0,
+                    hint = "sin(c) = 1 / n.",
+                    stepByStepSolution = "sin(c) = 1 / 2.0 = 0.5 => c = 30°.",
+                    waecMarkingScheme = "M1: sin c = 0.5; A1: 30°.",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_11_3",
+                    topic = "Convex Mirrors",
+                    examType = "JAMB",
+                    year = 2022,
+                    question = "Why are convex mirrors fitted as vehicle side-view driving mirrors?",
+                    options = listOf("They magnify distant trucks", "They give an upright image and wider field of view", "They invert upside-down rays", "They focus heat"),
+                    correctIndex = 1,
+                    hint = "Convex mirrors never form real inverted images.",
+                    stepByStepSolution = "Convex mirrors always produce upright, diminished images covering a much wider field of view.",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_11_4",
+                    topic = "Lens Power",
+                    examType = "JAMB",
+                    year = 2025,
+                    question = "Calculate the optical power (in Dioptres) of a convex lens with focal length +25 cm.",
+                    options = listOf("+0.04 D", "+2.5 D", "+4.0 D", "+25 D"),
                     correctIndex = 2,
-                    hint = "Object is inside focal point (u < f) of a concave mirror (like a shaving mirror).",
-                    stepByStepSolution = "1/v = 1/15 − 1/10 = −1/30 => v = −30 cm (virtual, upright, 3× magnified).",
+                    hint = "Convert 25 cm to 0.25 m before P = 1 / f.",
+                    stepByStepSolution = "P = 1 / 0.25 m = +4.0 D.",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_11_5",
+                    topic = "Dispersion",
+                    examType = "WAEC",
+                    year = 2021,
+                    question = "Passing white light through a glass prism bends which spectrum color the MOST?",
+                    options = listOf("Red", "Yellow", "Green", "Violet"),
+                    correctIndex = 3,
+                    hint = "Shortest wavelength slows down most in glass.",
+                    stepByStepSolution = "Violet has the shortest wavelength, highest refractive index in glass, and deviates most (Red deviates least).",
+                    waecMarkingScheme = "A1: Violet.",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_11_6",
+                    topic = "Mirror Formula",
+                    examType = "JAMB",
+                    year = 2020,
+                    question = "A concave mirror of focal length 12 cm forms a real image at 24 cm. Where is the object placed?",
+                    options = listOf("8 cm", "12 cm", "24 cm", "36 cm"),
+                    correctIndex = 2,
+                    hint = "When v = 2f, u = 2f.",
+                    stepByStepSolution = "1/u = 1/12 − 1/24 = 1/24 => u = 24 cm (at Center of Curvature C).",
                   ),
                 ),
             ),
@@ -256,561 +602,303 @@ object PhysicsCurriculumPart2 {
         id = "phys_mod_4",
         subjectId = "physics",
         indexLabel = "Module 04",
-        title = "Electricity, Electromagnetism & Modern Physics",
-        summary = "Master DC circuits, capacitors, transformers, AC impedance, photoelectric effect, and nuclear half-life.",
+        title = "Electrostatics, Capacitors & Current Electricity",
+        summary = "Master Coulomb charges, capacitors in series/parallel, Ohm's law, EMF internal resistance, meters & kWh electricity bills.",
         lessons =
           listOf(
             Lesson(
-              id = "phys_09_dc_circuits",
+              id = "phys_12_electrostatics_capacitors",
               moduleId = "phys_mod_4",
               subjectId = "physics",
-              title = "DC Circuits, Internal Resistance & Capacitors",
-              durationMinutes = 22,
-              syllabusTag = "JAMB Sec. 6 • WAEC Electricity",
+              title = "Electrostatics, Electric Fields & Capacitors",
+              durationMinutes = 18,
+              syllabusTag = "JAMB Sec. 8.1–8.3 • WAEC Electrostatics",
               learningOutcomes =
                 listOf(
-                  "Solve series/parallel resistor networks and internal battery drop V = E − Ir.",
-                  "Compare series vs parallel capacitor laws and stored energy E = ½CV².",
+                  "Apply Coulomb's inverse-square law F = kq₁q₂/r² and electric field E = V/d.",
+                  "Combine capacitors in Series (reciprocal) vs Parallel (direct sum) and find stored energy ½CV².",
                 ),
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "Step 1: Series/Parallel Resistors & Internal Resistance",
+                    heading = "1. Static Sparks & Electric Push Fields",
                     explanation =
-                      "In series, current I is uniform and total resistance adds (R_s = R₁ + R₂). In parallel, potential difference V is uniform and total resistance drops (1/R_p = 1/R₁ + 1/R₂). Real batteries have internal resistance r that consumes 'lost volts' I·r inside the casing.",
-                    keyFormula = "E = I(R + r) = V + Ir   |   P = I^2R = \\frac{V^2}{R}",
+                      "Rub a plastic pen on dry hair and it picks up paper bits! Opposite charges attract; same charges push apart according to Coulomb's Law: move charges TWICE as far apart, and electric force drops FOUR times weaker (1/r²). Sharp lightning rods leak electric charge safely to earth via 'Action of Points'.",
+                    keyFormula = "F = \\frac{k q_1 q_2}{r^2}   |   E = \\frac{F}{q} = \\frac{V}{d}   |   W = q V",
                     examTip =
-                      "Terminal p.d. equals EMF ONLY on open circuit (I = 0). Remember electrical energy paid on PHCN meters is in kWh: 1 kWh = 3.6 × 10⁶ J!",
+                      "Careful! Adding resistors in SERIES adds directly (R₁+R₂), but Capacitors are OPPOSITE: PARALLEL adds directly (C = C₁ + C₂) and SERIES uses reciprocals!",
                   ),
                   ConceptBlock(
-                    heading = "Step 2: Capacitors (Opposite Algebraic Rules to Resistors!)",
+                    heading = "2. Capacitors: Tiny Fast-Charge Buckets",
                     explanation =
-                      "A capacitor stores electric charge Q = C·V in Farads. Parallel capacitors ADD directly (C_p = C₁ + C₂), whereas Series capacitors combine reciprocally (1/C_s = 1/C₁ + 1/C₂) — the exact opposite of resistors!",
-                    keyFormula = "Q = CV   |   U = \\frac{1}{2}CV^2   |   C_{parallel} = C_1 + C_2",
+                      "A capacitor stores electric charge between two parallel metal plates separated by an insulator (dielectric). Bigger plate area A or better dielectric boosts Capacitance C; wider plate gap d shrinks C.",
+                    keyFormula = "C = \\frac{Q}{V} = \\frac{\\varepsilon_0 A}{d}   |   U = \\frac{1}{2} C V^2 = \\frac{1}{2} Q V   |   C_{\\text{parallel}} = C_1 + C_2",
                     examTip =
-                      "Do NOT drop the ½ in capacitor energy U = ½CV² = ½QV!",
+                      "Inserting an insulating plastic dielectric slab between capacitor plates INCREASES capacitance C!",
                   ),
                 ),
               workedExamples =
                 listOf(
                   WorkedExample(
-                    title = "Parallel Load + Internal Resistance Circuit",
-                    examSource = "WAEC SSCE 2022 • Paper 1 Q38",
+                    title = "Series vs Parallel Capacitor Equivalence",
+                    examSource = "JAMB UTME 2024 • Physics Q28",
                     problemStatement =
-                      "A 12 V battery of internal resistance 1 Ω drives 6 Ω and 3 Ω resistors in parallel. Find total current and terminal p.d.",
+                      "A 3 μF and a 6 μF capacitor are connected in SERIES across a 12 V battery. Find total capacitance C_T and stored energy.",
                     steps =
                       listOf(
-                        "Step 1 — R_p = (6 × 3) / (6 + 3) = 18 / 9 = 2 Ω.",
-                        "Step 2 — Total current: I = E / (R_p + r) = 12 / (2 + 1) = 4.0 A.",
-                        "Step 3 — Terminal p.d.: V = I·R_p = 4 × 2 = 8.0 V (Lost volts = 4 × 1 = 4 V).",
+                        "Step 1 — Series capacitors: 1/C_T = 1/3 + 1/6 = 3/6 = 1/2 => C_T = 2.0 μF.",
+                        "Step 2 — Stored energy U = ½ C_T V² = ½ × (2×10⁻⁶) × 12² = 1.44 × 10⁻⁴ J.",
                       ),
-                    finalAnswer = "I = 4.0 A, V_terminal = 8.0 V",
-                    examinerTrap = "Never forget internal resistance r in series with the external network!",
+                    finalAnswer = "C_T = 2.0 μF  |  U = 1.44 × 10⁻⁴ J",
+                    examinerTrap = "Always convert microfarads (μF = 10⁻⁶ F) when computing energy in Joules!",
                   ),
                   WorkedExample(
-                    title = "Energy Stored in Parallel Capacitors",
-                    examSource = "JAMB UTME 2024 • Physics Q31",
+                    title = "Coulomb Distance Halving",
+                    examSource = "WAEC SSCE 2023 • Paper 1 Q27",
                     problemStatement =
-                      "Two capacitors of 4 μF and 6 μF are connected in parallel across a 100 V supply. Calculate total energy stored.",
+                      "Two point charges repel with 16 N at distance d. What is the force if distance doubles to 2d?",
                     steps =
                       listOf(
-                        "Step 1 — Parallel capacitance: C_eq = 4 + 6 = 10 μF = 10 × 10⁻⁶ F.",
-                        "Step 2 — U = ½·C·V² = 0.5 × 10⁻⁵ × 100² = 0.5 × 10⁻⁵ × 10⁴ = 0.05 J.",
+                        "Step 1 — F ∝ 1/r².",
+                        "Step 2 — Doubling distance divides force by 2² = 4: 16 / 4 = 4.0 N.",
                       ),
-                    finalAnswer = "0.05 J (5.0 × 10⁻² J)",
-                    examinerTrap = "Convert μF to F (× 10⁻⁶) or express energy carefully in Joules!",
+                    finalAnswer = "4.0 N",
+                    examinerTrap = "Don't just halve 16 to 8—remember the square in r²!",
                   ),
                 ),
               scenarios =
                 listOf(
                   RealLifeScenario(
-                    title = "Home Solar Inverter Battery Sag Under Load",
-                    industryDomain = "Renewable Power",
+                    title = "Camera Flash & Defibrillator Pulse Storage",
+                    industryDomain = "Electronics & Medical Tech",
                     narrative =
-                      "Domestic outlets run in parallel so each appliance gets 230 V, while aging inverter batteries gain internal resistance r causing voltage sag V = E − Ir when heavy pumps start.",
-                    examConnection = "Explains parallel household wiring and internal resistance drops.",
-                  ),
-                  RealLifeScenario(
-                    title = "Camera Xenon Flash Capacitors",
-                    industryDomain = "Consumer Electronics",
-                    narrative =
-                      "Charging a capacitor slowly from small AA cells and dumping ½CV² in milliseconds creates an intense camera flash pulse.",
-                    examConnection = "Connects Q = CV and energy storage.",
+                      "Batteries slowly charge a flash capacitor, which then dumps all ½CV² energy in 1 millisecond to light up a bright camera flash!",
+                    examConnection = "Explains Q = CV rapid discharge in WAEC electronics.",
                   ),
                 ),
-              labType = PracticalLabType.OHMS_CIRCUIT,
+              labType = PracticalLabType.ELECTROSTATIC_CAPACITOR_LAB,
               labBrief =
-                "Use the DC Circuit Bench below with V = 12 V, R₁ = 6 Ω, R₂ = 3 Ω: flip Series vs Parallel to see current jump from 1.33 A to 6.00 A!",
+                "Adjust capacitor plate area A, spacing d, voltage V, and Series/Parallel switch below to observe Capacitance C, Charge Q, and stored Joules!",
               exercises =
                 listOf(
                   PracticeQuestion(
-                    id = "ex_phys_dc1",
-                    topic = "DC Circuits",
-                    examType = "JAMB",
-                    year = 2024,
-                    question = "Three 6 Ω resistors connected in parallel across a 12 V ideal battery dissipate total power:",
-                    options = listOf("24 W", "36 W", "72 W", "144 W"),
-                    correctIndex = 2,
-                    hint = "R_eq = 6/3 = 2 Ω, then P = V² / R_eq.",
-                    stepByStepSolution = "R_eq = 2 Ω => P = 12² / 2 = 144 / 2 = 72 W.",
-                  ),
-                  PracticeQuestion(
-                    id = "ex_phys_dc2",
+                    id = "ex_phy_12_1",
                     topic = "Capacitors",
-                    examType = "WAEC",
-                    year = 2023,
-                    question = "What is the equivalent capacitance of two 6 μF capacitors connected in series?",
-                    options = listOf("3 μF", "6 μF", "12 μF", "36 μF"),
-                    correctIndex = 0,
-                    hint = "Series capacitors obey 1/C_s = 1/C₁ + 1/C₂.",
-                    stepByStepSolution = "1/C_s = 1/6 + 1/6 = 2/6 = 1/3 => C_s = 3 μF.",
-                    waecMarkingScheme = "M1: 1/Cs = 1/6 + 1/6; A1: 3 μF.",
-                  ),
-                  PracticeQuestion(
-                    id = "ex_phys_dc3",
-                    topic = "Electrical Billing",
-                    examType = "JAMB",
-                    year = 2023,
-                    question = "A 2 kW electric kettle runs for 30 minutes daily for 10 days. At ₦50 per kWh, what is the energy cost?",
-                    options = listOf("₦250", "₦500", "₦1000", "₦1500"),
-                    correctIndex = 1,
-                    hint = "Total kWh = 2 kW × (0.5 hr × 10 days).",
-                    stepByStepSolution = "Energy = 2 kW × 5 hr = 10 kWh. Cost = 10 × ₦50 = ₦500.",
-                  ),
-                ),
-            ),
-            Lesson(
-              id = "phys_10_ac_transformers",
-              moduleId = "phys_mod_4",
-              subjectId = "physics",
-              title = "Electromagnetism, Transformers & AC Impedance",
-              durationMinutes = 20,
-              syllabusTag = "JAMB Sec. 7 & 8 • WAEC AC Circuits",
-              learningOutcomes =
-                listOf(
-                  "Apply Faraday's & Lenz's Laws and transformer turns ratio V_s/V_p = N_s/N_p.",
-                  "Calculate inductive/capacitive reactance (X_L, X_C), impedance Z, and resonance frequency.",
-                ),
-              concepts =
-                listOf(
-                  ConceptBlock(
-                    heading = "Step 1: Transformers & National Grid Transmission",
-                    explanation =
-                      "A changing current in the primary coil induces an alternating magnetic flux in a laminated soft-iron core (lamination cuts Eddy Current heat!). Step-up transformers have N_s > N_p to transmit electricity at HIGH voltage and LOW current, slashing I²R cable losses.",
-                    keyFormula = "\\frac{V_s}{V_p} = \\frac{N_s}{N_p}   |   \\eta = \\frac{V_s I_s}{V_p I_p} \\times 100\\%",
-                    examTip =
-                      "Transformers ONLY work on Alternating Current (AC) — never steady DC, because DC produces zero changing magnetic flux!",
-                  ),
-                  ConceptBlock(
-                    heading = "Step 2: RLC Alternating Current & Resonance",
-                    explanation =
-                      "In AC circuits, inductors oppose high frequencies (X_L = 2πfL) while capacitors oppose low frequencies (X_C = 1/(2πfC)). Total opposition is Impedance Z = √(R² + (X_L − X_C)²). Resonance occurs when X_L = X_C, making Z = R (minimum) and current MAXIMUM!",
-                    keyFormula = "Z = \\sqrt{R^2 + (X_L - X_C)^2}   |   f_0 = \\frac{1}{2\\pi\\sqrt{LC}}",
-                    examTip =
-                      "Remember rms vs peak values: I_rms = I₀ / √2 and V_rms = V₀ / √2!",
-                  ),
-                ),
-              workedExamples =
-                listOf(
-                  WorkedExample(
-                    title = "Non-Ideal Transformer Current Calculation",
-                    examSource = "WAEC SSCE 2023 • Paper 2 Q9",
-                    problemStatement =
-                      "A 90% efficient transformer steps down 240 V to 12 V to power a 36 W lamp. Calculate the primary current.",
-                    steps =
-                      listOf(
-                        "Step 1 — Output power P_out = 36 W.",
-                        "Step 2 — Efficiency η = P_out / P_in => P_in = 36 / 0.90 = 40 W.",
-                        "Step 3 — Primary current: I_p = P_in / V_p = 40 / 240 = 0.167 A (1/6 A).",
-                      ),
-                    finalAnswer = "0.17 A",
-                    examinerTrap = "Do NOT assume I_p = P_out/V_p unless efficiency is 100%!",
-                  ),
-                  WorkedExample(
-                    title = "Series RL Impedance & Current",
-                    examSource = "JAMB UTME 2022 • Physics Q35",
-                    problemStatement =
-                      "A 30 Ω resistor is connected in series with an inductor of reactance 40 Ω across a 100 V rms AC supply. Find the current.",
-                    steps =
-                      listOf(
-                        "Step 1 — Use Pythagorean triangle 3–4–5: Z = √(30² + 40²) = √2500 = 50 Ω.",
-                        "Step 2 — I_rms = V_rms / Z = 100 / 50 = 2.0 A.",
-                      ),
-                    finalAnswer = "2.0 A",
-                    examinerTrap = "Never add R + X_L directly (30 + 40 = 70 is wrong); reactances are 90° out of phase with resistance!",
-                  ),
-                ),
-              scenarios =
-                listOf(
-                  RealLifeScenario(
-                    title = "330 kV National Grid Step-Up Substations",
-                    industryDomain = "Electrical Grid Infrastructure",
-                    narrative =
-                      "Power generated at Egbin or Shiroro is stepped up to 330 kV before long-distance transmission because cutting current by 10× reduces I²R heat losses by 100×!",
-                    examConnection = "Classic WAEC Theory question: why transmit AC at very high voltage?",
-                  ),
-                  RealLifeScenario(
-                    title = "FM Radio Station RLC Resonance Tuning",
-                    industryDomain = "RF Broadcast Engineering",
-                    narrative =
-                      "Turning a radio dial tunes capacitance C until f₀ = 1/(2π√LC) matches your chosen FM station, boosting signal current exclusively at that station.",
-                    examConnection = "Tests resonance condition X_L = X_C in JAMB.",
-                  ),
-                ),
-              labType = PracticalLabType.OHMS_CIRCUIT,
-              labBrief =
-                "Verify how total opposition (resistance/impedance) inversely controls circuit current I = V/Z in the circuit analyzer below.",
-              exercises =
-                listOf(
-                  PracticeQuestion(
-                    id = "ex_phys_ac1",
-                    topic = "Transformers",
                     examType = "JAMB",
                     year = 2024,
-                    question = "Why is the core of a practical transformer laminated into thin insulated iron sheets?",
-                    options =
-                      listOf(
-                        "To increase hysteresis loss",
-                        "To reduce eddy current heat loss",
-                        "To convert AC to DC",
-                        "To decrease mutual inductance",
-                      ),
-                    correctIndex = 1,
-                    hint = "Thin insulated laminations block circulating induced currents in the core.",
-                    stepByStepSolution = "Laminating the soft-iron core increases resistance to circulating eddy currents, minimizing I²R core heating.",
-                  ),
-                  PracticeQuestion(
-                    id = "ex_phys_ac2",
-                    topic = "AC Circuits",
-                    examType = "WAEC",
-                    year = 2022,
-                    question = "An AC source has peak voltage 220√2 V. What is its root-mean-square (rms) voltage?",
-                    options = listOf("110 V", "220 V", "311 V", "440 V"),
-                    correctIndex = 1,
-                    hint = "V_rms = V₀ / √2.",
-                    stepByStepSolution = "V_rms = (220√2) / √2 = 220 V.",
-                    waecMarkingScheme = "A1: 220 V.",
-                  ),
-                  PracticeQuestion(
-                    id = "ex_phys_ac3",
-                    topic = "AC Resonance",
-                    examType = "JAMB",
-                    year = 2023,
-                    question = "At resonance in a series RLC circuit, which statement is TRUE?",
-                    options = listOf("Z is maximum", "Current is zero", "X_L equals X_C", "Power factor is zero"),
+                    question = "Two capacitors of 4 μF and 12 μF are joined in SERIES. Find their effective capacitance.",
+                    options = listOf("16 μF", "8 μF", "3 μF", "0.33 μF"),
                     correctIndex = 2,
-                    hint = "Capacitive and inductive reactances cancel each other completely.",
-                    stepByStepSolution = "When X_L = X_C, Z = R (minimum impedance), giving maximum current and unity power factor.",
+                    hint = "Series: (4 × 12) / (4 + 12).",
+                    stepByStepSolution = "48 / 16 = 3.0 μF.",
                   ),
-                ),
-            ),
-            Lesson(
-              id = "phys_11_modern_nuclear",
-              moduleId = "phys_mod_4",
-              subjectId = "physics",
-              title = "Photoelectric Effect, Bohr Atom & Nuclear Half-Life",
-              durationMinutes = 20,
-              syllabusTag = "JAMB Sec. 9 • WAEC Modern Physics",
-              learningOutcomes =
-                listOf(
-                  "Apply Einstein's photoelectric equation hf = Φ + KE_max and threshold frequency f₀.",
-                  "Balance α/β/γ nuclear decays and compute half-life N = N₀(½)^n.",
-                ),
-              concepts =
-                listOf(
-                  ConceptBlock(
-                    heading = "Step 1: Photons & Einstein's Photoelectric Equation",
-                    explanation =
-                      "Light arrives in discrete packets (photons) of energy E = h·f = h·c/λ. Electrons escape a metal surface ONLY if photon energy hf exceeds the Work Function Φ = h·f₀. Higher light intensity emits MORE electrons per second (current), while higher frequency increases electron SPEED (KE_max)!",
-                    keyFormula = "hf = \\Phi + KE_{max}   |   \\Phi = hf_0   |   1\\text{ eV} = 1.6\\times 10^{-19}\\text{ J}",
-                    examTip =
-                      "Intensity controls photoelectron CURRENT; Frequency controls maximum KINETIC ENERGY (and stopping potential eV_s)!",
-                  ),
-                  ConceptBlock(
-                    heading = "Step 2: Radioactivity & Half-Life Decay Law",
-                    explanation =
-                      "Alpha (⁴₂He) lowers mass number by 4 and atomic number by 2. Beta⁻ (⁰₋₁e) keeps mass number unchanged and raises atomic number by +1. Gamma rays change neither! Half-life T_½ is the constant time for half the unstable nuclei to decay.",
-                    keyFormula = "N = N_0 \\left(\\frac{1}{2}\\right)^n   |   n = \\frac{t}{T_{1/2}}",
-                    examTip =
-                      "Be careful whether a question asks for fraction REMAINING (1/2^n) or fraction DECAYED (1 − 1/2^n)!",
-                  ),
-                ),
-              workedExamples =
-                listOf(
-                  WorkedExample(
-                    title = "Half-Life Activity Calculation",
-                    examSource = "JAMB UTME 2024 • Physics Q39",
-                    problemStatement =
-                      "A radioactive isotope has a half-life of 6 hours. What fraction of the original sample remains after 24 hours?",
-                    steps =
-                      listOf(
-                        "Step 1 — Number of half-lives: n = 24 / 6 = 4.",
-                        "Step 2 — Remaining fraction: N / N₀ = (1/2)⁴ = 1/16.",
-                      ),
-                    finalAnswer = "1/16 remaining (15/16 decayed)",
-                    examinerTrap = "Do not divide 1 by 4; each half-life halves the PREVIOUS quantity (1 -> ½ -> ¼ -> ⅛ -> 1/16).",
-                  ),
-                  WorkedExample(
-                    title = "Photoelectric Stopping Kinetic Energy",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q48",
-                    problemStatement =
-                      "Light of photon energy 4.5 eV strikes a zinc plate whose work function is 3.3 eV. Find the maximum kinetic energy of emitted electrons in Joules (1 eV = 1.6 × 10⁻¹⁹ J).",
-                    steps =
-                      listOf(
-                        "Step 1 — KE_max = hf − Φ = 4.5 − 3.3 = 1.2 eV.",
-                        "Step 2 — Convert to Joules: 1.2 × 1.6 × 10⁻¹⁹ = 1.92 × 10⁻¹⁹ J.",
-                      ),
-                    finalAnswer = "1.92 × 10⁻¹⁹ J",
-                    examinerTrap = "Always subtract in the same unit (both eV or both Joules) before converting!",
-                  ),
-                ),
-              scenarios =
-                listOf(
-                  RealLifeScenario(
-                    title = "Solar Photovoltaic Panels & Carbon-14 Archaeological Dating",
-                    industryDomain = "Clean Energy & Archaeology",
-                    narrative =
-                      "Solar cells turn photon energy directly into electrical current using silicon bandgaps, while archaeologists date Nok terracotta artifacts from remaining Carbon-14 half-lives (5,730 years).",
-                    examConnection = "Links photoelectric quantum threshold and half-life decay.",
-                  ),
-                  RealLifeScenario(
-                    title = "Medical Cobalt-60 Radiotherapy",
-                    industryDomain = "Oncology & Nuclear Medicine",
-                    narrative =
-                      "Controlled gamma beams target deep tumors selectively while short-lived Tc-99m tracers image organs without prolonged radiation exposure.",
-                    examConnection = "Tests penetrating power of α (paper) < β (aluminum) < γ (thick lead).",
-                  ),
-                ),
-              labType = PracticalLabType.WAVE_OPTICS_BENCH,
-              labBrief =
-                "Use the Frequency slider in the bench below to visualize how photon frequency f governs wave energy E = hf.",
-              exercises =
-                listOf(
                   PracticeQuestion(
-                    id = "ex_phys_n1",
-                    topic = "Modern Physics",
+                    id = "ex_phy_12_2",
+                    topic = "Parallel Plate Capacitor",
+                    examType = "WAEC",
+                    year = 2023,
+                    question = "Which change INCREASES the capacitance of a parallel-plate air capacitor?",
+                    options = listOf("Increasing plate separation d", "Reducing plate overlap area", "Inserting a glass dielectric", "Lowering battery voltage"),
+                    correctIndex = 2,
+                    hint = "C = ε A / d.",
+                    stepByStepSolution = "Inserting a dielectric raises permittivity ε, increasing C.",
+                    waecMarkingScheme = "A1: Inserting a dielectric.",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_12_3",
+                    topic = "Electroscope",
+                    examType = "JAMB",
+                    year = 2022,
+                    question = "What instrument detects whether a body carries static electric charge and tests its sign?",
+                    options = listOf("Galvanometer", "Gold-leaf electroscope", "Hydrometer", "Wheatstone bridge"),
+                    correctIndex = 1,
+                    hint = "Leaves diverge when like charges repel.",
+                    stepByStepSolution = "A gold-leaf electroscope detects charge and identifies polarity via divergence.",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_12_4",
+                    topic = "Electric Field",
+                    examType = "WAEC",
+                    year = 2024,
+                    question = "Two parallel plates 0.02 m apart hold a 400 V potential difference. Find the electric field strength between them.",
+                    options = listOf("8 V/m", "800 V/m", "20,000 V/m", "200 V/m"),
+                    correctIndex = 2,
+                    hint = "E = V / d.",
+                    stepByStepSolution = "E = 400 / 0.02 = 20,000 V/m.",
+                    waecMarkingScheme = "M1: 400/0.02; A1: 20,000 V/m.",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_12_5",
+                    topic = "Capacitor Energy",
                     examType = "JAMB",
                     year = 2025,
-                    question = "A nuclide ²³⁸₉₂U emits an alpha particle followed by a beta particle. What are the mass and atomic numbers of the daughter nuclide?",
-                    options = listOf("234 and 91", "234 and 90", "236 and 91", "234 and 89"),
+                    question = "A 10 μF capacitor is charged to 100 V. Calculate the energy stored.",
+                    options = listOf("0.05 J", "0.50 J", "1.0 J", "50 J"),
                     correctIndex = 0,
-                    hint = "Alpha: A−4, Z−2. Beta⁻: A−0, Z+1.",
-                    stepByStepSolution = "A = 238 − 4 = 234. Z = 92 − 2 + 1 = 91.",
+                    hint = "U = ½ C V².",
+                    stepByStepSolution = "U = 0.5 × 10⁻⁵ × 10,000 = 0.05 J.",
                   ),
                   PracticeQuestion(
-                    id = "ex_phys_n2",
-                    topic = "Photoelectric Effect",
-                    examType = "WAEC",
-                    year = 2023,
-                    question = "Which property of incident light increases the maximum kinetic energy of emitted photoelectrons?",
-                    options = listOf("Intensity", "Frequency", "Exposure time", "Beam area"),
+                    id = "ex_phy_12_6",
+                    topic = "Lightning Rods",
+                    examType = "JAMB",
+                    year = 2021,
+                    question = "Lightning conductors installed on tall rooftops work on the principle of:",
+                    options = listOf("Electromagnetic induction", "Action of sharp points (corona discharge)", "Thermionic emission", "Eddy currents"),
                     correctIndex = 1,
-                    hint = "KE_max = hf − Φ.",
-                    stepByStepSolution = "Increasing frequency f increases photon energy hf, raising photoelectron kinetic energy.",
-                    waecMarkingScheme = "A1: Frequency (or shorter wavelength).",
+                    hint = "Charges concentrate heavily at sharp tips.",
+                    stepByStepSolution = "Sharp points concentrate electric field, ionizing air to neutralize storm clouds quietly.",
                   ),
+                ),
+            ),
+            Lesson(
+              id = "phys_13_circuits_emf",
+              moduleId = "phys_mod_4",
+              subjectId = "physics",
+              title = "Current Electricity, Internal Resistance & Meters",
+              durationMinutes = 20,
+              syllabusTag = "JAMB Sec. 8.4–8.8 • WAEC Electric Circuits",
+              learningOutcomes =
+                listOf(
+                  "Solve Series & Parallel resistor loops plus cell internal resistance E = I(R + r).",
+                  "Compute electrical energy/bills in kWh and convert galvanometers into ammeters/voltmeters.",
+                ),
+              concepts =
+                listOf(
+                  ConceptBlock(
+                    heading = "1. Water-Pipe Analogy for Voltage, Current & Ohm's Law",
+                    explanation =
+                      "Think of electrons flowing around copper wire like water flowing through pipes. Voltage V is the water-pump push, Current I is how many litres flow per second, and Resistance R is a narrow pinch in the pipe! Even a real battery has tiny internal friction r inside its chemicals, stealing a small 'lost volt' (Ir) from EMF E.",
+                    keyFormula = "V = I R   |   E = I(R + r) = V + I r   |   P = IV = I^2 R = \\frac{V^2}{R}",
+                    examTip =
+                      "To make a Galvanometer measure huge CURRENT (Ammeter), put a tiny SHUNT resistor in PARALLEL. To measure huge VOLTAGE (Voltmeter), put a huge MULTIPLIER resistor in SERIES!",
+                  ),
+                  ConceptBlock(
+                    heading = "2. Buying Electricity from Utility Meters (kWh)",
+                    explanation =
+                      "NEPA/DISCO meters charge by Kilowatt-Hours (kWh), NOT watts alone! Divide Watts by 1,000 to get Kilowatts, multiply by Hours run, then multiply by price per kWh.",
+                    keyFormula = "R = \\frac{\\rho L}{A}   |   \\text{Energy (kWh)} = \\frac{\\text{Watts}}{1000} \\times \\text{Hours}",
+                    examTip =
+                      "Doubling a wire's LENGTH doubles resistance R; doubling its DIAMETER shrinks resistance by FOUR (1/2² = ¼) because Area = πd²/4!",
+                  ),
+                ),
+              workedExamples =
+                listOf(
+                  WorkedExample(
+                    title = "Battery EMF & Internal Resistance Circuit",
+                    examSource = "JAMB UTME 2024 • Physics Q30",
+                    problemStatement =
+                      "A cell of EMF 1.5 V and internal resistance 0.5 Ω feeds a 2.5 Ω resistor. Find circuit current I and terminal p.d. V.",
+                    steps =
+                      listOf(
+                        "Step 1 — Total resistance = R + r = 2.5 + 0.5 = 3.0 Ω.",
+                        "Step 2 — Current I = E / (R + r) = 1.5 / 3.0 = 0.5 A.",
+                        "Step 3 — Terminal voltage V = I R = 0.5 × 2.5 = 1.25 V (Lost volts = 0.25 V).",
+                      ),
+                    finalAnswer = "I = 0.5 A  |  V = 1.25 V",
+                    examinerTrap = "NEVER divide E by external R alone when internal resistance r is given!",
+                  ),
+                  WorkedExample(
+                    title = "Monthly Heater Electricity Bill in kWh",
+                    examSource = "WAEC SSCE 2023 • Paper 2 Q8",
+                    problemStatement =
+                      "A 2,000 W electric iron runs for 3 hours daily over 10 days at ₦60 per kWh. Calculate total electricity cost.",
+                    steps =
+                      listOf(
+                        "Step 1 — Power = 2,000 W = 2.0 kW. Total time = 3 × 10 = 30 hours.",
+                        "Step 2 — Energy = 2.0 kW × 30 h = 60 kWh.",
+                        "Step 3 — Cost = 60 × ₦60 = ₦3,600.",
+                      ),
+                    finalAnswer = "60 kWh  |  ₦3,600",
+                    examinerTrap = "Convert Watts to kW first before multiplying by hours!",
+                  ),
+                ),
+              scenarios =
+                listOf(
+                  RealLifeScenario(
+                    title = "Parallel Home Sockets vs Christmas Fairy Lights",
+                    industryDomain = "Residential Electrical Wiring",
+                    narrative =
+                      "Nigerian house sockets are wired in parallel at 230 V so switching off a bedroom lamp never turns off the refrigerator!",
+                    examConnection = "Tests why parallel appliances share full mains voltage.",
+                  ),
+                ),
+              labType = PracticalLabType.OHMS_CIRCUIT,
+              labBrief =
+                "Toggle Series vs Parallel resistors R₁, R₂ and tune battery EMF and internal resistance r in the DC Circuit Bench below!",
+              exercises =
+                listOf(
                   PracticeQuestion(
-                    id = "ex_phys_n3",
-                    topic = "Radioactivity",
+                    id = "ex_phy_13_1",
+                    topic = "Resistors in Parallel",
                     examType = "JAMB",
                     year = 2024,
-                    question = "A sample decays from 1600 counts/min to 200 counts/min in 15 days. What is its half-life?",
-                    options = listOf("3 days", "5 days", "7.5 days", "10 days"),
+                    question = "Resistors of 6 Ω and 3 Ω are wired in PARALLEL. What is their equivalent resistance?",
+                    options = listOf("2 Ω", "4.5 Ω", "9 Ω", "18 Ω"),
+                    correctIndex = 0,
+                    hint = "(6 × 3) / (6 + 3).",
+                    stepByStepSolution = "18 / 9 = 2.0 Ω.",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_13_2",
+                    topic = "Galvanometer Conversion",
+                    examType = "WAEC",
+                    year = 2023,
+                    question = "To convert a sensitive moving-coil galvanometer into a high-range AMMETER, connect:",
+                    options = listOf("High resistance in series", "Low shunt resistance in parallel", "Capacitor in parallel", "Fuse in series"),
                     correctIndex = 1,
-                    hint = "1600 -> 800 -> 400 -> 200 is 3 half-lives.",
-                    stepByStepSolution = "1600/200 = 8 = 2³, so n = 3 half-lives. T_½ = 15 / 3 = 5 days.",
+                    hint = "Let excess current bypass the coil.",
+                    stepByStepSolution = "A low-resistance shunt placed in parallel diverts excess current around the coil.",
+                    waecMarkingScheme = "A1: Low resistance (shunt) in parallel.",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_13_3",
+                    topic = "Wire Resistivity",
+                    examType = "JAMB",
+                    year = 2025,
+                    question = "A wire has resistance 8 Ω. Another copper wire of the SAME length but TWICE the diameter has resistance:",
+                    options = listOf("2 Ω", "4 Ω", "16 Ω", "32 Ω"),
+                    correctIndex = 0,
+                    hint = "R ∝ 1/d².",
+                    stepByStepSolution = "Doubling diameter multiplies cross-sectional area by 4, dividing R by 4 -> 8 / 4 = 2.0 Ω.",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_13_4",
+                    topic = "Internal Resistance",
+                    examType = "WAEC",
+                    year = 2022,
+                    question = "A 12 V battery of internal resistance 1 Ω feeds a 5 Ω lamp. What is the voltage drop across the 5 Ω lamp?",
+                    options = listOf("2 V", "10 V", "12 V", "6 V"),
+                    correctIndex = 1,
+                    hint = "I = 12 / (5 + 1) = 2 A; V = I × 5.",
+                    stepByStepSolution = "I = 2 A => V = 2 × 5 = 10 V.",
+                    waecMarkingScheme = "M1: I = 2 A; A1: 10 V.",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_13_5",
+                    topic = "Potentiometer",
+                    examType = "JAMB",
+                    year = 2021,
+                    question = "Why is a potentiometer superior to a voltmeter when measuring a cell's EMF?",
+                    options = listOf("It draws zero current at balance point", "It works only on AC", "It costs less copper", "It measures temperature too"),
+                    correctIndex = 0,
+                    hint = "No current drawn means ZERO lost volts Ir.",
+                    stepByStepSolution = "At null deflection balance point, zero current flows from the test cell so V_measured equals true EMF E.",
+                  ),
+                  PracticeQuestion(
+                    id = "ex_phy_13_6",
+                    topic = "Fuse Safety",
+                    examType = "JAMB",
+                    year = 2020,
+                    question = "A 2,400 W electric kettle operates on 240 V mains. Which fuse rating is safest?",
+                    options = listOf("5 A", "10 A", "13 A", "30 A"),
+                    correctIndex = 2,
+                    hint = "I = P/V = 10 A; pick the standard fuse just ABOVE normal load.",
+                    stepByStepSolution = "Normal current = 2,400/240 = 10 A, so a 10 A fuse might blow on surge—use 13 A fuse.",
                   ),
                 ),
             ),
           ),
-      ),
-    )
-
-  val pastQuestions: List<PracticeQuestion> =
-    listOf(
-      PracticeQuestion(
-        id = "pq_phys_2025_1",
-        topic = "Units & Dimensions",
-        examType = "JAMB",
-        year = 2025,
-        question = "Which of the following pairs of physical quantities have identical dimensions?",
-        options = listOf("Force and Power", "Torque and Work", "Momentum and Force", "Impulse and Pressure"),
-        correctIndex = 1,
-        hint = "Check units: Torque is N·m; Work is N·m (Joules).",
-        stepByStepSolution = "Both Torque (r × F) and Work (F · d) have dimension M L² T⁻².",
-      ),
-      PracticeQuestion(
-        id = "pq_phys_2025_2",
-        topic = "Projectile Motion",
-        examType = "WAEC",
-        year = 2025,
-        question = "A projectile attains a maximum height of 45 m when launched at 30° to the horizontal. Find its initial launch speed (g = 10 m/s²).",
-        options = listOf("30 m/s", "45 m/s", "60 m/s", "90 m/s"),
-        correctIndex = 2,
-        hint = "Use H = u²sin²θ / (2g) with sin(30°) = 0.5.",
-        stepByStepSolution = "45 = u²(0.5)² / 20 => u²(0.25) = 900 => u² = 3600 => u = 60 m/s.",
-        waecMarkingScheme = "M1: H = u²sin²θ/2g; M1: u² = 3600; A1: 60 m/s.",
-      ),
-      PracticeQuestion(
-        id = "pq_phys_2024_1",
-        topic = "Kinematics",
-        examType = "JAMB",
-        year = 2024,
-        question = "A stone drops freely from rest from a height of 125 m. Find the time taken to hit the ground (g = 10 m/s²).",
-        options = listOf("2.5 s", "4.0 s", "5.0 s", "12.5 s"),
-        correctIndex = 2,
-        hint = "Use h = ½gt².",
-        stepByStepSolution = "125 = 5t² => t² = 25 => t = 5.0 s.",
-      ),
-      PracticeQuestion(
-        id = "pq_phys_2024_2",
-        topic = "DC Circuits",
-        examType = "WAEC",
-        year = 2024,
-        question = "A 6 V battery of internal resistance 0.4 Ω is connected to a 2.6 Ω resistor. Calculate the power dissipated in the external resistor.",
-        options = listOf("2.6 W", "4.0 W", "10.4 W", "12.0 W"),
-        correctIndex = 2,
-        hint = "Find current I = E / (R + r), then P = I²R.",
-        stepByStepSolution = "I = 6 / (2.6 + 0.4) = 2.0 A. External power P = 2² × 2.6 = 10.4 W.",
-        waecMarkingScheme = "M1: I = 2.0 A; M1: P = I²R; A1: 10.4 W.",
-      ),
-      PracticeQuestion(
-        id = "pq_phys_2023_1",
-        topic = "Projectile Motion",
-        examType = "JAMB",
-        year = 2023,
-        question = "A stone is thrown horizontally from the top of a 45 m tower at 20 m/s. How far from the base does it land? (g = 10 m/s²)",
-        options = listOf("30 m", "45 m", "60 m", "90 m"),
-        correctIndex = 2,
-        hint = "Find fall time from h = ½gt², then R = u_x·t.",
-        stepByStepSolution = "45 = 5t² => t = 3 s. R = 20 × 3 = 60 m.",
-      ),
-      PracticeQuestion(
-        id = "pq_phys_2023_2",
-        topic = "Waves & Sound",
-        examType = "WAEC",
-        year = 2023,
-        question = "A wave of frequency 500 Hz travels at 340 m/s. Find the distance between two consecutive troughs.",
-        options = listOf("0.34 m", "0.68 m", "1.47 m", "6.80 m"),
-        correctIndex = 1,
-        hint = "Consecutive troughs are 1 wavelength λ apart.",
-        stepByStepSolution = "λ = v / f = 340 / 500 = 0.68 m.",
-        waecMarkingScheme = "M1: λ = v/f; A1: 0.68 m.",
-      ),
-      PracticeQuestion(
-        id = "pq_phys_2022_1",
-        topic = "DC Circuits",
-        examType = "WAEC",
-        year = 2022,
-        question = "A cell of EMF 2.0 V and internal resistance 0.5 Ω supplies a 3.5 Ω resistor. Find the terminal p.d.",
-        options = listOf("0.25 V", "1.50 V", "1.75 V", "2.00 V"),
-        correctIndex = 2,
-        hint = "I = E/(R+r), then V = IR.",
-        stepByStepSolution = "I = 2.0 / 4.0 = 0.5 A. V = 0.5 × 3.5 = 1.75 V.",
-        waecMarkingScheme = "M1: I = 0.5 A; A1: 1.75 V.",
-      ),
-      PracticeQuestion(
-        id = "pq_phys_2022_2",
-        topic = "Optics & Refraction",
-        examType = "JAMB",
-        year = 2022,
-        question = "An object is placed 15 cm in front of a convex lens of focal length 10 cm. Where is the image formed?",
-        options = listOf("6 cm, virtual", "30 cm, real", "25 cm, real", "30 cm, virtual"),
-        correctIndex = 1,
-        hint = "1/v = 1/f − 1/u.",
-        stepByStepSolution = "1/v = 1/10 − 1/15 = 1/30 => v = +30 cm (real image).",
-      ),
-      PracticeQuestion(
-        id = "pq_phys_2021_1",
-        topic = "Optics & Refraction",
-        examType = "JAMB",
-        year = 2021,
-        question = "Light enters glass (n = 1.5) from air (c = 3.0 × 10⁸ m/s). What is its speed in glass?",
-        options = listOf("1.5 × 10⁸ m/s", "2.0 × 10⁸ m/s", "3.0 × 10⁸ m/s", "4.5 × 10⁸ m/s"),
-        correctIndex = 1,
-        hint = "n = c / v.",
-        stepByStepSolution = "v = (3.0 × 10⁸) / 1.5 = 2.0 × 10⁸ m/s.",
-      ),
-      PracticeQuestion(
-        id = "pq_phys_2021_2",
-        topic = "Work & Energy",
-        examType = "WAEC",
-        year = 2021,
-        question = "An engine develops 4.0 kW while lifting a crate steadily at 2.0 m/s. Find the lifting tension force.",
-        options = listOf("500 N", "1000 N", "2000 N", "8000 N"),
-        correctIndex = 2,
-        hint = "P = F · v.",
-        stepByStepSolution = "F = P / v = 4000 / 2.0 = 2000 N.",
-        waecMarkingScheme = "M1: P = Fv; A1: 2000 N.",
-      ),
-      PracticeQuestion(
-        id = "pq_phys_2020_1",
-        topic = "Linear Momentum",
-        examType = "WAEC",
-        year = 2020,
-        question = "A 2 kg mass moving east at 5 m/s sticks to a 3 kg mass moving west at 2 m/s. Find their common velocity.",
-        options = listOf("0.8 m/s East", "0.8 m/s West", "3.2 m/s East", "1.6 m/s East"),
-        correctIndex = 0,
-        hint = "Take East (+) and West (−).",
-        stepByStepSolution = "(2×5) + (3×−2) = 5v => 4 = 5v => v = +0.8 m/s East.",
-        waecMarkingScheme = "M1: Sign convention; A1: 0.8 m/s East.",
-      ),
-      PracticeQuestion(
-        id = "pq_phys_2020_2",
-        topic = "Thermal Physics",
-        examType = "JAMB",
-        year = 2020,
-        question = "How much heat warms 2 kg of aluminum (c = 900 J/kg·K) from 25 °C to 75 °C?",
-        options = listOf("45 kJ", "90 kJ", "135 kJ", "180 kJ"),
-        correctIndex = 1,
-        hint = "Q = m·c·Δθ.",
-        stepByStepSolution = "Q = 2 × 900 × (75 − 25) = 2 × 900 × 50 = 90,000 J = 90 kJ.",
-      ),
-      PracticeQuestion(
-        id = "pq_phys_2019_1",
-        topic = "Fluid Pressure",
-        examType = "JAMB",
-        year = 2019,
-        question = "A hydraulic press has pistons of areas 10 cm² and 200 cm². What effort lifts a 4000 N car?",
-        options = listOf("20 N", "100 N", "200 N", "800 N"),
-        correctIndex = 2,
-        hint = "F₁/A₁ = F₂/A₂.",
-        stepByStepSolution = "F₁ = 4000 × (10 / 200) = 200 N.",
-      ),
-      PracticeQuestion(
-        id = "pq_phys_2019_2",
-        topic = "Transformers",
-        examType = "WAEC",
-        year = 2019,
-        question = "An ideal transformer has 500 primary turns and 2000 secondary turns. If input is 120 V AC, find the secondary voltage.",
-        options = listOf("30 V", "240 V", "480 V", "600 V"),
-        correctIndex = 2,
-        hint = "V_s / V_p = N_s / N_p.",
-        stepByStepSolution = "V_s = 120 × (2000 / 500) = 120 × 4 = 480 V.",
-        waecMarkingScheme = "M1: Vs/Vp = Ns/Np; A1: 480 V.",
-      ),
-      PracticeQuestion(
-        id = "pq_phys_2018_1",
-        topic = "Modern Physics",
-        examType = "JAMB",
-        year = 2018,
-        question = "Which radiation is deflected most strongly toward the positive plate of an electric field?",
-        options = listOf("Alpha rays", "Beta⁻ particles", "Gamma rays", "Neutrons"),
-        correctIndex = 1,
-        hint = "Opposite charges attract; very light particles deflect farthest.",
-        stepByStepSolution = "Negatively charged Beta⁻ particles (electrons) have tiny mass and deflect sharply toward the positive plate.",
-      ),
-      PracticeQuestion(
-        id = "pq_phys_2018_2",
-        topic = "Simple Machines",
-        examType = "WAEC",
-        year = 2018,
-        question = "A screw jack of pitch 0.5 cm is turned by a lever arm of length 35 cm. Calculate its Velocity Ratio (take π = 22/7).",
-        options = listOf("70", "140", "220", "440"),
-        correctIndex = 3,
-        hint = "VR = 2πR / p.",
-        stepByStepSolution = "VR = (2 × 22/7 × 35) / 0.5 = (2 × 110) / 0.5 = 440.",
-        waecMarkingScheme = "M1: 2πR/p; A1: 440.",
       ),
     )
 }
