@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -27,11 +26,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.BookmarkAdd
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -47,6 +49,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,6 +62,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.data.curriculum.CurriculumProgression
 import com.example.data.curriculum.Lesson
 import com.example.data.curriculum.LessonPillar
 import com.example.data.curriculum.PracticeQuestion
@@ -66,22 +70,32 @@ import com.example.data.model.LessonProgress
 import com.example.ui.components.EquationDisplayCard
 import com.example.ui.components.ScientificText
 import com.example.ui.labs.PracticalLabWorkspace
-import com.example.ui.theme.UdacityCyan
+import com.example.ui.theme.CourseraAzureAccent
 import com.example.ui.theme.semanticColors
 
 @Composable
 fun LessonClassroomScreen(
   lesson: Lesson,
   progress: LessonProgress?,
+  nextLesson: Lesson? = null,
   onBack: () -> Unit,
   onMarkPillarComplete: (LessonPillar, Long?) -> Unit,
   onSaveNote: (title: String, content: String) -> Unit,
+  onOpenNextLesson: ((Lesson) -> Unit)? = null,
 ) {
   BackHandler(onBack = onBack)
 
-  var selectedPillar by remember(lesson.id) { mutableStateOf(LessonPillar.CONCEPT) }
+  val completedSteps = progress?.completedSteps?.distinct()?.toSet() ?: emptySet()
+  var selectedPillar by remember(lesson.id) {
+    val firstIncomplete =
+      LessonPillar.entries.firstOrNull {
+        it.key !in completedSteps && CurriculumProgression.isPillarUnlocked(it, completedSteps)
+      }
+    mutableStateOf(firstIncomplete ?: LessonPillar.CONCEPT)
+  }
   var showNoteDialog by remember { mutableStateOf(false) }
-  val completedSteps = progress?.completedSteps?.toSet() ?: emptySet()
+  var lockNoticeMessage by remember { mutableStateOf<String?>(null) }
+
   val semantics = MaterialTheme.semanticColors
   val classroomRatio = completedSteps.size / LessonPillar.entries.size.toFloat()
 
@@ -92,7 +106,7 @@ fun LessonClassroomScreen(
         .statusBarsPadding()
         .navigationBarsPadding(),
   ) {
-    // Udacity Signature Dark Navy Classroom Top Bar + Progress Rail
+    // Coursera Distraction-Free Classroom Header + Progress Rail
     Column(modifier = Modifier.fillMaxWidth().background(semantics.classroomBar)) {
       Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 10.dp),
@@ -102,7 +116,7 @@ fun LessonClassroomScreen(
         IconButton(onClick = onBack, modifier = Modifier.testTag("classroom_back_button")) {
           Icon(
             Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = "Back to curriculum",
+            contentDescription = "Back to syllabus",
             tint = semantics.onClassroomBar,
           )
         }
@@ -115,7 +129,7 @@ fun LessonClassroomScreen(
             overflow = TextOverflow.Ellipsis,
           )
           Text(
-            text = "${lesson.syllabusTag} • ${completedSteps.size}/${LessonPillar.entries.size} pillars completed",
+            text = "${lesson.syllabusTag} • ${completedSteps.size}/${LessonPillar.entries.size} sections completed",
             style = MaterialTheme.typography.labelSmall,
             color = semantics.classroomSubtext,
           )
@@ -134,21 +148,35 @@ fun LessonClassroomScreen(
       LinearProgressIndicator(
         progress = { classroomRatio.coerceAtLeast(0.05f) },
         modifier = Modifier.fillMaxWidth().height(4.dp),
-        color = UdacityCyan,
-        trackColor = Color(0xFF1E3A6E),
+        color = CourseraAzureAccent,
+        trackColor = Color(0xFF143C7B),
       )
     }
 
-    // Adaptive Split-Workspace (Tablet/Foldable sidebar vs Handheld numbered stepper)
+    if (!lockNoticeMessage.isNullOrBlank()) {
+      Surface(
+        color = MaterialTheme.colorScheme.tertiaryContainer,
+        modifier = Modifier.fillMaxWidth(),
+      ) {
+        Text(
+          text = lockNoticeMessage.orEmpty(),
+          style = MaterialTheme.typography.labelMedium,
+          color = MaterialTheme.colorScheme.onTertiaryContainer,
+          modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        )
+      }
+    }
+
+    // Adaptive Coursera Split-Workspace (Tablet sidebar vs Handheld stepper rail)
     BoxWithConstraints(modifier = Modifier.weight(1f).fillMaxWidth()) {
       val isWide = maxWidth >= 720.dp
 
       if (isWide) {
         Row(modifier = Modifier.fillMaxSize()) {
-          // Left Udacity Classroom Sidebar
+          // Left Coursera Module Outline Sidebar
           Column(
             modifier =
-              Modifier.width(260.dp)
+              Modifier.width(268.dp)
                 .fillMaxHeight()
                 .background(MaterialTheme.colorScheme.surface)
                 .border(1.dp, MaterialTheme.colorScheme.outlineVariant)
@@ -156,49 +184,72 @@ fun LessonClassroomScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp),
           ) {
             Text(
-              text = "CLASSROOM SYLLABUS",
+              text = "LESSON ROADMAP",
               style = MaterialTheme.typography.labelSmall,
               color = MaterialTheme.colorScheme.primary,
               fontWeight = FontWeight.Bold,
               modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp),
             )
-            LessonPillar.entries.forEachIndexed { idx, pillar ->
+            LessonPillar.entries.forEach { pillar ->
               val isDone = pillar.key in completedSteps
+              val isUnlocked = CurriculumProgression.isPillarUnlocked(pillar, completedSteps)
               val active = pillar == selectedPillar
               Row(
                 modifier =
                   Modifier.fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(10.dp))
                     .background(
-                      if (active) MaterialTheme.colorScheme.primaryContainer
-                      else MaterialTheme.colorScheme.background
+                      when {
+                        active -> MaterialTheme.colorScheme.primaryContainer
+                        !isUnlocked -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f)
+                        else -> MaterialTheme.colorScheme.background
+                      }
                     )
                     .border(
-                      1.5.dp,
+                      1.dp,
                       if (active) MaterialTheme.colorScheme.primary
                       else MaterialTheme.colorScheme.outlineVariant,
-                      RoundedCornerShape(12.dp),
+                      RoundedCornerShape(10.dp),
                     )
-                    .clickable { selectedPillar = pillar }
+                    .clickable {
+                      if (isUnlocked) {
+                        lockNoticeMessage = null
+                        selectedPillar = pillar
+                      } else {
+                        lockNoticeMessage =
+                          "Complete ${LessonPillar.entries[(pillar.ordinal - 1).coerceAtLeast(0)].shortLabel} first to unlock ${pillar.shortLabel}."
+                      }
+                    }
                     .padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
               ) {
                 Icon(
-                  imageVector = if (isDone) Icons.Filled.CheckCircle else Icons.Filled.Check,
+                  imageVector =
+                    when {
+                      isDone -> Icons.Filled.CheckCircle
+                      !isUnlocked -> Icons.Filled.Lock
+                      else -> Icons.Filled.Check
+                    },
                   contentDescription = null,
                   tint =
-                    if (isDone) semantics.success
-                    else if (active) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                    when {
+                      isDone -> semantics.success
+                      !isUnlocked -> MaterialTheme.colorScheme.onSurfaceVariant
+                      active -> MaterialTheme.colorScheme.primary
+                      else -> MaterialTheme.colorScheme.onSurfaceVariant
+                    },
                   modifier = Modifier.size(18.dp),
                 )
                 Text(
-                  text = "${idx + 1}. ${pillar.fullLabel}",
+                  text = pillar.fullLabel,
                   style = MaterialTheme.typography.labelLarge,
                   color =
-                    if (active) MaterialTheme.colorScheme.onPrimaryContainer
-                    else MaterialTheme.colorScheme.onSurface,
+                    when {
+                      active -> MaterialTheme.colorScheme.onPrimaryContainer
+                      !isUnlocked -> MaterialTheme.colorScheme.onSurfaceVariant
+                      else -> MaterialTheme.colorScheme.onSurface
+                    },
                   fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
                 )
               }
@@ -207,14 +258,17 @@ fun LessonClassroomScreen(
 
           LessonPillarBody(
             lesson = lesson,
+            progress = progress,
+            nextLesson = nextLesson,
             selectedPillar = selectedPillar,
             modifier = Modifier.weight(1f).fillMaxHeight(),
             onMarkExerciseComplete = { score -> onMarkPillarComplete(selectedPillar, score) },
+            onOpenNextLesson = onOpenNextLesson,
           )
         }
       } else {
         Column(modifier = Modifier.fillMaxSize()) {
-          // Handheld High-Contrast Numbered Stepper
+          // Handheld Coursera Sequential Section Stepper
           Row(
             modifier =
               Modifier.fillMaxWidth()
@@ -224,25 +278,29 @@ fun LessonClassroomScreen(
                 .padding(horizontal = 12.dp, vertical = 10.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
           ) {
-            LessonPillar.entries.forEachIndexed { idx, pillar ->
+            LessonPillar.entries.forEach { pillar ->
               val active = pillar == selectedPillar
               val isDone = pillar.key in completedSteps
+              val isUnlocked = CurriculumProgression.isPillarUnlocked(pillar, completedSteps)
               val bgColor =
                 when {
                   active -> MaterialTheme.colorScheme.primary
                   isDone -> semantics.successContainer
+                  !isUnlocked -> MaterialTheme.colorScheme.surfaceVariant
                   else -> MaterialTheme.colorScheme.background
                 }
               val borderColor =
                 when {
                   active -> MaterialTheme.colorScheme.primary
                   isDone -> semantics.success
+                  !isUnlocked -> MaterialTheme.colorScheme.outlineVariant
                   else -> MaterialTheme.colorScheme.outline
                 }
               val textColor =
                 when {
                   active -> MaterialTheme.colorScheme.onPrimary
                   isDone -> semantics.onSuccessContainer
+                  !isUnlocked -> MaterialTheme.colorScheme.onSurfaceVariant
                   else -> MaterialTheme.colorScheme.onSurface
                 }
 
@@ -251,8 +309,16 @@ fun LessonClassroomScreen(
                 shape = RoundedCornerShape(99.dp),
                 modifier =
                   Modifier.clip(RoundedCornerShape(99.dp))
-                    .border(1.5.dp, borderColor, RoundedCornerShape(99.dp))
-                    .clickable { selectedPillar = pillar }
+                    .border(1.2.dp, borderColor, RoundedCornerShape(99.dp))
+                    .clickable {
+                      if (isUnlocked) {
+                        lockNoticeMessage = null
+                        selectedPillar = pillar
+                      } else {
+                        lockNoticeMessage =
+                          "Finish ${LessonPillar.entries[(pillar.ordinal - 1).coerceAtLeast(0)].shortLabel} first to unlock ${pillar.shortLabel}."
+                      }
+                    }
                     .testTag("pillar_tab_${pillar.key}"),
               ) {
                 Row(
@@ -260,16 +326,24 @@ fun LessonClassroomScreen(
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
-                  if (isDone) {
-                    Icon(
-                      imageVector = Icons.Filled.CheckCircle,
-                      contentDescription = "Completed",
-                      tint = if (active) MaterialTheme.colorScheme.onPrimary else semantics.success,
-                      modifier = Modifier.size(16.dp),
-                    )
+                  when {
+                    isDone ->
+                      Icon(
+                        imageVector = Icons.Filled.CheckCircle,
+                        contentDescription = "Completed",
+                        tint = if (active) MaterialTheme.colorScheme.onPrimary else semantics.success,
+                        modifier = Modifier.size(15.dp),
+                      )
+                    !isUnlocked ->
+                      Icon(
+                        imageVector = Icons.Filled.Lock,
+                        contentDescription = "Locked",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(14.dp),
+                      )
                   }
                   Text(
-                    text = "${idx + 1}. ${pillar.shortLabel}",
+                    text = pillar.shortLabel,
                     style = MaterialTheme.typography.labelMedium,
                     color = textColor,
                     fontWeight = if (active || isDone) FontWeight.Bold else FontWeight.SemiBold,
@@ -281,15 +355,18 @@ fun LessonClassroomScreen(
 
           LessonPillarBody(
             lesson = lesson,
+            progress = progress,
+            nextLesson = nextLesson,
             selectedPillar = selectedPillar,
             modifier = Modifier.weight(1f).fillMaxWidth(),
             onMarkExerciseComplete = { score -> onMarkPillarComplete(selectedPillar, score) },
+            onOpenNextLesson = onOpenNextLesson,
           )
         }
       }
     }
 
-    // Sticky Udacity Classroom Footer Controls
+    // Sticky Coursera Classroom Footer Controls
     val isCurrentDone = selectedPillar.key in completedSteps
     Row(
       modifier =
@@ -303,42 +380,47 @@ fun LessonClassroomScreen(
       OutlinedButton(
         onClick = {
           val prevIdx = (selectedPillar.ordinal - 1).coerceAtLeast(0)
+          lockNoticeMessage = null
           selectedPillar = LessonPillar.entries[prevIdx]
         },
         enabled = selectedPillar.ordinal > 0,
         modifier = Modifier.height(48.dp),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(10.dp),
       ) {
         Text("← Prev")
       }
 
       if (selectedPillar != LessonPillar.EXERCISE) {
         OutlinedButton(
-          onClick = { onMarkPillarComplete(selectedPillar, null) },
+          onClick = {
+            lockNoticeMessage = null
+            onMarkPillarComplete(selectedPillar, null)
+          },
           modifier = Modifier.weight(1f).height(48.dp).testTag("mark_pillar_complete"),
-          shape = RoundedCornerShape(12.dp),
+          shape = RoundedCornerShape(10.dp),
         ) {
           Text(
-            text = if (isCurrentDone) "Completed ✓" else "Complete (+15 XP)",
+            text = if (isCurrentDone) "Completed ✓" else "Mark Complete",
             maxLines = 1,
           )
         }
 
         Button(
           onClick = {
+            lockNoticeMessage = null
             if (!isCurrentDone) onMarkPillarComplete(selectedPillar, null)
             val nextIdx = (selectedPillar.ordinal + 1).coerceAtMost(LessonPillar.entries.lastIndex)
             selectedPillar = LessonPillar.entries[nextIdx]
           },
           modifier = Modifier.weight(1f).height(48.dp).testTag("next_pillar_button"),
-          shape = RoundedCornerShape(12.dp),
+          shape = RoundedCornerShape(10.dp),
           colors =
             ButtonDefaults.buttonColors(
               containerColor = MaterialTheme.colorScheme.primary,
               contentColor = MaterialTheme.colorScheme.onPrimary,
             ),
         ) {
-          Text("Next →", fontWeight = FontWeight.Bold)
+          Text("Next Section →", fontWeight = FontWeight.Bold)
         }
       } else {
         Spacer(modifier = Modifier.weight(1f))
@@ -394,8 +476,11 @@ fun LessonClassroomScreen(
 @Composable
 private fun LessonPillarBody(
   lesson: Lesson,
+  progress: LessonProgress?,
+  nextLesson: Lesson?,
   selectedPillar: LessonPillar,
   onMarkExerciseComplete: (Long?) -> Unit,
+  onOpenNextLesson: ((Lesson) -> Unit)?,
   modifier: Modifier = Modifier,
 ) {
   val semantics = MaterialTheme.semanticColors
@@ -403,7 +488,7 @@ private fun LessonPillarBody(
   Column(
     modifier =
       modifier
-        .verticalScroll(rememberScrollState())
+        .verticalScroll(rememberScrollState(initial = 0))
         .padding(horizontal = 16.dp, vertical = 16.dp),
     verticalArrangement = Arrangement.spacedBy(14.dp),
   ) {
@@ -418,14 +503,14 @@ private fun LessonPillarBody(
         Column(
           modifier =
             Modifier.fillMaxWidth()
-              .clip(RoundedCornerShape(16.dp))
+              .clip(RoundedCornerShape(14.dp))
               .background(MaterialTheme.colorScheme.primaryContainer)
-              .border(1.5.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
+              .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(14.dp))
               .padding(16.dp),
           verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
           Text(
-            text = "SYLLABUS OBJECTIVES",
+            text = "WHAT YOU WILL MASTER IN THIS LESSON",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onPrimaryContainer,
             fontWeight = FontWeight.Bold,
@@ -442,16 +527,28 @@ private fun LessonPillarBody(
           }
         }
 
-        lesson.concepts.forEach { block ->
+        lesson.concepts.forEachIndexed { idx, block ->
           Column(
             modifier =
               Modifier.fillMaxWidth()
-                .clip(RoundedCornerShape(18.dp))
+                .clip(RoundedCornerShape(16.dp))
                 .background(MaterialTheme.colorScheme.surface)
-                .border(1.5.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(18.dp))
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
           ) {
+            Surface(
+              color = MaterialTheme.colorScheme.surfaceVariant,
+              shape = RoundedCornerShape(6.dp),
+            ) {
+              Text(
+                text = "CONCEPT BLOCK ${idx + 1} OF ${lesson.concepts.size}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+              )
+            }
             Text(
               text = block.heading,
               style = MaterialTheme.typography.titleMedium,
@@ -499,9 +596,9 @@ private fun LessonPillarBody(
           Column(
             modifier =
               Modifier.fillMaxWidth()
-                .clip(RoundedCornerShape(18.dp))
+                .clip(RoundedCornerShape(16.dp))
                 .background(MaterialTheme.colorScheme.surface)
-                .border(1.5.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(18.dp))
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
           ) {
@@ -590,9 +687,9 @@ private fun LessonPillarBody(
           Column(
             modifier =
               Modifier.fillMaxWidth()
-                .clip(RoundedCornerShape(18.dp))
+                .clip(RoundedCornerShape(16.dp))
                 .background(MaterialTheme.colorScheme.surface)
-                .border(1.5.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(18.dp))
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
           ) {
@@ -650,8 +747,12 @@ private fun LessonPillarBody(
 
       LessonPillar.EXERCISE -> {
         InlineExerciseSection(
+          lessonId = lesson.id,
           questions = lesson.exercises,
+          isAlreadyMastered = progress?.isCompleted == true,
+          nextLesson = nextLesson,
           onGraded = { pct -> onMarkExerciseComplete(pct) },
+          onOpenNextLesson = onOpenNextLesson,
         )
       }
     }
@@ -662,12 +763,17 @@ private fun LessonPillarBody(
 
 @Composable
 private fun InlineExerciseSection(
+  lessonId: String,
   questions: List<PracticeQuestion>,
+  isAlreadyMastered: Boolean,
+  nextLesson: Lesson?,
   onGraded: (Long) -> Unit,
+  onOpenNextLesson: ((Lesson) -> Unit)?,
 ) {
-  val selectedAnswers = remember { mutableStateMapOf<String, Int>() }
-  val hintShown = remember { mutableStateMapOf<String, Boolean>() }
-  var submitted by remember { mutableStateOf(false) }
+  val selectedAnswers = remember(lessonId) { mutableStateMapOf<String, Int>() }
+  val hintShown = remember(lessonId) { mutableStateMapOf<String, Boolean>() }
+  var submitted by remember(lessonId) { mutableStateOf(false) }
+  var attemptCount by remember(lessonId) { mutableIntStateOf(0) }
   val semantics = MaterialTheme.semanticColors
 
   Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -676,9 +782,9 @@ private fun InlineExerciseSection(
       Column(
         modifier =
           Modifier.fillMaxWidth()
-            .clip(RoundedCornerShape(18.dp))
+            .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.surface)
-            .border(1.5.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(18.dp))
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
       ) {
@@ -811,32 +917,87 @@ private fun InlineExerciseSection(
       Button(
         onClick = {
           submitted = true
+          attemptCount++
           val correct = questions.count { selectedAnswers[it.id] == it.correctIndex }
           val pct = if (questions.isEmpty()) 100L else ((correct * 100L) / questions.size)
           onGraded(pct)
         },
         enabled = selectedAnswers.size == questions.size,
         modifier = Modifier.fillMaxWidth().height(52.dp).testTag("submit_inline_exercise"),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
       ) {
-        Text("Check Answers & Claim +40 XP", fontWeight = FontWeight.Bold)
+        Text("Check Answers & Grade Quiz (≥60% to Unlock)", fontWeight = FontWeight.Bold)
       }
     } else {
       val correct = questions.count { selectedAnswers[it.id] == it.correctIndex }
-      Surface(
-        color = semantics.successContainer,
-        shape = RoundedCornerShape(16.dp),
+      val pct = if (questions.isEmpty()) 100L else ((correct * 100L) / questions.size)
+      val passed = pct >= CurriculumProgression.PASS_THRESHOLD_PERCENT || isAlreadyMastered
+
+      Column(
         modifier =
           Modifier.fillMaxWidth()
-            .border(1.5.dp, semantics.success, RoundedCornerShape(16.dp)),
+            .clip(RoundedCornerShape(16.dp))
+            .background(if (passed) semantics.successContainer else MaterialTheme.colorScheme.errorContainer)
+            .border(
+              1.5.dp,
+              if (passed) semantics.success else MaterialTheme.colorScheme.error,
+              RoundedCornerShape(16.dp),
+            )
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
       ) {
         Text(
-          text = "Score: $correct / ${questions.size} mastered! Progress saved to your device.",
-          style = MaterialTheme.typography.titleSmall,
-          color = semantics.onSuccessContainer,
+          text =
+            if (passed) {
+              "Lesson Mastered • $correct / ${questions.size} (${pct}%)"
+            } else {
+              "Not Mastered Yet • $correct / ${questions.size} (${pct}%)"
+            },
+          style = MaterialTheme.typography.titleMedium,
+          color = if (passed) semantics.onSuccessContainer else MaterialTheme.colorScheme.onErrorContainer,
           fontWeight = FontWeight.Bold,
-          modifier = Modifier.padding(14.dp),
         )
+        Text(
+          text =
+            if (passed) {
+              if (nextLesson != null) "Next lesson unlocked: \"${nextLesson.title}\""
+              else "Final lesson in this track completed! You are ready for timed Exam Lab mocks."
+            } else {
+              "Score at least 60% (${(questions.size * 6 + 9) / 10}/${questions.size}) to master this lesson and unlock the next one."
+            },
+          style = MaterialTheme.typography.bodySmall,
+          color = if (passed) semantics.onSuccessContainer else MaterialTheme.colorScheme.onErrorContainer,
+        )
+
+        if (passed && nextLesson != null && onOpenNextLesson != null) {
+          Button(
+            onClick = { onOpenNextLesson(nextLesson) },
+            modifier = Modifier.fillMaxWidth().height(48.dp).testTag("continue_next_lesson_button"),
+            shape = RoundedCornerShape(10.dp),
+            colors =
+              ButtonDefaults.buttonColors(
+                containerColor = semantics.success,
+                contentColor = semantics.onSuccess,
+              ),
+          ) {
+            Text("Continue to Next Lesson", fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.width(6.dp))
+            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, modifier = Modifier.size(18.dp))
+          }
+        } else if (!passed) {
+          Button(
+            onClick = {
+              selectedAnswers.clear()
+              submitted = false
+            },
+            modifier = Modifier.fillMaxWidth().height(48.dp).testTag("retry_inline_exercise"),
+            shape = RoundedCornerShape(10.dp),
+          ) {
+            Icon(Icons.Filled.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(modifier = Modifier.width(6.dp))
+            Text("Retry Mastery Quiz (Attempt #${attemptCount + 1})", fontWeight = FontWeight.Bold)
+          }
+        }
       }
     }
   }

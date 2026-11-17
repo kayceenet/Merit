@@ -31,10 +31,12 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.TrackChanges
 import androidx.compose.material.icons.outlined.Biotech
@@ -63,18 +65,19 @@ import androidx.compose.ui.unit.dp
 import com.example.R
 import com.example.data.curriculum.CourseModule
 import com.example.data.curriculum.CurriculumCatalog
+import com.example.data.curriculum.CurriculumProgression
 import com.example.data.curriculum.Lesson
 import com.example.data.curriculum.LessonPillar
 import com.example.data.curriculum.SubjectTrack
 import com.example.data.model.ExamAttempt
 import com.example.data.model.LessonProgress
 import com.example.data.model.UserProfile
-import com.example.ui.theme.JetBrainsMonoFontFamily
-import com.example.ui.theme.ScholarAmberTertiary
-import com.example.ui.theme.UdacityCyan
-import com.example.ui.theme.UdacityCyanInk
-import com.example.ui.theme.UdacityNavy
-import com.example.ui.theme.UdacityNavyElevated
+import com.example.ui.theme.CourseraAzureAccent
+import com.example.ui.theme.CourseraAzureInk
+import com.example.ui.theme.CourseraBlue
+import com.example.ui.theme.CourseraDeepNavy
+import com.example.ui.theme.CourseraNavyElevated
+import com.example.ui.theme.ScholarAmber
 import com.example.ui.theme.semanticColors
 import kotlin.math.roundToInt
 
@@ -96,10 +99,26 @@ fun HomeDashboardScreen(
       val dbLessons = structuredModules.flatMap { it.lessons }
       if (dbLessons.isNotEmpty()) dbLessons else CurriculumCatalog.allLessons()
     }
-  val completedIds = progressList.filter { it.isCompleted }.map { it.lessonId }.toSet()
-  val nextLesson = allLessons.firstOrNull { it.id !in completedIds } ?: allLessons.first()
-  val nextLessonProgress = progressList.find { it.lessonId == nextLesson.id }
-  val nextLessonPillarsDone = nextLessonProgress?.completedSteps?.size ?: 0
+  val progressMap = remember(progressList) { progressList.associateBy { it.lessonId } }
+  val completedIds =
+    remember(progressList) { progressList.filter { it.isCompleted }.map { it.lessonId }.toSet() }
+
+  // Find next unlocked, unmastered lesson in track-order so the user always resumes cleanly
+  val nextLesson =
+    remember(structuredModules, progressMap, allLessons) {
+      val orderedByTracks =
+        CurriculumCatalog.tracks.mapNotNull { track ->
+          val trackLessons =
+            structuredModules.filter { it.subjectId == track.id }.flatMap { it.lessons }.ifEmpty {
+              track.allLessons
+            }
+          val candidate = CurriculumProgression.nextUnlockedLesson(trackLessons, progressMap)
+          if (candidate != null && progressMap[candidate.id]?.isCompleted != true) candidate else null
+        }
+      orderedByTracks.firstOrNull() ?: allLessons.first()
+    }
+  val nextLessonProgress = progressMap[nextLesson.id]
+  val nextLessonPillarsDone = nextLessonProgress?.completedSteps?.distinct()?.size ?: 0
   val nextLessonRatio = nextLessonPillarsDone / LessonPillar.entries.size.toFloat()
 
   val anyConceptDone = progressList.any { LessonPillar.CONCEPT.key in it.completedSteps }
@@ -111,6 +130,8 @@ fun HomeDashboardScreen(
   val projectedJamb =
     if (attempts.isEmpty()) 260 else (180 + (avgAccuracy * 2.2)).roundToInt().coerceIn(160, 400)
   val recentWeakTopic = attempts.firstOrNull()?.weakTopics?.firstOrNull()
+  val totalPastQuestions =
+    remember { CurriculumCatalog.tracks.sumOf { CurriculumCatalog.pastQuestionsFor(it.id, "ALL").size } }
   val semantics = MaterialTheme.semanticColors
 
   Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
@@ -119,40 +140,52 @@ fun HomeDashboardScreen(
       contentPadding = PaddingValues(bottom = 24.dp),
       verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-      // Udacity-Style Dark Navy Studio Top Header + Dark Theme Quick Toggle
+      // Coursera-Style Clean Academic Top Bar + Theme Switch
       item {
         Column(
           modifier =
             Modifier.fillMaxWidth()
               .background(semantics.classroomBar)
               .padding(horizontal = 16.dp, vertical = 16.dp),
-          verticalArrangement = Arrangement.spacedBy(12.dp),
+          verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
           Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
           ) {
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+              Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+              ) {
+                Icon(
+                  imageVector = Icons.Filled.School,
+                  contentDescription = null,
+                  tint = CourseraAzureAccent,
+                  modifier = Modifier.size(16.dp),
+                )
+                Text(
+                  text = "MERITPREP ACADEMY • ${profile?.targetExam ?: "JAMB + WAEC"}",
+                  style = MaterialTheme.typography.labelSmall,
+                  color = CourseraAzureAccent,
+                  fontWeight = FontWeight.Bold,
+                )
+              }
               Text(
-                text = "MERITPREP STUDIO • ${profile?.targetExam ?: "BOTH"}",
-                style = MaterialTheme.typography.labelSmall,
-                color = semantics.classroomAccent,
-                fontWeight = FontWeight.Bold,
-              )
-              Text(
-                text = "Welcome, ${profile?.displayName?.substringBefore(" ") ?: "Scholar"}",
+                text = "Welcome back, ${profile?.displayName?.substringBefore(" ") ?: "Scholar"}",
                 style = MaterialTheme.typography.headlineMedium,
                 color = semantics.onClassroomBar,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
               )
               Text(
-                text = "UTME Target ${profile?.targetScore ?: 320}/400 • ${completedIds.size}/${allLessons.size} chapters mastered",
+                text = "UTME Target ${profile?.targetScore ?: 320}/400 • ${completedIds.size}/${allLessons.size} lessons mastered • $totalPastQuestions past Qs",
                 style = MaterialTheme.typography.bodySmall,
                 color = semantics.classroomSubtext,
               )
             }
+
             Row(
               horizontalArrangement = Arrangement.spacedBy(6.dp),
               verticalAlignment = Alignment.CenterVertically,
@@ -167,23 +200,23 @@ fun HomeDashboardScreen(
               StatBadge(
                 icon = Icons.Filled.Bolt,
                 text = "${profile?.totalXp ?: 0} XP",
-                containerColor = UdacityNavyElevated,
-                contentColor = Color(0xFF7DD3FC),
-                borderColor = UdacityCyan,
+                containerColor = CourseraNavyElevated,
+                contentColor = Color(0xFFBAE6FD),
+                borderColor = CourseraAzureAccent,
               )
               IconButton(
                 onClick = onToggleDarkTheme,
                 modifier =
                   Modifier.size(40.dp)
                     .clip(CircleShape)
-                    .background(UdacityNavyElevated)
-                    .border(1.dp, Color(0xFF334155), CircleShape)
+                    .background(CourseraNavyElevated)
+                    .border(1.dp, Color(0xFF28559A), CircleShape)
                     .testTag("home_dark_theme_toggle"),
               ) {
                 Icon(
                   imageVector = if (isDarkTheme) Icons.Filled.LightMode else Icons.Filled.DarkMode,
                   contentDescription = if (isDarkTheme) "Switch to Light Theme" else "Switch to Dark Theme",
-                  tint = if (isDarkTheme) Color(0xFFFDE68A) else Color(0xFF7DD3FC),
+                  tint = if (isDarkTheme) Color(0xFFFDE68A) else CourseraAzureAccent,
                   modifier = Modifier.size(20.dp),
                 )
               }
@@ -192,15 +225,15 @@ fun HomeDashboardScreen(
         }
       }
 
-      // Udacity Nanodegree "Resume Classroom" Hero Card
+      // Coursera "My Learning" Active Course Hero Card
       item {
         Box(
           modifier =
             Modifier.padding(horizontal = 16.dp)
               .fillMaxWidth()
-              .clip(RoundedCornerShape(20.dp))
-              .background(UdacityNavy)
-              .border(1.5.dp, Color(0xFF28427B), RoundedCornerShape(20.dp)),
+              .clip(RoundedCornerShape(18.dp))
+              .background(CourseraDeepNavy)
+              .border(1.5.dp, Color(0xFF1E4C9A), RoundedCornerShape(18.dp)),
         ) {
           Image(
             painter = painterResource(id = R.drawable.img_hero_academy_1794740698817),
@@ -213,94 +246,88 @@ fun HomeDashboardScreen(
               Modifier.matchParentSize()
                 .background(
                   Brush.horizontalGradient(
-                    colors = listOf(Color(0xF507122B), Color(0xEA0B1633), Color(0xB80B1633))
+                    colors = listOf(Color(0xF5001E4D), Color(0xEB00255C), Color(0xC200255C))
                   )
                 )
           )
-          Row(modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
-            Box(
-              modifier =
-                Modifier.width(6.dp)
-                  .fillMaxHeight()
-                  .background(UdacityCyan)
-            )
-            Column(
-              modifier = Modifier.weight(1f).padding(18.dp),
-              verticalArrangement = Arrangement.spacedBy(10.dp),
+          Column(
+            modifier = Modifier.fillMaxWidth().padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+          ) {
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically,
             ) {
-              Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
+              Surface(
+                color = CourseraAzureAccent,
+                shape = RoundedCornerShape(6.dp),
               ) {
-                Surface(
-                  color = UdacityCyan,
-                  shape = RoundedCornerShape(6.dp),
-                ) {
-                  Text(
-                    text = "CONTINUE CLASSROOM",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = UdacityCyanInk,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                  )
-                }
                 Text(
-                  text = "$nextLessonPillarsDone/${LessonPillar.entries.size} pillars",
-                  style = MaterialTheme.typography.labelSmall.copy(fontFamily = JetBrainsMonoFontFamily),
-                  color = Color(0xFFE0F2FE),
-                )
-              }
-
-              Text(
-                text = nextLesson.title,
-                style = MaterialTheme.typography.headlineSmall,
-                color = Color.White,
-              )
-              Text(
-                text = "${nextLesson.syllabusTag} • ${nextLesson.durationMinutes} min • Lab: ${nextLesson.labType.title}",
-                style = MaterialTheme.typography.bodySmall,
-                color = Color(0xFFE2E8F0),
-              )
-
-              LinearProgressIndicator(
-                progress = { nextLessonRatio.coerceAtLeast(0.06f) },
-                modifier = Modifier.fillMaxWidth().height(6.dp).clip(CircleShape),
-                color = UdacityCyan,
-                trackColor = Color(0xFF1E3A6E),
-              )
-
-              Button(
-                onClick = { onOpenLesson(nextLesson) },
-                modifier = Modifier.fillMaxWidth().height(48.dp).testTag("resume_lesson_button"),
-                shape = RoundedCornerShape(12.dp),
-                colors =
-                  ButtonDefaults.buttonColors(
-                    containerColor = UdacityCyan,
-                    contentColor = UdacityCyanInk,
-                  ),
-              ) {
-                Icon(Icons.Filled.PlayArrow, contentDescription = null, modifier = Modifier.size(20.dp))
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                  text = if (nextLessonPillarsDone > 0) "Resume Classroom" else "Enter Classroom",
-                  style = MaterialTheme.typography.titleSmall,
+                  text = "MY LEARNING • NEXT LESSON",
+                  style = MaterialTheme.typography.labelSmall,
+                  color = CourseraAzureInk,
                   fontWeight = FontWeight.Bold,
+                  modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                 )
               }
+              Text(
+                text = "$nextLessonPillarsDone/${LessonPillar.entries.size} parts",
+                style = MaterialTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
+                color = Color(0xFFE0F2FE),
+                fontWeight = FontWeight.SemiBold,
+              )
+            }
+
+            Text(
+              text = nextLesson.title,
+              style = MaterialTheme.typography.headlineSmall,
+              color = Color.White,
+            )
+            Text(
+              text = "${nextLesson.syllabusTag} • ${nextLesson.durationMinutes} min • Lab: ${nextLesson.labType.title}",
+              style = MaterialTheme.typography.bodySmall,
+              color = Color(0xFFD6E6FF),
+            )
+
+            LinearProgressIndicator(
+              progress = { nextLessonRatio.coerceAtLeast(0.06f) },
+              modifier = Modifier.fillMaxWidth().height(6.dp).clip(CircleShape),
+              color = CourseraAzureAccent,
+              trackColor = Color(0xFF143C7B),
+            )
+
+            Button(
+              onClick = { onOpenLesson(nextLesson) },
+              modifier = Modifier.fillMaxWidth().height(48.dp).testTag("resume_lesson_button"),
+              shape = RoundedCornerShape(10.dp),
+              colors =
+                ButtonDefaults.buttonColors(
+                  containerColor = CourseraBlue,
+                  contentColor = Color.White,
+                ),
+            ) {
+              Icon(Icons.Filled.PlayArrow, contentDescription = null, modifier = Modifier.size(20.dp))
+              Spacer(modifier = Modifier.width(6.dp))
+              Text(
+                text = if (nextLessonPillarsDone > 0) "Resume Lesson" else "Start Lesson",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+              )
             }
           }
         }
       }
 
-      // Udacity-Style Daily Study Checklist
+      // Coursera Guided Daily Study Goals
       item {
         Column(
           modifier =
             Modifier.padding(horizontal = 16.dp)
               .fillMaxWidth()
-              .clip(RoundedCornerShape(18.dp))
+              .clip(RoundedCornerShape(16.dp))
               .background(MaterialTheme.colorScheme.surface)
-              .border(1.5.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(18.dp))
+              .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
               .padding(16.dp),
           verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
@@ -310,7 +337,7 @@ fun HomeDashboardScreen(
             verticalAlignment = Alignment.CenterVertically,
           ) {
             Text(
-              text = "Today's Study Checklist",
+              text = "Daily Learning Plan",
               style = MaterialTheme.typography.titleMedium,
               color = MaterialTheme.colorScheme.onSurface,
             )
@@ -320,8 +347,8 @@ fun HomeDashboardScreen(
               shape = RoundedCornerShape(99.dp),
             ) {
               Text(
-                text = "$doneTasks/3 DONE",
-                style = MaterialTheme.typography.labelSmall,
+                text = "$doneTasks/3 GOALS",
+                style = MaterialTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
@@ -330,27 +357,27 @@ fun HomeDashboardScreen(
           }
 
           StudyChecklistItem(
-            title = "Complete 1 Concept Derivation",
-            subtitle = "Build intuition in ${nextLesson.title}",
+            title = "Build Zero-to-One Foundations",
+            subtitle = "Read concepts & score 60%+ quiz in ${nextLesson.title}",
             isDone = anyConceptDone,
             onClick = { onOpenLesson(nextLesson) },
           )
           StudyChecklistItem(
-            title = "Run 1 Interactive Practical Lab",
+            title = "Complete 1 Interactive Virtual Lab",
             subtitle = nextLesson.labType.title,
             isDone = anyLabDone,
             onClick = { onOpenLesson(nextLesson) },
           )
           StudyChecklistItem(
-            title = "Score 70%+ in Exam Lab",
-            subtitle = "Timed JAMB CBT & WAEC practice",
+            title = "Pass 1 Timed Past-Question Drill (70%+)",
+            subtitle = "2018–2025 JAMB UTME & WAEC Paper Bank",
             isDone = anyExamPassed,
             onClick = { onOpenExamLab("physics") },
           )
         }
       }
 
-      // High-Contrast Exam Readiness & Quick CBT Action Strip
+      // Exam Projection & Timed CBT Practice Strip
       item {
         Row(
           modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
@@ -359,13 +386,16 @@ fun HomeDashboardScreen(
           Column(
             modifier =
               Modifier.weight(1f)
-                .clip(RoundedCornerShape(18.dp))
+                .clip(RoundedCornerShape(16.dp))
                 .background(MaterialTheme.colorScheme.surface)
-                .border(1.5.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(18.dp))
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
                 .padding(14.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
           ) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
               Icon(
                 Icons.Filled.TrackChanges,
                 contentDescription = null,
@@ -373,7 +403,7 @@ fun HomeDashboardScreen(
                 modifier = Modifier.size(18.dp),
               )
               Text(
-                "UTME Projection",
+                "UTME Readiness",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.SemiBold,
@@ -381,7 +411,7 @@ fun HomeDashboardScreen(
             }
             Text(
               text = "$projectedJamb / 400",
-              style = MaterialTheme.typography.headlineSmall.copy(fontFamily = JetBrainsMonoFontFamily),
+              style = MaterialTheme.typography.headlineSmall.copy(fontFeatureSettings = "tnum"),
               color = MaterialTheme.colorScheme.primary,
               fontWeight = FontWeight.Bold,
             )
@@ -395,52 +425,55 @@ fun HomeDashboardScreen(
           Column(
             modifier =
               Modifier.weight(1f)
-                .clip(RoundedCornerShape(18.dp))
-                .background(MaterialTheme.colorScheme.secondaryContainer)
-                .border(1.5.dp, MaterialTheme.colorScheme.secondary, RoundedCornerShape(18.dp))
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
                 .clickable { onOpenExamLab("physics") }
                 .padding(14.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
           ) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
               Icon(
                 Icons.Filled.Quiz,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier.size(18.dp),
               )
               Text(
-                "Quick CBT Drill",
+                "Timed Exam Practice",
                 style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
                 fontWeight = FontWeight.SemiBold,
               )
             }
             Text(
               text = "JAMB & WAEC",
               style = MaterialTheme.typography.titleLarge,
-              color = MaterialTheme.colorScheme.onSecondaryContainer,
+              color = MaterialTheme.colorScheme.onPrimaryContainer,
             )
             Text(
-              text = recentWeakTopic?.let { "Fix weak topic: $it →" } ?: "Start timed drill →",
+              text = recentWeakTopic?.let { "Drill weak topic: $it →" } ?: "Start past-question paper →",
               style = MaterialTheme.typography.bodySmall,
-              color = MaterialTheme.colorScheme.onSecondaryContainer,
+              color = MaterialTheme.colorScheme.primary,
               fontWeight = FontWeight.Bold,
             )
           }
         }
       }
 
-      // Section Header: Nanodegree Subject Tracks
+      // Section Header: Coursera Specializations
       item {
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
           Text(
-            text = "Nanodegree Subject Tracks",
+            text = "JAMB & WAEC Specializations",
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground,
           )
           Text(
-            text = "Structured Room-backed modules with interactive labs & past questions",
+            text = "Sequential zero-to-mastery courses — score ≥60% on each quiz to unlock the next lesson",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
@@ -453,12 +486,16 @@ fun HomeDashboardScreen(
         val trackLessons = if (dbTrackLessons.isNotEmpty()) dbTrackLessons else track.allLessons
         val doneCount = trackLessons.count { it.id in completedIds }
         val ratio = if (trackLessons.isEmpty()) 0f else doneCount / trackLessons.size.toFloat()
+        val nextTrackLesson = CurriculumProgression.nextUnlockedLesson(trackLessons, progressMap)
+        val bankSize = CurriculumCatalog.pastQuestionsFor(track.id, "ALL").size
 
         Box(modifier = Modifier.padding(horizontal = 16.dp)) {
           SubjectTrackCard(
             track = track,
             completedLessons = doneCount,
             totalLessons = trackLessons.size,
+            pastQuestionCount = bankSize,
+            nextLessonTitle = nextTrackLesson?.title,
             progressRatio = ratio,
             onClick = { onOpenTrack(track) },
           )
@@ -510,6 +547,8 @@ private fun StudyChecklistItem(
         text = subtitle,
         style = MaterialTheme.typography.bodySmall,
         color = if (isDone) semantics.onSuccessContainer else MaterialTheme.colorScheme.onSurfaceVariant,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
       )
     }
     Icon(
@@ -542,7 +581,7 @@ private fun StatBadge(
       Icon(icon, contentDescription = null, tint = contentColor, modifier = Modifier.size(16.dp))
       Text(
         text = text,
-        style = MaterialTheme.typography.labelMedium.copy(fontFamily = JetBrainsMonoFontFamily),
+        style = MaterialTheme.typography.labelMedium.copy(fontFeatureSettings = "tnum"),
         color = contentColor,
         fontWeight = FontWeight.Bold,
       )
@@ -555,17 +594,19 @@ fun SubjectTrackCard(
   track: SubjectTrack,
   completedLessons: Int,
   totalLessons: Int,
+  pastQuestionCount: Int,
+  nextLessonTitle: String?,
   progressRatio: Float,
   onClick: () -> Unit,
 ) {
   val semantics = MaterialTheme.semanticColors
   val accentColor =
     when (track.id) {
-      "physics" -> UdacityCyan
-      "mathematics" -> MaterialTheme.colorScheme.primary
+      "physics" -> CourseraBlue
+      "mathematics" -> CourseraAzureAccent
       "chemistry" -> semantics.success
       "biology" -> MaterialTheme.colorScheme.secondary
-      else -> ScholarAmberTertiary
+      else -> ScholarAmber
     }
   val trackIcon =
     when (track.id) {
@@ -580,13 +621,13 @@ fun SubjectTrackCard(
     modifier =
       Modifier.fillMaxWidth()
         .height(IntrinsicSize.Min)
-        .clip(RoundedCornerShape(18.dp))
+        .clip(RoundedCornerShape(16.dp))
         .background(MaterialTheme.colorScheme.surface)
-        .border(1.5.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(18.dp))
+        .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
         .clickable(onClick = onClick)
         .testTag("track_card_${track.id}"),
   ) {
-    Box(modifier = Modifier.width(6.dp).fillMaxHeight().background(accentColor))
+    Box(modifier = Modifier.width(5.dp).fillMaxHeight().background(accentColor))
 
     Column(
       modifier = Modifier.weight(1f).padding(16.dp),
@@ -623,10 +664,10 @@ fun SubjectTrackCard(
               color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
-              text = "${track.modules.size} modules • ${track.examCoverage}",
+              text = "${track.modules.size} modules • $totalLessons lessons • $pastQuestionCount past Qs",
               style = MaterialTheme.typography.labelSmall,
-              color = MaterialTheme.colorScheme.secondary,
-              fontWeight = FontWeight.Bold,
+              color = MaterialTheme.colorScheme.primary,
+              fontWeight = FontWeight.SemiBold,
             )
           }
         }
@@ -643,6 +684,27 @@ fun SubjectTrackCard(
         color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
 
+      if (!nextLessonTitle.isNullOrBlank()) {
+        Row(
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.spacedBy(5.dp),
+        ) {
+          Icon(
+            imageVector = Icons.Filled.LockOpen,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.size(14.dp),
+          )
+          Text(
+            text = "Unlocked next: $nextLessonTitle",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.secondary,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+          )
+        }
+      }
+
       Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(
           modifier = Modifier.fillMaxWidth(),
@@ -650,7 +712,7 @@ fun SubjectTrackCard(
           verticalAlignment = Alignment.CenterVertically,
         ) {
           Text(
-            text = "$completedLessons / $totalLessons chapters mastered",
+            text = "$completedLessons / $totalLessons lessons mastered",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
@@ -662,7 +724,7 @@ fun SubjectTrackCard(
           ) {
             Text(
               text = "${(progressRatio * 100).roundToInt()}%",
-              style = MaterialTheme.typography.labelSmall.copy(fontFamily = JetBrainsMonoFontFamily),
+              style = MaterialTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
               color =
                 if (progressRatio >= 1f) semantics.onSuccessContainer
                 else MaterialTheme.colorScheme.onPrimaryContainer,
@@ -673,7 +735,7 @@ fun SubjectTrackCard(
         }
         LinearProgressIndicator(
           progress = { progressRatio },
-          modifier = Modifier.fillMaxWidth().height(8.dp).clip(CircleShape),
+          modifier = Modifier.fillMaxWidth().height(7.dp).clip(CircleShape),
           color = if (progressRatio >= 1f) semantics.success else MaterialTheme.colorScheme.primary,
           trackColor = MaterialTheme.colorScheme.surfaceVariant,
         )

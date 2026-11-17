@@ -7,8 +7,8 @@ object CurriculumCatalog {
       PhysicsCurriculum.track,
       MathematicsCurriculum.track,
       ChemistryCurriculum.track,
-      BiologyEnglishCurriculum.biologyTrack,
-      BiologyEnglishCurriculum.englishTrack,
+      BiologyCurriculum.track,
+      EnglishCurriculum.track,
     )
 
   fun trackById(subjectId: String): SubjectTrack? = tracks.find { it.id == subjectId }

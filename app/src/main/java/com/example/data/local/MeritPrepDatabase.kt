@@ -8,6 +8,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.Transaction
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import com.example.data.model.ExamAttempt
@@ -101,6 +102,29 @@ interface MeritPrepDao {
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun insertPastQuestions(questions: List<PastQuestionEntity>)
+
+  @Query("DELETE FROM learning_modules")
+  suspend fun deleteAllModules()
+
+  @Query("DELETE FROM learning_chapters")
+  suspend fun deleteAllChapters()
+
+  @Query("DELETE FROM past_questions")
+  suspend fun deleteAllPastQuestions()
+
+  @Transaction
+  suspend fun replaceCurriculum(
+    modules: List<LearningModuleEntity>,
+    chapters: List<LearningChapterEntity>,
+    questions: List<PastQuestionEntity>,
+  ) {
+    deleteAllModules()
+    deleteAllChapters()
+    deleteAllPastQuestions()
+    insertModules(modules)
+    insertChapters(chapters)
+    insertPastQuestions(questions)
+  }
 
   @Query(
     "SELECT * FROM past_questions WHERE subjectId = :subjectId AND LOWER(examType) = LOWER(:examType) ORDER BY orderIndex ASC"

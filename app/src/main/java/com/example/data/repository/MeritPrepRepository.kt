@@ -52,14 +52,19 @@ class MeritPrepRepository(
 
   suspend fun seedCurriculumIfNeeded() {
     try {
-      if (dao.getModuleCount() == 0) {
-        dao.insertModules(CurriculumEntityMapper.buildModuleEntities())
-      }
-      if (dao.getChapterCount() == 0) {
-        dao.insertChapters(CurriculumEntityMapper.buildChapterEntities())
-      }
-      if (dao.getPastQuestionCount() == 0) {
-        dao.insertPastQuestions(CurriculumEntityMapper.buildPastQuestionEntities())
+      val expectedModules = CurriculumEntityMapper.buildModuleEntities()
+      val expectedChapters = CurriculumEntityMapper.buildChapterEntities()
+      val expectedQuestions = CurriculumEntityMapper.buildPastQuestionEntities()
+      val storedVersion = preferencesRepository?.getCurriculumVersion() ?: CURRENT_CURRICULUM_VERSION
+      val needsRefresh =
+        storedVersion != CURRENT_CURRICULUM_VERSION ||
+          dao.getModuleCount() != expectedModules.size ||
+          dao.getChapterCount() != expectedChapters.size ||
+          dao.getPastQuestionCount() != expectedQuestions.size
+
+      if (needsRefresh) {
+        dao.replaceCurriculum(expectedModules, expectedChapters, expectedQuestions)
+        preferencesRepository?.setCurriculumVersion(CURRENT_CURRICULUM_VERSION)
       }
     } catch (e: CancellationException) {
       throw e
@@ -246,7 +251,12 @@ class MeritPrepRepository(
       val safeTotal = totalQuestions.coerceIn(1L, 200L)
       val safeCorrect = correctCount.coerceIn(0L, safeTotal)
       val percentage = ((safeCorrect * 100L) / safeTotal).coerceIn(0L, 100L)
-      val safeExamType = if (examType == "WAEC") "WAEC" else "JAMB"
+      val safeExamType =
+        when {
+          examType.equals("WAEC", ignoreCase = true) -> "WAEC"
+          examType.equals("ALL", ignoreCase = true) -> "ALL"
+          else -> "JAMB"
+        }
       val safeWeakTopics = weakTopics.distinct().map { it.take(64) }.take(10)
       val now = System.currentTimeMillis()
       val safeDuration = durationSeconds.coerceIn(0L, 18000L)
@@ -360,5 +370,9 @@ class MeritPrepRepository(
     } catch (e: Exception) {
       Result.failure(e)
     }
+  }
+
+  private companion object {
+    const val CURRENT_CURRICULUM_VERSION = 3
   }
 }

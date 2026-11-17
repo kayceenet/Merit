@@ -1,0 +1,89 @@
+package com.example.data.curriculum
+
+import com.example.data.model.LessonProgress
+
+data class LessonUnlockState(
+  val isUnlocked: Boolean,
+  val isMastered: Boolean,
+  val prerequisiteLessonTitle: String?,
+  val completedPillarsCount: Int,
+  val exerciseScore: Long,
+) {
+  val totalPillars: Int = LessonPillar.entries.size
+  val progressRatio: Float
+    get() = (completedPillarsCount / totalPillars.toFloat()).coerceIn(0f, 1f)
+}
+
+object CurriculumProgression {
+  const val PASS_THRESHOLD_PERCENT: Long = 60L
+
+  fun isLessonMastered(progress: LessonProgress?): Boolean {
+    if (progress == null) return false
+    return progress.isCompleted
+  }
+
+  fun unlockStateForLesson(
+    orderedTrackLessons: List<Lesson>,
+    lessonId: String,
+    progressMap: Map<String, LessonProgress>,
+  ): LessonUnlockState {
+    val index = orderedTrackLessons.indexOfFirst { it.id == lessonId }
+    val prog = progressMap[lessonId]
+    val completedCount = prog?.completedSteps?.distinct()?.size ?: 0
+    val mastered = isLessonMastered(prog)
+    if (index <= 0) {
+      return LessonUnlockState(
+        isUnlocked = true,
+        isMastered = mastered,
+        prerequisiteLessonTitle = null,
+        completedPillarsCount = completedCount,
+        exerciseScore = prog?.exerciseScore ?: 0L,
+      )
+    }
+    val previousLesson = orderedTrackLessons[index - 1]
+    val prevMastered = isLessonMastered(progressMap[previousLesson.id])
+    return LessonUnlockState(
+      isUnlocked = prevMastered || mastered,
+      isMastered = mastered,
+      prerequisiteLessonTitle = previousLesson.title,
+      completedPillarsCount = completedCount,
+      exerciseScore = prog?.exerciseScore ?: 0L,
+    )
+  }
+
+  fun isPillarUnlocked(pillar: LessonPillar, completedSteps: Set<String>): Boolean {
+    val idx = LessonPillar.entries.indexOf(pillar)
+    if (idx <= 0) return true
+    val previousPillar = LessonPillar.entries[idx - 1]
+    return previousPillar.key in completedSteps || pillar.key in completedSteps
+  }
+
+  fun nextUnlockedLesson(
+    orderedTrackLessons: List<Lesson>,
+    progressMap: Map<String, LessonProgress>,
+  ): Lesson? {
+    if (orderedTrackLessons.isEmpty()) return null
+    val firstIncomplete =
+      orderedTrackLessons.firstOrNull { lesson ->
+        val state = unlockStateForLesson(orderedTrackLessons, lesson.id, progressMap)
+        state.isUnlocked && !state.isMastered
+      }
+    return firstIncomplete ?: orderedTrackLessons.first()
+  }
+
+  fun nextLessonAfter(
+    orderedTrackLessons: List<Lesson>,
+    currentLessonId: String,
+  ): Lesson? {
+    val idx = orderedTrackLessons.indexOfFirst { it.id == currentLessonId }
+    return if (idx in 0 until orderedTrackLessons.lastIndex) orderedTrackLessons[idx + 1] else null
+  }
+
+  fun prerequisiteLessonFor(
+    orderedTrackLessons: List<Lesson>,
+    lessonId: String,
+  ): Lesson? {
+    val idx = orderedTrackLessons.indexOfFirst { it.id == lessonId }
+    return if (idx > 0) orderedTrackLessons[idx - 1] else null
+  }
+}

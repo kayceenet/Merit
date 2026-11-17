@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -22,10 +21,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,7 +32,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
@@ -43,15 +44,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.data.curriculum.PracticalLabType
 import com.example.ui.components.ScientificText
-import com.example.ui.theme.JetBrainsMonoFontFamily
 import com.example.ui.theme.semanticColors
 import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.asin
 import kotlin.math.cos
 import kotlin.math.ln
-import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
+import kotlin.math.tan
 
 @Composable
 fun PracticalLabWorkspace(
@@ -63,25 +64,30 @@ fun PracticalLabWorkspace(
     modifier =
       modifier
         .fillMaxWidth()
-        .clip(RoundedCornerShape(20.dp))
+        .clip(RoundedCornerShape(16.dp))
         .background(MaterialTheme.colorScheme.surface)
-        .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(20.dp))
+        .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
         .padding(16.dp),
     verticalArrangement = Arrangement.spacedBy(14.dp),
   ) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
       Surface(
-        color = MaterialTheme.colorScheme.secondaryContainer,
+        color = MaterialTheme.colorScheme.primaryContainer,
         shape = RoundedCornerShape(99.dp),
       ) {
         Text(
-          text = "INTERACTIVE PRACTICAL LAB",
+          text = "INTERACTIVE VIRTUAL LAB",
           style = MaterialTheme.typography.labelSmall,
-          color = MaterialTheme.colorScheme.onSecondaryContainer,
+          color = MaterialTheme.colorScheme.onPrimaryContainer,
+          fontWeight = FontWeight.Bold,
           modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
         )
       }
-      Text(text = labType.title, style = MaterialTheme.typography.titleLarge)
+      Text(
+        text = labType.title,
+        style = MaterialTheme.typography.titleLarge,
+        color = MaterialTheme.colorScheme.onSurface,
+      )
       ScientificText(
         text = labBrief,
         style = MaterialTheme.typography.bodyMedium,
@@ -92,10 +98,14 @@ fun PracticalLabWorkspace(
     when (labType) {
       PracticalLabType.PROJECTILE_KINEMATICS -> ProjectileKinematicsLab()
       PracticalLabType.OHMS_CIRCUIT -> OhmsCircuitLab()
+      PracticalLabType.WAVE_OPTICS_BENCH -> WaveOpticsBenchLab()
       PracticalLabType.QUADRATIC_TANGENT -> QuadraticTangentLab()
       PracticalLabType.TITRATION_PH -> TitrationPhLab()
+      PracticalLabType.GAS_LAW_PISTON -> GasLawPistonLab()
       PracticalLabType.MENDELIAN_GENETICS -> MendelianGeneticsLab()
+      PracticalLabType.ECOLOGY_ENERGY_PYRAMID -> EcologyEnergyPyramidLab()
       PracticalLabType.ORAL_ENGLISH_STRESS -> OralEnglishStressLab()
+      PracticalLabType.SYNTAX_LEXIS_STUDIO -> SyntaxLexisStudioLab()
     }
   }
 }
@@ -122,7 +132,7 @@ private fun LabMetricTile(
     )
     ScientificText(
       text = value,
-      style = MaterialTheme.typography.titleSmall.copy(fontFamily = JetBrainsMonoFontFamily),
+      style = MaterialTheme.typography.titleSmall.copy(fontFeatureSettings = "tnum"),
       color = MaterialTheme.colorScheme.primary,
       fontWeight = FontWeight.Bold,
     )
@@ -152,9 +162,9 @@ private fun ProjectileKinematicsLab() {
       modifier =
         Modifier.fillMaxWidth()
           .height(190.dp)
-          .clip(RoundedCornerShape(16.dp))
+          .clip(RoundedCornerShape(14.dp))
           .background(MaterialTheme.colorScheme.background)
-          .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
+          .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(14.dp))
     ) {
       val pad = 28f
       val plotW = size.width - pad * 2f
@@ -162,12 +172,10 @@ private fun ProjectileKinematicsLab() {
       val maxRefRange = 360.0
       val maxRefHeight = 160.0
 
-      // Grid lines
       for (i in 0..4) {
         val y = pad + plotH * (i / 4f)
         drawLine(gridColor, Offset(pad, y), Offset(pad + plotW, y), strokeWidth = 1.5f)
       }
-      // Ground axis
       drawLine(
         color = secondary,
         start = Offset(pad, pad + plotH),
@@ -188,7 +196,6 @@ private fun ProjectileKinematicsLab() {
       }
       drawPath(path, color = primary, style = Stroke(width = 5f))
 
-      // Peak marker
       val peakPx = pad + (((range * 0.5) / maxRefRange).toFloat().coerceIn(0f, 1f) * plotW)
       val peakPy = (pad + plotH) - ((maxHeight / maxRefHeight).toFloat().coerceIn(0f, 1f) * plotH)
       drawLine(
@@ -284,9 +291,9 @@ private fun OhmsCircuitLab() {
       modifier =
         Modifier.fillMaxWidth()
           .height(155.dp)
-          .clip(RoundedCornerShape(16.dp))
+          .clip(RoundedCornerShape(14.dp))
           .background(MaterialTheme.colorScheme.background)
-          .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
+          .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(14.dp))
     ) {
       val left = 50f
       val right = size.width - 50f
@@ -294,7 +301,6 @@ private fun OhmsCircuitLab() {
       val bottom = size.height - 32f
       val midY = (top + bottom) / 2f
 
-      // Battery symbol on left
       drawLine(primary, Offset(left, top), Offset(left, midY - 12f), strokeWidth = 5f)
       drawLine(tertiary, Offset(left - 18f, midY - 12f), Offset(left + 18f, midY - 12f), strokeWidth = 6f)
       drawLine(tertiary, Offset(left - 10f, midY + 12f), Offset(left + 10f, midY + 12f), strokeWidth = 6f)
@@ -305,9 +311,7 @@ private fun OhmsCircuitLab() {
         val branchX2 = left + (right - left) * 0.8f
         drawLine(primary, Offset(left, top), Offset(branchX2, top), strokeWidth = 5f)
         drawLine(primary, Offset(left, bottom), Offset(branchX2, bottom), strokeWidth = 5f)
-        // Branch 1
         drawLine(secondary, Offset(branchX1, top), Offset(branchX1, bottom), strokeWidth = 6f)
-        // Branch 2
         drawLine(secondary, Offset(branchX2, top), Offset(branchX2, bottom), strokeWidth = 6f)
         drawCircle(tertiary, radius = 14f, center = Offset(branchX1, midY))
         drawCircle(tertiary, radius = 14f, center = Offset(branchX2, midY))
@@ -338,6 +342,79 @@ private fun OhmsCircuitLab() {
 }
 
 @Composable
+private fun WaveOpticsBenchLab() {
+  var incidentDeg by remember { mutableFloatStateOf(35f) }
+  var nMedium by remember { mutableFloatStateOf(1.50f) } // Glass default
+  var frequencyHz by remember { mutableFloatStateOf(5.0f) }
+
+  val sinTheta2 = sin(incidentDeg * PI / 180.0) / nMedium
+  val refractedDeg = (asin(sinTheta2.coerceIn(-1.0, 1.0)) * 180.0 / PI).toFloat()
+  val criticalDeg = (asin((1.0 / nMedium).coerceIn(-1.0, 1.0)) * 180.0 / PI).toFloat()
+  val waveSpeed = 300f / nMedium
+  val wavelengthNm = waveSpeed / frequencyHz
+
+  val primary = MaterialTheme.colorScheme.primary
+  val secondary = MaterialTheme.colorScheme.secondary
+  val tertiary = MaterialTheme.colorScheme.tertiary
+  val outline = MaterialTheme.colorScheme.outline
+
+  Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+      FilterChip(selected = abs(nMedium - 1.33f) < 0.03f, onClick = { nMedium = 1.33f }, label = { Text("Water (1.33)") })
+      FilterChip(selected = abs(nMedium - 1.50f) < 0.03f, onClick = { nMedium = 1.50f }, label = { Text("Glass (1.50)") })
+      FilterChip(selected = abs(nMedium - 2.42f) < 0.03f, onClick = { nMedium = 2.42f }, label = { Text("Diamond (2.42)") })
+    }
+
+    Canvas(
+      modifier =
+        Modifier.fillMaxWidth()
+          .height(180.dp)
+          .clip(RoundedCornerShape(14.dp))
+          .background(MaterialTheme.colorScheme.background)
+          .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(14.dp))
+    ) {
+      val midY = size.height / 2f
+      val midX = size.width / 2f
+      // Medium 2 shaded block
+      drawRect(color = primary.copy(alpha = 0.08f), topLeft = Offset(0f, midY), size = Size(size.width, midY))
+      // Interface & normal
+      drawLine(outline, Offset(0f, midY), Offset(size.width, midY), strokeWidth = 3f)
+      drawLine(
+        color = outline.copy(alpha = 0.7f),
+        start = Offset(midX, 12f),
+        end = Offset(midX, size.height - 12f),
+        strokeWidth = 2f,
+        pathEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 8f)),
+      )
+
+      val len = size.height * 0.44f
+      val incRad = incidentDeg * PI / 180.0
+      val refRad = refractedDeg * PI / 180.0
+
+      val startX = (midX - len * sin(incRad)).toFloat()
+      val startY = (midY - len * cos(incRad)).toFloat()
+      drawLine(tertiary, Offset(startX, startY), Offset(midX, midY), strokeWidth = 6f)
+
+      val endX = (midX + len * sin(refRad)).toFloat()
+      val endY = (midY + len * cos(refRad)).toFloat()
+      drawLine(secondary, Offset(midX, midY), Offset(endX, endY), strokeWidth = 6f)
+    }
+
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+      LabMetricTile("REFRACT r", String.format("%.1f°", refractedDeg), Modifier.weight(1f))
+      LabMetricTile("CRITICAL c", String.format("%.1f°", criticalDeg), Modifier.weight(1f))
+      LabMetricTile("v in MEDIUM", String.format("%.2f×10⁸", 3.0f / nMedium), Modifier.weight(1f))
+    }
+
+    Text("Angle of Incidence i = ${incidentDeg.toInt()}°", style = MaterialTheme.typography.labelMedium)
+    Slider(value = incidentDeg, onValueChange = { incidentDeg = it }, valueRange = 5f..80f)
+
+    Text("Wave Frequency f = ${String.format("%.1f", frequencyHz)} × 10¹⁴ Hz (Relative λ = ${String.format("%.1f", wavelengthNm)})", style = MaterialTheme.typography.labelMedium)
+    Slider(value = frequencyHz, onValueChange = { frequencyHz = it }, valueRange = 3.0f..8.0f)
+  }
+}
+
+@Composable
 private fun QuadraticTangentLab() {
   var a by remember { mutableFloatStateOf(1f) }
   var b by remember { mutableFloatStateOf(-4f) }
@@ -357,16 +434,15 @@ private fun QuadraticTangentLab() {
       modifier =
         Modifier.fillMaxWidth()
           .height(190.dp)
-          .clip(RoundedCornerShape(16.dp))
+          .clip(RoundedCornerShape(14.dp))
           .background(MaterialTheme.colorScheme.background)
-          .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
+          .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(14.dp))
     ) {
       val cx = size.width / 2f
       val cy = size.height * 0.55f
       val scaleX = size.width / 12f
       val scaleY = size.height / 24f
 
-      // Axes
       drawLine(axisColor, Offset(0f, cy), Offset(size.width, cy), strokeWidth = 2f)
       drawLine(axisColor, Offset(cx, 0f), Offset(cx, size.height), strokeWidth = 2f)
 
@@ -381,7 +457,6 @@ private fun QuadraticTangentLab() {
       }
       drawPath(path, color = primary, style = Stroke(width = 5f))
 
-      // Tangent segment at x0
       val tx1 = x0 - 2.2f
       val ty1 = yAtX0 + slopeAtX0 * (tx1 - x0)
       val tx2 = x0 + 2.2f
@@ -482,15 +557,14 @@ private fun TitrationPhLab() {
       modifier =
         Modifier.fillMaxWidth()
           .height(175.dp)
-          .clip(RoundedCornerShape(16.dp))
+          .clip(RoundedCornerShape(14.dp))
           .background(MaterialTheme.colorScheme.background)
-          .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
+          .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(14.dp))
     ) {
       val pad = 26f
       val w = size.width - pad * 2f
       val h = size.height - pad * 2f
 
-      // pH = 7 line
       val y7 = pad + h * (1f - 7f / 14f)
       drawLine(gridColor, Offset(pad, y7), Offset(pad + w, y7), strokeWidth = 2f)
 
@@ -541,6 +615,63 @@ private fun TitrationPhLab() {
   }
 }
 
+@Composable
+private fun GasLawPistonLab() {
+  var tempCelsius by remember { mutableFloatStateOf(27f) }
+  var pressureAtm by remember { mutableFloatStateOf(1.0f) }
+  var molarMass by remember { mutableFloatStateOf(16f) } // CH4 default
+
+  val tempKelvin = tempCelsius + 273f
+  // 1 mole ideal gas volume in dm³: V = nRT/P, R = 0.0821 L·atm/(mol·K)
+  val volumeLitres = (0.0821f * tempKelvin) / pressureAtm
+  val grahamSpeedVsO2 = sqrt(32.0 / molarMass).toFloat()
+
+  val primary = MaterialTheme.colorScheme.primary
+  val secondary = MaterialTheme.colorScheme.secondary
+  val outline = MaterialTheme.colorScheme.outline
+
+  Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+      FilterChip(selected = abs(molarMass - 2f) < 0.5f, onClick = { molarMass = 2f }, label = { Text("H₂ (M=2)") })
+      FilterChip(selected = abs(molarMass - 16f) < 0.5f, onClick = { molarMass = 16f }, label = { Text("CH₄ (M=16)") })
+      FilterChip(selected = abs(molarMass - 64f) < 0.5f, onClick = { molarMass = 64f }, label = { Text("SO₂ (M=64)") })
+    }
+
+    Canvas(
+      modifier =
+        Modifier.fillMaxWidth()
+          .height(110.dp)
+          .clip(RoundedCornerShape(14.dp))
+          .background(MaterialTheme.colorScheme.background)
+          .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(14.dp))
+    ) {
+      val fillFrac = (volumeLitres / 60f).coerceIn(0.12f, 0.92f)
+      val chamberW = size.width - 40f
+      val gasW = chamberW * fillFrac
+      drawRoundRect(
+        color = primary.copy(alpha = 0.22f),
+        topLeft = Offset(20f, 20f),
+        size = Size(gasW, size.height - 40f),
+        cornerRadius = CornerRadius(10f, 10f),
+      )
+      drawLine(secondary, Offset(20f + gasW, 14f), Offset(20f + gasW, size.height - 14f), strokeWidth = 10f)
+      drawRect(outline, topLeft = Offset(20f, 20f), size = Size(chamberW, size.height - 40f), style = Stroke(3f))
+    }
+
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+      LabMetricTile("KELVIN (T)", "${tempKelvin.toInt()} K", Modifier.weight(1f))
+      LabMetricTile("VOLUME (V)", String.format("%.1f dm³", volumeLitres), Modifier.weight(1f))
+      LabMetricTile("DIFFUSE vs O₂", String.format("%.2f×", grahamSpeedVsO2), Modifier.weight(1f))
+    }
+
+    Text("Temperature t = ${tempCelsius.toInt()} °C (${tempKelvin.toInt()} K)", style = MaterialTheme.typography.labelMedium)
+    Slider(value = tempCelsius, onValueChange = { tempCelsius = it }, valueRange = 0f..350f)
+
+    Text("Pressure P = ${String.format("%.2f", pressureAtm)} atm", style = MaterialTheme.typography.labelMedium)
+    Slider(value = pressureAtm, onValueChange = { pressureAtm = it }, valueRange = 0.5f..3.0f)
+  }
+}
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun MendelianGeneticsLab() {
@@ -575,7 +706,6 @@ private fun MendelianGeneticsLab() {
       }
     }
 
-    // 2x2 Punnett Grid
     val semantics = MaterialTheme.semanticColors
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
       for (row in 0..1) {
@@ -597,15 +727,15 @@ private fun MendelianGeneticsLab() {
             Box(
               modifier =
                 Modifier.weight(1f)
-                  .clip(RoundedCornerShape(14.dp))
+                  .clip(RoundedCornerShape(12.dp))
                   .background(bg)
-                  .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(14.dp))
+                  .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(12.dp))
                   .padding(vertical = 14.dp),
               contentAlignment = Alignment.Center,
             ) {
               Text(
                 text = "Hb$child",
-                style = MaterialTheme.typography.titleMedium.copy(fontFamily = JetBrainsMonoFontFamily),
+                style = MaterialTheme.typography.titleMedium.copy(fontFeatureSettings = "tnum"),
                 color = fg,
                 fontWeight = FontWeight.Bold,
               )
@@ -629,6 +759,62 @@ private fun normalizeGenotype(a: String, b: String): String =
   } else {
     "SS"
   }
+
+@Composable
+private fun EcologyEnergyPyramidLab() {
+  var producerEnergy by remember { mutableFloatStateOf(10000f) }
+  var transferEffPct by remember { mutableFloatStateOf(10f) }
+
+  val eff = transferEffPct / 100f
+  val primaryConsumer = producerEnergy * eff
+  val secondaryConsumer = primaryConsumer * eff
+  val tertiaryConsumer = secondaryConsumer * eff
+
+  val semantics = MaterialTheme.semanticColors
+  val levels =
+    listOf(
+      Triple("Tertiary Consumers (Hawks)", tertiaryConsumer, MaterialTheme.colorScheme.error),
+      Triple("Secondary Consumers (Snakes)", secondaryConsumer, MaterialTheme.colorScheme.tertiary),
+      Triple("Primary Consumers (Grasshoppers)", primaryConsumer, MaterialTheme.colorScheme.primary),
+      Triple("Producers (Maize / Grass)", producerEnergy, semantics.success),
+    )
+
+  Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    levels.forEachIndexed { idx, (name, energy, barColor) ->
+      val widthFraction = (0.35f + idx * 0.21f).coerceIn(0.3f, 1f)
+      Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+          Text(name, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.SemiBold)
+          Text(
+            "${energy.toInt()} kcal",
+            style = MaterialTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
+            color = barColor,
+            fontWeight = FontWeight.Bold,
+          )
+        }
+        Box(
+          modifier =
+            Modifier.fillMaxWidth(widthFraction)
+              .height(16.dp)
+              .clip(RoundedCornerShape(6.dp))
+              .background(barColor.copy(alpha = 0.85f))
+        )
+      }
+    }
+
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+      LabMetricTile("PRODUCERS", "${producerEnergy.toInt()} kcal", Modifier.weight(1f))
+      LabMetricTile("PRIMARY", "${primaryConsumer.toInt()} kcal", Modifier.weight(1f))
+      LabMetricTile("TERTIARY", "${String.format("%.1f", tertiaryConsumer)} kcal", Modifier.weight(1f))
+    }
+
+    Text("Producer Fixed Solar Energy = ${producerEnergy.toInt()} kcal", style = MaterialTheme.typography.labelMedium)
+    Slider(value = producerEnergy, onValueChange = { producerEnergy = it }, valueRange = 2000f..20000f)
+
+    Text("Lindeman Trophic Transfer Efficiency = ${transferEffPct.toInt()}% (90% lost as heat)", style = MaterialTheme.typography.labelMedium)
+    Slider(value = transferEffPct, onValueChange = { transferEffPct = it }, valueRange = 5f..20f)
+  }
+}
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -661,7 +847,7 @@ private fun OralEnglishStressLab() {
     Row(
       modifier =
         Modifier.fillMaxWidth()
-          .clip(RoundedCornerShape(16.dp))
+          .clip(RoundedCornerShape(14.dp))
           .background(MaterialTheme.colorScheme.background)
           .padding(14.dp),
       horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -682,7 +868,7 @@ private fun OralEnglishStressLab() {
         ) {
           Text(
             text = syl,
-            style = MaterialTheme.typography.titleSmall.copy(fontFamily = JetBrainsMonoFontFamily),
+            style = MaterialTheme.typography.titleSmall,
             color = if (stressed) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = if (stressed) FontWeight.Bold else FontWeight.Medium,
           )
@@ -696,5 +882,55 @@ private fun OralEnglishStressLab() {
       color = MaterialTheme.colorScheme.secondary,
       fontWeight = FontWeight.SemiBold,
     )
+  }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun SyntaxLexisStudioLab() {
+  val rules = remember {
+    listOf(
+      Triple(
+        "Parenthetical Subject ('as well as')",
+        "The Vice-Chancellor, as well as the Deans, ___ attending convocation.",
+        "Correct: IS (ignore the parenthetical phrase between commas; match 'Vice-Chancellor').",
+      ),
+      Triple(
+        "Proximity Concord ('neither...nor')",
+        "Neither the captain nor the defenders ___ ready for the penalty kick.",
+        "Correct: WERE (verb agrees with closer plural noun 'defenders').",
+      ),
+      Triple(
+        "Subjunctive / 'It is high time'",
+        "It is high time the candidates ___ revising past questions.",
+        "Correct: STARTED ('It is high time + subject' takes past tense verb!).",
+      ),
+      Triple(
+        "Emphatic Contrast Focus",
+        "ADEWALE bought a RED bicycle yesterday.",
+        "If 'RED' is stressed, question must test color: 'Did Adewale buy a BLUE bicycle yesterday?'",
+      ),
+    )
+  }
+  var idx by remember { mutableIntStateOf(0) }
+  val active = rules[idx]
+
+  Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Text("Select a High-Yield Grammar / Lexis Pattern:", style = MaterialTheme.typography.labelMedium)
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+      rules.forEachIndexed { i, item ->
+        FilterChip(selected = idx == i, onClick = { idx = i }, label = { Text(item.first) })
+      }
+    }
+    Surface(
+      color = MaterialTheme.colorScheme.background,
+      shape = RoundedCornerShape(12.dp),
+      modifier = Modifier.fillMaxWidth().border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(12.dp)),
+    ) {
+      Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(text = active.second, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
+        Text(text = active.third, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
+      }
+    }
   }
 }

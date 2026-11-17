@@ -11,6 +11,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import org.json.JSONArray
 import org.json.JSONObject
@@ -86,6 +87,12 @@ class OfflinePreferencesRepository(private val dataStore: DataStore<Preferences>
 
   suspend fun setUseDynamicColor(enabled: Boolean) {
     dataStore.edit { prefs -> prefs[KEY_USE_DYNAMIC_COLOR] = enabled }
+  }
+
+  suspend fun getCurriculumVersion(): Int = dataStore.data.first()[KEY_CURRICULUM_VERSION] ?: 0
+
+  suspend fun setCurriculumVersion(version: Int) {
+    dataStore.edit { prefs -> prefs[KEY_CURRICULUM_VERSION] = version }
   }
 
   suspend fun recordLessonSnapshot(
@@ -178,5 +185,6 @@ class OfflinePreferencesRepository(private val dataStore: DataStore<Preferences>
     val KEY_OFFLINE_STREAK_DAYS = longPreferencesKey("offline_streak_days")
     val KEY_TOTAL_EXAMS_TAKEN = intPreferencesKey("total_exams_taken")
     val KEY_RECENT_EXAM_RESULTS_JSON = stringPreferencesKey("recent_exam_results_json")
+    val KEY_CURRICULUM_VERSION = intPreferencesKey("curriculum_version")
   }
 }

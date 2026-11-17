@@ -15,6 +15,10 @@ enum class PracticalLabType(val title: String, val subtitle: String) {
     title = "DC Circuit & Power Bench",
     subtitle = "Toggle Series vs Parallel resistors and watch current, voltage drops & power dissipation",
   ),
+  WAVE_OPTICS_BENCH(
+    title = "Waves & Snell's Refraction Bench",
+    subtitle = "Tune wave frequency, wavelength & refractive index to observe bending rays and total internal reflection",
+  ),
   QUADRATIC_TANGENT(
     title = "Quadratic & Derivative Explorer",
     subtitle = "Tune coefficients a, b, c to visualize roots, discriminant Δ & live tangent slope dy/dx",
@@ -23,22 +27,34 @@ enum class PracticalLabType(val title: String, val subtitle: String) {
     title = "Acid-Base Titration Lab",
     subtitle = "Add NaOH titrant to HCl/CH₃COOH and observe the pH sigmoid curve & indicator color",
   ),
+  GAS_LAW_PISTON(
+    title = "Ideal Gas & Graham Diffusion Lab",
+    subtitle = "Vary Kelvin temperature, pressure & molar mass to watch cylinder volume and gas effusion speed respond",
+  ),
   MENDELIAN_GENETICS(
     title = "Mendelian & Sickle-Cell Cross Lab",
     subtitle = "Select parental genotypes (HbA/HbS or Traits) to inspect Punnett ratios & clinical risk",
   ),
+  ECOLOGY_ENERGY_PYRAMID(
+    title = "Trophic Energy Pyramid Lab",
+    subtitle = "Adjust solar input & ecological transfer efficiency to inspect biomass & energy across food chains",
+  ),
   ORAL_ENGLISH_STRESS(
-    title = "Syllable Stress & Concord Studio",
-    subtitle = "Test JAMB primary stress shifts and build syntactically valid concord clauses",
+    title = "Syllable Stress & Emphatic Focus Studio",
+    subtitle = "Test JAMB primary stress shifts across suffixes and noun/verb pairs",
+  ),
+  SYNTAX_LEXIS_STUDIO(
+    title = "Concord & Clause Architecture Studio",
+    subtitle = "Inspect subject-verb concord rules, question tags & emphatic stress answers",
   ),
 }
 
 enum class LessonPillar(val key: String, val shortLabel: String, val fullLabel: String) {
-  CONCEPT("concept", "1. Concept", "Systematic Concept & Formulas"),
-  EXAMPLES("examples", "2. Examples", "Worked Past-Paper Examples"),
-  SCENARIO("scenario", "3. Real-Life", "Real-World Applications"),
-  LAB("lab", "4. Lab Demo", "Interactive Practical Demonstration"),
-  EXERCISE("exercise", "5. Exercise", "Check-Your-Grasp Mastery Drill"),
+  CONCEPT("concept", "1. Foundations", "Part 1: Zero-to-One Foundations & Formulas"),
+  EXAMPLES("examples", "2. Examples", "Part 2: Guided Worked Examples"),
+  SCENARIO("scenario", "3. Real-Life", "Part 3: Real-World Exam Connections"),
+  LAB("lab", "4. Lab", "Part 4: Interactive Practical Lab"),
+  EXERCISE("exercise", "5. Mastery Quiz", "Part 5: Mastery Quiz (≥ 60% Unlocks Next)"),
 }
 
 data class ConceptBlock(

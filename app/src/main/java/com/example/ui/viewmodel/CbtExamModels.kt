@@ -42,6 +42,7 @@ data class CbtExamState(
   val stage: CbtExamStage = CbtExamStage.SETUP,
   val selectedSubjectId: String = CurriculumCatalog.tracks.first().id,
   val selectedExamBoard: String = "JAMB",
+  val selectedQuestionLimit: Int = 15,
   val questions: List<PracticeQuestion> = emptyList(),
   val currentIndex: Int = 0,
   val selectedAnswers: Map<Int, Int> = emptyMap(),

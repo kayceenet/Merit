@@ -53,15 +53,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.R
 import com.example.data.curriculum.CurriculumCatalog
 import com.example.ui.components.ScientificText
-import com.example.ui.theme.JetBrainsMonoFontFamily
-import com.example.ui.theme.UdacityCyan
-import com.example.ui.theme.UdacityCyanInk
-import com.example.ui.theme.UdacityNavy
+import com.example.ui.theme.CourseraAzureAccent
+import com.example.ui.theme.CourseraAzureInk
+import com.example.ui.theme.CourseraDeepNavy
+import com.example.ui.theme.CourseraNavyElevated
 import com.example.ui.theme.semanticColors
 import com.example.ui.viewmodel.CbtExamStage
 import com.example.ui.viewmodel.CbtExamState
@@ -73,7 +74,8 @@ fun ExamSimulatorScreen(
   cbtState: CbtExamState,
   onSelectSubject: (String) -> Unit,
   onSelectBoard: (String) -> Unit,
-  onStartExam: (subjectId: String, examBoard: String) -> Unit,
+  onSelectQuestionLimit: (Int) -> Unit,
+  onStartExam: (subjectId: String, examBoard: String, questionLimit: Int) -> Unit,
   onSelectAnswer: (questionIndex: Int, optionIndex: Int) -> Unit,
   onToggleFlag: (Int) -> Unit,
   onGoToQuestion: (Int) -> Unit,
@@ -98,10 +100,14 @@ fun ExamSimulatorScreen(
       CbtExamStage.SETUP -> {
         val selectedSubjectId = cbtState.selectedSubjectId
         val selectedExamBoard = cbtState.selectedExamBoard
+        val selectedQuestionLimit = cbtState.selectedQuestionLimit
         val previewQuestions = CurriculumCatalog.pastQuestionsFor(selectedSubjectId, selectedExamBoard)
-        val effectiveCount =
+        val availableCount =
           if (previewQuestions.isNotEmpty()) previewQuestions.size
           else CurriculumCatalog.pastQuestionsFor(selectedSubjectId, "ALL").size
+        val effectiveCount =
+          if (selectedQuestionLimit <= 0) availableCount
+          else minOf(selectedQuestionLimit, availableCount)
 
         LazyColumn(
           modifier = Modifier.widthIn(max = 880.dp).fillMaxSize(),
@@ -114,8 +120,8 @@ fun ExamSimulatorScreen(
                 Modifier.fillMaxWidth()
                   .height(175.dp)
                   .clip(RoundedCornerShape(20.dp))
-                  .background(UdacityNavy)
-                  .border(1.5.dp, Color(0xFF28427B), RoundedCornerShape(20.dp)),
+                  .background(CourseraDeepNavy)
+                  .border(1.5.dp, CourseraNavyElevated, RoundedCornerShape(20.dp)),
             ) {
               Image(
                 painter = painterResource(id = R.drawable.img_cbt_banner_1794740699279),
@@ -128,7 +134,7 @@ fun ExamSimulatorScreen(
                   Modifier.fillMaxSize()
                     .background(
                       Brush.horizontalGradient(
-                        listOf(Color(0xF507122B), Color(0xD90B1633), Color(0x880B1633))
+                        listOf(Color(0xF500255C), Color(0xD900255C), Color(0x880D3575))
                       )
                     )
               )
@@ -136,11 +142,11 @@ fun ExamSimulatorScreen(
                 modifier = Modifier.fillMaxSize().padding(18.dp),
                 verticalArrangement = Arrangement.Bottom,
               ) {
-                Surface(color = UdacityCyan, shape = RoundedCornerShape(6.dp)) {
+                Surface(color = CourseraAzureAccent, shape = RoundedCornerShape(6.dp)) {
                   Text(
                     text = "TIMED CBT & WAEC ENGINE",
                     style = MaterialTheme.typography.labelSmall,
-                    color = UdacityCyanInk,
+                    color = CourseraAzureInk,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                   )
@@ -152,7 +158,7 @@ fun ExamSimulatorScreen(
                   color = Color.White,
                 )
                 Text(
-                  text = "Local Room past-question bank, state-managed timer, and detailed post-exam summary.",
+                  text = "2018–2026 past-question bank, state-managed timer, and detailed post-exam summary.",
                   style = MaterialTheme.typography.bodySmall,
                   color = Color(0xFFE2E8F0),
                 )
@@ -179,14 +185,20 @@ fun ExamSimulatorScreen(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
               ) {
-                listOf("JAMB", "WAEC").forEach { board ->
+                listOf("JAMB", "WAEC", "ALL").forEach { board ->
                   val selected = selectedExamBoard == board
+                  val boardLabel =
+                    when (board) {
+                      "JAMB" -> "JAMB UTME CBT"
+                      "WAEC" -> "WAEC SSCE + Marking Scheme"
+                      else -> "JAMB + WAEC Combined"
+                    }
                   FilterChip(
                     selected = selected,
                     onClick = { onSelectBoard(board) },
                     label = {
                       Text(
-                        text = if (board == "JAMB") "JAMB UTME CBT" else "WAEC SSCE + Marking Scheme",
+                        text = boardLabel,
                         fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
                       )
                     },
@@ -234,6 +246,44 @@ fun ExamSimulatorScreen(
                 }
               }
 
+              Text(
+                text = "3. Paper Length",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+              )
+              FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+              ) {
+                val limitChoices =
+                  listOf(
+                    10 to "10 Qs Sprint",
+                    15 to "15 Qs Standard",
+                    0 to "Full Bank ($availableCount Qs)",
+                  )
+                limitChoices.forEach { (limitValue, limitLabel) ->
+                  val selected = selectedQuestionLimit == limitValue
+                  FilterChip(
+                    selected = selected,
+                    onClick = { onSelectQuestionLimit(limitValue) },
+                    label = {
+                      Text(
+                        text = limitLabel,
+                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                      )
+                    },
+                    colors =
+                      FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MaterialTheme.colorScheme.primary,
+                        selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                        containerColor = MaterialTheme.colorScheme.background,
+                        labelColor = MaterialTheme.colorScheme.onSurface,
+                      ),
+                    modifier = Modifier.testTag("exam_limit_$limitValue"),
+                  )
+                }
+              }
+
               Surface(
                 color = MaterialTheme.colorScheme.primaryContainer,
                 shape = RoundedCornerShape(14.dp),
@@ -243,16 +293,20 @@ fun ExamSimulatorScreen(
               ) {
                 Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                   Text(
-                    text = "Offline Paper Blueprint: $effectiveCount Local Past Questions",
+                    text = "Offline Paper Blueprint: $effectiveCount of $availableCount Local Past Questions",
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                   )
                   Text(
                     text =
-                      if (selectedExamBoard == "JAMB")
-                        "Fetched from local Room SQLite bank with live countdown clock, per-question timing & post-exam review."
-                      else
-                        "Includes WAEC Objective + Method/Accuracy (M1/A1) examiner marking schemes & offline DataStore sync.",
+                      when (selectedExamBoard) {
+                        "JAMB" ->
+                          "Fetched from local Room SQLite bank with live countdown clock, per-question timing & post-exam review."
+                        "WAEC" ->
+                          "Includes WAEC Objective + Method/Accuracy (M1/A1) examiner marking schemes & offline DataStore sync."
+                        else ->
+                          "Combined JAMB UTME & WAEC SSCE multi-year paper bank with full step-by-step derivations."
+                      },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                   )
@@ -260,7 +314,7 @@ fun ExamSimulatorScreen(
               }
 
               Button(
-                onClick = { onStartExam(selectedSubjectId, selectedExamBoard) },
+                onClick = { onStartExam(selectedSubjectId, selectedExamBoard, selectedQuestionLimit) },
                 enabled = effectiveCount > 0 && !cbtState.isLoadingQuestions,
                 modifier = Modifier.fillMaxWidth().height(54.dp).testTag("start_mock_exam_button"),
                 shape = RoundedCornerShape(14.dp),
@@ -326,11 +380,15 @@ fun ExamSimulatorScreen(
                 Icon(
                   Icons.Filled.Timer,
                   contentDescription = "Remaining time",
-                  tint = if (cbtState.remainingSeconds < 60) Color(0xFFFCA5A5) else UdacityCyan,
+                  tint = if (cbtState.remainingSeconds < 60) Color(0xFFFCA5A5) else CourseraAzureAccent,
                 )
                 Text(
                   text = String.format("%02d:%02d", minutes, seconds),
-                  style = MaterialTheme.typography.titleMedium.copy(fontFamily = JetBrainsMonoFontFamily),
+                  style =
+                    MaterialTheme.typography.titleMedium.copy(
+                      fontFamily = FontFamily.Default,
+                      fontFeatureSettings = "tnum",
+                    ),
                   color = if (cbtState.remainingSeconds < 60) Color(0xFFFCA5A5) else Color.White,
                   fontWeight = FontWeight.Bold,
                   modifier = Modifier.testTag("cbt_timer_text"),
@@ -352,7 +410,7 @@ fun ExamSimulatorScreen(
                 text =
                   if (cbtState.isTimerPaused) "PAUSED"
                   else "${cbtState.selectedAnswers.size}/${questions.size} Answered",
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelMedium.copy(fontFeatureSettings = "tnum"),
                 color = if (cbtState.isTimerPaused) Color(0xFFFDE68A) else semantics.classroomSubtext,
                 fontWeight = FontWeight.Bold,
               )
@@ -362,8 +420,8 @@ fun ExamSimulatorScreen(
                 shape = RoundedCornerShape(10.dp),
                 colors =
                   ButtonDefaults.buttonColors(
-                    containerColor = UdacityCyan,
-                    contentColor = UdacityCyanInk,
+                    containerColor = CourseraAzureAccent,
+                    contentColor = CourseraAzureInk,
                   ),
                 modifier = Modifier.testTag("submit_cbt_button"),
               ) {
@@ -373,8 +431,8 @@ fun ExamSimulatorScreen(
             LinearProgressIndicator(
               progress = { timerProgress.coerceIn(0f, 1f) },
               modifier = Modifier.fillMaxWidth().height(4.dp),
-              color = if (cbtState.remainingSeconds < 60) Color(0xFFFCA5A5) else UdacityCyan,
-              trackColor = Color(0xFF1E3A6E),
+              color = if (cbtState.remainingSeconds < 60) Color(0xFFFCA5A5) else CourseraAzureAccent,
+              trackColor = CourseraNavyElevated,
             )
           }
 
@@ -419,7 +477,7 @@ fun ExamSimulatorScreen(
               ) {
                 Text(
                   text = "${i + 1}",
-                  style = MaterialTheme.typography.labelLarge.copy(fontFamily = JetBrainsMonoFontFamily),
+                  style = MaterialTheme.typography.labelLarge.copy(fontFeatureSettings = "tnum"),
                   color = pillText,
                   fontWeight = FontWeight.Bold,
                 )

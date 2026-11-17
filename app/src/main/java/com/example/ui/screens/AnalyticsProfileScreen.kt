@@ -68,8 +68,7 @@ import com.example.data.local.ThemePreferences
 import com.example.data.model.ExamAttempt
 import com.example.data.model.LessonProgress
 import com.example.data.model.UserProfile
-import com.example.ui.theme.JetBrainsMonoFontFamily
-import com.example.ui.theme.UdacityCyan
+import com.example.ui.theme.CourseraBlue
 import com.example.ui.theme.semanticColors
 import kotlin.math.roundToInt
 
@@ -182,7 +181,7 @@ fun AnalyticsProfileScreen(
         }
       }
 
-      // 4-Metric Udacity Telemetry Summary Strip
+      // 4-Metric Coursera Telemetry Summary Strip
       item {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
           TelemetryTile("MASTERED", "$masteredLessons", Modifier.weight(1f))
@@ -196,7 +195,7 @@ fun AnalyticsProfileScreen(
       item {
         val strongColor = semantics.success
         val weakColor = MaterialTheme.colorScheme.error
-        val masteryColor = UdacityCyan
+        val masteryColor = CourseraBlue
         val gridColor = MaterialTheme.colorScheme.outline
         val trackBg = MaterialTheme.colorScheme.surfaceVariant
         val selectedStat = subjectStats.getOrNull(inspectedSubjectIdx)
@@ -347,7 +346,7 @@ fun AnalyticsProfileScreen(
                 ) {
                   Text(
                     text = stat.code,
-                    style = MaterialTheme.typography.labelSmall.copy(fontFamily = JetBrainsMonoFontFamily),
+                    style = MaterialTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
                     color =
                       if (selected) MaterialTheme.colorScheme.onPrimaryContainer
                       else MaterialTheme.colorScheme.onSurface,
@@ -631,7 +630,7 @@ fun AnalyticsProfileScreen(
               recentAttempts.forEach { att ->
                 Text(
                   text = "${att.subjectTitle.take(4)} ${att.percentage}%",
-                  style = MaterialTheme.typography.labelSmall.copy(fontFamily = JetBrainsMonoFontFamily),
+                  style = MaterialTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
                   color = if (att.percentage >= 70L) semantics.success else MaterialTheme.colorScheme.primary,
                   fontWeight = FontWeight.Bold,
                 )
@@ -773,7 +772,7 @@ fun AnalyticsProfileScreen(
 
           Text(
             text = "UTME Target Score: ${targetScore.roundToInt()} / 400",
-            style = MaterialTheme.typography.labelMedium.copy(fontFamily = JetBrainsMonoFontFamily),
+            style = MaterialTheme.typography.labelMedium.copy(fontFeatureSettings = "tnum"),
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,
           )
@@ -835,7 +834,7 @@ fun AnalyticsProfileScreen(
             ) {
               Text(
                 text = "${att.percentage}%",
-                style = MaterialTheme.typography.titleSmall.copy(fontFamily = JetBrainsMonoFontFamily),
+                style = MaterialTheme.typography.titleSmall.copy(fontFeatureSettings = "tnum"),
                 color =
                   if (att.percentage >= 70L) semantics.onSuccessContainer
                   else MaterialTheme.colorScheme.onPrimaryContainer,
@@ -888,7 +887,7 @@ private fun TelemetryTile(
     )
     Text(
       text = value,
-      style = MaterialTheme.typography.titleMedium.copy(fontFamily = JetBrainsMonoFontFamily),
+      style = MaterialTheme.typography.titleMedium.copy(fontFeatureSettings = "tnum"),
       color = MaterialTheme.colorScheme.primary,
       fontWeight = FontWeight.Bold,
     )

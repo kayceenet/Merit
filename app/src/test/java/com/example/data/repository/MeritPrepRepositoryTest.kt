@@ -4,6 +4,9 @@ import android.content.Context
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import com.example.data.curriculum.CurriculumCatalog
+import com.example.data.curriculum.CurriculumProgression
+import com.example.data.curriculum.LessonPillar
 import com.example.data.local.MeritPrepDatabase
 import com.example.data.local.OfflinePreferencesRepository
 import com.example.data.local.ThemeMode
@@ -11,10 +14,14 @@ import com.example.data.model.UserProfile
 import com.example.ui.viewmodel.CbtExamStage
 import com.example.ui.viewmodel.MeritPrepViewModel
 import java.io.File
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -40,6 +47,7 @@ class MeritPrepRepositoryTest {
   private lateinit var context: Context
   private lateinit var db: MeritPrepDatabase
   private lateinit var prefsFile: File
+  private lateinit var dataStoreScope: CoroutineScope
   private lateinit var prefsRepo: OfflinePreferencesRepository
   private lateinit var repository: MeritPrepRepository
   private val testDispatcher = StandardTestDispatcher()
@@ -55,16 +63,31 @@ class MeritPrepRepositoryTest {
         .setTransactionExecutor { it.run() }
         .build()
     prefsFile = File(context.filesDir, "test_prefs_${System.nanoTime()}.preferences_pb")
-    val dataStore = PreferenceDataStoreFactory.create(produceFile = { prefsFile })
+    dataStoreScope = CoroutineScope(testDispatcher + SupervisorJob())
+    val dataStore =
+      PreferenceDataStoreFactory.create(
+        scope = dataStoreScope,
+        produceFile = { prefsFile },
+      )
     prefsRepo = OfflinePreferencesRepository(dataStore)
     repository = MeritPrepRepository(db.meritPrepDao(), prefsRepo)
   }
 
   @After
   fun tearDown() {
+    dataStoreScope.cancel()
     db.close()
     if (prefsFile.exists()) prefsFile.delete()
     Dispatchers.resetMain()
+  }
+
+  private fun TestScope.awaitStage(viewModel: MeritPrepViewModel, target: CbtExamStage) {
+    val deadline = System.currentTimeMillis() + 5_000L
+    while (viewModel.cbtState.value.stage != target && System.currentTimeMillis() < deadline) {
+      runCurrent()
+      if (viewModel.cbtState.value.stage == target) break
+      Thread.sleep(10)
+    }
   }
 
   @Test
@@ -175,7 +198,7 @@ class MeritPrepRepositoryTest {
       runCurrent()
 
       viewModel.startMockExam("physics", "JAMB")
-      runCurrent()
+      awaitStage(viewModel, CbtExamStage.RUNNING)
       advanceTimeBy(2_000L)
       runCurrent()
 
@@ -207,5 +230,139 @@ class MeritPrepRepositoryTest {
         assertFalse(summary.reviewItems[1].isCorrect)
         assertFalse(summary.reviewItems[1].isUnanswered)
       }
+    }
+
+  @Test
+  fun `full five-subject jamb waec curriculum seeds and resync preserves user progress`() =
+    runTest(testDispatcher) {
+      repository.seedCurriculumIfNeeded()
+
+      val modules = repository.observeStructuredModules().first()
+      assertEquals(20, modules.size)
+      val lessons = modules.flatMap { it.lessons }
+      assertEquals(55, lessons.size)
+      assertTrue(lessons.all { it.concepts.isNotEmpty() && it.exercises.size >= 3 })
+
+      // Verify every subject has combined multi-year past questions (including >= 2024/2025)
+      CurriculumCatalog.tracks.forEach { track ->
+        val allQuestions = repository.fetchPastQuestionsForCbt(track.id, "ALL")
+        assertTrue("Expected >= 40 questions for ${track.id}", allQuestions.size >= 40)
+        assertTrue("Expected recent 2024+ questions for ${track.id}", allQuestions.any { it.year >= 2024 })
+      }
+
+      // Save user lesson progress before simulating an outdated curriculum version
+      val firstLesson = CurriculumCatalog.tracks.first().allLessons.first()
+      repository.saveLessonProgress(
+        userId = UserProfile.DEFAULT_PROFILE_ID,
+        lessonId = firstLesson.id,
+        subjectId = firstLesson.subjectId,
+        moduleId = firstLesson.moduleId,
+        completedSteps = LessonPillar.entries.map { it.key },
+        exerciseScore = 100L,
+        isCompleted = true,
+      ).getOrThrow()
+
+      prefsRepo.setCurriculumVersion(1)
+      repository.seedCurriculumIfNeeded()
+
+      assertEquals(3, prefsRepo.getCurriculumVersion())
+      assertEquals(55, repository.observeStructuredModules().first().flatMap { it.lessons }.size)
+      val preserved =
+        repository.observeLessonProgress(UserProfile.DEFAULT_PROFILE_ID).first()
+          .firstOrNull { it.lessonId == firstLesson.id }
+      assertNotNull(preserved)
+      assertTrue(preserved!!.isCompleted)
+    }
+
+  @Test
+  fun `sequential lesson and pillar locking gates next lesson behind 60 percent mastery`() =
+    runTest(testDispatcher) {
+      val physicsLessons = CurriculumCatalog.trackById("physics")!!.allLessons
+      val lesson1 = physicsLessons[0]
+      val lesson2 = physicsLessons[1]
+
+      // Initially lesson 1 is unlocked, lesson 2 is locked
+      val initial1 = CurriculumProgression.unlockStateForLesson(physicsLessons, lesson1.id, emptyMap())
+      val initial2 = CurriculumProgression.unlockStateForLesson(physicsLessons, lesson2.id, emptyMap())
+      assertTrue(initial1.isUnlocked)
+      assertFalse(initial2.isUnlocked)
+      assertEquals(lesson1.title, initial2.prerequisiteLessonTitle)
+
+      // Within lesson 1, only CONCEPT is unlocked initially
+      assertTrue(CurriculumProgression.isPillarUnlocked(LessonPillar.CONCEPT, emptySet()))
+      assertFalse(CurriculumProgression.isPillarUnlocked(LessonPillar.EXAMPLES, emptySet()))
+      assertFalse(CurriculumProgression.isPillarUnlocked(LessonPillar.EXERCISE, emptySet()))
+
+      val viewModel = MeritPrepViewModel(repository)
+      advanceUntilIdle()
+
+      // Complete first 4 pillars sequentially via ViewModel
+      val nonExercisePillars =
+        listOf(
+          LessonPillar.CONCEPT,
+          LessonPillar.EXAMPLES,
+          LessonPillar.SCENARIO,
+          LessonPillar.LAB,
+        )
+      nonExercisePillars.forEach { pillar ->
+        val current =
+          repository.observeLessonProgress(UserProfile.DEFAULT_PROFILE_ID).first()
+            .firstOrNull { it.lessonId == lesson1.id }
+        viewModel.markPillarCompleted(lesson1, pillar, current)
+        advanceUntilIdle()
+      }
+
+      // Attempt Mastery Quiz with 33% (< 60%) -> lesson 2 must remain locked
+      var progress1 =
+        repository.observeLessonProgress(UserProfile.DEFAULT_PROFILE_ID).first()
+          .first { it.lessonId == lesson1.id }
+      viewModel.markPillarCompleted(lesson1, LessonPillar.EXERCISE, progress1, exerciseScore = 33L)
+      advanceUntilIdle()
+
+      progress1 =
+        repository.observeLessonProgress(UserProfile.DEFAULT_PROFILE_ID).first()
+          .first { it.lessonId == lesson1.id }
+      assertFalse(progress1.isCompleted)
+      assertFalse(
+        CurriculumProgression.unlockStateForLesson(
+          physicsLessons,
+          lesson2.id,
+          mapOf(lesson1.id to progress1),
+        ).isUnlocked
+      )
+
+      // Retake Mastery Quiz with 67% (>= 60%) -> lesson 1 mastered & lesson 2 unlocked!
+      viewModel.markPillarCompleted(lesson1, LessonPillar.EXERCISE, progress1, exerciseScore = 67L)
+      advanceUntilIdle()
+
+      progress1 =
+        repository.observeLessonProgress(UserProfile.DEFAULT_PROFILE_ID).first()
+          .first { it.lessonId == lesson1.id }
+      assertTrue(progress1.isCompleted)
+      assertTrue(
+        CurriculumProgression.unlockStateForLesson(
+          physicsLessons,
+          lesson2.id,
+          mapOf(lesson1.id to progress1),
+        ).isUnlocked
+      )
+      assertEquals(lesson2.id, CurriculumProgression.nextUnlockedLesson(physicsLessons, mapOf(lesson1.id to progress1))?.id)
+    }
+
+  @Test
+  fun `cbt exam respects ALL board option and configurable question limit`() =
+    runTest(testDispatcher) {
+      repository.seedCurriculumIfNeeded()
+      val viewModel = MeritPrepViewModel(repository)
+      runCurrent()
+
+      viewModel.startMockExam(subjectId = "chemistry", examBoard = "ALL", questionLimit = 10)
+      awaitStage(viewModel, CbtExamStage.RUNNING)
+
+      val running = viewModel.cbtState.value
+      assertEquals(CbtExamStage.RUNNING, running.stage)
+      assertEquals("ALL", running.selectedExamBoard)
+      assertEquals(10, running.questions.size)
+      viewModel.returnToCbtSetup()
     }
 }

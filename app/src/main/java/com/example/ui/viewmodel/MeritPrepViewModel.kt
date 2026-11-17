@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.curriculum.CourseModule
 import com.example.data.curriculum.CurriculumCatalog
+import com.example.data.curriculum.CurriculumProgression
 import com.example.data.curriculum.Lesson
 import com.example.data.curriculum.LessonPillar
 import com.example.data.local.OfflineProgressSnapshot
@@ -173,21 +174,39 @@ class MeritPrepViewModel(
     }
   }
 
-  fun startMockExam(subjectId: String? = null, examBoard: String? = null) {
+  fun selectQuestionLimit(limit: Int) {
+    _cbtState.update {
+      if (it.stage == CbtExamStage.SETUP) it.copy(selectedQuestionLimit = limit) else it
+    }
+  }
+
+  fun startMockExam(
+    subjectId: String? = null,
+    examBoard: String? = null,
+    questionLimit: Int? = null,
+  ) {
     examTimerJob?.cancel()
     val targetSubject = subjectId ?: _cbtState.value.selectedSubjectId
     val targetBoard = examBoard ?: _cbtState.value.selectedExamBoard
+    val targetLimit = questionLimit ?: _cbtState.value.selectedQuestionLimit
 
     _cbtState.update {
       it.copy(
         selectedSubjectId = targetSubject,
         selectedExamBoard = targetBoard,
+        selectedQuestionLimit = targetLimit,
         isLoadingQuestions = true,
       )
     }
 
     viewModelScope.launch {
-      val questions = repository.fetchPastQuestionsForCbt(targetSubject, targetBoard)
+      val allQuestions = repository.fetchPastQuestionsForCbt(targetSubject, targetBoard)
+      val questions =
+        if (targetLimit > 0 && allQuestions.size > targetLimit) {
+          allQuestions.sortedByDescending { it.year }.take(targetLimit)
+        } else {
+          allQuestions
+        }
       if (questions.isEmpty()) {
         _cbtState.update { it.copy(isLoadingQuestions = false) }
         _statusMessage.value = "No past questions found for this track."
@@ -199,6 +218,7 @@ class MeritPrepViewModel(
           stage = CbtExamStage.RUNNING,
           selectedSubjectId = targetSubject,
           selectedExamBoard = targetBoard,
+          selectedQuestionLimit = targetLimit,
           questions = questions,
           currentIndex = 0,
           selectedAnswers = emptyMap(),
@@ -398,9 +418,27 @@ class MeritPrepViewModel(
   ) {
     viewModelScope.launch {
       val currentSteps = existingProgress?.completedSteps ?: emptyList()
-      val updatedSteps = (currentSteps + pillar.key).distinct()
-      val score = exerciseScore ?: existingProgress?.exerciseScore ?: 0L
-      val completedNow = updatedSteps.size >= LessonPillar.entries.size || score >= 60L
+      val passedExercise =
+        if (pillar == LessonPillar.EXERCISE) {
+          (exerciseScore ?: 0L) >= CurriculumProgression.PASS_THRESHOLD_PERCENT
+        } else {
+          true
+        }
+      val updatedSteps =
+        if (passedExercise) {
+          (currentSteps + pillar.key).distinct()
+        } else {
+          currentSteps.filterNot { it == LessonPillar.EXERCISE.key }.distinct()
+        }
+      val previousScore = existingProgress?.exerciseScore ?: 0L
+      val score =
+        if (exerciseScore != null) maxOf(previousScore, exerciseScore) else previousScore
+      val allPillarsCompleted =
+        LessonPillar.entries.all { required -> required.key in updatedSteps }
+      val completedNow =
+        (existingProgress?.isCompleted == true) ||
+          (allPillarsCompleted && score >= CurriculumProgression.PASS_THRESHOLD_PERCENT)
+
       val res =
         repository.saveLessonProgress(
           userId = currentUserId,
@@ -414,9 +452,21 @@ class MeritPrepViewModel(
       if (res.isSuccess) {
         val currentStreak =
           (profileState.value as? UiState.Success)?.data?.streakDays?.coerceAtLeast(1L) ?: 1L
-        val xpBonus = if (pillar == LessonPillar.EXERCISE) 40L else 15L
+        val xpBonus =
+          when {
+            pillar == LessonPillar.EXERCISE && passedExercise -> 40L
+            pillar == LessonPillar.EXERCISE -> 10L
+            else -> 15L
+          }
         repository.awardXp(currentUserId, xpBonus, currentStreak)
-        _statusMessage.value = "Saved ${pillar.shortLabel} progress (+${xpBonus} XP)"
+        _statusMessage.value =
+          when {
+            pillar == LessonPillar.EXERCISE && passedExercise ->
+              "Mastered (${score}%)! Next lesson unlocked (+${xpBonus} XP)"
+            pillar == LessonPillar.EXERCISE ->
+              "Scored ${exerciseScore ?: 0}% — reach 60%+ to unlock the next lesson"
+            else -> "Saved ${pillar.shortLabel} (+${xpBonus} XP)"
+          }
       } else {
         _statusMessage.value = "Could not sync lesson progress."
       }

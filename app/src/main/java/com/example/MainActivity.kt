@@ -163,9 +163,21 @@ private fun MeritPrepAppShell(
   val openLesson = activeLesson
   if (openLesson != null) {
     val lessonProgress = progressList.find { it.lessonId == openLesson.id }
+    val trackLessons =
+      remember(structuredModules, openLesson.subjectId) {
+        val dbLessons =
+          structuredModules.filter { it.subjectId == openLesson.subjectId }.flatMap { it.lessons }
+        if (dbLessons.isNotEmpty()) dbLessons
+        else com.example.data.curriculum.CurriculumCatalog.trackById(openLesson.subjectId)?.allLessons.orEmpty()
+      }
+    val nextLesson =
+      remember(trackLessons, openLesson.id) {
+        com.example.data.curriculum.CurriculumProgression.nextLessonAfter(trackLessons, openLesson.id)
+      }
     LessonClassroomScreen(
       lesson = openLesson,
       progress = lessonProgress,
+      nextLesson = nextLesson,
       onBack = { activeLesson = null },
       onMarkPillarComplete = { pillar, score ->
         viewModel.markPillarCompleted(openLesson, pillar, lessonProgress, score)
@@ -173,6 +185,7 @@ private fun MeritPrepAppShell(
       onSaveNote = { title, content ->
         viewModel.createStudyNote(openLesson.id, openLesson.subjectId, title, content, true)
       },
+      onOpenNextLesson = { upcoming -> activeLesson = upcoming },
     )
     return
   }
@@ -283,6 +296,7 @@ private fun MeritPrepAppShell(
               cbtState = cbtState,
               onSelectSubject = viewModel::selectExamSubject,
               onSelectBoard = viewModel::selectExamBoard,
+              onSelectQuestionLimit = viewModel::selectQuestionLimit,
               onStartExam = viewModel::startMockExam,
               onSelectAnswer = viewModel::selectCbtAnswer,
               onToggleFlag = viewModel::toggleFlagCbtQuestion,

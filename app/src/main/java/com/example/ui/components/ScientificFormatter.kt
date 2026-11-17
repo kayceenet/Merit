@@ -37,10 +37,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ui.theme.AppleStyleMonoFontFamily
 import com.example.ui.theme.CodeFormulaText
 import com.example.ui.theme.CodeSurface
-import com.example.ui.theme.UdacityCyan
+import com.example.ui.theme.CourseraAzureAccent
 
 sealed interface FormulaToken {
   data class Inline(val text: String) : FormulaToken
@@ -209,7 +208,7 @@ object ScientificNotationEngine {
   fun formatAnnotated(
     raw: String,
     baseFontSizeSp: Float = 14f,
-    codeFontFamily: FontFamily = AppleStyleMonoFontFamily,
+    codeFontFamily: FontFamily = FontFamily.Monospace,
   ): AnnotatedString {
     val text = normalizeMarkup(raw)
     val scriptSize = (baseFontSizeSp * 0.72f).coerceAtLeast(9f).sp
@@ -620,7 +619,7 @@ fun EquationDisplayCard(
   modifier: Modifier = Modifier,
   containerColor: Color = CodeSurface,
   textColor: Color = CodeFormulaText,
-  accentColor: Color = UdacityCyan,
+  accentColor: Color = CourseraAzureAccent,
   badgeLabel: String? = null,
 ) {
   val expressions =
@@ -673,7 +672,7 @@ fun EquationDisplayCard(
                   text = token.text,
                   style =
                     MaterialTheme.typography.bodyMedium.copy(
-                      fontFamily = AppleStyleMonoFontFamily,
+                      fontFamily = FontFamily.Monospace,
                       fontWeight = FontWeight.Bold,
                     ),
                   color = textColor,
@@ -694,7 +693,7 @@ fun EquationDisplayCard(
                     text = token.numerator,
                     style =
                       MaterialTheme.typography.bodySmall.copy(
-                        fontFamily = AppleStyleMonoFontFamily,
+                        fontFamily = FontFamily.Monospace,
                         fontWeight = FontWeight.Bold,
                         fontSize = 13.sp,
                       ),
@@ -713,7 +712,7 @@ fun EquationDisplayCard(
                     text = token.denominator,
                     style =
                       MaterialTheme.typography.bodySmall.copy(
-                        fontFamily = AppleStyleMonoFontFamily,
+                        fontFamily = FontFamily.Monospace,
                         fontWeight = FontWeight.Bold,
                         fontSize = 13.sp,
                       ),

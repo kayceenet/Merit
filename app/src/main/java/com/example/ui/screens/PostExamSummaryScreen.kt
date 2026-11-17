@@ -54,9 +54,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.ui.components.ScientificText
-import com.example.ui.theme.JetBrainsMonoFontFamily
-import com.example.ui.theme.UdacityCyan
-import com.example.ui.theme.UdacityCyanInk
+import com.example.ui.theme.CourseraAzureAccent
+import com.example.ui.theme.CourseraAzureInk
+import com.example.ui.theme.CourseraNavyElevated
 import com.example.ui.theme.semanticColors
 import com.example.ui.viewmodel.ExamResultSummary
 import com.example.ui.viewmodel.QuestionReviewItem
@@ -111,14 +111,14 @@ fun PostExamSummaryScreen(
       contentPadding = PaddingValues(16.dp),
       verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-      // Udacity Dark Navy Post-Exam Hero Report Card
+      // Coursera Deep Navy Post-Exam Hero Report Card
       item {
         Column(
           modifier =
             Modifier.fillMaxWidth()
               .clip(RoundedCornerShape(22.dp))
               .background(semantics.classroomBar)
-              .border(1.5.dp, Color(0xFF28427B), RoundedCornerShape(22.dp))
+              .border(1.5.dp, CourseraNavyElevated, RoundedCornerShape(22.dp))
               .padding(20.dp),
           verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
@@ -127,11 +127,11 @@ fun PostExamSummaryScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
           ) {
-            Surface(color = UdacityCyan, shape = RoundedCornerShape(6.dp)) {
+            Surface(color = CourseraAzureAccent, shape = RoundedCornerShape(6.dp)) {
               Text(
                 text = "${summary.examBoard} • ${summary.subjectTitle.uppercase()}",
                 style = MaterialTheme.typography.labelSmall,
-                color = UdacityCyanInk,
+                color = CourseraAzureInk,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
               )
@@ -164,7 +164,7 @@ fun PostExamSummaryScreen(
                 text = "${summary.percentage}%",
                 style =
                   MaterialTheme.typography.displaySmall.copy(
-                    fontFamily = JetBrainsMonoFontFamily
+                    fontFeatureSettings = "tnum"
                   ),
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
@@ -185,14 +185,14 @@ fun PostExamSummaryScreen(
                 Icon(
                   Icons.Filled.Timer,
                   contentDescription = "Time taken",
-                  tint = UdacityCyan,
+                  tint = CourseraAzureAccent,
                   modifier = Modifier.size(16.dp),
                 )
                 Text(
                   text = "Time: $formattedTime",
                   style =
                     MaterialTheme.typography.titleSmall.copy(
-                      fontFamily = JetBrainsMonoFontFamily
+                      fontFeatureSettings = "tnum"
                     ),
                   color = Color.White,
                   fontWeight = FontWeight.Bold,
@@ -211,7 +211,7 @@ fun PostExamSummaryScreen(
                 )
                 Text(
                   text = "+${summary.xpEarned} XP • ${avgSecondsPerQuestion}s/Q",
-                  style = MaterialTheme.typography.labelSmall,
+                  style = MaterialTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
                   color = Color(0xFFFDE68A),
                   fontWeight = FontWeight.Bold,
                 )
@@ -222,8 +222,8 @@ fun PostExamSummaryScreen(
           LinearProgressIndicator(
             progress = { (summary.percentage / 100f).coerceIn(0.03f, 1f) },
             modifier = Modifier.fillMaxWidth().height(8.dp).clip(CircleShape),
-            color = if (summary.percentage >= 70) semantics.success else UdacityCyan,
-            trackColor = Color(0xFF1E3A6E),
+            color = if (summary.percentage >= 70) semantics.success else CourseraAzureAccent,
+            trackColor = CourseraNavyElevated,
           )
 
           Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -244,8 +244,8 @@ fun PostExamSummaryScreen(
               shape = RoundedCornerShape(12.dp),
               colors =
                 ButtonDefaults.buttonColors(
-                  containerColor = UdacityCyan,
-                  contentColor = UdacityCyanInk,
+                  containerColor = CourseraAzureAccent,
+                  contentColor = CourseraAzureInk,
                 ),
             ) {
               Icon(Icons.Filled.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -403,7 +403,7 @@ private fun BreakdownMetricCard(
   ) {
     Text(
       text = "$count",
-      style = MaterialTheme.typography.titleLarge.copy(fontFamily = JetBrainsMonoFontFamily),
+      style = MaterialTheme.typography.titleLarge.copy(fontFeatureSettings = "tnum"),
       color = contentColor,
       fontWeight = FontWeight.Bold,
     )
@@ -487,7 +487,7 @@ private fun QuestionReviewCard(item: QuestionReviewItem) {
       }
       Text(
         text = "${q.examType} ${q.year} • ${item.timeSpentSeconds}s",
-        style = MaterialTheme.typography.labelSmall.copy(fontFamily = JetBrainsMonoFontFamily),
+        style = MaterialTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
         color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
     }
