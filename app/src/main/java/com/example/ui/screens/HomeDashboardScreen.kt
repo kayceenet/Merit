@@ -166,7 +166,7 @@ fun HomeDashboardScreen(
                   modifier = Modifier.size(16.dp),
                 )
                 Text(
-                  text = "MERITPREP ACADEMY • ${profile?.targetExam ?: "JAMB + WAEC"}",
+                  text = "MERITPREP ACADEMY • ${profile?.targetExam ?: "JAMB • WAEC • NECO"}",
                   style = MaterialTheme.typography.labelSmall,
                   color = CourseraAzureAccent,
                   fontWeight = FontWeight.Bold,
@@ -180,7 +180,7 @@ fun HomeDashboardScreen(
                 overflow = TextOverflow.Ellipsis,
               )
               Text(
-                text = "UTME Target ${profile?.targetScore ?: 320}/400 • ${completedIds.size}/${allLessons.size} lessons mastered • $totalPastQuestions past Qs",
+                text = "UTME Target ${profile?.targetScore ?: 320}/400 • ${completedIds.size}/${allLessons.size} lessons mastered • $totalPastQuestions Qs",
                 style = MaterialTheme.typography.bodySmall,
                 color = semantics.classroomSubtext,
               )
@@ -358,7 +358,7 @@ fun HomeDashboardScreen(
 
           StudyChecklistItem(
             title = "Build Zero-to-One Foundations",
-            subtitle = "Read concepts & score 60%+ quiz in ${nextLesson.title}",
+            subtitle = "Complete study stages & score ${CurriculumProgression.PASS_THRESHOLD_PERCENT}%+ in ${nextLesson.title}",
             isDone = anyConceptDone,
             onClick = { onOpenLesson(nextLesson) },
           )
@@ -369,8 +369,8 @@ fun HomeDashboardScreen(
             onClick = { onOpenLesson(nextLesson) },
           )
           StudyChecklistItem(
-            title = "Pass 1 Timed Past-Question Drill (70%+)",
-            subtitle = "2018–2025 JAMB UTME & WAEC Paper Bank",
+            title = "Pass 1 Timed Exam Drill (70%+)",
+            subtitle = "JAMB UTME, WAEC WASSCE & NECO SSCE Bank",
             isDone = anyExamPassed,
             onClick = { onOpenExamLab("physics") },
           )
@@ -450,12 +450,12 @@ fun HomeDashboardScreen(
               )
             }
             Text(
-              text = "JAMB & WAEC",
+              text = "JAMB, WAEC & NECO",
               style = MaterialTheme.typography.titleLarge,
               color = MaterialTheme.colorScheme.onPrimaryContainer,
             )
             Text(
-              text = recentWeakTopic?.let { "Drill weak topic: $it →" } ?: "Start past-question paper →",
+              text = recentWeakTopic?.let { "Drill weak topic: $it →" } ?: "Start syllabus mock paper →",
               style = MaterialTheme.typography.bodySmall,
               color = MaterialTheme.colorScheme.primary,
               fontWeight = FontWeight.Bold,
@@ -468,12 +468,12 @@ fun HomeDashboardScreen(
       item {
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
           Text(
-            text = "JAMB & WAEC Specializations",
+            text = "JAMB, WAEC & NECO Specializations",
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground,
           )
           Text(
-            text = "Sequential zero-to-mastery courses — score ≥60% on each quiz to unlock the next lesson",
+            text = "Sequential zero-to-mastery courses — score ≥${CurriculumProgression.PASS_THRESHOLD_PERCENT}% on each assessment to unlock the next lesson",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
@@ -664,7 +664,7 @@ fun SubjectTrackCard(
               color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
-              text = "${track.modules.size} modules • $totalLessons lessons • $pastQuestionCount past Qs",
+              text = "${track.modules.size} modules • $totalLessons lessons • $pastQuestionCount Practice Qs",
               style = MaterialTheme.typography.labelSmall,
               color = MaterialTheme.colorScheme.primary,
               fontWeight = FontWeight.SemiBold,

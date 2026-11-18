@@ -53,6 +53,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.data.curriculum.CurriculumProgression
 import com.example.ui.components.ScientificText
 import com.example.ui.theme.CourseraAzureAccent
 import com.example.ui.theme.CourseraAzureInk
@@ -97,13 +98,8 @@ fun PostExamSummaryScreen(
   val avgSecondsPerQuestion =
     if (summary.totalQuestions > 0) summary.timeTakenSeconds / summary.totalQuestions else 0
 
-  val verdictText =
-    when {
-      summary.percentage >= 80 -> "DISTINCTION"
-      summary.percentage >= 70 -> "EXAM READY"
-      summary.percentage >= 50 -> "DEVELOPING"
-      else -> "NEEDS REVISION"
-    }
+  val masteryBand = CurriculumProgression.bandForPercentage(summary.percentage.toLong())
+  val verdictText = masteryBand.label.uppercase()
 
   Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
     LazyColumn(
@@ -138,7 +134,7 @@ fun PostExamSummaryScreen(
             }
             Surface(
               color =
-                if (summary.percentage >= 70) semantics.successContainer
+                if (summary.percentage >= CurriculumProgression.PASS_THRESHOLD_PERCENT) semantics.successContainer
                 else MaterialTheme.colorScheme.tertiaryContainer,
               shape = RoundedCornerShape(99.dp),
             ) {
@@ -146,7 +142,7 @@ fun PostExamSummaryScreen(
                 text = verdictText,
                 style = MaterialTheme.typography.labelSmall,
                 color =
-                  if (summary.percentage >= 70) semantics.onSuccessContainer
+                  if (summary.percentage >= CurriculumProgression.PASS_THRESHOLD_PERCENT) semantics.onSuccessContainer
                   else MaterialTheme.colorScheme.onTertiaryContainer,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
@@ -486,7 +482,7 @@ private fun QuestionReviewCard(item: QuestionReviewItem) {
         }
       }
       Text(
-        text = "${q.examType} ${q.year} • ${item.timeSpentSeconds}s",
+        text = "${q.boardStyleLabel} • ${item.timeSpentSeconds}s",
         style = MaterialTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
         color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
@@ -598,10 +594,18 @@ private fun QuestionReviewCard(item: QuestionReviewItem) {
       )
       if (!q.waecMarkingScheme.isNullOrBlank()) {
         ScientificText(
-          text = "WAEC Marking Scheme: ${q.waecMarkingScheme}",
+          text = "Examiner Marking Scheme: ${q.waecMarkingScheme}",
           style = MaterialTheme.typography.labelSmall,
           color = MaterialTheme.colorScheme.primary,
           fontWeight = FontWeight.Bold,
+        )
+      }
+      if (!item.isCorrect && q.remediationTip.isNotBlank()) {
+        ScientificText(
+          text = "Remediation Focus: ${q.remediationTip}",
+          style = MaterialTheme.typography.labelSmall,
+          color = MaterialTheme.colorScheme.tertiary,
+          fontWeight = FontWeight.Medium,
         )
       }
     }

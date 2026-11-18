@@ -48,7 +48,7 @@ object BiologyCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Diagnosing & Correcting Myopia vs Presbyopia",
-                    examSource = "JAMB UTME 2024 • Bio Q20",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "A student reads her textbook clearly without glasses but cannot read notes written on the whiteboard 6 m away. Name the defect, optical cause, and lens.",
                     steps =
@@ -62,7 +62,7 @@ object BiologyCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Tracing Sound Amplification Through the Middle Ear",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q24",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Name the correct sequence of vibrations from Tympanum (eardrum) to Auditory Nerve.",
                     steps =
                       listOf(
@@ -146,7 +146,7 @@ object BiologyCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_bio_07_6",
                     topic = "Sensory Receptors",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "Which vitamin is essential to synthesize Rhodopsin pigment in retinal rod cells for dim-light vision?",
                     options = listOf("Vitamin D", "Vitamin A (Retinol)", "Vitamin C", "Vitamin B12"),
@@ -193,7 +193,7 @@ object BiologyCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Clinostat Auxin Geotropism Experiment",
-                    examSource = "WAEC SSCE 2024 • Practical Paper 3",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "Two germinating bean seedlings lie horizontally—one stationary, one pinned on a slowly rotating electric clinostat. Compare growth after 48 hours.",
                     steps =
@@ -206,7 +206,7 @@ object BiologyCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Vertebral Anatomy: Atlas vs Axis vs Thoracic",
-                    examSource = "JAMB UTME 2023 • Bio Q22",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "Match Cervical Atlas, Cervical Axis, and Thoracic vertebrae to their standout structural features.",
                     steps =
                       listOf(
@@ -291,7 +291,7 @@ object BiologyCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_bio_08_6",
                     topic = "Nastic vs Tropic",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "The rapid folding of Mimosa pudica ('touch-me-not') leaflets when brushed is an example of:",
                     options = listOf("Phototropism", "Chemotaxis", "Thigmonasty (non-directional turgor response)", "Geotropism"),
@@ -338,7 +338,7 @@ object BiologyCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Identifying Wind vs Insect Pollinated Flowers",
-                    examSource = "JAMB UTME 2024 • Bio Q25",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "A flower has dull small greenish petals, zero nectar, huge feathery stigmas hanging outside, and smooth powdery pollen. Classify its pollination.",
                     steps =
@@ -351,7 +351,7 @@ object BiologyCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Distinguishing Epigeal vs Hypogeal Germination",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q27",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Why do Cowpea cotyledons emerge above ground while Maize scutellum stays buried?",
                     steps =
                       listOf(
@@ -435,7 +435,7 @@ object BiologyCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_bio_09_6",
                     topic = "Fruit Dispersal",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "Tridax (coat buttons) and Dandelion fruits possess silky pappus hairs specifically adapted for:",
                     options = listOf("Animal hook dispersal", "Explosive dehiscence", "Wind dispersal", "Water flotation"),
@@ -492,7 +492,7 @@ object BiologyCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Sickle-Cell Genetic Counselling (AS × AS)",
-                    examSource = "WAEC SSCE 2024 • Paper 2 Q8",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "Both parents are healthy Sickle-Cell carriers (Hb^A Hb^S). Using a cross, state the probability of (a) an SS child and (b) a normal AA child.",
                     steps =
@@ -506,7 +506,7 @@ object BiologyCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Blood Group Cross I^A I^O × I^B I^O",
-                    examSource = "JAMB UTME 2023 • Bio Q30",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "Can a Blood Group A father and Blood Group B mother legitimately have a Blood Group O baby? Prove it.",
                     steps =
@@ -591,7 +591,7 @@ object BiologyCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_bio_10_6",
                     topic = "Sex Determination",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "In humans, the biological sex of a baby is determined at fertilization by:",
                     options = listOf("Mother's ovum (X vs Y)", "Father's sperm carrying either X or Y", "Age of uterus", "Hormone level"),
@@ -638,7 +638,7 @@ object BiologyCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Transcribing a DNA Strand to mRNA",
-                    examSource = "JAMB UTME 2024 • Bio Q32",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "A DNA template strand reads 3'–TAC GGA CTT–5'. Write the complementary mRNA strand.",
                     steps =
                       listOf(
@@ -650,7 +650,7 @@ object BiologyCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Pepper Moth Industrial Melanism",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q33",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Explain why dark peppered moths (Biston betularia) out-numbered pale moths in polluted industrial towns.",
                     steps =
                       listOf(
@@ -734,7 +734,7 @@ object BiologyCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_bio_11_6",
                     topic = "Vestigial Evidence",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "The human appendix and tailbone (coccyx) serve as evolutionary clues known as:",
                     options = listOf("Analogous organs", "Vestigial structures", "Mutant tumors", "Adaptive radiation"),

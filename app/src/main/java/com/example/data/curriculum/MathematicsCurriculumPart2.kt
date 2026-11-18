@@ -48,7 +48,7 @@ object MathematicsCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Finding Unknown x in a Singular Matrix",
-                    examSource = "JAMB UTME 2024 • Maths Q17",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "Given A = [[x, 3], [4, x − 1]] is singular, find the positive value of x.",
                     steps =
                       listOf(
@@ -61,7 +61,7 @@ object MathematicsCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Computing a 2×2 Inverse Matrix",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q21",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Find the inverse of M = [[5, 3], [2, 2]].",
                     steps =
                       listOf(
@@ -146,7 +146,7 @@ object MathematicsCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_math_07_6",
                     topic = "3×3 Determinant",
-                    examType = "JAMB",
+                    examType = "NECO",
                     year = 2024,
                     question = "Evaluate det [[1, 0, 2], [0, 3, 1], [0, 0, 4]].",
                     options = listOf("12", "8", "24", "6"),
@@ -193,7 +193,7 @@ object MathematicsCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Finding Number of Sides from Interior Angle",
-                    examSource = "JAMB UTME 2024 • Maths Q19",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "Each interior angle of a regular polygon is 150°. How many sides does it have?",
                     steps =
                       listOf(
@@ -205,7 +205,7 @@ object MathematicsCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Similar Triangles Area Ratio",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q24",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "Two similar triangles have corresponding sides 4 cm and 6 cm. If the smaller has area 24 cm², find the area of the larger.",
                     steps =
@@ -291,7 +291,7 @@ object MathematicsCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_math_08_6",
                     topic = "Regular Decagon",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "Find the size of one interior angle of a regular 10-sided polygon.",
                     options = listOf("135°", "140°", "144°", "150°"),
@@ -338,7 +338,7 @@ object MathematicsCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Center Angle + Cyclic Quadrilateral Double Step",
-                    examSource = "WAEC SSCE 2024 • Paper 2 Q6",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "A, B, C, D lie on a circle with center O. Angle AOC = 130° (minor arc). Find angle ADC on major arc and angle ABC on minor arc.",
                     steps =
@@ -352,7 +352,7 @@ object MathematicsCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Chord Distance from Circle Center",
-                    examSource = "JAMB UTME 2023 • Maths Q22",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "A chord of length 24 cm is 5 cm from the center of a circle. Find the radius.",
                     steps =
                       listOf(
@@ -437,7 +437,7 @@ object MathematicsCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_math_09_6",
                     topic = "Loci",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "The locus of points equidistant from two fixed points A and B is:",
                     options = listOf("Circle with diameter AB", "Perpendicular bisector of AB", "Angle bisector", "Line parallel to AB"),
@@ -484,7 +484,7 @@ object MathematicsCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Folding a Sector into a Cone",
-                    examSource = "WAEC SSCE 2024 • Paper 2 Q8",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "A sector of radius 10 cm and angle 216° is folded into a cone. Find the base radius r and height h.",
                     steps =
@@ -498,7 +498,7 @@ object MathematicsCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Melting a Cylinder into Spheres",
-                    examSource = "JAMB UTME 2023 • Maths Q25",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "How many solid spheres of radius 3 cm can be recast from a solid cylinder of radius 6 cm and height 12 cm?",
                     steps =
@@ -584,7 +584,7 @@ object MathematicsCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_math_10_6",
                     topic = "Latitude Circle Distance",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "On Earth (radius R), what is the radius r of the parallel of latitude 60°N?",
                     options = listOf("R", "0.5 R", "0.866 R", "0.25 R"),
@@ -641,7 +641,7 @@ object MathematicsCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Finding Back Bearing & Ship Distance",
-                    examSource = "WAEC SSCE 2024 • Paper 2 Q9",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "A boat sails 6 km on bearing 040° from P to Q, then 8 km on bearing 130° to R. Find distance PR and bearing of P from Q.",
                     steps =
@@ -655,7 +655,7 @@ object MathematicsCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Cosine Rule for Enclosed Angle",
-                    examSource = "JAMB UTME 2023 • Maths Q28",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "In ΔXYZ, x = 5, y = 8, and ∠Z = 60°. Find side z.",
                     steps =
                       listOf(
@@ -740,7 +740,7 @@ object MathematicsCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_math_11_6",
                     topic = "Sine Rule",
-                    examType = "JAMB",
+                    examType = "NECO",
                     year = 2024,
                     question = "In ΔPQR, p = 10 cm, ∠P = 30°, ∠Q = 45°. Find q.",
                     options = listOf("10√2 cm", "5√2 cm", "10 cm", "20 cm"),
@@ -787,7 +787,7 @@ object MathematicsCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Line Perpendicular to Given Line",
-                    examSource = "JAMB UTME 2024 • Maths Q30",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "Find the equation of the line passing through (2, −1) perpendicular to 2x + 3y = 6.",
                     steps =
                       listOf(
@@ -800,7 +800,7 @@ object MathematicsCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Center and Radius of Expanded Circle",
-                    examSource = "WAEC Further / JAMB 2023 • Q31",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Find the center and radius of circle x² + y² − 6x + 8y − 11 = 0.",
                     steps =
                       listOf(
@@ -884,7 +884,7 @@ object MathematicsCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_math_12_6",
                     topic = "Collinear Points",
-                    examType = "JAMB",
+                    examType = "NECO",
                     year = 2021,
                     question = "If points (1, 2), (3, 6), and (5, k) lie on a straight line, find k.",
                     options = listOf("8", "9", "10", "12"),

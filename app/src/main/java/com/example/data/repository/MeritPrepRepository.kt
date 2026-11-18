@@ -144,7 +144,7 @@ class MeritPrepRepository(
       val now = System.currentTimeMillis()
       val existing = dao.getProfileOnce(userId) ?: UserProfile(id = userId, userId = userId, createdAt = now)
       val safeName = displayName.trim().ifBlank { "Scholar" }.take(80)
-      val safeExam = if (targetExam in listOf("BOTH", "JAMB", "WAEC")) targetExam else "BOTH"
+      val safeExam = if (targetExam in listOf("ALL", "BOTH", "JAMB", "WAEC", "NECO")) targetExam else "BOTH"
       val safeScore = targetScore.coerceIn(160L, 400L)
       dao.upsertProfile(
         existing.copy(
@@ -254,6 +254,7 @@ class MeritPrepRepository(
       val safeExamType =
         when {
           examType.equals("WAEC", ignoreCase = true) -> "WAEC"
+          examType.equals("NECO", ignoreCase = true) -> "NECO"
           examType.equals("ALL", ignoreCase = true) -> "ALL"
           else -> "JAMB"
         }
@@ -373,6 +374,6 @@ class MeritPrepRepository(
   }
 
   private companion object {
-    const val CURRENT_CURRICULUM_VERSION = 4
+    const val CURRENT_CURRICULUM_VERSION = 5
   }
 }

@@ -33,22 +33,33 @@ internal fun EnglishLabDispatcher(lessonId: String, labType: PracticalLabType) {
 @Composable
 private fun ClausesFunctionsLab(lessonId: String) {
   var idx by remember { mutableIntStateOf(0) }
-  val samples = listOf(
-    "\"WHAT SHE TOLD ME\" amazed the panel." to "Noun Clause • Subject of verb 'amazed' (IT-swap works!)",
-    "The prefect \"WHO LOST THE KEY\" apologized." to "Adjectival Clause • Qualifies the noun 'prefect'",
-    "We trained hard \"SO THAT WE MIGHT WIN\"." to "Adverbial Clause of Purpose • Modifies verb 'trained'",
-    "\"Walking to class\", a bike splashed Ada." to "Dangling Modifier Error! Fix: '...she got splashed by a bike.'",
-  )
+  val samples = when (lessonId) {
+    "eng_01_parts_affixes" -> listOf(
+      "\"Much INFORMATION / Few STUDENTS\"" to "Uncountables (information, advice, equipment) take MUCH/LITTLE & singular verb; Countables take FEWER/MANY",
+      "Prefix 'in-' / 'un-' / 'dis-'" to "Reverses polarity (capable → incapable, honest → dishonest) without altering root spelling",
+      "Suffix '-ize' / '-tion' / '-ly'" to "Shifts word class: Nation (Noun) → National (Adj) → Nationalize (Verb) → Nationally (Adv)",
+      "'Each' & 'Every'" to "Distributive determiners take SINGULAR noun + SINGULAR verb ('Each candidate HAS a slip')",
+    )
+    "eng_03_sentences_modifiers" -> listOf(
+      "\"Walking to class\", a bike splashed Ada." to "Dangling Modifier Error! Fix: 'Walking to class, Ada was splashed by a bike.'",
+      "Comma Splice Repair" to "BAD: 'He studied hard, he passed.' → GOOD: 'He studied hard, and he passed.' / '; therefore, he passed.'",
+      "Simple vs Compound Sentence" to "1 Independent clause (Simple) vs 2+ Independent clauses joined by FANBOYS or ';' (Compound)",
+      "Complex Sentence Spine" to "1 Main clause + 1+ Subordinate clause linked by because/although/who/which",
+    )
+    else -> listOf(
+      "\"WHAT SHE TOLD ME\" amazed the panel." to "Noun Clause • Subject of verb 'amazed' (IT-swap works!)",
+      "The prefect \"WHO LOST THE KEY\" apologized." to "Adjectival Clause • Qualifies the noun 'prefect'",
+      "We trained hard \"SO THAT WE MIGHT WIN\"." to "Adverbial Clause of Purpose • Modifies verb 'trained'",
+      "She believes \"THAT HONESTY PAYS\"." to "Noun Clause • Direct Object of transitive verb 'believes'",
+    )
+  }
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-      listOf("Noun Clause", "Adjectival", "Adverbial", "Modifier Fix").forEachIndexed { i, title ->
-        FilterChip(selected = idx == i, onClick = { idx = i }, label = { Text(title) })
+      samples.forEachIndexed { i, (label, _) ->
+        FilterChip(selected = idx == i, onClick = { idx = i }, label = { Text(label.take(16)) })
       }
     }
-    LabMetricBanner(listOf("Sentence" to samples[idx].first, "WAEC Analysis" to samples[idx].second))
-    if (lessonId == "eng_01_parts_affixes") {
-      ScientificText("Countable rule: FEWER students (plural); LESS water / equipment / advice (uncountable).", style = MaterialTheme.typography.bodySmall)
-    }
+    LabMetricBanner(listOf("Pattern" to samples[idx].first, "WAEC Analysis" to samples[idx].second))
   }
 }
 
@@ -56,23 +67,39 @@ private fun ClausesFunctionsLab(lessonId: String) {
 @Composable
 private fun ConcordTagsConditionalsLab(lessonId: String) {
   var idx by remember { mutableIntStateOf(0) }
-  val prompts = listOf(
-    "The coach, as well as the boys, ___ coming." to "IS (ignore ', as well as...'; match singular 'coach')",
-    "Neither Ada nor her brothers ___ late." to "WERE (proximity agrees with closer 'brothers')",
-    "It is high time we ___ home." to "LEFT (overdue present uses Simple Past V₂!)",
-    "She hardly talks in class, ___?" to "DOES SHE? ('hardly' makes main clause negative!)",
-    "I am chosen for the debate, ___?" to "AREN'T I? (standard positive 'I am' tag)",
-  )
+  val prompts = when (lessonId) {
+    "eng_04_tenses_conditionals" -> listOf(
+      "She ___ here since 2021." to "HAS BEEN (Present Perfect bridges past start 'since' to now)",
+      "Type 1 Probable Condition" to "If it RAINS (Present), we WILL STAY indoors (Future 'will')",
+      "Type 2 Hypothetical Condition" to "If I WERE rich (Simple Past), I WOULD BUILD a library ('would + base')",
+      "Type 3 Inverted Unreal" to "'Had I known...' (= If I had known...) → 'would have + V₃'",
+    )
+    "eng_05_subjunctive_passive" -> listOf(
+      "It is high time we ___ home." to "LEFT (Simple Past V₂ marks overdue present action!)",
+      "The chair insisted that he ___ present." to "BE / STAY (Mandative subjunctive uses bare base infinitive)",
+      "Active → Passive Continuous" to "'Tunde is writing a letter' → 'A letter IS BEING WRITTEN by Tunde'",
+      "I wish I ___ taller." to "WERE (Counterfactual wish always uses 'were', never 'was' in formal style)",
+    )
+    "eng_07_tags_punctuation" -> listOf(
+      "She hardly talks in class, ___?" to "DOES SHE? ('hardly/seldom/scarcely' make statement negative → positive tag)",
+      "I am chosen for the debate, ___?" to "AREN'T I? (Standard positive 'I am' question tag)",
+      "Let's review the notes, ___?" to "SHALL WE? ('Let's...' takes 'shall we'; imperatives take 'will you')",
+      "Its vs It's" to "ITS = possessive ('its tail'); IT'S = 'it is / it has' contraction",
+    )
+    else -> listOf(
+      "The coach, as well as the boys, ___ coming." to "IS (ignore ', as well as...'; match singular 'coach')",
+      "Neither Ada nor her brothers ___ late." to "WERE (proximity agrees with closer plural 'brothers')",
+      "The number of candidates ___ risen." to "HAS ('The number' = singular vs 'A number of students' = plural)",
+      "Bread and butter ___ his favourite breakfast." to "IS (single combined meal notion → singular verb)",
+    )
+  }
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-      listOf("As Well As", "Neither/Nor", "High Time", "Hardly Tag", "I Am Tag").forEachIndexed { i, t ->
-        FilterChip(selected = idx == i, onClick = { idx = i }, label = { Text(t) })
+      prompts.forEachIndexed { i, (label, _) ->
+        FilterChip(selected = idx == i, onClick = { idx = i }, label = { Text(label.take(15)) })
       }
     }
     LabMetricBanner(listOf("Prompt" to prompts[idx].first, "Rule Verdict" to prompts[idx].second))
-    if (lessonId == "eng_04_tenses_conditionals") {
-      ScientificText("Type 3 Inverted: 'Had I known...' = 'If I had known... + would have + V₃'.", style = MaterialTheme.typography.bodySmall)
-    }
   }
 }
 
@@ -81,6 +108,18 @@ private fun ConcordTagsConditionalsLab(lessonId: String) {
 private fun IdiomsRegistersLab(lessonId: String) {
   var idx by remember { mutableIntStateOf(0) }
   val entries = when (lessonId) {
+    "eng_08_synonyms_antonyms" -> listOf(
+      "Word-Class Lock" to "Noun prompts require Noun replacements; Verb prompts require Verb equivalents in identical tense.",
+      "Precision Antonyms" to "'Magnanimous' ↔ 'Vindictive/Petty' (NOT merely 'angry'); watch 'Opposite in Meaning' headers!",
+      "Context Polarity" to "'Austere budget' = strict/frugal; 'Auspicious start' = favourable/promising.",
+      "Substitution Check" to "Always re-read the original sentence with your chosen option inserted before locking it.",
+    )
+    "eng_10_prepositions_confusables" -> listOf(
+      "Congratulate / Prefer" to "Congratulate someone ON (not for); Prefer tea TO coffee (not than)",
+      "Comprise vs Consist" to "Comprises 5 units (ZERO 'of'!); Consists OF 5 units",
+      "Zero Redundant Preps" to "Say 'discuss the plan' (NOT discuss about), 'cope with' (NOT cope up with)",
+      "Stationary vs Stationery" to "Stationary = motionless (A as in 'at rest'); Stationery = paper/pens (E as in 'envelopes')",
+    )
     "eng_11_registers_cloze" -> listOf(
       "Courtroom Register" to "Plaintiff, Defendant, Bailiff, Arraign, Verdict, Acquitted OF charges",
       "Medical Register" to "Prognosis, Prescription, Scalpel, Sterilize, Ward, Outpatient",
@@ -90,8 +129,8 @@ private fun IdiomsRegistersLab(lessonId: String) {
     else -> listOf(
       "White Elephant" to "Costly useless project (NEVER literal albino animal!)",
       "Call off vs Put off" to "'Call off' = Cancel completely; 'Put off' = Postpone till later",
-      "Congratulate / Prefer" to "Congratulate someone ON (not for); Prefer tea TO coffee (not than)",
-      "Comprise vs Consist" to "Comprises 5 units (ZERO 'of'!); Consists OF 5 units",
+      "Take After / Put Up With" to "'Take after' = Resemble; 'Put up with' = Tolerate patiently",
+      "Bite the Bullet" to "Face an unavoidable hardship with courage",
     )
   }
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {

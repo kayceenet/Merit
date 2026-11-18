@@ -47,7 +47,7 @@ object ChemistryCurriculumPart3 {
               listOf(
                 WorkedExample(
                   title = "Counting Structural Isomers of C₅H₁₂",
-                  examSource = "JAMB UTME 2024 • Chem Q34",
+                  examSource = "JAMB UTME-Style Worked Problem",
                   problemStatement = "Name all three structural isomers of Pentane (C₅H₁₂).",
                   steps =
                     listOf(
@@ -60,7 +60,7 @@ object ChemistryCurriculumPart3 {
                 ),
                 WorkedExample(
                   title = "IUPAC Naming of Branched Alkene",
-                  examSource = "WAEC SSCE 2023 • Paper 1 Q35",
+                  examSource = "WAEC WASSCE-Style Worked Problem",
                   problemStatement = "Name CH₃−CH=C(CH₃)−CH₃.",
                   steps =
                     listOf(
@@ -145,7 +145,7 @@ object ChemistryCurriculumPart3 {
                 PracticeQuestion(
                   id = "ex_chem_13_6",
                   topic = "Cis-Trans Isomerism",
-                  examType = "WAEC",
+                  examType = "NECO",
                   year = 2024,
                   question = "Which alkene exhibits geometric (cis-trans) isomerism?",
                   options = listOf("Ethene", "Propene", "But-1-ene", "But-2-ene"),
@@ -192,7 +192,7 @@ object ChemistryCurriculumPart3 {
               listOf(
                 WorkedExample(
                   title = "Naming & Synthesizing Fruity Esters",
-                  examSource = "WAEC SSCE 2024 • Paper 2 Q10",
+                  examSource = "WAEC WASSCE-Style Worked Problem",
                   problemStatement =
                       "Propan-1-ol reacts with Ethanoic acid under reflux with Conc. H₂SO₄. Name the product and state the catalyst's two roles.",
                   steps =
@@ -205,7 +205,7 @@ object ChemistryCurriculumPart3 {
                 ),
                 WorkedExample(
                   title = "Fermentation Gas Volume from Glucose",
-                  examSource = "JAMB UTME 2023 • Chem Q36",
+                  examSource = "JAMB UTME-Style Worked Problem",
                   problemStatement =
                       "90 g of Glucose (C₆H₁₂O₆, Mᵣ = 180) is fermented completely by yeast. What volume of CO₂ forms at STP?",
                   steps =
@@ -291,7 +291,7 @@ object ChemistryCurriculumPart3 {
                 PracticeQuestion(
                   id = "ex_chem_14_6",
                   topic = "Dehydration of Ethanol",
-                  examType = "WAEC",
+                  examType = "NECO",
                   year = 2024,
                   question = "Heating Ethanol with excess Conc. H₂SO₄ at 170°C produces:",
                   options = listOf("Ethoxyethane", "Ethene", "Ethanoic acid", "Ethane"),
@@ -338,7 +338,7 @@ object ChemistryCurriculumPart3 {
               listOf(
                 WorkedExample(
                   title = "Pinpointing an Unknown Salt X",
-                  examSource = "WAEC SSCE 2024 • Practical Paper 3 Q2",
+                  examSource = "WAEC WASSCE-Style Worked Problem",
                   problemStatement =
                       "Salt X gives a white precipitate with NaOH soluble in excess, a white precipitate with NH₃ INSOLUBLE in excess, and a bright yellow precipitate with KI(aq). Identify X's cation.",
                   steps =
@@ -352,7 +352,7 @@ object ChemistryCurriculumPart3 {
                 ),
                 WorkedExample(
                   title = "Balancing Nuclear Beta Emission",
-                  examSource = "JAMB UTME 2023 • Chem Q39",
+                  examSource = "JAMB UTME-Style Worked Problem",
                   problemStatement = "Carbon-14 (¹⁴₆C) undergoes β-decay. Identify the daughter nuclide.",
                   steps =
                     listOf(
@@ -436,7 +436,7 @@ object ChemistryCurriculumPart3 {
                 PracticeQuestion(
                   id = "ex_chem_15_6",
                   topic = "Nuclear Decay Balance",
-                  examType = "WAEC",
+                  examType = "NECO",
                   year = 2024,
                   question = "If ²²⁶₈₈Ra emits one alpha particle (⁴₂He), the resulting nuclide has mass and atomic number:",
                   options = listOf("222, 86", "222, 90", "226, 89", "224, 86"),
@@ -455,25 +455,25 @@ object ChemistryCurriculumPart3 {
       PracticeQuestion("pq_chem_02", "Atomic Orbitals", "WAEC", 2024, "How many electrons can completely fill the p-subshell of shell n=2?", listOf("6", "2", "10", "14"), 0, "Three p orbitals × 2e⁻ each.", "3 × 2 = 6 electrons (2p⁶)."),
       PracticeQuestion("pq_chem_03", "Periodic Trends", "JAMB", 2024, "Which element has the highest electronegativity?", listOf("Fluorine", "Oxygen", "Chlorine", "Sodium"), 0, "Top-right non-noble corner.", "Fluorine (4.0) is the most electronegative element."),
       PracticeQuestion("pq_chem_04", "Bonding", "WAEC", 2023, "Which substance conducts electricity in BOTH solid and molten states?", listOf("Magnesium", "Sodium chloride", "Diamond", "Sulphur"), 0, "Metallic delocalized electron sea.", "Magnesium has free mobile electrons in solid and liquid states."),
-      PracticeQuestion("pq_chem_05", "Mole Concept", "JAMB", 2023, "What volume of O₂ at STP is needed to completely burn 2 moles of C₂H₆? (2C₂H₆ + 7O₂ → 4CO₂ + 6H₂O)", listOf("156.8 dm³", "78.4 dm³", "44.8 dm³", "22.4 dm³"), 0, "7 moles O₂ per 2 moles C₂H₆.", "7 × 22.4 = 156.8 dm³."),
+      PracticeQuestion("pq_chem_05", "Mole Concept", "NECO", 2023, "What volume of O₂ at STP is needed to completely burn 2 moles of C₂H₆? (2C₂H₆ + 7O₂ → 4CO₂ + 6H₂O)", listOf("156.8 dm³", "78.4 dm³", "44.8 dm³", "22.4 dm³"), 0, "7 moles O₂ per 2 moles C₂H₆.", "7 × 22.4 = 156.8 dm³."),
       PracticeQuestion("pq_chem_06", "Gas Laws", "WAEC", 2024, "Under identical conditions, which gas diffuses fastest?", listOf("NH₃ (M=17)", "CO (M=28)", "CO₂ (M=44)", "SO₂ (M=64)"), 0, "Lightest gas wins Graham's race.", "NH₃ has lowest molar mass (17)."),
       PracticeQuestion("pq_chem_07", "Titration", "JAMB", 2025, "Best indicator for titrating weak CH₃COOH against strong NaOH?", listOf("Phenolphthalein", "Methyl orange", "Methyl red", "Litmus"), 0, "Equivalence point pH is ~8.7 (alkaline).", "Phenolphthalein changes sharply at pH 8.3–10.0."),
       PracticeQuestion("pq_chem_08", "Salt Hydrolysis", "WAEC", 2022, "An aqueous solution of Na₂CO₃ has pH:", listOf("Above 7 (Alkaline)", "Exactly 7", "Below 7 (Acidic)", "Zero"), 0, "Strong base NaOH + Weak acid H₂CO₃.", "CO₃²⁻ hydrolyzes water producing OH⁻ → pH > 7."),
       PracticeQuestion("pq_chem_09", "Thermochemistry", "JAMB", 2024, "Breaking a covalent Cl−Cl bond is always:", listOf("Endothermic (ΔH > 0)", "Exothermic (ΔH < 0)", "Spontaneous at 0 K", "Nuclear"), 0, "Takes energy input to snap bonds.", "Bond breaking absorbs energy (+ΔH)."),
-      PracticeQuestion("pq_chem_10", "Kinetics", "WAEC", 2023, "Raising temperature by 10°C roughly doubles reaction rate mainly because:", listOf("Far more particles exceed Activation Energy Eₐ", "Activation energy Eₐ drops", "Equilibrium constant K_c halves", "Pressure drops"), 0, "Kinetic energy distribution shifts above Eₐ threshold.", "More colliding particles possess E ≥ Eₐ."),
+      PracticeQuestion("pq_chem_10", "Kinetics", "NECO", 2023, "Raising temperature by 10°C roughly doubles reaction rate mainly because:", listOf("Far more particles exceed Activation Energy Eₐ", "Activation energy Eₐ drops", "Equilibrium constant K_c halves", "Pressure drops"), 0, "Kinetic energy distribution shifts above Eₐ threshold.", "More colliding particles possess E ≥ Eₐ."),
       PracticeQuestion("pq_chem_11", "Equilibrium", "JAMB", 2022, "In Haber Process N₂ + 3H₂ ⇌ 2NH₃ (ΔH = −92 kJ), higher pressure:", listOf("Increases NH₃ yield", "Decreases NH₃ yield", "Has no effect", "Changes K_c"), 0, "4 gas moles → 2 gas moles.", "High pressure shifts equilibrium toward fewer gas moles (NH₃)."),
       PracticeQuestion("pq_chem_12", "Redox", "WAEC", 2025, "Find the oxidation state of Mn in KMnO₄.", listOf("+7", "+5", "+4", "+2"), 0, "+1 + x + 4(−2) = 0.", "x = +7."),
       PracticeQuestion("pq_chem_13", "Electrochemistry", "JAMB", 2021, "In any electrolytic or galvanic cell, Reduction ALWAYS occurs at the:", listOf("Cathode", "Anode", "Salt bridge", "External wire"), 0, "RED CAT.", "Cathode gains electrons (Reduction)."),
       PracticeQuestion("pq_chem_14", "Faraday Law", "WAEC", 2024, "Calculate charge required to deposit 1 mole of Mg²⁺ from molten MgCl₂.", listOf("193,000 C", "96,500 C", "48,250 C", "289,500 C"), 0, "2 Faradays = 2 × 96,500 C.", "193,000 C."),
-      PracticeQuestion("pq_chem_15", "Hard Water", "JAMB", 2023, "Which ion causes permanent hardness that boiling CANNOT remove?", listOf("Ca²⁺ paired with SO₄²⁻", "Na⁺ paired with Cl⁻", "Ca²⁺ paired with HCO₃⁻", "K⁺ paired with NO₃⁻"), 0, "CaSO₄ stays dissolved on boiling.", "CaSO₄ / MgSO₄ cause permanent hardness."),
+      PracticeQuestion("pq_chem_15", "Hard Water", "NECO", 2023, "Which ion causes permanent hardness that boiling CANNOT remove?", listOf("Ca²⁺ paired with SO₄²⁻", "Na⁺ paired with Cl⁻", "Ca²⁺ paired with HCO₃⁻", "K⁺ paired with NO₃⁻"), 0, "CaSO₄ stays dissolved on boiling.", "CaSO₄ / MgSO₄ cause permanent hardness."),
       PracticeQuestion("pq_chem_16", "Gas Testing", "WAEC", 2021, "Which gas turns acidified K₂Cr₂O₇ paper from orange to green?", listOf("SO₂", "CO₂", "N₂", "O₂"), 0, "SO₂ is a strong reducing agent.", "SO₂ reduces Cr⁶⁺ (orange) to Cr³⁺ (green)."),
       PracticeQuestion("pq_chem_17", "Metals", "JAMB", 2024, "Which metal is extracted exclusively by electrolysis of its fused salt?", listOf("Aluminium", "Iron", "Zinc", "Copper"), 0, "Metals above Carbon in reactivity need electrolysis.", "Aluminium is extracted by electrolysis of Al₂O₃ in molten cryolite."),
       PracticeQuestion("pq_chem_18", "Alloys", "WAEC", 2022, "Bronze is an alloy composed mainly of:", listOf("Copper and Tin", "Copper and Zinc", "Iron and Carbon", "Lead and Antimony"), 0, "Sn = Tin.", "Bronze = Cu + Sn."),
       PracticeQuestion("pq_chem_19", "Hydrocarbons", "JAMB", 2025, "General formula of saturated open-chain alkanes is:", listOf("CₙH₂ₙ₊₂", "CₙH₂ₙ", "CₙH₂ₙ₋₂", "CₙH₂ₙ₊₁OH"), 0, "Try CH₄ (n=1): 2(1)+2 = 4.", "CₙH₂ₙ₊₂."),
-      PracticeQuestion("pq_chem_20", "Petroleum", "WAEC", 2023, "Converting heavy gas-oil fractions into smaller high-octane petrol molecules is called:", listOf("Cracking", "Reforming", "Polymerization", "Fermentation"), 0, "C−C bond thermal/catalytic cleavage.", "Thermal or catalytic cracking."),
+      PracticeQuestion("pq_chem_20", "Petroleum", "NECO", 2023, "Converting heavy gas-oil fractions into smaller high-octane petrol molecules is called:", listOf("Cracking", "Reforming", "Polymerization", "Fermentation"), 0, "C−C bond thermal/catalytic cleavage.", "Thermal or catalytic cracking."),
       PracticeQuestion("pq_chem_21", "Esters", "JAMB", 2022, "Ethanol reacts with Methanoic acid to yield which ester?", listOf("Ethyl methanoate", "Methyl ethanoate", "Ethyl ethanoate", "Propyl methanoate"), 0, "Alcohol ethyl + Acid methanoate.", "Ethyl methanoate (HCOOC₂H₅)."),
       PracticeQuestion("pq_chem_22", "Biomolecules", "WAEC", 2024, "Hydrolysis of proteins ultimately yields:", listOf("Amino acids", "Glucose", "Fatty acids", "Ethene"), 0, "Peptide −CONH− bonds break to amino monomers.", "Amino acids."),
       PracticeQuestion("pq_chem_23", "Qualitative Analysis", "JAMB", 2021, "A salt forms white ppt with AgNO₃(aq) soluble in excess aqueous NH₃. The anion is:", listOf("Cl⁻", "SO₄²⁻", "I⁻", "NO₃⁻"), 0, "AgCl dissolves cleanly in NH₃(aq); AgI does not.", "Chloride ion, Cl⁻."),
-      PracticeQuestion("pq_chem_24", "Nuclear Chemistry", "WAEC", 2025, "Heavy nuclei splitting into lighter nuclei with huge energy release is:", listOf("Nuclear fission", "Nuclear fusion", "Beta decay", "Cracking"), 0, "Used in power reactors (²³⁵U).", "Nuclear fission."),
+      PracticeQuestion("pq_chem_24", "Nuclear Chemistry", "NECO", 2025, "Heavy nuclei splitting into lighter nuclei with huge energy release is:", listOf("Nuclear fission", "Nuclear fusion", "Beta decay", "Cracking"), 0, "Used in power reactors (²³⁵U).", "Nuclear fission."),
     )
 }

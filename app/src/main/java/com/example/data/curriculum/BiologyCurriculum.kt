@@ -59,7 +59,7 @@ object BiologyCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Calculating Microscope Drawing Magnification",
-                    examSource = "WAEC SSCE 2024 • Paper 2 Q1",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "An Amoeba actually measures 200 μm across. A student draws it 6 cm wide in her notebook. Find the magnification.",
                     steps =
@@ -72,7 +72,7 @@ object BiologyCurriculum {
                   ),
                   WorkedExample(
                     title = "Euglena: Half-Plant, Half-Animal Protist",
-                    examSource = "JAMB UTME 2023 • Bio Q2",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "Why do botanists AND zoologists both claim Euglena viridis?",
                     steps =
                       listOf(
@@ -156,7 +156,7 @@ object BiologyCurriculum {
                   PracticeQuestion(
                     id = "ex_bio_01_6",
                     topic = "Viruses",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "Why are Viruses considered living organisms ONLY when inside a host cell?",
                     options = listOf("They photosynthesize there", "They possess organelles", "They replicate using the host's ribosomes & ATP", "They breathe oxygen"),
@@ -203,7 +203,7 @@ object BiologyCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Potato Strip Weight Change in Sugar Solutions",
-                    examSource = "WAEC SSCE 2024 • Practical Paper 3",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "Fresh potato cylinders of mass 5.0 g are placed in Beaker A (distilled water) and Beaker B (20% sucrose) for 1 hour. Predict mass and feel.",
                     steps =
@@ -216,7 +216,7 @@ object BiologyCurriculum {
                   ),
                   WorkedExample(
                     title = "Amoeba Contractile Vacuole in Sea Water",
-                    examSource = "JAMB UTME 2023 • Bio Q5",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "Why do freshwater Amoebae pump contractile vacuoles furiously whereas marine Amoebae rarely need one?",
                     steps =
@@ -301,7 +301,7 @@ object BiologyCurriculum {
                   PracticeQuestion(
                     id = "ex_bio_02_6",
                     topic = "Cell Theory",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "Which scientist coined the term 'cell' after observing honeycomb pores in thin cork slices (1665)?",
                     options = listOf("Robert Hooke", "Matthias Schleiden", "Theodor Schwann", "Rudolf Virchow"),
@@ -348,7 +348,7 @@ object BiologyCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Source of Oxygen Bubbles in Photosynthesis",
-                    examSource = "JAMB UTME 2024 • Bio Q8",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "Using heavy ¹⁸O isotope labels, scientists prove that ALL oxygen gas released during photosynthesis comes from:",
                     steps =
@@ -361,7 +361,7 @@ object BiologyCurriculum {
                   ),
                   WorkedExample(
                     title = "Anaerobic Sprinting & Oxygen Debt",
-                    examSource = "WAEC SSCE 2023 • Paper 2 Q3",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Why does a 100 m sprinter pant heavily AFTER finishing the race?",
                     steps =
                       listOf(
@@ -445,7 +445,7 @@ object BiologyCurriculum {
                   PracticeQuestion(
                     id = "ex_bio_03_6",
                     topic = "Compensation Point",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "At the Light Compensation Point (dawn/dusk), a green leaf shows zero net gas exchange because:",
                     options = listOf("Stomata are frozen", "Rate of Photosynthesis equals Rate of Respiration", "Chlorophyll breaks down", "Enzyme stops"),
@@ -502,7 +502,7 @@ object BiologyCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Testing Unknown Food Juice for Sucrose",
-                    examSource = "WAEC SSCE 2024 • Practical Paper 3",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "Solution X stays blue when boiled with Benedict's solution. When boiled with dilute HCl, cooled, neutralized with NaHCO₃, and re-boiled with Benedict's, it turns brick-red. Identify X.",
                     steps =
@@ -515,7 +515,7 @@ object BiologyCurriculum {
                   ),
                   WorkedExample(
                     title = "Carnivore vs Herbivore Dental Formula",
-                    examSource = "JAMB UTME 2023 • Bio Q11",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "Which tooth adaptations specifically distinguish a carnivore (dog) from a herbivore (rabbit)?",
                     steps =
                       listOf(
@@ -599,7 +599,7 @@ object BiologyCurriculum {
                   PracticeQuestion(
                     id = "ex_bio_04_6",
                     topic = "Symbiotic Root Nodules",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "The relationship between Rhizobium bacteria inside cowpea root nodules and the legume plant is:",
                     options = listOf("Parasitism", "Commensalism", "Mutualism (Symbiosis)", "Saprophytism"),
@@ -646,7 +646,7 @@ object BiologyCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Bark Ringing Experiment (Girdling)",
-                    examSource = "WAEC SSCE 2024 • Paper 2 Q5",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "A ring of outer bark containing Phloem is peeled off a mango branch while central Xylem stays intact. What happens after 3 weeks?",
                     steps =
@@ -659,7 +659,7 @@ object BiologyCurriculum {
                   ),
                   WorkedExample(
                     title = "Renal vs Hepatic Portal Blood Composition",
-                    examSource = "JAMB UTME 2023 • Bio Q15",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "Which blood vessel contains the LEAST urea in the entire human body?",
                     steps =
                       listOf(
@@ -743,7 +743,7 @@ object BiologyCurriculum {
                   PracticeQuestion(
                     id = "ex_bio_05_6",
                     topic = "Open vs Closed Circulation",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "Which organism possesses an OPEN circulatory system with haemolymph bathing tissues in a haemocoel?",
                     options = listOf("Earthworm", "Tilapia fish", "Grasshopper", "Toad"),
@@ -790,7 +790,7 @@ object BiologyCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Fluid Composition Changes Along a Human Nephron",
-                    examSource = "WAEC SSCE 2024 • Paper 2 Q6",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "Compare the concentration of Plasma Protein, Glucose, and Urea in (a) Renal Artery, (b) Glomerular Filtrate, and (c) Urine.",
                     steps =
@@ -804,7 +804,7 @@ object BiologyCurriculum {
                   ),
                   WorkedExample(
                     title = "Sweating vs Shivering Homeostasis in Skin & Hypothalamus",
-                    examSource = "JAMB UTME 2023 • Bio Q18",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "Describe two skin blood-vessel responses when human body temperature rises above 37°C.",
                     steps =
                       listOf(
@@ -888,7 +888,7 @@ object BiologyCurriculum {
                   PracticeQuestion(
                     id = "ex_bio_06_6",
                     topic = "Excretory Products in Reptiles",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "Birds and desert reptiles excrete nitrogenous waste mainly as semi-solid Uric Acid primarily to:",
                     options = listOf("Save energy", "Conserve body water & lighten flight weight", "Increase urine volume", "Neutralize stomach acid"),

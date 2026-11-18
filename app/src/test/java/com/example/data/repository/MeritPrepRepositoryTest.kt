@@ -242,13 +242,33 @@ class MeritPrepRepositoryTest {
       assertEquals(25, modules.size)
       val lessons = modules.flatMap { it.lessons }
       assertEquals(76, lessons.size)
-      assertTrue(lessons.all { it.concepts.isNotEmpty() && it.exercises.size >= 6 })
+      assertTrue(
+        lessons.all {
+          it.concepts.size >= 5 &&
+            it.vocabulary.isNotEmpty() &&
+            it.misconceptions.isNotEmpty() &&
+            it.guidedPractice != null &&
+            it.masteryProject != null &&
+            it.cheatSheet != null &&
+            it.exercises.size >= 6
+        }
+      )
+      assertTrue(
+        lessons.flatMap { it.workedExamples }.none {
+          it.examSource.contains("2024") || it.examSource.contains("2025")
+        }
+      )
 
-      // Verify every subject has combined multi-year past questions (including >= 2024/2025)
+      // Verify every subject has syllabus-aligned CBT banks for JAMB, WAEC, and NECO without fake year citations
       CurriculumCatalog.tracks.forEach { track ->
         val allQuestions = repository.fetchPastQuestionsForCbt(track.id, "ALL")
+        val necoQuestions = repository.fetchPastQuestionsForCbt(track.id, "NECO")
         assertTrue("Expected >= 40 questions for ${track.id}", allQuestions.size >= 40)
-        assertTrue("Expected recent 2024+ questions for ${track.id}", allQuestions.any { it.year >= 2024 })
+        assertTrue("Expected NECO questions for ${track.id}", necoQuestions.isNotEmpty())
+        assertTrue(
+          "Expected honest board style labels for ${track.id}",
+          allQuestions.none { it.boardStyleLabel.contains("2024") || it.boardStyleLabel.contains("2025") },
+        )
       }
 
       // Save user lesson progress before simulating an outdated curriculum version
@@ -266,7 +286,7 @@ class MeritPrepRepositoryTest {
       prefsRepo.setCurriculumVersion(1)
       repository.seedCurriculumIfNeeded()
 
-      assertEquals(4, prefsRepo.getCurriculumVersion())
+      assertEquals(5, prefsRepo.getCurriculumVersion())
       assertEquals(76, repository.observeStructuredModules().first().flatMap { it.lessons }.size)
       val preserved =
         repository.observeLessonProgress(UserProfile.DEFAULT_PROFILE_ID).first()
@@ -276,7 +296,7 @@ class MeritPrepRepositoryTest {
     }
 
   @Test
-  fun `sequential lesson and pillar locking gates next lesson behind 60 percent mastery`() =
+  fun `sequential lesson and pillar locking gates next lesson behind 80 percent mastery`() =
     runTest(testDispatcher) {
       val physicsLessons = CurriculumCatalog.trackById("physics")!!.allLessons
       val lesson1 = physicsLessons[0]
@@ -297,13 +317,14 @@ class MeritPrepRepositoryTest {
       val viewModel = MeritPrepViewModel(repository)
       advanceUntilIdle()
 
-      // Complete first 4 pillars sequentially via ViewModel
+      // Complete first 5 pillars sequentially via ViewModel
       val nonExercisePillars =
         listOf(
           LessonPillar.CONCEPT,
           LessonPillar.EXAMPLES,
           LessonPillar.SCENARIO,
           LessonPillar.LAB,
+          LessonPillar.PROJECT,
         )
       nonExercisePillars.forEach { pillar ->
         val current =
@@ -313,11 +334,11 @@ class MeritPrepRepositoryTest {
         advanceUntilIdle()
       }
 
-      // Attempt Mastery Quiz with 33% (< 60%) -> lesson 2 must remain locked
+      // Attempt Mastery Quiz with 67% (< 80%) -> lesson 2 must remain locked
       var progress1 =
         repository.observeLessonProgress(UserProfile.DEFAULT_PROFILE_ID).first()
           .first { it.lessonId == lesson1.id }
-      viewModel.markPillarCompleted(lesson1, LessonPillar.EXERCISE, progress1, exerciseScore = 33L)
+      viewModel.markPillarCompleted(lesson1, LessonPillar.EXERCISE, progress1, exerciseScore = 67L)
       advanceUntilIdle()
 
       progress1 =
@@ -332,8 +353,8 @@ class MeritPrepRepositoryTest {
         ).isUnlocked
       )
 
-      // Retake Mastery Quiz with 67% (>= 60%) -> lesson 1 mastered & lesson 2 unlocked!
-      viewModel.markPillarCompleted(lesson1, LessonPillar.EXERCISE, progress1, exerciseScore = 67L)
+      // Retake Mastery Quiz with 85% (>= 80%) -> lesson 1 mastered & lesson 2 unlocked!
+      viewModel.markPillarCompleted(lesson1, LessonPillar.EXERCISE, progress1, exerciseScore = 85L)
       advanceUntilIdle()
 
       progress1 =

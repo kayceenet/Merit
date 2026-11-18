@@ -59,7 +59,7 @@ object MathematicsCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Finding Unknown Base x",
-                    examSource = "JAMB UTME 2024 • Maths Q1",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "If 34ₓ = 25₁₀ (or find x given 112ₓ = 22₁₀), solve 23ₓ = 17₁₀.",
                     steps =
                       listOf(
@@ -72,7 +72,7 @@ object MathematicsCurriculum {
                   ),
                   WorkedExample(
                     title = "Binary Fractional Multiplication & Remainder Mod",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q4",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Evaluate 23 × 14 (mod 5) and convert 13.5₁₀ to Base 2.",
                     steps =
                       listOf(
@@ -157,7 +157,7 @@ object MathematicsCurriculum {
                   PracticeQuestion(
                     id = "ex_math_01_6",
                     topic = "Base Subtraction",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "Subtract 23₅ from 41₅ in Base 5.",
                     options = listOf("12₅", "13₅", "14₅", "23₅"),
@@ -204,7 +204,7 @@ object MathematicsCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Exponential Equation with Base 3",
-                    examSource = "JAMB UTME 2024 • Maths Q3",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "Solve for x: 9^(2x − 1) = 27^(x + 1).",
                     steps =
                       listOf(
@@ -217,7 +217,7 @@ object MathematicsCurriculum {
                   ),
                   WorkedExample(
                     title = "Rationalizing Surd Fractions",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q7",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Simplify 6 / (√5 − √2) in the form a√5 + b√2.",
                     steps =
                       listOf(
@@ -302,7 +302,7 @@ object MathematicsCurriculum {
                   PracticeQuestion(
                     id = "ex_math_02_6",
                     topic = "Surd Rationalization",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "Simplify (√3 + √2) / (√3 − √2).",
                     options = listOf("5 + 2√6", "5 − 2√6", "1 + 2√6", "5 + √6"),
@@ -349,7 +349,7 @@ object MathematicsCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Class Survey 2-Set Venn Diagram",
-                    examSource = "WAEC SSCE 2024 • Paper 2 Q2",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "In a class of 50 students, 32 offer Biology, 24 offer Chemistry, and 4 offer neither. How many offer ONLY Biology?",
                     steps =
@@ -363,7 +363,7 @@ object MathematicsCurriculum {
                   ),
                   WorkedExample(
                     title = "Finding Inverse Function f⁻¹(x)",
-                    examSource = "JAMB UTME 2023 • Maths Q9",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "Given f(x) = (3x − 1) / 2, find f⁻¹(4).",
                     steps =
                       listOf(
@@ -448,7 +448,7 @@ object MathematicsCurriculum {
                   PracticeQuestion(
                     id = "ex_math_03_6",
                     topic = "Domain Restriction",
-                    examType = "JAMB",
+                    examType = "NECO",
                     year = 2023,
                     question = "For what value of x is the function f(x) = (x + 5) / (x² − 9) undefined?",
                     options = listOf("−5", "3 or −3", "9", "0"),
@@ -505,7 +505,7 @@ object MathematicsCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Joint & Inverse Variation Word Problem",
-                    examSource = "JAMB UTME 2024 • Maths Q7",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "P varies directly as Q and inversely as √R. When Q = 6 and R = 9, P = 8. Find P when Q = 10 and R = 25.",
                     steps =
@@ -519,7 +519,7 @@ object MathematicsCurriculum {
                   ),
                   WorkedExample(
                     title = "Quadratic Inequality Interval",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q11",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Find the range of values of x for which x² − x − 6 ≤ 0.",
                     steps =
                       listOf(
@@ -604,7 +604,7 @@ object MathematicsCurriculum {
                   PracticeQuestion(
                     id = "ex_math_04_6",
                     topic = "Change of Subject",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "Make r the subject of V = (1/3)πr²h.",
                     options = listOf("√(3V / πh)", "3V / πh", "√(V / 3πh)", "√(πh / 3V)"),
@@ -651,7 +651,7 @@ object MathematicsCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Finding α² + β² Using Root Shortcuts",
-                    examSource = "JAMB UTME 2024 • Maths Q12",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "If α and β are roots of 2x² − 6x + 5 = 0, find α² + β².",
                     steps =
                       listOf(
@@ -664,7 +664,7 @@ object MathematicsCurriculum {
                   ),
                   WorkedExample(
                     title = "Remainder Theorem Constant k",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q15",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "When P(x) = x³ + kx² − 5x + 6 is divided by (x − 2), the remainder is 8. Find k.",
                     steps =
                       listOf(
@@ -749,7 +749,7 @@ object MathematicsCurriculum {
                   PracticeQuestion(
                     id = "ex_math_05_6",
                     topic = "Reciprocal Roots",
-                    examType = "JAMB",
+                    examType = "NECO",
                     year = 2021,
                     question = "If α, β are roots of 3x² + 9x − 2 = 0, find (1/α) + (1/β).",
                     options = listOf("9/2", "−9/2", "3", "−2/9"),
@@ -796,7 +796,7 @@ object MathematicsCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Finding GP Terms & Sum to Infinity",
-                    examSource = "JAMB UTME 2024 • Maths Q14",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "The 2nd and 5th terms of a GP are 6 and 48. Find the first term a and S₄.",
                     steps =
                       listOf(
@@ -809,7 +809,7 @@ object MathematicsCurriculum {
                   ),
                   WorkedExample(
                     title = "Identity and Inverse Under Custom Operation",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q18",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Define a * b = a + b − ab on ℝ. Find (i) identity e and (ii) inverse of 3.",
                     steps =
                       listOf(
@@ -893,7 +893,7 @@ object MathematicsCurriculum {
                   PracticeQuestion(
                     id = "ex_math_06_6",
                     topic = "Geometric Mean",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "Insert one positive geometric mean between 4 and 36.",
                     options = listOf("12", "16", "20", "18"),

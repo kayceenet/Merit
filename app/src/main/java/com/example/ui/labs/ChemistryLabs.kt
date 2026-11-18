@@ -41,11 +41,15 @@ internal fun ChemistryLabDispatcher(lessonId: String, labType: PracticalLabType)
     PracticalLabType.ENERGETICS_KINETICS_LAB -> {
       if (lessonId == "chem_07_thermochemistry") EnthalpyBarrierLab() else LeChatelierHaberLab()
     }
-    PracticalLabType.REDOX_ELECTROLYSIS_LAB -> FaradayElectrolysisLab()
+    PracticalLabType.REDOX_ELECTROLYSIS_LAB -> {
+      if (lessonId == "chem_09_redox_cells") RedoxCellEmfLab() else FaradayElectrolysisLab()
+    }
     PracticalLabType.INORGANIC_GASES_METALS_LAB -> {
       if (lessonId == "chem_11_nonmetals_water") GasIdentificationLab() else MetalReactivityFurnaceLab()
     }
-    PracticalLabType.ORGANIC_HYDROCARBON_LAB -> OrganicSeriesLab()
+    PracticalLabType.ORGANIC_HYDROCARBON_LAB -> {
+      if (lessonId == "chem_14_alkanols_esters_polymers") FunctionalGroupPolymerLab() else OrganicSeriesLab()
+    }
     PracticalLabType.QUALITATIVE_ANALYSIS_LAB -> QualitativeCationBenchLab()
     else -> AcidBaseTitrationLab()
   }
@@ -251,6 +255,26 @@ private fun LeChatelierHaberLab() {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
+private fun RedoxCellEmfLab() {
+  var cellIdx by remember { mutableIntStateOf(0) }
+  val cells = listOf(
+    Triple("Zn | Zn²⁺ || Cu²⁺ | Cu", "+1.10 V", "Anode (Oxidation): Zn → Zn²⁺ + 2e⁻ (−0.76 V)  •  Cathode (Reduction): Cu²⁺ + 2e⁻ → Cu (+0.34 V)"),
+    Triple("Mg | Mg²⁺ || Ag⁺ | Ag", "+3.17 V", "Anode (Oxidation): Mg (−2.37 V)  •  Cathode (Reduction): Ag⁺ (+0.80 V)  •  High voltage cell!"),
+    Triple("Fe | Fe²⁺ || Cu²⁺ | Cu", "+0.78 V", "Anode (Oxidation): Fe (−0.44 V)  •  Cathode (Reduction): Cu²⁺ (+0.34 V)  •  Explains sacrificial zinc/galvanizing!"),
+  )
+  Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+      listOf("Zn / Cu (Daniell)", "Mg / Ag", "Fe / Cu").forEachIndexed { i, title ->
+        FilterChip(selected = cellIdx == i, onClick = { cellIdx = i }, label = { Text(title) })
+      }
+    }
+    LabMetricBanner(listOf("Cell Notation" to cells[cellIdx].first, "Standard E°_cell" to cells[cellIdx].second))
+    ScientificText(cells[cellIdx].third, style = MaterialTheme.typography.bodySmall)
+  }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
 private fun FaradayElectrolysisLab() {
   var currentA by remember { mutableFloatStateOf(2.0f) }
   var mins by remember { mutableFloatStateOf(15f) }
@@ -320,6 +344,27 @@ private fun MetalReactivityFurnaceLab() {
     }
     LabMetricBanner(listOf("Metal" to metals[metalIdx]))
     ScientificText(extractions[metalIdx], style = MaterialTheme.typography.bodySmall)
+  }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun FunctionalGroupPolymerLab() {
+  var idx by remember { mutableIntStateOf(0) }
+  val pathways = listOf(
+    "1° Alkanol Oxidation" to "Ethanol + acidified K₂Cr₂O₇ (Orange → Green) → Ethanal → Ethanoic Acid (CH₃COOH).",
+    "Esterification" to "Ethanol + Ethanoic acid (+ Conc. H₂SO₄, heat) ⇌ Ethyl ethanoate (fruity pear aroma) + H₂O.",
+    "Saponification (Soap)" to "Vegetable Fat/Palm Oil + 3 NaOH (boil) → Soap (Sodium carboxylate) + Glycerol.",
+    "Addition vs Condensation" to "Addition (Ethene → Polythene, zero byproduct) vs Condensation (Nylon / Terylene / Starch, eliminates H₂O).",
+  )
+  Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+      pathways.forEachIndexed { i, (label, _) ->
+        FilterChip(selected = idx == i, onClick = { idx = i }, label = { Text(label.substringBefore(" (")) })
+      }
+    }
+    LabMetricBanner(listOf("Organic Pathway" to pathways[idx].first))
+    ScientificText(pathways[idx].second, style = MaterialTheme.typography.bodySmall)
   }
 }
 

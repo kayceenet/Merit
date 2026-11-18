@@ -47,7 +47,7 @@ object EnglishCurriculumPart3 {
               listOf(
                 WorkedExample(
                   title = "Decoding '-ed' Past Tense Sounds",
-                  examSource = "JAMB UTME 2024 • Oral English Q52",
+                  examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "Which word has the SAME '-ed' ending sound as 'WASH<u>ED</u>' (/t/): (A) begged (B) heated (C) packed (D) played?",
                   steps =
                     listOf(
@@ -59,7 +59,7 @@ object EnglishCurriculumPart3 {
                 ),
                 WorkedExample(
                   title = "Pinpointing /θ/ vs /ð/ and Silent 'b'",
-                  examSource = "WAEC SSCE 2023 • Paper 3 Orals Q18",
+                  examSource = "WAEC WASSCE-Style Worked Problem",
                   problemStatement = "Pick the word containing the same consonant sound as the underlined in '<u>th</u>ose' (/ð/): (A) author (B) breath (C) bathe (D) bath.",
                   steps =
                     listOf(
@@ -143,7 +143,7 @@ object EnglishCurriculumPart3 {
                 PracticeQuestion(
                   id = "ex_eng_13_6",
                   topic = "Nasal /ŋ/ Sound",
-                  examType = "WAEC",
+                  examType = "NECO",
                   year = 2024,
                   question = "Which word contains the nasal velar /ŋ/ sound?",
                   options = listOf("thin", "singer", "sinner", "gentle"),
@@ -190,7 +190,7 @@ object EnglishCurriculumPart3 {
               listOf(
                 WorkedExample(
                   title = "Applying '-phy' and '-ic' Suffix Stress Shifts",
-                  examSource = "JAMB UTME 2024 • Oral English Q55",
+                  examSource = "JAMB UTME-Style Worked Problem",
                   problemStatement =
                       "Mark primary stress (CAPS) on: (1) photography, (2) photographic, (3) democracy.",
                   steps =
@@ -204,7 +204,7 @@ object EnglishCurriculumPart3 {
                 ),
                 WorkedExample(
                   title = "Cracking Emphatic Stress in 5 Seconds",
-                  examSource = "WAEC SSCE 2023 • Paper 3 Q42",
+                  examSource = "WAEC WASSCE-Style Worked Problem",
                   problemStatement =
                       "Statement: 'The principal praised MUSA for honesty.' Pick the question this statement answers cleanly.",
                   steps =
@@ -294,7 +294,7 @@ object EnglishCurriculumPart3 {
                 PracticeQuestion(
                   id = "ex_eng_14_6",
                   topic = "Suffix '-ic' Rule",
-                  examType = "WAEC",
+                  examType = "NECO",
                   year = 2024,
                   question = "Where does primary stress fall in 'economic'?",
                   options = listOf("E-co-no-mic", "e-CO-no-mic", "e-co-NO-mic", "e-co-no-MIC"),
@@ -341,7 +341,7 @@ object EnglishCurriculumPart3 {
               listOf(
                 WorkedExample(
                   title = "Fixing a Lifted Phrase into a Full-Mark WAEC Summary Sentence",
-                  examSource = "WAEC SSCE 2024 • Paper 2 Summary Q7",
+                  examSource = "WAEC WASSCE-Style Worked Problem",
                   problemStatement =
                       "Passage: 'Moreover, relentless gully erosion washes away fertile topsoil while farmers cut down protective forests for firewood.' Summarize two causes of low crop yield in ONE sentence each.",
                   steps =
@@ -355,7 +355,7 @@ object EnglishCurriculumPart3 {
                 ),
                 WorkedExample(
                   title = "Catching Formal Letter Format Errors",
-                  examSource = "WAEC SSCE 2023 • Paper 2 Essay Section A",
+                  examSource = "WAEC WASSCE-Style Worked Problem",
                   problemStatement = "Spot 3 fatal format errors in closing a Formal Letter to a Newspaper Editor with 'Yours Sincerely, Bisi.'",
                   steps =
                     listOf(
@@ -440,7 +440,7 @@ object EnglishCurriculumPart3 {
                 PracticeQuestion(
                   id = "ex_eng_15_6",
                   topic = "Debate / Speech Opening",
-                  examType = "WAEC",
+                  examType = "NECO",
                   year = 2024,
                   question = "Which opening feature is compulsory at the start of an inter-school Debate Speech?",
                   options = listOf("Two addresses", "Vocatives acknowledging Chairman, Judges, Timekeeper & Audience", "Bibliography", "Yours faithfully"),
@@ -459,25 +459,25 @@ object EnglishCurriculumPart3 {
       PracticeQuestion("pq_eng_02", "Grammatical Function", "WAEC", 2024, "In 'The girl WHO WON THE ESSAY PRIZE beamed joyfully', 'WHO WON THE ESSAY PRIZE' is:", listOf("Adjectival clause qualifying 'girl'", "Noun clause object", "Adverbial clause of time", "Noun phrase"), 0, "Sits immediately after 'girl' describing which girl.", "Relative/Adjectival clause qualifying 'the girl'."),
       PracticeQuestion("pq_eng_03", "Dangling Modifier", "JAMB", 2024, "Spot the error-free sentence:", listOf("Entering the dark room, the candle blew out.", "Entering the dark room, she tripped over a stool.", "To win the medal, hard training was done.", "Tired after work, the bed looked soft."), 1, "Place the actual human doer right after the comma.", "'she' entered the dark room and tripped."),
       PracticeQuestion("pq_eng_04", "Conditionals", "WAEC", 2023, "Had the pilot checked the fuel gauge earlier, the emergency landing ____ necessary.", listOf("would not have been", "will not be", "would not be", "was not"), 0, "Type 3 inverted past conditional.", "Pairs 'Had + V₃' with 'would not have been'."),
-      PracticeQuestion("pq_eng_05", "High Time Rule", "JAMB", 2023, "It is about time the landlord ____ that leaking roof.", listOf("repaired", "repairs", "repair", "has repaired"), 0, "'It is about/high time + Subj' takes Simple Past V₂.", "Subjunctive overdue past requires 'repaired'."),
+      PracticeQuestion("pq_eng_05", "High Time Rule", "NECO", 2023, "It is about time the landlord ____ that leaking roof.", listOf("repaired", "repairs", "repair", "has repaired"), 0, "'It is about/high time + Subj' takes Simple Past V₂.", "Subjunctive overdue past requires 'repaired'."),
       PracticeQuestion("pq_eng_06", "Concord", "WAEC", 2024, "Neither the captain nor his teammates ____ happy with the referee's decision.", listOf("were", "was", "is", "has been"), 0, "Closer subject 'teammates' is plural.", "Proximity rule selects plural 'were'."),
       PracticeQuestion("pq_eng_07", "Concord Trap", "JAMB", 2025, "A large number of candidates ____ already printed their exam slips.", listOf("have", "has", "is", "was"), 0, "'A number of' = several → plural; 'The number of' → singular.", "'A number of candidates' takes plural 'have'."),
       PracticeQuestion("pq_eng_08", "Question Tags", "WAEC", 2022, "Scarcely anyone survived the landslide, ____?", listOf("did they", "didn't they", "did he", "was it"), 0, "'Scarcely' is negative → positive tag; indefinite 'anyone' → 'they'.", "'did they?'."),
       PracticeQuestion("pq_eng_09", "Synonyms", "JAMB", 2024, "NEAREST in meaning: 'The judge commended the witness for his VERACITY.'", listOf("truthfulness", "nervousness", "eloquence", "hostility"), 0, "Root 'ver-' (verify, verity) = truth.", "Veracity means habitual truthfulness."),
-      PracticeQuestion("pq_eng_10", "Antonyms", "WAEC", 2023, "OPPOSITE in meaning: 'The governor gave an IMPROMPTU speech at the stadium.'", listOf("prepared / rehearsed", "short", "inspiring", "spontaneous"), 0, "Impromptu = unscripted on the spot.", "Opposite is rehearsed / prepared."),
+      PracticeQuestion("pq_eng_10", "Antonyms", "NECO", 2023, "OPPOSITE in meaning: 'The governor gave an IMPROMPTU speech at the stadium.'", listOf("prepared / rehearsed", "short", "inspiring", "spontaneous"), 0, "Impromptu = unscripted on the spot.", "Opposite is rehearsed / prepared."),
       PracticeQuestion("pq_eng_11", "Idioms", "JAMB", 2022, "'Our chemistry teacher always calls a SPADE A SPADE.' This means she:", listOf("Speaks bluntly and honestly without sugarcoating", "Loves gardening", "Uses big Latin words", "Changes topics quickly"), 0, "Direct frank honesty.", "Calls things plainly as they are."),
       PracticeQuestion("pq_eng_12", "Phrasal Verbs", "WAEC", 2025, "The fire brigade took three hours to ____ the blaze at the market.", listOf("put out", "put off", "put up", "put down"), 0, "Extinguish a fire.", "'Put out' means extinguish."),
       PracticeQuestion("pq_eng_13", "Prepositions", "JAMB", 2021, "The accused was eventually acquitted ____ all charges of conspiracy.", listOf("of", "from", "with", "about"), 0, "Fixed legal collocation: acquit OF.", "One is charged WITH, convicted OF, and acquitted OF."),
       PracticeQuestion("pq_eng_14", "Confusables", "WAEC", 2024, "Wait until the bus comes to a ____ halt before stepping off.", listOf("stationary", "stationery", "steady", "statuary"), 0, "Not moving = stationARy.", "Spelling 'stationary' denotes immobile."),
-      PracticeQuestion("pq_eng_15", "Register", "JAMB", 2023, "A newspaper's official statement expressing its own stand on national policy is an:", listOf("editorial", "obituary", "epitaph", "appendix"), 0, "Journalism opinion column by editors.", "Editorial."),
+      PracticeQuestion("pq_eng_15", "Register", "NECO", 2023, "A newspaper's official statement expressing its own stand on national policy is an:", listOf("editorial", "obituary", "epitaph", "appendix"), 0, "Journalism opinion column by editors.", "Editorial."),
       PracticeQuestion("pq_eng_16", "Vowels /iː/ vs /ɪ/", "WAEC", 2021, "Which word shares the vowel sound in 'qu<u>ay</u>' (/iː/)?", listOf("way", "say", "key", "day"), 2, "'Quay' (wharf) is pronounced identically to 'key'!", "Key /kiː/ matches quay /kiː/."),
       PracticeQuestion("pq_eng_17", "Diphthongs", "JAMB", 2024, "Which word contains the diphthong /aɪ/ as in 'h<u>ei</u>ght'?", listOf("weight", "aisle", "eight", "obey"), 1, "'Aisle' sounds like 'I'll' (/aɪl/); others use /eɪ/.", "Aisle /aɪl/."),
       PracticeQuestion("pq_eng_18", "Vowels /ʌ/", "WAEC", 2022, "Identify the word containing central short /ʌ/ as in 'c<u>u</u>p':", listOf("put", "blood", "food", "foot"), 1, "'Blood' & 'flood' pronounce /ʌ/ despite 'oo' spelling!", "Blood /blʌd/."),
       PracticeQuestion("pq_eng_19", "Consonant /ʃ/", "JAMB", 2025, "Which word contains the consonant sound /ʃ/ as in '<u>sh</u>oe'?", listOf("treasure", "champagne", "vision", "church"), 1, "French loan 'ch' sounds like 'sh'.", "Champagne /ʃæmˈpeɪn/."),
-      PracticeQuestion("pq_eng_20", "Consonant '-s' Plural", "WAEC", 2023, "How is the plural '-s' pronounced in 'cap<u>s</u>'?", listOf("/s/", "/z/", "/ɪz/", "silent"), 0, "After voiceless /p/, '-s' stays voiceless /s/.", "/s/."),
+      PracticeQuestion("pq_eng_20", "Consonant '-s' Plural", "NECO", 2023, "How is the plural '-s' pronounced in 'cap<u>s</u>'?", listOf("/s/", "/z/", "/ɪz/", "silent"), 0, "After voiceless /p/, '-s' stays voiceless /s/.", "/s/."),
       PracticeQuestion("pq_eng_21", "Word Stress", "JAMB", 2022, "Which word is stressed on the THIRD syllable?", listOf("DEmocracy", "photoGRAphic", "uniVERsity", "Both photoGRAphic and uniVERsity"), 3, "pho-to-GRA-phic (3rd) and u-ni-VER-si-ty (3rd).", "Both follow -ic (2nd-last) and -ty (3rd-last) rules onto syllable 3."),
       PracticeQuestion("pq_eng_22", "Emphatic Stress", "WAEC", 2024, "Answer: 'Ngozi visited her AUNT in Abuja.' Pick the matching question.", listOf("Did Ngozi visit her uncle in Abuja?", "Did Kemi visit her aunt in Abuja?", "Did Ngozi visit her aunt in Kano?", "Did Ngozi phone her aunt in Abuja?"), 0, "Contradict ONLY 'AUNT' (→ uncle).", "Everything else stays identical; 'uncle' opposes 'AUNT'."),
       PracticeQuestion("pq_eng_23", "Rhymes", "JAMB", 2021, "Which word rhymes cleanly with 'CATCH'?", listOf("watch", "hatch", "wash", "much"), 1, "Same /ætʃ/ rime.", "Catch and hatch rhyme (/ætʃ/)."),
-      PracticeQuestion("pq_eng_24", "Comprehension Summary", "WAEC", 2025, "Which closing punctuation & capitalization is right for a Formal Letter?", listOf("Yours faithfully,", "Your's Faithfully,", "Yours Sincerely,", "Faithfully your's,"), 0, "No apostrophe; lowercase second word; trailing comma.", "Yours faithfully,"),
+      PracticeQuestion("pq_eng_24", "Comprehension Summary", "NECO", 2025, "Which closing punctuation & capitalization is right for a Formal Letter?", listOf("Yours faithfully,", "Your's Faithfully,", "Yours Sincerely,", "Faithfully your's,"), 0, "No apostrophe; lowercase second word; trailing comma.", "Yours faithfully,"),
     )
 }

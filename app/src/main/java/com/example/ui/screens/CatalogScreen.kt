@@ -207,7 +207,7 @@ fun CatalogScreen(
               color = Color(0xFFE2E8F0),
             )
             Text(
-              text = "${totalMinutes / 60}h ${totalMinutes % 60}m curriculum • $bankQuestionCount JAMB/WAEC questions • Sequential mastery lock enabled",
+              text = "${totalMinutes / 60}h ${totalMinutes % 60}m curriculum • $bankQuestionCount JAMB/WAEC/NECO questions • 80% sequential mastery lock",
               style = MaterialTheme.typography.labelSmall,
               color = semantics.classroomSubtext,
             )
@@ -436,7 +436,7 @@ fun CatalogScreen(
                       }
                       if (isLocked && !unlockState.prerequisiteLessonTitle.isNullOrBlank()) {
                         Text(
-                          text = "Complete \"${unlockState.prerequisiteLessonTitle}\" (≥60% quiz) to unlock",
+                          text = "Complete \"${unlockState.prerequisiteLessonTitle}\" (≥${CurriculumProgression.PASS_THRESHOLD_PERCENT}% mastery) to unlock",
                           style = MaterialTheme.typography.labelSmall,
                           color = MaterialTheme.colorScheme.tertiary,
                           maxLines = 2,
@@ -521,9 +521,9 @@ fun CatalogScreen(
         Text(
           text =
             if (!prereqTitle.isNullOrBlank()) {
-              "\"${lockedLesson.title}\" builds directly on \"$prereqTitle\". Complete all 5 sections and score at least 60% on the prerequisite Mastery Quiz to unlock this lesson."
+              "\"${lockedLesson.title}\" builds directly on \"$prereqTitle\". Complete all study, lab & project stages and score at least ${CurriculumProgression.PASS_THRESHOLD_PERCENT}% on the Mastery Quiz to unlock this lesson."
             } else {
-              "Complete the prerequisite lesson (≥60% quiz score) to unlock \"${lockedLesson.title}\"."
+              "Complete the prerequisite lesson (≥${CurriculumProgression.PASS_THRESHOLD_PERCENT}% quiz score) to unlock \"${lockedLesson.title}\"."
             },
           style = MaterialTheme.typography.bodyMedium,
         )

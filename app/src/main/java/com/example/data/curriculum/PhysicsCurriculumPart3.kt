@@ -46,7 +46,7 @@ object PhysicsCurriculumPart3 {
               listOf(
                 WorkedExample(
                   title = "Non-Ideal Step-Down Transformer Current",
-                  examSource = "JAMB UTME 2024 • Physics Q33",
+                  examSource = "JAMB UTME-Style Worked Problem",
                   problemStatement =
                     "A 240 V to 12 V step-down transformer at 80% efficiency lights a 12 V, 24 W bulb. Find primary current I_p.",
                   steps =
@@ -60,7 +60,7 @@ object PhysicsCurriculumPart3 {
                 ),
                 WorkedExample(
                   title = "Series RLC Impedance & Current",
-                  examSource = "WAEC SSCE 2023 • Paper 2 Q11",
+                  examSource = "WAEC WASSCE-Style Worked Problem",
                   problemStatement =
                     "A 3 Ω resistor, 10 Ω inductive reactance coil, and 6 Ω capacitor sit in series across 25 V rms AC. Find Impedance Z and Current I.",
                   steps =
@@ -148,7 +148,7 @@ object PhysicsCurriculumPart3 {
                 PracticeQuestion(
                   id = "ex_phy_14_6",
                   topic = "Grid Power Loss",
-                  examType = "JAMB",
+                  examType = "NECO",
                   year = 2020,
                   question = "Why is electrical power transmitted over long distances at very high voltage?",
                   options = listOf("High voltage travels faster", "Reduces current I and thus slashes I²R cable heat loss", "Copper melts at low voltage", "Eliminates transformers"),
@@ -193,7 +193,7 @@ object PhysicsCurriculumPart3 {
               listOf(
                 WorkedExample(
                   title = "Photoelectric Maximum Kinetic Energy & Stopping Voltage",
-                  examSource = "JAMB UTME 2025 • Physics Q37",
+                  examSource = "JAMB UTME-Style Worked Problem",
                   problemStatement =
                     "Photons of energy 5.0 eV strike cesium of work function 2.1 eV. Find max kinetic energy KE_max and stopping potential V_s.",
                   steps =
@@ -206,7 +206,7 @@ object PhysicsCurriculumPart3 {
                 ),
                 WorkedExample(
                   title = "Bohr Hydrogen Emission Transition",
-                  examSource = "WAEC SSCE 2023 • Paper 1 Q45",
+                  examSource = "WAEC WASSCE-Style Worked Problem",
                   problemStatement =
                     "An electron drops from level −3.4 eV to −13.6 eV. Find emitted photon energy.",
                   steps =
@@ -292,7 +292,7 @@ object PhysicsCurriculumPart3 {
                 PracticeQuestion(
                   id = "ex_phy_15_6",
                   topic = "Photon Energy",
-                  examType = "JAMB",
+                  examType = "NECO",
                   year = 2020,
                   question = "Find the energy of a photon of frequency 5.0 × 10¹⁴ Hz (h = 6.6 × 10⁻³⁴ J·s).",
                   options = listOf("3.3 × 10⁻¹⁹ J", "1.3 × 10⁻⁴⁸ J", "3.3 × 10⁻²⁰ J", "6.6 × 10⁻¹⁹ J"),
@@ -337,7 +337,7 @@ object PhysicsCurriculumPart3 {
               listOf(
                 WorkedExample(
                   title = "Counting Half-Lives to Find Remaining Mass",
-                  examSource = "JAMB UTME 2024 • Physics Q39",
+                  examSource = "JAMB UTME-Style Worked Problem",
                   problemStatement =
                     "Cobalt-60 has a half-life of 5 years. Starting with 80 g, how much remains undecayed after 20 years?",
                   steps =
@@ -350,7 +350,7 @@ object PhysicsCurriculumPart3 {
                 ),
                 WorkedExample(
                   title = "Balancing Successive α and β Decays",
-                  examSource = "WAEC SSCE 2023 • Paper 1 Q48",
+                  examSource = "WAEC WASSCE-Style Worked Problem",
                   problemStatement =
                     "Nucleus ²³⁸₉₂U emits 1 alpha particle and 2 beta particles. Find final mass number A and atomic number Z.",
                   steps =
@@ -437,7 +437,7 @@ object PhysicsCurriculumPart3 {
                 PracticeQuestion(
                   id = "ex_phy_16_6",
                   topic = "Radiation Safety",
-                  examType = "JAMB",
+                  examType = "NECO",
                   year = 2020,
                   question = "Which shielding material is most effective against penetrating Gamma radiation?",
                   options = listOf("Cardboard sheet", "Aluminum foil", "Thick Lead block", "Perspex glass"),

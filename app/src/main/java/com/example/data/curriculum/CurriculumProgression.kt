@@ -2,6 +2,34 @@ package com.example.data.curriculum
 
 import com.example.data.model.LessonProgress
 
+enum class MasteryBand(val label: String, val passesGate: Boolean, val summary: String) {
+  NOT_YET_COMPETENT(
+    label = "Not Yet Competent (<60%)",
+    passesGate = false,
+    summary = "Foundational concepts need immediate guided re-teaching before retrying.",
+  ),
+  DEVELOPING(
+    label = "Developing (60–69%)",
+    passesGate = false,
+    summary = "Partial understanding shown, but procedural accuracy is below mastery.",
+  ),
+  APPROACHING_MASTERY(
+    label = "Approaching Mastery (70–79%)",
+    passesGate = false,
+    summary = "Close to readiness—clear the remaining weak competency to reach 80%.",
+  ),
+  MASTERED(
+    label = "Mastered (80–89%)",
+    passesGate = true,
+    summary = "Core and applied competencies demonstrated cleanly at Academy standard.",
+  ),
+  STRONG_MASTERY(
+    label = "Strong Mastery (90–100%)",
+    passesGate = true,
+    summary = "Independent mastery across recall, application, and unfamiliar analysis.",
+  ),
+}
+
 data class LessonUnlockState(
   val isUnlocked: Boolean,
   val isMastered: Boolean,
@@ -15,7 +43,16 @@ data class LessonUnlockState(
 }
 
 object CurriculumProgression {
-  const val PASS_THRESHOLD_PERCENT: Long = 60L
+  const val PASS_THRESHOLD_PERCENT: Long = 80L
+
+  fun bandForPercentage(percentage: Long): MasteryBand =
+    when {
+      percentage >= 90L -> MasteryBand.STRONG_MASTERY
+      percentage >= 80L -> MasteryBand.MASTERED
+      percentage >= 70L -> MasteryBand.APPROACHING_MASTERY
+      percentage >= 60L -> MasteryBand.DEVELOPING
+      else -> MasteryBand.NOT_YET_COMPETENT
+    }
 
   fun isLessonMastered(progress: LessonProgress?): Boolean {
     if (progress == null) return false
@@ -87,3 +124,4 @@ object CurriculumProgression {
     return if (idx > 0) orderedTrackLessons[idx - 1] else null
   }
 }
+

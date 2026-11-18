@@ -1,220 +1,265 @@
 package com.example.data.curriculum
 
 enum class ExamBoard(val label: String) {
-  JAMB("JAMB UTME"),
-  WAEC("WAEC SSCE"),
-  BOTH("JAMB + WAEC"),
+  JAMB("JAMB UTME-Style"),
+  WAEC("WAEC WASSCE-Style"),
+  NECO("NECO SSCE-Style"),
+  BOTH("All Boards (JAMB • WAEC • NECO)"),
 }
 
 enum class PracticalLabType(val title: String, val subtitle: String) {
   // Physics
   MEASUREMENT_VECTOR_LAB(
     title = "Measurements & Resultant Vector Lab",
-    subtitle = "Read vernier/micrometer scales and combine two forces at any angle θ live",
+    subtitle = "Read vernier/micrometer scales with zero error and resolve force parallelograms live",
   ),
   PROJECTILE_KINEMATICS(
-    title = "Kinematics & Projectile Motion Lab",
-    subtitle = "Adjust launch speed, angle θ & gravity g to watch trajectory, range & flight time",
+    title = "Kinematics, Newton's Laws & Projectile Motion Lab",
+    subtitle = "Predict range, flight time, and maximum height before firing across launch angles",
   ),
   TORQUE_MACHINES_LAB(
     title = "Moments, Equilibrium & Simple Machines Bench",
-    subtitle = "Balance clockwise vs anticlockwise torque and calculate MA, VR & machine efficiency",
+    subtitle = "Investigate clockwise vs anticlockwise moments and measure MA, VR & efficiency",
   ),
   SHM_FLUIDS_LAB(
-    title = "SHM Pendulum & Archimedes Fluid Lab",
-    subtitle = "Vary pendulum length, fluid density & submerged depth to measure period T and upthrust",
+    title = "SHM Pendulum, Elasticity & Archimedes Fluid Lab",
+    subtitle = "Test length vs mass independence on period T and verify displaced-fluid upthrust",
   ),
   THERMAL_EXPANSION_CALORIMETRY(
-    title = "Thermal Expansion, Gas & Calorimetry Bench",
-    subtitle = "Heat solids and water across phase plateaus using Q = mcΔT + mL and linear expansivity",
+    title = "Thermal Expansion, Gas Laws & Calorimetry Bench",
+    subtitle = "Observe linear expansion ΔL, Kelvin gas laws, and flat latent-heat phase plateaus",
   ),
   WAVE_OPTICS_BENCH(
     title = "Waves, Sound Harmonics & Optics Ray Bench",
-    subtitle = "Explore Snell's refraction, converging lens images, and open/closed pipe harmonics",
+    subtitle = "Investigate converging lens images (1/u + 1/v = 1/f) and open vs closed pipe harmonics",
   ),
   ELECTROSTATIC_CAPACITOR_LAB(
     title = "Electrostatics & Capacitor Network Bench",
-    subtitle = "Adjust plate area, separation & series/parallel capacitors to observe C, Q, and energy U",
+    subtitle = "Switch series vs parallel capacitors and inspect stored charge Q and energy U",
   ),
   OHMS_CIRCUIT(
     title = "DC Circuit, Internal Resistance & Power Bench",
-    subtitle = "Toggle Series/Parallel resistors and cell internal resistance r to measure V, I & P",
+    subtitle = "Explore series/parallel resistance and terminal voltage loss V = E − Ir across loads",
   ),
   EM_TRANSFORMER_AC_LAB(
-    title = "Electromagnetism, Transformers & RLC A.C. Bench",
-    subtitle = "Tune primary/secondary coil turns and R-L-C impedance to find resonance frequency f₀",
+    title = "Electromagnetism, Transformers & Digital Logic Bench",
+    subtitle = "Test step-up/step-down turns ratios and evaluate AND/OR/NAND/XOR truth tables",
   ),
   QUANTUM_NUCLEAR_LAB(
     title = "Photoelectric Quantum & Half-Life Decay Lab",
-    subtitle = "Vary photon frequency above threshold f₀ and watch N = N₀(1/2)ⁿ radioactive decay live",
+    subtitle = "Compare threshold frequency f₀ across metals and trace N = N₀(1/2)ⁿ radioactive decay",
   ),
 
   // Mathematics
   NUMBER_BASE_INDICES_LAB(
-    title = "Number Bases, Modular Clock & Surds Studio",
-    subtitle = "Convert bases 2–16, inspect mod-n remainders, and evaluate laws of indices & logarithms",
+    title = "Number Bases, Modular Clock & Indices Studio",
+    subtitle = "Convert bases 2–16 step-by-step, wrap mod-n remainders, and map indices to logarithms",
   ),
   SETS_VENN_LAB(
-    title = "Interactive 2-Set & 3-Set Venn Diagram Studio",
-    subtitle = "Adjust n(U), n(A), n(B), and overlap n(A∩B) to see regions shade and compute complements",
+    title = "Interactive Venn Diagram & Set Operations Studio",
+    subtitle = "Vary n(U), n(A), n(B), and n(A∩B) to inspect region shading and complement counts",
   ),
   ALGEBRA_VARIATION_LAB(
-    title = "Linear Inequalities & Direct/Inverse Variation Lab",
-    subtitle = "Explore direct/inverse/joint variation constants k and shade inequality solution intervals",
+    title = "Direct, Inverse & Joint Variation Graph Lab",
+    subtitle = "Compare linear y = kx against hyperbolic y = k/x scaling constants interactively",
   ),
   QUADRATIC_TANGENT(
-    title = "Quadratic Roots, Vertex & Polynomial Lab",
-    subtitle = "Tune a, b, c to visualize parabola turning points, discriminant Δ, and factor theorem roots",
+    title = "Quadratic Roots, Vertex & Discriminant Lab",
+    subtitle = "Tune parabola coefficients b and c to track Δ = b² − 4ac, vertex (h, k), and roots",
   ),
   SEQUENCE_MATRIX_LAB(
     title = "AP/GP Progressions & 2×2 Matrix Determinant Bench",
-    subtitle = "Step through n-th terms/sums Sₙ and compute 2×2 determinants & matrix inverses live",
+    subtitle = "Compute nth terms, series sums Sₙ, and non-singular matrix determinants ad − bc",
   ),
   POLYGON_CIRCLE_THEOREM_LAB(
     title = "Euclidean Polygons & Circle Theorems Workbench",
-    subtitle = "Move chord/circumference angles live to verify Center = 2×Circumference & cyclic sums",
+    subtitle = "Verify interior/exterior polygon sums and Center Angle = 2×Circumference Angle live",
   ),
   MENSURATION_3D_LAB(
-    title = "3D Solids & Circle Sector Mensuration Lab",
-    subtitle = "Vary radius r and height h to compute cone slant edge, cylinder area, sphere & sector volume",
+    title = "3D Solids, Slant Height & Volume Mensuration Lab",
+    subtitle = "Explore cones, cylinders, and spheres across radius r and height h scaling",
   ),
   TRIG_BEARING_LAB(
     title = "Unit Circle Trigonometry & 3-Figure Bearing Compass",
-    subtitle = "Rotate bearing θ clockwise from North and solve SOHCAHTOA & Sine/Cosine Rule triangles",
+    subtitle = "Trace clockwise bearings from North and convert forward bearings to back-bearings",
   ),
   COORDINATE_CALCULUS_LAB(
-    title = "Coordinate Geometry, Derivatives & Integral Area Lab",
-    subtitle = "Slide x₀ along curves to watch tangent slope dy/dx and shaded definite integral area update",
+    title = "Coordinate Calculus, Tangents & Integral Area Lab",
+    subtitle = "Slide x₀ along y = ½x² to inspect instantaneous gradient dy/dx and definite area",
   ),
   PROBABILITY_STATISTICS_LAB(
-    title = "Combinatorics, Probability & Grouped Statistics Lab",
-    subtitle = "Compute nPr, nCr, combined event odds, and inspect bar distribution, mean, median & σ",
+    title = "Combinatorics, Probability & Dispersion Statistics Lab",
+    subtitle = "Contrast nPr vs nCr and observe how constant shifts vs scaling affect Variance & SD",
   ),
 
   // Chemistry
   SEPARATION_ATOMIC_LAB(
-    title = "Separation Techniques & Bohr Atom Orbital Builder",
-    subtitle = "Pick atomic number Z (1–20) to see 1s² 2s² shells build and match pure separation methods",
+    title = "Separation Methods & Bohr Electron Shell Builder",
+    subtitle = "Match mixtures to separation apparatus and build K-L-M-N shells for elements Z = 1–20",
   ),
   BONDING_PERIODIC_LAB(
-    title = "Periodic Trends & Chemical Bonding Simulator",
-    subtitle = "Compare element electronegativity ΔEN to predict ionic vs covalent bonds & hydrogen bonding",
+    title = "Electronegativity & Chemical Bonding Simulator",
+    subtitle = "Compare ΔEN differences to classify ionic transfer, polar covalent, and dative bonds",
   ),
   STOICHIOMETRY_MOLE_LAB(
-    title = "Mole Concept, Limiting Reagent & Empirical Formula Lab",
-    subtitle = "Vary reactant grams & molar mass Mᵣ to find moles, limiting reactant, and theoretical yield",
+    title = "Mole Concept, Limiting Reagent & STP Yield Lab",
+    subtitle = "Adjust H₂ and O₂ moles to identify limiting reactants and compute STP gas volumes",
   ),
   GAS_LAW_PISTON(
     title = "Ideal Gas Laws & Graham Effusion Piston",
-    subtitle = "Adjust Kelvin temperature, pressure & molar mass to observe volume PV = nRT and diffusion rate",
+    subtitle = "Vary Kelvin T, pressure P, and molar mass M to test effusion speed ratio √(M₁/M₂)",
   ),
   TITRATION_PH(
-    title = "Acid-Base Titration, pH Curve & Hydrolysis Lab",
-    subtitle = "Add NaOH titrant drop-by-drop to HCl or CH₃COOH and watch indicator endpoint color switch",
+    title = "Acid-Base Titration & Indicator Endpoint Lab",
+    subtitle = "Compare strong HCl vs weak CH₃COOH equivalence pH jumps and indicator colour changes",
   ),
   ENERGETICS_KINETICS_LAB(
-    title = "Reaction Enthalpy Profile & Le Chatelier Lab",
-    subtitle = "Toggle Exothermic/Endothermic ΔH, add a catalyst to lower Eₐ, and shift equilibrium",
+    title = "Enthalpy Barrier, Catalyst & Le Chatelier Lab",
+    subtitle = "Observe catalysts lowering Eₐ without shifting ΔH and tune Haber P/T yield",
   ),
   REDOX_ELECTROLYSIS_LAB(
-    title = "Redox Oxidation-State & Faraday Electrolysis Bench",
-    subtitle = "Adjust current I (A) and time t to plate Cu/Ag at the cathode using m = MIt / (nF)",
+    title = "Redox & Faraday Electrolysis Plating Bench",
+    subtitle = "Control current I (A), time t, and ion valency (Ag⁺, Cu²⁺, Al³⁺) to measure mass plated",
   ),
   INORGANIC_GASES_METALS_LAB(
-    title = "Gas Identification & Metal Reactivity Displacement Bench",
-    subtitle = "Test NH₃, SO₂, Cl₂, CO₂ indicators and inspect Blast Furnace iron/aluminum extraction steps",
+    title = "Inorganic Gas Tests & Metal Extraction Furnace",
+    subtitle = "Verify NH₃, Cl₂, SO₂, CO₂ confirmatory tests and industrial electrolysis/blast furnace paths",
   ),
   ORGANIC_HYDROCARBON_LAB(
-    title = "Organic Homologous Series, Esters & Polymers Bench",
-    subtitle = "Switch Alkanes, Alkenes, Alkynes, Alkanols & Esters to inspect formulas, C=C tests & soaps",
+    title = "Homologous Series & Unsaturation Bench",
+    subtitle = "Compare Br₂ water, KMnO₄, ammoniacal Cu⁺, and esterification diagnostic reactions",
   ),
   QUALITATIVE_ANALYSIS_LAB(
-    title = "WAEC Qualitative Cation & Anion Bench",
-    subtitle = "Add NaOH(aq) or NH₃(aq) in drops and excess to identify Cu²⁺, Fe²⁺, Fe³⁺, Zn²⁺, Pb²⁺ & anions",
+    title = "WAEC Qualitative Cation & Anion Reagent Bench",
+    subtitle = "Add NaOH(aq) and NH₃(aq) in drops and excess to distinguish Cu²⁺, Fe²⁺, Fe³⁺, Zn²⁺, Pb²⁺",
   ),
 
   // Biology
   CELL_OSMOSIS_LAB(
-    title = "Microscopy, Cell Ultrastructure & Osmosis Chamber",
-    subtitle = "Compare hypotonic, isotonic & hypertonic baths to watch plasmolysis vs turgidity live",
+    title = "Microscopy Calibration & Osmosis Cell Chamber",
+    subtitle = "Compute micrometre specimen sizes and compare plasmolysis vs haemolysis across baths",
   ),
   BIOENERGETICS_ENZYME_LAB(
-    title = "Photosynthesis Rate & Enzyme Temp/pH Curve Lab",
-    subtitle = "Adjust temperature, pH & light intensity to observe optimum peaks and enzyme denaturation",
+    title = "Enzyme Temperature Activity & Denaturation Curve",
+    subtitle = "Test Pepsin, Amylase, and Trypsin across 0–65°C to locate optimum activity vs denaturation",
   ),
   NUTRITION_TRANSPORT_LAB(
-    title = "Food Tests, Mammalian Heart & Double Circulation Lab",
-    subtitle = "Inspect Reagent color tests (Biuret/Benedict/Iodine) and trace RA→RV→Lungs→LA→LV flow",
+    title = "Biochemical Food Tests & Double Circulation Trace",
+    subtitle = "Run Iodine/Benedict's/Biuret tests and trace RA → RV → Lungs → LA → LV cardiac flow",
   ),
   RESPIRATION_KIDNEY_LAB(
-    title = "Lung Breathing Mechanics & Kidney Nephron Lab",
-    subtitle = "Toggle inhalation/exhalation diaphragm movement and trace glomerular filtration & ADH action",
+    title = "Breathing Mechanics & Kidney ADH Nephron Lab",
+    subtitle = "Inspect thoracic volume-pressure changes and ADH control of urine concentration",
   ),
   NERVOUS_ENDOCRINE_LAB(
-    title = "Eye Accommodation, Reflex Arc & Hormone Loop Lab",
-    subtitle = "Adjust object distance for Myopia/Hypermetropia lens correction and Insulin blood feedback",
+    title = "Eye Lens Defects & Pancreatic Homeostasis Lab",
+    subtitle = "Match Myopia/Hypermetropia retinal focus errors to lenses and track Insulin/Glucagon feedback",
   ),
   REPRODUCTION_FLOWER_LAB(
-    title = "Pollination Structure & Menstrual Hormone Cycle Lab",
-    subtitle = "Slide Day 1–28 to observe FSH, LH, Estrogen & Progesterone peaks and floral cross-sections",
+    title = "28-Day Menstrual Hormone & Ovulation Lab",
+    subtitle = "Slide Day 1–28 to correlate FSH, LH surge, Estrogen, Progesterone, and uterine lining state",
   ),
   MENDELIAN_GENETICS(
-    title = "Mendelian Punnett Square & Sickle-Cell Cross Lab",
-    subtitle = "Select Parent 1 & Parent 2 genotypes (AA/AS/SS or X-linked) to calculate exact F₁ ratios",
+    title = "Mendelian Punnett Cross & Genotype Ratio Lab",
+    subtitle = "Combine parent AA/AS/SS genotypes to derive exact F₁ probability percentages",
   ),
   EVOLUTION_VARIATION_LAB(
-    title = "Variation Curve & Natural Selection Simulator",
-    subtitle = "Compare discontinuous blood-group bars with continuous height bell curves under selection",
+    title = "Variation & Natural Selection Population Simulator",
+    subtitle = "Track moth allele frequency shifts across 5 generations on soot-darkened vs clean bark",
   ),
   ECOLOGY_ENERGY_PYRAMID(
-    title = "10% Trophic Energy Pyramid & Quadrat Sampling Lab",
-    subtitle = "Vary Producer kcal & Lindeman efficiency across food chains and estimate field populations",
+    title = "Lindeman Trophic Energy Pyramid & Ecological Efficiency",
+    subtitle = "Vary ecological transfer efficiency (5–20%) across Producer → Primary → Tertiary levels",
   ),
   BIOGEOCHEMICAL_SOIL_LAB(
-    title = "Nitrogen Cycle Bacteria, Eutrophication & Soil Lab",
-    subtitle = "Trace Nitrosomonas → Nitrobacter → Pseudomonas and compare Sandy vs Loamy vs Clay drainage",
+    title = "Nitrogen Cycle Bacteria & Soil Porosity Lab",
+    subtitle = "Trace Rhizobium, Nitrosomonas, Nitrobacter, Pseudomonas & compare Sand/Loam/Clay profiles",
   ),
 
   // Use of English
   PARTS_CLAUSES_LAB(
-    title = "Clause, Phrase & Grammatical Function Inspector",
-    subtitle = "Break down underlined clauses into Noun, Adjectival, or Adverbial roles with WAEC phrasing",
+    title = "Clause, Word Class & Grammatical Function Inspector",
+    subtitle = "Diagnose Noun, Adjectival, and Adverbial clauses and fix dangling modifiers step-by-step",
   ),
   SYNTAX_LEXIS_STUDIO(
-    title = "Concord, Conditionals, Subjunctive & Tag Studio",
-    subtitle = "Test Subject-Verb Agreement rules, polarity-flip question tags & conditional timelines",
+    title = "Concord, Conditionals & Question Tag Studio",
+    subtitle = "Test proximity vs parenthetical concord, Type 3 inversion, and polarity-flip tags",
   ),
   LEXIS_IDIOMS_REGISTER_LAB(
-    title = "Synonyms, Antonyms, Idioms & Register Switchboard",
-    subtitle = "Contrast Medical, Judicial, Aviation & Banking registers alongside confusable word pairs",
+    title = "Nigerian Register, Preposition & Idiom Switchboard",
+    subtitle = "Inspect Judicial, Medical, Banking & Aviation registers plus WAEC prepositional collocations",
   ),
   ORAL_ENGLISH_STRESS(
-    title = "Syllable Stress & Emphatic Contrast Studio",
-    subtitle = "Inspect suffix stress shifts (-tion, -ic, -graphy), noun/verb pairs & JAMB emphatic contrast",
+    title = "Syllable Stress Rules & Emphatic Contrast Studio",
+    subtitle = "Test noun/verb stress shifts, -tion/-ic/-graphy rules & JAMB emphatic sentence contrast",
   ),
   PHONETICS_CONSONANTS_LAB(
-    title = "IPA Vowel Length, Diphthongs & Consonants Studio",
-    subtitle = "Compare /iː/ vs /ɪ/, /θ/ vs /ð/, voiced pairs, and silent letters from JAMB Oral English",
+    title = "IPA Vowel Contrast, -ed Allomorphs & Silent Letters",
+    subtitle = "Compare /iː/ vs /ɪ/, /θ/ vs /ð/, past-tense /t/ vs /d/ vs /ɪd/, and silent consonants",
   ),
   COMPREHENSION_ESSAY_LAB(
-    title = "Comprehension, Summary Paraphrase & Essay Formatter",
-    subtitle = "Compare lifted vs own-word WAEC summary answers and verify Formal/Informal letter layouts",
+    title = "WAEC Summary Paraphrase & Formal/Informal Essay Lab",
+    subtitle = "Spot lifted phrase penalties vs own-word sentences and verify WAEC letter format rules",
   ),
 }
 
 enum class LessonPillar(val key: String, val shortLabel: String, val fullLabel: String) {
-  CONCEPT("concept", "1. Easy Guide", "Part 1: Crystal-Clear Foundations & Diagrams"),
-  EXAMPLES("examples", "2. Examples", "Part 2: Guided Worked Examples"),
-  SCENARIO("scenario", "3. Real-Life", "Part 3: Real-World Exam Connections"),
-  LAB("lab", "4. Virtual Lab", "Part 4: Topic Interactive Virtual Lab"),
-  EXERCISE("exercise", "5. Mastery Quiz", "Part 5: Fresh Shuffled Quiz (≥ 60% Unlocks Next)"),
+  CONCEPT("concept", "1. Architecture & Study", "Stage 1: Topic Architecture, Prerequisites & 5-Section Study"),
+  EXAMPLES("examples", "2. Worked & Guided", "Stage 2: Step-by-Step Examples & 3-Hint Guided Practice"),
+  SCENARIO("scenario", "3. Context & Cheat Sheet", "Stage 3: Nigerian Real-World Context, Misconceptions & Cheat Sheet"),
+  LAB("lab", "4. Virtual Lab", "Stage 4: Academy Guided Virtual Lab Simulation"),
+  PROJECT("project", "5. Mastery Project", "Stage 5: Authentic Nigerian Capstone Project & Rubric"),
+  EXERCISE("exercise", "6. Final Assessment", "Stage 6: 100-Mark Mastery Gate (≥ 80% Unlocks Next)"),
 }
+
+data class VocabularyEntry(
+  val term: String,
+  val definition: String,
+  val simpleMeaning: String,
+  val examUsage: String,
+)
+
+data class MisconceptionAnalysis(
+  val wrongBelief: String,
+  val whyStudentsBelieveIt: String,
+  val correctUnderstanding: String,
+  val avoidanceRule: String,
+)
+
+data class GuidedPracticeTask(
+  val prompt: String,
+  val difficulty: String,
+  val estimatedMinutes: Int,
+  val hints: List<String>,
+  val expectedApproach: String,
+  val completeSolution: String,
+)
+
+data class TopicMasteryProject(
+  val title: String,
+  val format: String,
+  val nigerianScenario: String,
+  val stages: List<String>,
+  val rubricCriteria: List<String>,
+  val modelResponse: String,
+)
+
+data class TopicCheatSheet(
+  val overview: String,
+  val symbolLegend: List<String>,
+  val commonTraps: List<String>,
+  val memoryAid: String,
+  val spacedRevisionDays: List<Int> = listOf(1, 3, 7, 14, 30),
+)
 
 data class ConceptBlock(
   val heading: String,
   val explanation: String,
   val keyFormula: String? = null,
   val examTip: String,
+  val mechanismWhyHow: String = "",
+  val examIntelligence: String = "",
+  val recap: String = "",
 )
 
 data class WorkedExample(
@@ -244,7 +289,18 @@ data class PracticeQuestion(
   val hint: String,
   val stepByStepSolution: String,
   val waecMarkingScheme: String? = null,
-)
+  val cognitiveLevel: String = "Application",
+  val marks: Int = 20,
+  val remediationTip: String = "",
+) {
+  val boardStyleLabel: String
+    get() =
+      when {
+        examType.equals("WAEC", ignoreCase = true) -> "WAEC WASSCE-Style Practice"
+        examType.equals("NECO", ignoreCase = true) -> "NECO SSCE-Style Practice"
+        else -> "JAMB UTME-Style Practice"
+      }
+}
 
 data class Lesson(
   val id: String,
@@ -260,7 +316,19 @@ data class Lesson(
   val labType: PracticalLabType,
   val labBrief: String,
   val exercises: List<PracticeQuestion>,
-)
+  val prerequisites: List<String> = emptyList(),
+  val dependencySummary: String = "",
+  val vocabulary: List<VocabularyEntry> = emptyList(),
+  val misconceptions: List<MisconceptionAnalysis> = emptyList(),
+  val guidedPractice: GuidedPracticeTask? = null,
+  val masteryProject: TopicMasteryProject? = null,
+  val cheatSheet: TopicCheatSheet? = null,
+) {
+  companion object {
+    const val ACADEMY_NANODEGREE =
+      "Nigerian Senior Secondary Excellence Nanodegree (JAMB UTME • WAEC WASSCE • NECO SSCE)"
+  }
+}
 
 data class CourseModule(
   val id: String,
@@ -285,3 +353,4 @@ data class SubjectTrack(
   val allLessons: List<Lesson>
     get() = modules.flatMap { it.lessons }
 }
+

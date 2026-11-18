@@ -479,7 +479,7 @@ class MeritPrepViewModel(
             pillar == LessonPillar.EXERCISE && passedExercise ->
               "Mastered (${score}%)! Next lesson unlocked (+${xpBonus} XP)"
             pillar == LessonPillar.EXERCISE ->
-              "Scored ${exerciseScore ?: 0}% — reach 60%+ to unlock the next lesson"
+              "Scored ${exerciseScore ?: 0}% — reach ${CurriculumProgression.PASS_THRESHOLD_PERCENT}%+ to unlock the next lesson"
             else -> "Saved ${pillar.shortLabel} (+${xpBonus} XP)"
           }
       } else {

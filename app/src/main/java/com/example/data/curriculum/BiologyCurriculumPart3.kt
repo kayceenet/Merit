@@ -47,7 +47,7 @@ object BiologyCurriculumPart3 {
               listOf(
                 WorkedExample(
                   title = "Calculating 10% Trophic Energy Transfer",
-                  examSource = "JAMB UTME 2024 • Bio Q34",
+                  examSource = "JAMB UTME-Style Worked Problem",
                   problemStatement =
                       "Grass traps 20,000 kJ of energy. How much reaches the Hawk in: Grass → Grasshopper → Lizard → Hawk?",
                   steps =
@@ -61,7 +61,7 @@ object BiologyCurriculumPart3 {
                 ),
                 WorkedExample(
                   title = "Capture-Recapture Fish Population Estimate",
-                  examSource = "WAEC SSCE 2023 • Paper 1 Q36",
+                  examSource = "WAEC WASSCE-Style Worked Problem",
                   problemStatement =
                       "50 tilapia fish are netted, fin-tagged, and released. Next week 60 tilapia are caught, 12 bearing tags. Estimate the pond population.",
                     steps =
@@ -146,7 +146,7 @@ object BiologyCurriculumPart3 {
                 PracticeQuestion(
                   id = "ex_bio_12_6",
                   topic = "Biological Pest Control",
-                  examType = "WAEC",
+                  examType = "NECO",
                   year = 2024,
                   question = "Introducing Ladybird beetles to eat crop-destroying aphids is preferred over DDT spray because it:",
                   options = listOf("Kills all soil worms", "Avoids biomagnification & toxic food contamination", "Works instantly in 1 second", "Increases soil salinity"),
@@ -193,7 +193,7 @@ object BiologyCurriculumPart3 {
               listOf(
                 WorkedExample(
                   title = "Interpreting Aquatic vs Desert Leaf Cross-Sections",
-                  examSource = "JAMB UTME 2024 • Bio Q36",
+                  examSource = "JAMB UTME-Style Worked Problem",
                   problemStatement =
                       "Microscopy shows a leaf with thick waxy cuticle, sunken stomata lined with hairs, and rolled blade. Identify habitat and adaptive benefit.",
                   steps =
@@ -206,7 +206,7 @@ object BiologyCurriculumPart3 {
                 ),
                 WorkedExample(
                   title = "Mangrove Swamp Mud Roots",
-                  examSource = "WAEC SSCE 2023 • Paper 2 Q9",
+                  examSource = "WAEC WASSCE-Style Worked Problem",
                   problemStatement = "Why do White Mangrove trees (Avicennia) grow vertical peg-like roots sticking UP out of tidal mud?",
                   steps =
                     listOf(
@@ -290,7 +290,7 @@ object BiologyCurriculumPart3 {
                 PracticeQuestion(
                   id = "ex_bio_13_6",
                   topic = "Camouflage Adaptation",
-                  examType = "WAEC",
+                  examType = "NECO",
                   year = 2024,
                   question = "When a harmless hoverfly evolves yellow-and-black wasp stripes to scare off birds, this adaptation is:",
                   options = listOf("Counter-shading", "Batesian mimicry", "Hibernation", "Territoriality"),
@@ -337,7 +337,7 @@ object BiologyCurriculumPart3 {
               listOf(
                 WorkedExample(
                   title = "Determining Soil Humus Percentage Lab",
-                  examSource = "WAEC SSCE 2024 • Practical Paper 3",
+                  examSource = "WAEC WASSCE-Style Worked Problem",
                   problemStatement =
                       "An evaporating dish + soil weighs 50 g. After oven-drying at 105°C it weighs 45 g; after red-hot ignition to constant mass it weighs 40 g (empty dish = 20 g). Find % Humus of dry soil.",
                   steps =
@@ -351,7 +351,7 @@ object BiologyCurriculumPart3 {
                 ),
                 WorkedExample(
                   title = "Why Ploughing Helps Soil Fertility",
-                  examSource = "JAMB UTME 2023 • Bio Q37",
+                  examSource = "JAMB UTME-Style Worked Problem",
                   problemStatement = "How does draining and aerating waterlogged farmland improve plant nitrate supply?",
                   steps =
                     listOf(
@@ -435,7 +435,7 @@ object BiologyCurriculumPart3 {
                 PracticeQuestion(
                   id = "ex_bio_14_6",
                   topic = "Carbon Monoxide Toxicity",
-                  examType = "WAEC",
+                  examType = "NECO",
                   year = 2024,
                   question = "Why is inhaling exhaust Carbon Monoxide (CO) from a generator indoors lethal?",
                   options = listOf("Freezes alveoli", "Binds Haemoglobin ~200× tighter than O₂ forming carboxyhaemoglobin", "Dissolves plasma", "Bursts kidneys"),
@@ -482,7 +482,7 @@ object BiologyCurriculumPart3 {
               listOf(
                 WorkedExample(
                   title = "Controlling Malaria vs Bilharzia Life Cycles",
-                  examSource = "JAMB UTME 2024 • Bio Q39",
+                  examSource = "JAMB UTME-Style Worked Problem",
                   problemStatement =
                       "Contrast the most effective vector-targeted control step for (a) Malaria and (b) Schistosomiasis (Bilharzia).",
                   steps =
@@ -495,7 +495,7 @@ object BiologyCurriculumPart3 {
                 ),
                 WorkedExample(
                   title = "Active Vaccination vs Passive Snake Antivenom",
-                  examSource = "WAEC SSCE 2023 • Paper 1 Q39",
+                  examSource = "WAEC WASSCE-Style Worked Problem",
                   problemStatement = "Why does a child receive Polio drops BEFORE exposure whereas a snakebite victim receives Antivenom AFTER bite?",
                   steps =
                     listOf(
@@ -579,7 +579,7 @@ object BiologyCurriculumPart3 {
                 PracticeQuestion(
                   id = "ex_bio_15_6",
                   topic = "Conservation",
-                  examType = "WAEC",
+                  examType = "NECO",
                   year = 2024,
                   question = "Establishing National Game Reserves like Yankari and Cross River helps conservation primarily by:",
                   options = listOf("Encouraging logging", "Protecting natural habitats & endangered wildlife from poaching", "Draining wetlands", "Introducing invasive weeds"),
@@ -598,25 +598,25 @@ object BiologyCurriculumPart3 {
       PracticeQuestion("pq_bio_02", "Osmosis", "WAEC", 2024, "A plant cell placed in a hypotonic solution becomes:", listOf("Plasmolyzed", "Flaccid", "Turgid", "Haemolyzed"), 2, "Cell wall prevents bursting as water enters vacuole.", "Turgor pressure inflates the cell stiffly against its wall."),
       PracticeQuestion("pq_bio_03", "Enzymes", "JAMB", 2024, "Salivary amylase (ptyalin) stops digesting starch in the stomach because:", listOf("Stomach lacks water", "Hydrochloric acid pH ~2 denatures salivary amylase", "Pepsin eats it instantly", "Temp hits 60°C"), 1, "Ptyalin's optimum pH is ~6.8–7.0.", "Strong gastric HCl denatures neutral-preferring amylase."),
       PracticeQuestion("pq_bio_04", "Photosynthesis", "WAEC", 2023, "Which mineral deficiency turns mature plant leaves pale yellow (chlorosis)?", listOf("Magnesium", "Calcium", "Sodium", "Chlorine"), 0, "Mg²⁺ sits at the very center of every Chlorophyll ring!", "Lack of Magnesium prevents chlorophyll synthesis."),
-      PracticeQuestion("pq_bio_05", "Food Tests", "JAMB", 2023, "Heating glucose solution with Benedict's reagent yields a precipitate coloured:", listOf("Violet", "Brick-red", "Blue-black", "Pink"), 1, "Cu²⁺ reduces to Cu₂O.", "Reducing sugars give brick-red copper(I) oxide."),
+      PracticeQuestion("pq_bio_05", "Food Tests", "NECO", 2023, "Heating glucose solution with Benedict's reagent yields a precipitate coloured:", listOf("Violet", "Brick-red", "Blue-black", "Pink"), 1, "Cu²⁺ reduces to Cu₂O.", "Reducing sugars give brick-red copper(I) oxide."),
       PracticeQuestion("pq_bio_06", "Heart Circulation", "WAEC", 2024, "Which valve prevents blood from flowing back from the Left Ventricle into the Left Atrium?", listOf("Tricuspid valve", "Bicuspid (Mitral) valve", "Pulmonary semilunar", "Aortic semilunar"), 1, "Left = Bicuspid; Right = Tricuspid.", "Bicuspid (mitral) valve guards the left AV opening."),
       PracticeQuestion("pq_bio_07", "Transpiration", "JAMB", 2025, "Which instrument directly measures the rate of water uptake/transpiration in a cut leafy shoot?", listOf("Clinostat", "Potometer", "Auxanometer", "Hygrometer"), 1, "Tracks air bubble movement along capillary tube.", "Potometer quantifies water uptake rate."),
       PracticeQuestion("pq_bio_08", "Kidney Nephron", "WAEC", 2022, "Presence of glucose in human urine (glycosuria) typically signals insufficient:", listOf("ADH", "Thyroxine", "Insulin", "Bile"), 2, "Blood glucose exceeds kidney PCT transport max.", "Insulin deficiency (Diabetes mellitus) leaves excess glucose spilling into urine."),
       PracticeQuestion("pq_bio_09", "Respiration", "JAMB", 2024, "Which blood vessel leaves the kidneys with the LOWEST concentration of urea?", listOf("Renal artery", "Renal vein", "Hepatic vein", "Vena cava"), 1, "Cleaned blood exiting the kidney.", "Renal vein."),
-      PracticeQuestion("pq_bio_10", "Eye Defects", "WAEC", 2023, "Long-sightedness (Hypermetropia), where images focus behind the retina, is corrected with:", listOf("Concave lens", "Convex lens", "Opaque disc", "Plane mirror"), 1, "Need extra converging power to pull rays forward onto retina.", "Convex (converging) lens."),
+      PracticeQuestion("pq_bio_10", "Eye Defects", "NECO", 2023, "Long-sightedness (Hypermetropia), where images focus behind the retina, is corrected with:", listOf("Concave lens", "Convex lens", "Opaque disc", "Plane mirror"), 1, "Need extra converging power to pull rays forward onto retina.", "Convex (converging) lens."),
       PracticeQuestion("pq_bio_11", "Brain", "JAMB", 2022, "Which part of the human brain regulates involuntary heartbeat, breathing rate, and swallowing?", listOf("Cerebrum", "Cerebellum", "Medulla oblongata", "Olfactory lobe"), 2, "Brainstem vital center.", "Medulla oblongata."),
       PracticeQuestion("pq_bio_12", "Plant Hormones", "WAEC", 2025, "Which gaseous plant hormone triggers fruit ripening and leaf abscission?", listOf("Auxin", "Gibberellin", "Ethene (Ethylene)", "Cytokinin"), 2, "One ripe banana ripens the whole bunch!", "Ethene gas."),
       PracticeQuestion("pq_bio_13", "Skeleton", "JAMB", 2021, "The odontoid process (tooth-like peg for rotating the skull) is a feature of which vertebra?", listOf("Atlas", "Axis", "Lumbar", "Sacrum"), 1, "Second cervical vertebra C2.", "Axis vertebra."),
       PracticeQuestion("pq_bio_14", "Reproduction", "WAEC", 2024, "Where does fertilization of a human ovum normally take place?", listOf("Uterus lining", "Vagina", "Oviduct (Fallopian tube)", "Ovary surface"), 2, "Upper third of the Fallopian tube.", "Fallopian tube (oviduct)."),
-      PracticeQuestion("pq_bio_15", "Seeds & Fruits", "JAMB", 2023, "A true fruit differs from a seed because a true fruit develops from the fertilized:", listOf("Ovule", "Ovary", "Receptacle", "Stigma"), 1, "Cashew apple is a false fruit (swollen pedicel); mango develops from ovary.", "Ovary."),
+      PracticeQuestion("pq_bio_15", "Seeds & Fruits", "NECO", 2023, "A true fruit differs from a seed because a true fruit develops from the fertilized:", listOf("Ovule", "Ovary", "Receptacle", "Stigma"), 1, "Cashew apple is a false fruit (swollen pedicel); mango develops from ovary.", "Ovary."),
       PracticeQuestion("pq_bio_16", "Genetics", "WAEC", 2021, "A father is Blood Group O and mother is Blood Group AB. What blood groups can their biological children have?", listOf("A and B only", "AB and O only", "O only", "All four A, B, AB, O"), 0, "ii × I^A I^B → I^A i and I^B i ONLY.", "50% Type A, 50% Type B."),
       PracticeQuestion("pq_bio_17", "Sex-Linked Genes", "JAMB", 2024, "Why do X-linked recessive disorders like Haemophilia strike men far more frequently than women?", listOf("Y carries toxic genes", "Men possess only one X chromosome, so a single recessive allele is expressed", "Women are immune to clotting factors", "Men bleed more"), 1, "XY males have no second backup X chromosome.", "Hemizygous X^h Y males express the recessive allele immediately."),
       PracticeQuestion("pq_bio_18", "DNA Replication", "WAEC", 2022, "On DNA, Cytosine always forms three hydrogen bonds exclusively with:", listOf("Adenine", "Thymine", "Guanine", "Uracil"), 2, "A=T, C≡G.", "Guanine."),
       PracticeQuestion("pq_bio_19", "Evolution", "JAMB", 2025, "The rapid evolution of 14 Galápagos finch beak shapes from one mainland ancestor illustrates:", listOf("Adaptive radiation", "Lamarckian use", "Convergent mimicry", "Vestigial loss"), 0, "Diversifying into empty ecological feeding niches.", "Adaptive radiation."),
-      PracticeQuestion("pq_bio_20", "Ecology", "WAEC", 2023, "In the food chain Algae → Tadpole → Tilapia → Kingfisher, the Tilapia acts as a:", listOf("Primary producer", "Primary consumer", "Secondary consumer", "Tertiary consumer"), 2, "Algae (Prod) → Tadpole (1°) → Tilapia (2°) → Kingfisher (3°).", "Secondary consumer."),
+      PracticeQuestion("pq_bio_20", "Ecology", "NECO", 2023, "In the food chain Algae → Tadpole → Tilapia → Kingfisher, the Tilapia acts as a:", listOf("Primary producer", "Primary consumer", "Secondary consumer", "Tertiary consumer"), 2, "Algae (Prod) → Tadpole (1°) → Tilapia (2°) → Kingfisher (3°).", "Secondary consumer."),
       PracticeQuestion("pq_bio_21", "Nitrogen Cycle", "JAMB", 2022, "Which soil bacteria reduce fertility by converting useful nitrates into atmospheric N₂ gas?", listOf("Rhizobium", "Nitrosomonas", "Denitrifying bacteria (Pseudomonas)", "Azotobacter"), 2, "Thrive in waterlogged oxygen-poor soils.", "Denitrifying bacteria."),
       PracticeQuestion("pq_bio_22", "Soil Science", "WAEC", 2024, "Which soil type combines balanced drainage, good aeration, and rich organic humus ideal for crops?", listOf("Sandy soil", "Clay soil", "Loamy soil", "Laterite"), 2, "Sand + Silt + Clay + Humus.", "Loamy soil."),
       PracticeQuestion("pq_bio_23", "Vectors", "JAMB", 2021, "Trypanosoma gambiense, causing African Sleeping Sickness, is transmitted by the:", listOf("Anopheles mosquito", "Tsetse fly (Glossina)", "Blackfly", "Sandfly"), 1, "Feeds on blood along savannah riverbanks.", "Tsetse fly."),
-      PracticeQuestion("pq_bio_24", "Immunity", "WAEC", 2025, "Injecting tetanus toxoid vaccine stimulates a patient to develop:", listOf("Natural passive immunity", "Artificial active immunity", "Artificial passive immunity", "Innate allergy"), 1, "Person's own B-cells produce long-term memory + antibodies.", "Artificial active immunity."),
+      PracticeQuestion("pq_bio_24", "Immunity", "NECO", 2025, "Injecting tetanus toxoid vaccine stimulates a patient to develop:", listOf("Natural passive immunity", "Artificial active immunity", "Artificial passive immunity", "Innate allergy"), 1, "Person's own B-cells produce long-term memory + antibodies.", "Artificial active immunity."),
     )
 }

@@ -25,7 +25,8 @@ object CurriculumEntityMapper {
   fun buildChapterEntities(): List<LearningChapterEntity> =
     CurriculumCatalog.tracks.flatMap { track ->
       track.modules.flatMap { mod ->
-        mod.lessons.mapIndexed { idx, lesson ->
+        mod.lessons.mapIndexed { idx, rawLesson ->
+          val lesson = AcademyCurriculumEnricher.enrich(rawLesson)
           LearningChapterEntity(
             id = lesson.id,
             moduleId = lesson.moduleId,
@@ -39,7 +40,7 @@ object CurriculumEntityMapper {
             learningOutcomesJson = encodeStringList(lesson.learningOutcomes),
             conceptsJson = encodeConcepts(lesson.concepts),
             workedExamplesJson = encodeExamples(lesson.workedExamples),
-            scenariosJson = encodeScenarios(lesson.scenarios),
+            scenariosJson = encodeScenarioEnvelope(lesson),
             exercisesJson = encodeQuestions(lesson.exercises),
           )
         }
@@ -49,7 +50,8 @@ object CurriculumEntityMapper {
   fun buildPastQuestionEntities(): List<PastQuestionEntity> =
     CurriculumCatalog.tracks.flatMap { track ->
       val combined = (track.pastQuestions + track.allLessons.flatMap { it.exercises }).distinctBy { it.id }
-      combined.mapIndexed { idx, q ->
+      combined.mapIndexed { idx, raw ->
+        val q = AcademyCurriculumEnricher.sanitizeQuestion(raw, idx)
         PastQuestionEntity(
           id = "${track.id}_${q.id}",
           subjectId = track.id,
@@ -93,35 +95,47 @@ object CurriculumEntityMapper {
     val labType =
       PracticalLabType.entries.find { it.name == entity.labTypeKey }
         ?: PracticalLabType.PROJECTILE_KINEMATICS
-    return Lesson(
-      id = entity.id,
-      moduleId = entity.moduleId,
-      subjectId = entity.subjectId,
-      title = entity.title,
-      durationMinutes = entity.durationMinutes,
-      syllabusTag = entity.syllabusTag,
-      learningOutcomes = decodeStringList(entity.learningOutcomesJson),
-      concepts = decodeConcepts(entity.conceptsJson),
-      workedExamples = decodeExamples(entity.workedExamplesJson),
-      scenarios = decodeScenarios(entity.scenariosJson),
-      labType = labType,
-      labBrief = entity.labBrief,
-      exercises = decodeQuestions(entity.exercisesJson),
-    )
+    val envelope = decodeScenarioEnvelope(entity.scenariosJson)
+    val base =
+      Lesson(
+        id = entity.id,
+        moduleId = entity.moduleId,
+        subjectId = entity.subjectId,
+        title = entity.title,
+        durationMinutes = entity.durationMinutes,
+        syllabusTag = entity.syllabusTag,
+        learningOutcomes = decodeStringList(entity.learningOutcomesJson),
+        concepts = decodeConcepts(entity.conceptsJson),
+        workedExamples = decodeExamples(entity.workedExamplesJson),
+        scenarios = envelope.scenarios,
+        labType = labType,
+        labBrief = entity.labBrief,
+        exercises = decodeQuestions(entity.exercisesJson),
+        prerequisites = envelope.prerequisites,
+        dependencySummary = envelope.dependencySummary,
+        vocabulary = envelope.vocabulary,
+        misconceptions = envelope.misconceptions,
+        guidedPractice = envelope.guidedPractice,
+        masteryProject = envelope.masteryProject,
+        cheatSheet = envelope.cheatSheet,
+      )
+    return AcademyCurriculumEnricher.enrich(base)
   }
 
   fun toDomainQuestion(entity: PastQuestionEntity): PracticeQuestion =
-    PracticeQuestion(
-      id = entity.id,
-      topic = entity.topic,
-      examType = entity.examType,
-      year = entity.year,
-      question = entity.question,
-      options = decodeStringList(entity.optionsJson),
-      correctIndex = entity.correctIndex,
-      hint = entity.hint,
-      stepByStepSolution = entity.stepByStepSolution,
-      waecMarkingScheme = entity.waecMarkingScheme,
+    AcademyCurriculumEnricher.sanitizeQuestion(
+      PracticeQuestion(
+        id = entity.id,
+        topic = entity.topic,
+        examType = entity.examType,
+        year = entity.year,
+        question = entity.question,
+        options = decodeStringList(entity.optionsJson),
+        correctIndex = entity.correctIndex,
+        hint = entity.hint,
+        stepByStepSolution = entity.stepByStepSolution,
+        waecMarkingScheme = entity.waecMarkingScheme,
+      )
     )
 
   private fun encodeStringList(items: List<String>): String =
@@ -142,6 +156,9 @@ object CurriculumEntityMapper {
             put("explanation", c.explanation)
             put("keyFormula", c.keyFormula ?: JSONObject.NULL)
             put("examTip", c.examTip)
+            put("mechanismWhyHow", c.mechanismWhyHow)
+            put("examIntelligence", c.examIntelligence)
+            put("recap", c.recap)
           }
         )
       }
@@ -158,6 +175,9 @@ object CurriculumEntityMapper {
           explanation = o.optString("explanation", ""),
           keyFormula = if (kf == null || kf == JSONObject.NULL) null else kf.toString(),
           examTip = o.optString("examTip", ""),
+          mechanismWhyHow = o.optString("mechanismWhyHow", ""),
+          examIntelligence = o.optString("examIntelligence", ""),
+          recap = o.optString("recap", ""),
         )
       }
     }.getOrDefault(emptyList())
@@ -195,37 +215,210 @@ object CurriculumEntityMapper {
       }
     }.getOrDefault(emptyList())
 
-  private fun encodeScenarios(items: List<RealLifeScenario>): String =
-    JSONArray().apply {
-      items.forEach { s ->
-        put(
-          JSONObject().apply {
-            put("title", s.title)
-            put("industryDomain", s.industryDomain)
-            put("narrative", s.narrative)
-            put("examConnection", s.examConnection)
+  private data class ScenarioEnvelope(
+    val scenarios: List<RealLifeScenario>,
+    val prerequisites: List<String> = emptyList(),
+    val dependencySummary: String = "",
+    val vocabulary: List<VocabularyEntry> = emptyList(),
+    val misconceptions: List<MisconceptionAnalysis> = emptyList(),
+    val guidedPractice: GuidedPracticeTask? = null,
+    val masteryProject: TopicMasteryProject? = null,
+    val cheatSheet: TopicCheatSheet? = null,
+  )
+
+  private fun encodeScenarioEnvelope(lesson: Lesson): String =
+    JSONObject().apply {
+      put(
+        "scenarios",
+        JSONArray().apply {
+          lesson.scenarios.forEach { s ->
+            put(
+              JSONObject().apply {
+                put("title", s.title)
+                put("industryDomain", s.industryDomain)
+                put("narrative", s.narrative)
+                put("examConnection", s.examConnection)
+              }
+            )
           }
+        },
+      )
+      put("prerequisites", JSONArray(lesson.prerequisites))
+      put("dependencySummary", lesson.dependencySummary)
+      put(
+        "vocabulary",
+        JSONArray().apply {
+          lesson.vocabulary.forEach { v ->
+            put(
+              JSONObject().apply {
+                put("term", v.term)
+                put("definition", v.definition)
+                put("simpleMeaning", v.simpleMeaning)
+                put("examUsage", v.examUsage)
+              }
+            )
+          }
+        },
+      )
+      put(
+        "misconceptions",
+        JSONArray().apply {
+          lesson.misconceptions.forEach { m ->
+            put(
+              JSONObject().apply {
+                put("wrongBelief", m.wrongBelief)
+                put("whyStudentsBelieveIt", m.whyStudentsBelieveIt)
+                put("correctUnderstanding", m.correctUnderstanding)
+                put("avoidanceRule", m.avoidanceRule)
+              }
+            )
+          }
+        },
+      )
+      val gp = lesson.guidedPractice
+      if (gp != null) {
+        put(
+          "guidedPractice",
+          JSONObject().apply {
+            put("prompt", gp.prompt)
+            put("difficulty", gp.difficulty)
+            put("estimatedMinutes", gp.estimatedMinutes)
+            put("hints", JSONArray(gp.hints))
+            put("expectedApproach", gp.expectedApproach)
+            put("completeSolution", gp.completeSolution)
+          },
+        )
+      }
+      val mp = lesson.masteryProject
+      if (mp != null) {
+        put(
+          "masteryProject",
+          JSONObject().apply {
+            put("title", mp.title)
+            put("format", mp.format)
+            put("nigerianScenario", mp.nigerianScenario)
+            put("stages", JSONArray(mp.stages))
+            put("rubricCriteria", JSONArray(mp.rubricCriteria))
+            put("modelResponse", mp.modelResponse)
+          },
+        )
+      }
+      val cs = lesson.cheatSheet
+      if (cs != null) {
+        put(
+          "cheatSheet",
+          JSONObject().apply {
+            put("overview", cs.overview)
+            put("symbolLegend", JSONArray(cs.symbolLegend))
+            put("commonTraps", JSONArray(cs.commonTraps))
+            put("memoryAid", cs.memoryAid)
+            put("spacedRevisionDays", JSONArray(cs.spacedRevisionDays))
+          },
         )
       }
     }.toString()
 
-  private fun decodeScenarios(raw: String): List<RealLifeScenario> =
+  private fun decodeScenarioEnvelope(raw: String): ScenarioEnvelope =
     runCatching {
-      val arr = JSONArray(raw)
-      List(arr.length()) { i ->
-        val o = arr.getJSONObject(i)
-        RealLifeScenario(
-          title = o.optString("title", ""),
-          industryDomain = o.optString("industryDomain", ""),
-          narrative = o.optString("narrative", ""),
-          examConnection = o.optString("examConnection", ""),
-        )
+      val trimmed = raw.trim()
+      if (trimmed.startsWith("[")) {
+        return ScenarioEnvelope(scenarios = parseScenarioArray(JSONArray(trimmed)))
       }
-    }.getOrDefault(emptyList())
+      val obj = JSONObject(trimmed)
+      val scenarios = parseScenarioArray(obj.optJSONArray("scenarios") ?: JSONArray())
+      val prerequisites = jsonArrayToStrings(obj.optJSONArray("prerequisites"))
+      val dependencySummary = obj.optString("dependencySummary", "")
+      val vocabArr = obj.optJSONArray("vocabulary") ?: JSONArray()
+      val vocab =
+        List(vocabArr.length()) { i ->
+          val v = vocabArr.getJSONObject(i)
+          VocabularyEntry(
+            term = v.optString("term", ""),
+            definition = v.optString("definition", ""),
+            simpleMeaning = v.optString("simpleMeaning", ""),
+            examUsage = v.optString("examUsage", ""),
+          )
+        }
+      val miscArr = obj.optJSONArray("misconceptions") ?: JSONArray()
+      val misconceptions =
+        List(miscArr.length()) { i ->
+          val m = miscArr.getJSONObject(i)
+          MisconceptionAnalysis(
+            wrongBelief = m.optString("wrongBelief", ""),
+            whyStudentsBelieveIt = m.optString("whyStudentsBelieveIt", ""),
+            correctUnderstanding = m.optString("correctUnderstanding", ""),
+            avoidanceRule = m.optString("avoidanceRule", ""),
+          )
+        }
+      val gpObj = obj.optJSONObject("guidedPractice")
+      val gp =
+        gpObj?.let {
+          GuidedPracticeTask(
+            prompt = it.optString("prompt", ""),
+            difficulty = it.optString("difficulty", "Intermediate"),
+            estimatedMinutes = it.optInt("estimatedMinutes", 5),
+            hints = jsonArrayToStrings(it.optJSONArray("hints")),
+            expectedApproach = it.optString("expectedApproach", ""),
+            completeSolution = it.optString("completeSolution", ""),
+          )
+        }
+      val mpObj = obj.optJSONObject("masteryProject")
+      val mp =
+        mpObj?.let {
+          TopicMasteryProject(
+            title = it.optString("title", ""),
+            format = it.optString("format", "Applied Investigation"),
+            nigerianScenario = it.optString("nigerianScenario", ""),
+            stages = jsonArrayToStrings(it.optJSONArray("stages")),
+            rubricCriteria = jsonArrayToStrings(it.optJSONArray("rubricCriteria")),
+            modelResponse = it.optString("modelResponse", ""),
+          )
+        }
+      val csObj = obj.optJSONObject("cheatSheet")
+      val cs =
+        csObj?.let {
+          val daysArr = it.optJSONArray("spacedRevisionDays")
+          val days =
+            if (daysArr == null) listOf(1, 3, 7, 14, 30)
+            else List(daysArr.length()) { idx -> daysArr.optInt(idx, 1) }
+          TopicCheatSheet(
+            overview = it.optString("overview", ""),
+            symbolLegend = jsonArrayToStrings(it.optJSONArray("symbolLegend")),
+            commonTraps = jsonArrayToStrings(it.optJSONArray("commonTraps")),
+            memoryAid = it.optString("memoryAid", ""),
+            spacedRevisionDays = days,
+          )
+        }
+      ScenarioEnvelope(
+        scenarios = scenarios,
+        prerequisites = prerequisites,
+        dependencySummary = dependencySummary,
+        vocabulary = vocab,
+        misconceptions = misconceptions,
+        guidedPractice = gp,
+        masteryProject = mp,
+        cheatSheet = cs,
+      )
+    }.getOrDefault(ScenarioEnvelope(emptyList()))
+
+  private fun parseScenarioArray(arr: JSONArray): List<RealLifeScenario> =
+    List(arr.length()) { i ->
+      val o = arr.getJSONObject(i)
+      RealLifeScenario(
+        title = o.optString("title", ""),
+        industryDomain = o.optString("industryDomain", ""),
+        narrative = o.optString("narrative", ""),
+        examConnection = o.optString("examConnection", ""),
+      )
+    }
+
+  private fun jsonArrayToStrings(arr: JSONArray?): List<String> =
+    if (arr == null) emptyList() else List(arr.length()) { idx -> arr.optString(idx, "") }
 
   private fun encodeQuestions(items: List<PracticeQuestion>): String =
     JSONArray().apply {
-      items.forEach { q ->
+      items.forEach { raw ->
+        val q = AcademyCurriculumEnricher.sanitizeQuestion(raw)
         put(
           JSONObject().apply {
             put("id", q.id)
@@ -238,6 +431,9 @@ object CurriculumEntityMapper {
             put("hint", q.hint)
             put("stepByStepSolution", q.stepByStepSolution)
             put("waecMarkingScheme", q.waecMarkingScheme ?: JSONObject.NULL)
+            put("cognitiveLevel", q.cognitiveLevel)
+            put("marks", q.marks)
+            put("remediationTip", q.remediationTip)
           }
         )
       }
@@ -250,18 +446,24 @@ object CurriculumEntityMapper {
         val o = arr.getJSONObject(i)
         val optsArr = o.optJSONArray("options") ?: JSONArray()
         val scheme = o.opt("waecMarkingScheme")
-        PracticeQuestion(
-          id = o.optString("id", ""),
-          topic = o.optString("topic", ""),
-          examType = o.optString("examType", "JAMB"),
-          year = o.optInt("year", 2023),
-          question = o.optString("question", ""),
-          options = List(optsArr.length()) { idx -> optsArr.optString(idx, "") },
-          correctIndex = o.optInt("correctIndex", 0),
-          hint = o.optString("hint", ""),
-          stepByStepSolution = o.optString("stepByStepSolution", ""),
-          waecMarkingScheme = if (scheme == null || scheme == JSONObject.NULL) null else scheme.toString(),
+        AcademyCurriculumEnricher.sanitizeQuestion(
+          PracticeQuestion(
+            id = o.optString("id", ""),
+            topic = o.optString("topic", ""),
+            examType = o.optString("examType", "JAMB"),
+            year = o.optInt("year", 2025),
+            question = o.optString("question", ""),
+            options = List(optsArr.length()) { idx -> optsArr.optString(idx, "") },
+            correctIndex = o.optInt("correctIndex", 0),
+            hint = o.optString("hint", ""),
+            stepByStepSolution = o.optString("stepByStepSolution", ""),
+            waecMarkingScheme = if (scheme == null || scheme == JSONObject.NULL) null else scheme.toString(),
+            cognitiveLevel = o.optString("cognitiveLevel", "Application"),
+            marks = o.optInt("marks", 20),
+            remediationTip = o.optString("remediationTip", ""),
+          )
         )
       }
     }.getOrDefault(emptyList())
 }
+

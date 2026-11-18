@@ -54,7 +54,9 @@ internal fun MathLabDispatcher(lessonId: String, labType: PracticalLabType) {
     }
     PracticalLabType.MENSURATION_3D_LAB -> MensurationSolidsLab()
     PracticalLabType.TRIG_BEARING_LAB -> TrigBearingCompassLab()
-    PracticalLabType.COORDINATE_CALCULUS_LAB -> CalculusTangentAreaLab()
+    PracticalLabType.COORDINATE_CALCULUS_LAB -> {
+      if (lessonId == "math_12_coordinate_geometry") CoordinateLineLab() else CalculusTangentAreaLab()
+    }
     PracticalLabType.PROBABILITY_STATISTICS_LAB -> {
       if (lessonId == "math_14_perm_comb_prob") PermCombProbLab() else StatisticsDispersionLab()
     }
@@ -390,6 +392,50 @@ private fun TrigBearingCompassLab() {
       )
     )
     Slider(value = bearingDeg.toFloat(), onValueChange = { bearingDeg = it.roundToInt() }, valueRange = 0f..359f)
+  }
+}
+
+@Composable
+private fun CoordinateLineLab() {
+  var x2 by remember { mutableFloatStateOf(5f) }
+  var y2 by remember { mutableFloatStateOf(7f) }
+  val x1 = 1f
+  val y1 = 1f
+  val dx = x2 - x1
+  val dy = y2 - y1
+  val gradient = if (abs(dx) < 0.05f) null else dy / dx
+  val perp = if (gradient == null || abs(gradient) < 0.01f) null else -1f / gradient
+  val dist = sqrt(dx * dx + dy * dy)
+  val primary = MaterialTheme.colorScheme.primary
+  val outline = MaterialTheme.colorScheme.outlineVariant
+
+  Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    Canvas(modifier = Modifier.fillMaxWidth().height(130.dp)) {
+      val ox = 36f
+      val oy = size.height - 26f
+      drawLine(outline, Offset(ox, 12f), Offset(ox, oy + 10f), strokeWidth = 2f)
+      drawLine(outline, Offset(ox - 10f, oy), Offset(size.width - 16f, oy), strokeWidth = 2f)
+      val scaleX = (size.width - 68f) / 10f
+      val scaleY = (oy - 20f) / 10f
+      val p1 = Offset(ox + x1 * scaleX, oy - y1 * scaleY)
+      val p2 = Offset(ox + x2 * scaleX, oy - y2 * scaleY)
+      drawLine(primary, p1, p2, strokeWidth = 5f)
+      drawCircle(primary, radius = 7f, center = p1)
+      drawCircle(primary, radius = 7f, center = p2)
+    }
+    LabMetricBanner(
+      listOf(
+        "Gradient m" to (gradient?.let { String.format("%.2f", it) } ?: "Undefined"),
+        "Perp Slope" to (perp?.let { String.format("%.2f", it) } ?: "Vertical/0"),
+        "Distance |AB|" to String.format("%.2f", dist),
+      )
+    )
+    Text(
+      "A(1, 1) → B(${x2.roundToInt()}, ${y2.roundToInt()})  •  Midpoint = (${String.format("%.1f", (x1 + x2) / 2f)}, ${String.format("%.1f", (y1 + y2) / 2f)})",
+      style = MaterialTheme.typography.labelLarge,
+    )
+    Slider(value = x2, onValueChange = { x2 = it.roundToInt().toFloat() }, valueRange = 2f..9f)
+    Slider(value = y2, onValueChange = { y2 = it.roundToInt().toFloat() }, valueRange = 1f..9f)
   }
 }
 

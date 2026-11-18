@@ -28,16 +28,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.BookmarkAdd
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -63,10 +68,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.data.curriculum.CurriculumProgression
+import com.example.data.curriculum.GuidedPracticeTask
 import com.example.data.curriculum.Lesson
 import com.example.data.curriculum.LessonPillar
 import com.example.data.curriculum.PracticeQuestion
 import com.example.data.curriculum.QuestionShuffler
+import com.example.data.curriculum.TopicMasteryProject
 import com.example.data.model.LessonProgress
 import com.example.ui.components.EquationDisplayCard
 import com.example.ui.components.ScientificText
@@ -503,6 +510,40 @@ private fun LessonPillarBody(
 
     when (selectedPillar) {
       LessonPillar.CONCEPT -> {
+        if (lesson.prerequisites.isNotEmpty() || lesson.dependencySummary.isNotBlank()) {
+          Column(
+            modifier =
+              Modifier.fillMaxWidth()
+                .clip(RoundedCornerShape(14.dp))
+                .background(MaterialTheme.colorScheme.surface)
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(14.dp))
+                .padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+          ) {
+            Text(
+              text = "PREREQUISITE & SYLLABUS ROADMAP",
+              style = MaterialTheme.typography.labelSmall,
+              color = MaterialTheme.colorScheme.secondary,
+              fontWeight = FontWeight.Bold,
+            )
+            if (lesson.prerequisites.isNotEmpty()) {
+              ScientificText(
+                text = "Foundations Needed: ${lesson.prerequisites.joinToString(" • ")}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.SemiBold,
+              )
+            }
+            if (lesson.dependencySummary.isNotBlank()) {
+              ScientificText(
+                text = lesson.dependencySummary,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+              )
+            }
+          }
+        }
+
         Column(
           modifier =
             Modifier.fillMaxWidth()
@@ -530,6 +571,57 @@ private fun LessonPillarBody(
           }
         }
 
+        if (lesson.vocabulary.isNotEmpty()) {
+          Column(
+            modifier =
+              Modifier.fillMaxWidth()
+                .clip(RoundedCornerShape(14.dp))
+                .background(MaterialTheme.colorScheme.surface)
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(14.dp))
+                .padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+          ) {
+            Text(
+              text = "KEY VOCABULARY MATRIX (ZERO ASSUMED JARGON)",
+              style = MaterialTheme.typography.labelSmall,
+              color = MaterialTheme.colorScheme.primary,
+              fontWeight = FontWeight.Bold,
+            )
+            lesson.vocabulary.forEachIndexed { vIdx, entry ->
+              Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                Text(
+                  text = entry.term,
+                  style = MaterialTheme.typography.titleSmall,
+                  color = MaterialTheme.colorScheme.onSurface,
+                  fontWeight = FontWeight.Bold,
+                )
+                ScientificText(
+                  text = "Plain Meaning: ${entry.simpleMeaning}",
+                  style = MaterialTheme.typography.bodySmall,
+                  color = MaterialTheme.colorScheme.secondary,
+                  fontWeight = FontWeight.SemiBold,
+                )
+                ScientificText(
+                  text = entry.definition,
+                  style = MaterialTheme.typography.bodySmall,
+                  color = MaterialTheme.colorScheme.onSurface,
+                )
+                ScientificText(
+                  text = "Exam Usage: ${entry.examUsage}",
+                  style = MaterialTheme.typography.labelSmall,
+                  color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                if (vIdx < lesson.vocabulary.lastIndex) {
+                  HorizontalDivider(
+                    modifier = Modifier.padding(top = 6.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                  )
+                }
+              }
+            }
+          }
+        }
+
         SubjectHeroGraphic(subjectId = lesson.subjectId)
         TopicDiagramCard(lesson = lesson)
 
@@ -548,7 +640,7 @@ private fun LessonPillarBody(
               shape = RoundedCornerShape(6.dp),
             ) {
               Text(
-                text = "CONCEPT BLOCK ${idx + 1} OF ${lesson.concepts.size}",
+                text = "SECTION ${idx + 1} OF ${lesson.concepts.size}",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
@@ -565,11 +657,41 @@ private fun LessonPillarBody(
               style = MaterialTheme.typography.bodyLarge,
               color = MaterialTheme.colorScheme.onSurface,
             )
+            if (block.mechanismWhyHow.isNotBlank()) {
+              Surface(
+                color = MaterialTheme.colorScheme.background,
+                shape = RoundedCornerShape(10.dp),
+                modifier =
+                  Modifier.fillMaxWidth()
+                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(10.dp)),
+              ) {
+                ScientificText(
+                  text = "Why & How It Works: ${block.mechanismWhyHow}",
+                  style = MaterialTheme.typography.bodySmall,
+                  color = MaterialTheme.colorScheme.onSurface,
+                  modifier = Modifier.padding(10.dp),
+                )
+              }
+            }
             if (!block.keyFormula.isNullOrBlank()) {
               EquationDisplayCard(
                 formula = block.keyFormula,
                 badgeLabel = "SCIENTIFIC FORMULA",
               )
+            }
+            if (block.examIntelligence.isNotBlank()) {
+              Surface(
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.fillMaxWidth(),
+              ) {
+                ScientificText(
+                  text = "JAMB / WAEC / NECO Focus: ${block.examIntelligence}",
+                  style = MaterialTheme.typography.bodySmall,
+                  color = MaterialTheme.colorScheme.onSecondaryContainer,
+                  modifier = Modifier.padding(10.dp),
+                )
+              }
             }
             Row(
               modifier =
@@ -591,6 +713,14 @@ private fun LessonPillarBody(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onTertiaryContainer,
                 fontWeight = FontWeight.Medium,
+              )
+            }
+            if (block.recap.isNotBlank()) {
+              ScientificText(
+                text = "Checkpoint Recap: ${block.recap}",
+                style = MaterialTheme.typography.labelMedium,
+                color = semantics.success,
+                fontWeight = FontWeight.SemiBold,
               )
             }
           }
@@ -686,6 +816,11 @@ private fun LessonPillarBody(
             }
           }
         }
+
+        val guided = lesson.guidedPractice
+        if (guided != null) {
+          GuidedPracticeCard(lessonId = lesson.id, task = guided)
+        }
       }
 
       LessonPillar.SCENARIO -> {
@@ -742,6 +877,127 @@ private fun LessonPillarBody(
             }
           }
         }
+
+        if (lesson.misconceptions.isNotEmpty()) {
+          Column(
+            modifier =
+              Modifier.fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surface)
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+          ) {
+            Row(
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+              Icon(
+                Icons.Filled.Psychology,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.error,
+              )
+              Text(
+                text = "MISCONCEPTIONS & ERROR ANALYSIS",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.error,
+                fontWeight = FontWeight.Bold,
+              )
+            }
+            lesson.misconceptions.forEach { misc ->
+              Column(
+                modifier =
+                  Modifier.fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(12.dp))
+                    .padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+              ) {
+                ScientificText(
+                  text = "Wrong Belief: ${misc.wrongBelief}",
+                  style = MaterialTheme.typography.bodySmall,
+                  color = MaterialTheme.colorScheme.error,
+                  fontWeight = FontWeight.Bold,
+                )
+                ScientificText(
+                  text = "Why Students Fall For It: ${misc.whyStudentsBelieveIt}",
+                  style = MaterialTheme.typography.bodySmall,
+                  color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                ScientificText(
+                  text = "Correct Understanding: ${misc.correctUnderstanding}",
+                  style = MaterialTheme.typography.bodySmall,
+                  color = semantics.success,
+                  fontWeight = FontWeight.SemiBold,
+                )
+                ScientificText(
+                  text = "Avoidance Rule: ${misc.avoidanceRule}",
+                  style = MaterialTheme.typography.labelSmall,
+                  color = MaterialTheme.colorScheme.primary,
+                )
+              }
+            }
+          }
+        }
+
+        val cheat = lesson.cheatSheet
+        if (cheat != null) {
+          Column(
+            modifier =
+              Modifier.fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surface)
+                .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+          ) {
+            Text(
+              text = "TOPIC CHEAT SHEET & SPACED REVISION",
+              style = MaterialTheme.typography.labelSmall,
+              color = MaterialTheme.colorScheme.primary,
+              fontWeight = FontWeight.Bold,
+            )
+            ScientificText(
+              text = cheat.overview,
+              style = MaterialTheme.typography.bodyMedium,
+              color = MaterialTheme.colorScheme.onSurface,
+            )
+            if (cheat.symbolLegend.isNotEmpty()) {
+              ScientificText(
+                text = "Key Legend: ${cheat.symbolLegend.joinToString("  •  ")}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+              )
+            }
+            if (cheat.commonTraps.isNotEmpty()) {
+              ScientificText(
+                text = "Top Traps: ${cheat.commonTraps.joinToString(" | ")}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+              )
+            }
+            Surface(
+              color = MaterialTheme.colorScheme.tertiaryContainer,
+              shape = RoundedCornerShape(10.dp),
+              modifier = Modifier.fillMaxWidth(),
+            ) {
+              ScientificText(
+                text = "Memory Anchor: ${cheat.memoryAid}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(10.dp),
+              )
+            }
+            Text(
+              text = "Spaced Review Plan: Days ${cheat.spacedRevisionDays.joinToString(", ")}",
+              style = MaterialTheme.typography.labelSmall,
+              color = MaterialTheme.colorScheme.secondary,
+              fontWeight = FontWeight.Bold,
+            )
+          }
+        }
       }
 
       LessonPillar.LAB -> {
@@ -750,6 +1006,25 @@ private fun LessonPillarBody(
           labType = lesson.labType,
           labBrief = lesson.labBrief,
         )
+      }
+
+      LessonPillar.PROJECT -> {
+        val project = lesson.masteryProject
+        if (project != null) {
+          TopicMasteryProjectCard(lessonId = lesson.id, project = project)
+        } else {
+          Surface(
+            color = MaterialTheme.colorScheme.surface,
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.fillMaxWidth(),
+          ) {
+            Text(
+              text = "Apply the core principles from ${lesson.title} to solve an everyday Nigerian engineering or civic case and verify every unit.",
+              style = MaterialTheme.typography.bodyMedium,
+              modifier = Modifier.padding(16.dp),
+            )
+          }
+        }
       }
 
       LessonPillar.EXERCISE -> {
@@ -769,6 +1044,237 @@ private fun LessonPillarBody(
 }
 
 @Composable
+private fun GuidedPracticeCard(lessonId: String, task: GuidedPracticeTask) {
+  var revealedHints by remember(lessonId) { mutableIntStateOf(0) }
+  var showSolution by remember(lessonId) { mutableStateOf(false) }
+  val semantics = MaterialTheme.semanticColors
+
+  Column(
+    modifier =
+      Modifier.fillMaxWidth()
+        .clip(RoundedCornerShape(16.dp))
+        .background(MaterialTheme.colorScheme.surface)
+        .border(1.5.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
+        .padding(16.dp),
+    verticalArrangement = Arrangement.spacedBy(10.dp),
+  ) {
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Surface(color = MaterialTheme.colorScheme.primaryContainer, shape = RoundedCornerShape(99.dp)) {
+        Text(
+          text = "3-HINT GUIDED PRACTICE • ${task.difficulty.uppercase()}",
+          style = MaterialTheme.typography.labelSmall,
+          color = MaterialTheme.colorScheme.onPrimaryContainer,
+          fontWeight = FontWeight.Bold,
+          modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+        )
+      }
+      Text(
+        text = "~${task.estimatedMinutes} min",
+        style = MaterialTheme.typography.labelSmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+      )
+    }
+
+    ScientificText(
+      text = task.prompt,
+      style = MaterialTheme.typography.bodyLarge,
+      color = MaterialTheme.colorScheme.onSurface,
+      fontWeight = FontWeight.SemiBold,
+    )
+
+    task.hints.take(revealedHints).forEachIndexed { idx, hint ->
+      Surface(
+        color = MaterialTheme.colorScheme.tertiaryContainer,
+        shape = RoundedCornerShape(10.dp),
+        modifier = Modifier.fillMaxWidth(),
+      ) {
+        ScientificText(
+          text = "Hint ${idx + 1}: $hint",
+          style = MaterialTheme.typography.bodySmall,
+          color = MaterialTheme.colorScheme.onTertiaryContainer,
+          modifier = Modifier.padding(10.dp),
+        )
+      }
+    }
+
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+      if (revealedHints < task.hints.size) {
+        OutlinedButton(
+          onClick = { revealedHints++ },
+          modifier = Modifier.weight(1f).height(48.dp),
+          shape = RoundedCornerShape(10.dp),
+        ) {
+          Text("Reveal Hint ${revealedHints + 1}/${task.hints.size}")
+        }
+      }
+      Button(
+        onClick = { showSolution = !showSolution },
+        modifier = Modifier.weight(1f).height(48.dp),
+        shape = RoundedCornerShape(10.dp),
+      ) {
+        Text(if (showSolution) "Hide Solution" else "Check Full Solution")
+      }
+    }
+
+    if (showSolution) {
+      Surface(
+        color = semantics.successContainer,
+        shape = RoundedCornerShape(12.dp),
+        modifier =
+          Modifier.fillMaxWidth()
+            .border(1.dp, semantics.success, RoundedCornerShape(12.dp)),
+      ) {
+        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+          ScientificText(
+            text = "Expected Strategy: ${task.expectedApproach}",
+            style = MaterialTheme.typography.labelMedium,
+            color = semantics.onSuccessContainer,
+            fontWeight = FontWeight.Bold,
+          )
+          ScientificText(
+            text = task.completeSolution,
+            style = MaterialTheme.typography.bodySmall,
+            color = semantics.onSuccessContainer,
+          )
+        }
+      }
+    }
+  }
+}
+
+@Composable
+private fun TopicMasteryProjectCard(lessonId: String, project: TopicMasteryProject) {
+  val checkedRubric = remember(lessonId) { mutableStateMapOf<Int, Boolean>() }
+  var showModel by remember(lessonId) { mutableStateOf(false) }
+  val semantics = MaterialTheme.semanticColors
+
+  Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+    Column(
+      modifier =
+        Modifier.fillMaxWidth()
+          .clip(RoundedCornerShape(16.dp))
+          .background(MaterialTheme.colorScheme.surface)
+          .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
+          .padding(16.dp),
+      verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+      Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+      ) {
+        Icon(
+          Icons.Filled.Build,
+          contentDescription = null,
+          tint = MaterialTheme.colorScheme.primary,
+          modifier = Modifier.size(18.dp),
+        )
+        Text(
+          text = "APPLIED MASTERY PROJECT • ${project.format.uppercase()}",
+          style = MaterialTheme.typography.labelSmall,
+          color = MaterialTheme.colorScheme.primary,
+          fontWeight = FontWeight.Bold,
+        )
+      }
+      Text(
+        text = project.title,
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.onSurface,
+      )
+      ScientificText(
+        text = project.nigerianScenario,
+        style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onSurface,
+      )
+      Text(
+        text = "ACTION STAGES",
+        style = MaterialTheme.typography.labelSmall,
+        color = MaterialTheme.colorScheme.secondary,
+        fontWeight = FontWeight.Bold,
+      )
+      project.stages.forEachIndexed { idx, stage ->
+        ScientificText(
+          text = "${idx + 1}. $stage",
+          style = MaterialTheme.typography.bodySmall,
+          color = MaterialTheme.colorScheme.onSurface,
+        )
+      }
+    }
+
+    Column(
+      modifier =
+        Modifier.fillMaxWidth()
+          .clip(RoundedCornerShape(16.dp))
+          .background(MaterialTheme.colorScheme.surface)
+          .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
+          .padding(16.dp),
+      verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+      Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+      ) {
+        Icon(
+          Icons.Filled.Checklist,
+          contentDescription = null,
+          tint = semantics.success,
+          modifier = Modifier.size(18.dp),
+        )
+        Text(
+          text = "SELF-EVALUATION RUBRIC",
+          style = MaterialTheme.typography.labelSmall,
+          color = semantics.success,
+          fontWeight = FontWeight.Bold,
+        )
+      }
+      project.rubricCriteria.forEachIndexed { idx, criterion ->
+        val checked = checkedRubric[idx] == true
+        Row(
+          modifier =
+            Modifier.fillMaxWidth()
+              .clip(RoundedCornerShape(10.dp))
+              .clickable { checkedRubric[idx] = !checked }
+              .padding(vertical = 4.dp),
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+          Checkbox(checked = checked, onCheckedChange = { checkedRubric[idx] = it })
+          ScientificText(
+            text = criterion,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface,
+          )
+        }
+      }
+      OutlinedButton(
+        onClick = { showModel = !showModel },
+        modifier = Modifier.fillMaxWidth().height(48.dp),
+        shape = RoundedCornerShape(10.dp),
+      ) {
+        Text(if (showModel) "Hide Model Examiner Response" else "Compare With High-Scoring Model Response")
+      }
+      if (showModel) {
+        Surface(
+          color = semantics.successContainer,
+          shape = RoundedCornerShape(12.dp),
+          modifier = Modifier.fillMaxWidth(),
+        ) {
+          ScientificText(
+            text = project.modelResponse,
+            style = MaterialTheme.typography.bodySmall,
+            color = semantics.onSuccessContainer,
+            modifier = Modifier.padding(12.dp),
+          )
+        }
+      }
+    }
+  }
+}
+
+@Composable
 private fun InlineExerciseSection(
   lessonId: String,
   questions: List<PracticeQuestion>,
@@ -784,7 +1290,7 @@ private fun InlineExerciseSection(
   var retryNonce by remember(lessonId) { mutableIntStateOf(0) }
   var seenIds by remember(lessonId) { mutableStateOf(emptySet<String>()) }
   var lastRoundIds by remember(lessonId) { mutableStateOf(emptySet<String>()) }
-  val batchSize = minOf(3, questions.size).coerceAtLeast(1)
+  val batchSize = minOf(5, questions.size).coerceAtLeast(1)
   val activeQuestions =
     remember(lessonId, retryNonce, questions) {
       QuestionShuffler.prepareFreshQuestionSet(
@@ -793,6 +1299,16 @@ private fun InlineExerciseSection(
         previouslySeenIds = seenIds,
         lastRoundIds = lastRoundIds,
       )
+    }
+  val questionWeights =
+    remember(activeQuestions.size) {
+      when (activeQuestions.size) {
+        5 -> listOf(15, 20, 20, 20, 25)
+        4 -> listOf(25, 25, 25, 25)
+        3 -> listOf(30, 35, 35)
+        2 -> listOf(50, 50)
+        else -> List(activeQuestions.size) { 100 / activeQuestions.size.coerceAtLeast(1) }
+      }
     }
   val semantics = MaterialTheme.semanticColors
 
@@ -804,7 +1320,7 @@ private fun InlineExerciseSection(
     ) {
       Text(
         text =
-          "Attempt #${attemptCount + 1} • ${activeQuestions.size} Fresh Questions (Bank: ${questions.size}) • Shuffled A–D",
+          "Attempt #${attemptCount + 1} • 100-Mark Mastery Assessment (${activeQuestions.size} Qs from ${questions.size}-item Bank • Pass ≥${CurriculumProgression.PASS_THRESHOLD_PERCENT}%)",
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         fontWeight = FontWeight.SemiBold,
@@ -814,6 +1330,7 @@ private fun InlineExerciseSection(
 
     activeQuestions.forEachIndexed { idx, q ->
       val chosen = selectedAnswers[q.id]
+      val marksForQ = questionWeights.getOrElse(idx) { 20 }
       Column(
         modifier =
           Modifier.fillMaxWidth()
@@ -824,7 +1341,7 @@ private fun InlineExerciseSection(
         verticalArrangement = Arrangement.spacedBy(10.dp),
       ) {
         Text(
-          text = "Q${idx + 1} • ${q.examType} ${q.year}",
+          text = "Q${idx + 1} • ${q.boardStyleLabel} • ${q.cognitiveLevel} ($marksForQ marks)",
           style = MaterialTheme.typography.labelSmall,
           color = MaterialTheme.colorScheme.primary,
           fontWeight = FontWeight.Bold,
@@ -936,7 +1453,7 @@ private fun InlineExerciseSection(
               )
               if (!q.waecMarkingScheme.isNullOrBlank()) {
                 ScientificText(
-                  text = "WAEC Marking Scheme: ${q.waecMarkingScheme}",
+                  text = "Examiner Marking Scheme: ${q.waecMarkingScheme}",
                   style = MaterialTheme.typography.labelSmall,
                   color = MaterialTheme.colorScheme.primary,
                   fontWeight = FontWeight.Bold,
@@ -957,20 +1474,31 @@ private fun InlineExerciseSection(
           val updatedSeen = seenIds + roundIds
           seenIds = if (updatedSeen.size >= questions.size) roundIds else updatedSeen
           lastRoundIds = roundIds
-          val correct = activeQuestions.count { selectedAnswers[it.id] == it.correctIndex }
-          val pct = if (activeQuestions.isEmpty()) 100L else ((correct * 100L) / activeQuestions.size)
+          val totalMarks = questionWeights.sum().coerceAtLeast(1)
+          val earnedMarks =
+            activeQuestions.mapIndexed { idx, q ->
+              if (selectedAnswers[q.id] == q.correctIndex) questionWeights.getOrElse(idx) { 20 } else 0
+            }.sum()
+          val pct = ((earnedMarks * 100L) / totalMarks).coerceIn(0L, 100L)
           onGraded(pct)
         },
         enabled = selectedAnswers.size == activeQuestions.size,
         modifier = Modifier.fillMaxWidth().height(52.dp).testTag("submit_inline_exercise"),
         shape = RoundedCornerShape(12.dp),
       ) {
-        Text("Check Answers & Grade Quiz (≥60% to Unlock)", fontWeight = FontWeight.Bold)
+        Text("Submit Assessment (≥${CurriculumProgression.PASS_THRESHOLD_PERCENT}% Required)", fontWeight = FontWeight.Bold)
       }
     } else {
       val correct = activeQuestions.count { selectedAnswers[it.id] == it.correctIndex }
-      val pct = if (activeQuestions.isEmpty()) 100L else ((correct * 100L) / activeQuestions.size)
+      val totalMarks = questionWeights.sum().coerceAtLeast(1)
+      val earnedMarks =
+        activeQuestions.mapIndexed { idx, q ->
+          if (selectedAnswers[q.id] == q.correctIndex) questionWeights.getOrElse(idx) { 20 } else 0
+        }.sum()
+      val pct = ((earnedMarks * 100L) / totalMarks).coerceIn(0L, 100L)
+      val band = CurriculumProgression.bandForPercentage(pct)
       val passed = pct >= CurriculumProgression.PASS_THRESHOLD_PERCENT || isAlreadyMastered
+      val missedQuestions = activeQuestions.filter { selectedAnswers[it.id] != it.correctIndex }
 
       Column(
         modifier =
@@ -988,9 +1516,9 @@ private fun InlineExerciseSection(
         Text(
           text =
             if (passed) {
-              "Lesson Mastered • $correct / ${activeQuestions.size} (${pct}%)"
+              "${band.label} • $earnedMarks/$totalMarks marks ($correct/${activeQuestions.size} Qs • ${pct}%)"
             } else {
-              "Not Mastered Yet • $correct / ${activeQuestions.size} (${pct}%)"
+              "${band.label} • $earnedMarks/$totalMarks marks (${pct}% — Need ${CurriculumProgression.PASS_THRESHOLD_PERCENT}%)"
             },
           style = MaterialTheme.typography.titleMedium,
           color = if (passed) semantics.onSuccessContainer else MaterialTheme.colorScheme.onErrorContainer,
@@ -999,14 +1527,41 @@ private fun InlineExerciseSection(
         Text(
           text =
             if (passed) {
-              if (nextLesson != null) "Next lesson unlocked: \"${nextLesson.title}\""
-              else "Final lesson in this track completed! You are ready for timed Exam Lab mocks."
+              if (nextLesson != null) "Mastery threshold met! Next lesson unlocked: \"${nextLesson.title}\""
+              else "Final lesson in this track mastered! You are ready for timed Exam Lab mocks."
             } else {
-              "Score at least 60% (${(activeQuestions.size * 6 + 9) / 10}/${activeQuestions.size}) to master this lesson. Tap Retry for fresh unseen questions!"
+              "${band.summary} Tap Retry for a fresh shuffled paper."
             },
           style = MaterialTheme.typography.bodySmall,
           color = if (passed) semantics.onSuccessContainer else MaterialTheme.colorScheme.onErrorContainer,
         )
+
+        if (!passed && missedQuestions.isNotEmpty()) {
+          Surface(
+            color = MaterialTheme.colorScheme.surface,
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.fillMaxWidth(),
+          ) {
+            Column(
+              modifier = Modifier.padding(12.dp),
+              verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+              Text(
+                text = "TARGETED DIAGNOSTIC REMEDIATION",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.error,
+                fontWeight = FontWeight.Bold,
+              )
+              missedQuestions.forEach { mq ->
+                ScientificText(
+                  text = "• ${mq.topic}: ${mq.remediationTip}",
+                  style = MaterialTheme.typography.bodySmall,
+                  color = MaterialTheme.colorScheme.onSurface,
+                )
+              }
+            }
+          }
+        }
 
         if (passed && nextLesson != null && onOpenNextLesson != null) {
           Button(
@@ -1053,7 +1608,7 @@ private fun InlineExerciseSection(
             Text(
               text =
                 if (passed) "Practice ${activeQuestions.size} Fresh Questions"
-                else "Retry with Fresh Questions (Attempt #${attemptCount + 1})",
+                else "Retry Fresh Mastery Paper (Attempt #${attemptCount + 1})",
               fontWeight = FontWeight.Bold,
             )
           }

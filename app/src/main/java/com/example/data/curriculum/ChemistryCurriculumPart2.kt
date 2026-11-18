@@ -48,7 +48,7 @@ object ChemistryCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Calculating ΔH Using Bond Energies",
-                    examSource = "JAMB UTME 2024 • Chem Q20",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "For H₂ + Cl₂ → 2HCl, given H−H = 436, Cl−Cl = 242, H−Cl = 431 kJ/mol, find ΔH.",
                     steps =
@@ -62,7 +62,7 @@ object ChemistryCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Gibbs Free Energy Spontaneity Check",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q22",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "If ΔH = −20 kJ/mol and ΔS = −0.05 kJ/(mol·K) at 300 K, find ΔG.",
                     steps =
                       listOf(
@@ -146,7 +146,7 @@ object ChemistryCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_chem_07_6",
                     topic = "Calorimetry",
-                    examType = "JAMB",
+                    examType = "NECO",
                     year = 2024,
                     question = "Burning 0.5 mol of fuel heats 1000 g water by 20°C (c = 4.2 J/g°C). Molar ΔH is:",
                     options = listOf("−168 kJ/mol", "−84 kJ/mol", "−42 kJ/mol", "−336 kJ/mol"),
@@ -193,7 +193,7 @@ object ChemistryCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Le Chatelier Shifts in Contact Process (SO₃)",
-                    examSource = "JAMB UTME 2024 • Chem Q23",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "For 2SO₂(g) + O₂(g) ⇌ 2SO₃(g), ΔH = −197 kJ. Predict the effect of (i) raising pressure and (ii) raising temperature.",
                     steps =
@@ -207,7 +207,7 @@ object ChemistryCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Writing Homogeneous Equilibrium Constant K_c",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q24",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Write K_c for CaCO₃(s) ⇌ CaO(s) + CO₂(g) and N₂(g) + 3H₂(g) ⇌ 2NH₃(g).",
                     steps =
                       listOf(
@@ -291,7 +291,7 @@ object ChemistryCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_chem_08_6",
                     topic = "Rate Law Order",
-                    examType = "JAMB",
+                    examType = "NECO",
                     year = 2024,
                     question = "If Rate = k[A]²[B], doubling [A] while keeping [B] constant multiplies the rate by:",
                     options = listOf("2", "4", "8", "1"),
@@ -338,7 +338,7 @@ object ChemistryCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Finding Oxidation State of Chromium in K₂Cr₂O₇",
-                    examSource = "JAMB UTME 2024 • Chem Q25",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "Calculate the oxidation number of Chromium in Potassium Dichromate(VI), K₂Cr₂O₇.",
                     steps =
                       listOf(
@@ -351,7 +351,7 @@ object ChemistryCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Computing Standard Cell EMF",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q27",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Given Zn²⁺/Zn E° = −0.76 V and Cu²⁺/Cu E° = +0.34 V, find E°_cell.",
                     steps =
                       listOf(
@@ -435,7 +435,7 @@ object ChemistryCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_chem_09_6",
                     topic = "Peroxide Exception",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "What is the oxidation number of Oxygen in Hydrogen Peroxide (H₂O₂)?",
                     options = listOf("−2", "−1", "+1", "0"),
@@ -482,7 +482,7 @@ object ChemistryCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Mass of Copper Plated by Faraday's First Law",
-                    examSource = "JAMB UTME 2024 • Chem Q27",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "Calculate the mass of Copper deposited when a current of 2.0 A passes through CuSO₄(aq) for 965 s. (Cu = 64, F = 96,500 C/mol)",
                     steps =
@@ -496,7 +496,7 @@ object ChemistryCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Series Baths (Faraday's Second Law)",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q29",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "The same electricity deposits 0.1 mol of Ag from AgNO₃. How many moles of Al are deposited from molten Al₂O₃ in series?",
                     steps =
@@ -582,7 +582,7 @@ object ChemistryCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_chem_10_6",
                     topic = "Acidified Water",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "If 40 cm³ of Hydrogen is collected at the cathode during electrolysis of dilute H₂SO₄, what volume of Oxygen collects at the anode?",
                     options = listOf("80 cm³", "40 cm³", "20 cm³", "10 cm³"),
@@ -639,7 +639,7 @@ object ChemistryCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Halogen Displacement Down Group 17",
-                    examSource = "JAMB UTME 2024 • Chem Q29",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "Predict what happens when Chlorine gas bubbles through aqueous Potassium Bromide (KBr).",
                     steps =
                       listOf(
@@ -652,7 +652,7 @@ object ChemistryCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Removing Both Temporary & Permanent Hardness",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q31",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Which chemical softens BOTH temporary and permanent hard water in one step?",
                     steps =
                       listOf(
@@ -736,7 +736,7 @@ object ChemistryCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_chem_11_6",
                     topic = "Contact Process Catalyst",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "Name the catalyst used to oxidize SO₂ to SO₃ in the Contact Process.",
                     options = listOf("Finely divided Iron", "Vanadium(V) oxide (V₂O₅)", "Nickel", "Manganese(IV) oxide"),
@@ -783,7 +783,7 @@ object ChemistryCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Role of Limestone in Iron Extraction",
-                    examSource = "JAMB UTME 2024 • Chem Q32",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "What is the main chemical purpose of adding Limestone (CaCO₃) to the Blast Furnace?",
                     steps =
                       listOf(
@@ -795,7 +795,7 @@ object ChemistryCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Thermal Decomposition of Metal Nitrates",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q33",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Compare heat decomposition products of NaNO₃ vs Cu(NO₃)₂ vs AgNO₃.",
                     steps =
                       listOf(
@@ -880,7 +880,7 @@ object ChemistryCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_chem_12_6",
                     topic = "Iron Corrosion",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "Which pair of agents are BOTH strictly required for iron to rust?",
                     options = listOf("Nitrogen and water", "Oxygen and moisture (water)", "Carbon dioxide and heat", "Dry oxygen only"),

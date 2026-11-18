@@ -47,7 +47,7 @@ object PhysicsCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Finding Unknown Temperature on Uncalibrated Thermometer",
-                    examSource = "JAMB UTME 2024 • Physics Q18",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "A mercury thread measures 4.0 cm at 0°C and 24.0 cm at 100°C. What temperature gives length 14.0 cm?",
                     steps =
@@ -60,7 +60,7 @@ object PhysicsCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Gas Cylinder Heated at Constant Pressure",
-                    examSource = "WAEC SSCE 2023 • Paper 2 Q5",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "Gas occupies 300 cm³ at 27°C. What volume does it occupy at 127°C if pressure stays constant?",
                     steps =
@@ -147,7 +147,7 @@ object PhysicsCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_phy_08_6",
                     topic = "Thermometer Calibration",
-                    examType = "JAMB",
+                    examType = "NECO",
                     year = 2020,
                     question = "A resistance thermometer reads 10 Ω at 0°C, 30 Ω at 100°C, and 22 Ω in warm oil. Find oil temperature.",
                     options = listOf("40°C", "50°C", "60°C", "72°C"),
@@ -192,7 +192,7 @@ object PhysicsCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Method of Mixtures Calorimetry",
-                    examSource = "JAMB UTME 2024 • Physics Q20",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "A 100 W immersion heater supplies heat for 210 s to warm 0.5 kg of water (c = 4,200 J/kg·K). Find temperature rise Δθ.",
                     steps =
@@ -206,7 +206,7 @@ object PhysicsCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Total Energy to Melt Ice and Warm Water",
-                    examSource = "WAEC SSCE 2022 • Paper 2 Q6",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "How much heat converts 0.2 kg of ice at 0°C completely into water at 20°C? (L_f = 336,000 J/kg, c = 4,200 J/kg·K)",
                     steps =
@@ -294,7 +294,7 @@ object PhysicsCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_phy_09_6",
                     topic = "Evaporation",
-                    examType = "JAMB",
+                    examType = "NECO",
                     year = 2020,
                     question = "Which condition SLOWS down the rate of evaporation from an open bowl of water?",
                     options = listOf("Wind blowing across surface", "Higher temperature", "Higher air humidity", "Wider surface area"),
@@ -339,7 +339,7 @@ object PhysicsCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Closed Organ Pipe Fundamental & First Overtone",
-                    examSource = "JAMB UTME 2024 • Physics Q23",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "A pipe closed at one end is 0.25 m long. If sound speed in air is 340 m/s, find fundamental frequency f₀ and first overtone f₁.",
                     steps =
@@ -352,7 +352,7 @@ object PhysicsCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Extracting Frequency & Wavelength from Wave Equation",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q20",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "A wave is given by y = 5 sin(20π t − 0.4π x) in SI units. Find its frequency and wavelength.",
                     steps =
@@ -440,7 +440,7 @@ object PhysicsCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_phy_10_6",
                     topic = "Sound Medium",
-                    examType = "JAMB",
+                    examType = "NECO",
                     year = 2020,
                     question = "In which medium does sound travel FASTEST at room temperature?",
                     options = listOf("Vacuum", "Dry air", "Fresh water", "Steel rail"),
@@ -485,7 +485,7 @@ object PhysicsCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Converging Lens Real Image Distance",
-                    examSource = "JAMB UTME 2024 • Physics Q25",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "An object sits 30 cm in front of a convex lens of focal length 10 cm. Locate image v and magnification m.",
                     steps =
@@ -499,7 +499,7 @@ object PhysicsCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Apparent Depth of Coin in Swimming Pool",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q24",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "A coin sits at the bottom of a 2.0 m deep water tank (n = 1.33 ≈ 4/3). How deep does it appear from directly above?",
                     steps =
@@ -586,7 +586,7 @@ object PhysicsCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_phy_11_6",
                     topic = "Mirror Formula",
-                    examType = "JAMB",
+                    examType = "NECO",
                     year = 2020,
                     question = "A concave mirror of focal length 12 cm forms a real image at 24 cm. Where is the object placed?",
                     options = listOf("8 cm", "12 cm", "24 cm", "36 cm"),
@@ -641,7 +641,7 @@ object PhysicsCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Series vs Parallel Capacitor Equivalence",
-                    examSource = "JAMB UTME 2024 • Physics Q28",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "A 3 μF and a 6 μF capacitor are connected in SERIES across a 12 V battery. Find total capacitance C_T and stored energy.",
                     steps =
@@ -654,7 +654,7 @@ object PhysicsCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Coulomb Distance Halving",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q27",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "Two point charges repel with 16 N at distance d. What is the force if distance doubles to 2d?",
                     steps =
@@ -741,7 +741,7 @@ object PhysicsCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_phy_12_6",
                     topic = "Lightning Rods",
-                    examType = "JAMB",
+                    examType = "NECO",
                     year = 2021,
                     question = "Lightning conductors installed on tall rooftops work on the principle of:",
                     options = listOf("Electromagnetic induction", "Action of sharp points (corona discharge)", "Thermionic emission", "Eddy currents"),
@@ -786,7 +786,7 @@ object PhysicsCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Battery EMF & Internal Resistance Circuit",
-                    examSource = "JAMB UTME 2024 • Physics Q30",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "A cell of EMF 1.5 V and internal resistance 0.5 Ω feeds a 2.5 Ω resistor. Find circuit current I and terminal p.d. V.",
                     steps =
@@ -800,7 +800,7 @@ object PhysicsCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Monthly Heater Electricity Bill in kWh",
-                    examSource = "WAEC SSCE 2023 • Paper 2 Q8",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "A 2,000 W electric iron runs for 3 hours daily over 10 days at ₦60 per kWh. Calculate total electricity cost.",
                     steps =
@@ -888,7 +888,7 @@ object PhysicsCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_phy_13_6",
                     topic = "Fuse Safety",
-                    examType = "JAMB",
+                    examType = "NECO",
                     year = 2020,
                     question = "A 2,400 W electric kettle operates on 240 V mains. Which fuse rating is safest?",
                     options = listOf("5 A", "10 A", "13 A", "30 A"),

@@ -59,7 +59,7 @@ object EnglishCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Solving Uncountable Noun & Determiner Traps",
-                    examSource = "JAMB UTME 2024 • Use of English Q3",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "Choose the correct sentence: (A) She gave me many informations. (B) She gave me much useful information.",
                     steps =
                       listOf(
@@ -71,7 +71,7 @@ object EnglishCurriculum {
                   ),
                   WorkedExample(
                     title = "Testing Subject vs Object Pronouns",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q8",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Fill the gap: 'The principal scolded Ada and ____ for arriving late.' (I / me)",
                     steps =
                       listOf(
@@ -155,7 +155,7 @@ object EnglishCurriculum {
                   PracticeQuestion(
                     id = "ex_eng_01_6",
                     topic = "Negative Prefix",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "The word 'INFLAMMABLE' actually means:",
                     options = listOf("Impossible to burn", "Fireproof", "Easily catching fire", "Extinguished"),
@@ -202,7 +202,7 @@ object EnglishCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Distinguishing Same-Word Clause Jobs ('where she hid')",
-                    examSource = "WAEC SSCE 2024 • Comprehension Paper 2 Q4(g)",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "Contrast the underlined clause '...where she hid the keys' in: (1) 'I know WHERE SHE HID THE KEYS.' vs (2) 'The drawer WHERE SHE HID THE KEYS was locked.'",
                     steps =
@@ -215,7 +215,7 @@ object EnglishCurriculum {
                   ),
                   WorkedExample(
                     title = "Identifying Prepositional vs Participial Phrase",
-                    examSource = "JAMB UTME 2023 • Use of English Q11",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "What grammatical structure is 'ON THE WOODEN TABLE' in 'The keys on the wooden table vanished'?",
                     steps =
                       listOf(
@@ -299,7 +299,7 @@ object EnglishCurriculum {
                   PracticeQuestion(
                     id = "ex_eng_02_6",
                     topic = "Object of Preposition",
-                    examType = "JAMB",
+                    examType = "NECO",
                     year = 2024,
                     question = "In 'Success depends on HOW HARD YOU WORK', 'HOW HARD YOU WORK' is a:",
                     options = listOf("Noun clause (Complement of preposition 'on')", "Adverbial clause of manner", "Adjectival clause", "Verb phrase"),
@@ -346,7 +346,7 @@ object EnglishCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Repairing a Dangling Modifier",
-                    examSource = "JAMB UTME 2024 • Use of English Q15",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "Spot why 'Driving past the stadium, the scoreboard caught my eye' is faulty and pick the grammatically sound fix.",
                     steps =
@@ -359,7 +359,7 @@ object EnglishCurriculum {
                   ),
                   WorkedExample(
                     title = "Selecting Between Who and Whom Quickly",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q12",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Fill in: 'The candidate ____ the panel interviewed impressed everyone.' (who / whom)",
                     steps =
                       listOf(
@@ -448,7 +448,7 @@ object EnglishCurriculum {
                   PracticeQuestion(
                     id = "ex_eng_03_6",
                     topic = "Correlative Conjunctions",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "'Scarcely had the teacher entered ____ the noise ceased.'",
                     options = listOf("than", "when", "then", "since"),
@@ -505,7 +505,7 @@ object EnglishCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Third Conditional Inverted Clause",
-                    examSource = "JAMB UTME 2024 • Use of English Q18",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "Complete: 'Had the goalie dived a second earlier, he ____ the penalty.'",
                     steps =
                       listOf(
@@ -517,7 +517,7 @@ object EnglishCurriculum {
                   ),
                   WorkedExample(
                     title = "Fixed Past Timestamp vs Ongoing Action",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q16",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Choose right tense: 'My uncle ____ to Abuja two weeks ago.' (has travelled / travelled)",
                     steps =
                       listOf(
@@ -601,7 +601,7 @@ object EnglishCurriculum {
                   PracticeQuestion(
                     id = "ex_eng_04_6",
                     topic = "Irregular Verbs",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "The armed robber was sentenced to death and ____ at dawn.",
                     options = listOf("hung", "hanged", "hangs", "hanging"),
@@ -648,7 +648,7 @@ object EnglishCurriculum {
                 listOf(
                   WorkedExample(
                     title = "High Time & Would Rather Trap",
-                    examSource = "JAMB UTME 2024 • Use of English Q22",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "Complete: 'It is high time the committee ____ a final decision.'",
                     steps =
                       listOf(
@@ -660,7 +660,7 @@ object EnglishCurriculum {
                   ),
                   WorkedExample(
                     title = "Reported Question Word Order Flip",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q21",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Convert to Indirect Speech: He asked me, 'Where do you live?'",
                     steps =
                       listOf(
@@ -749,7 +749,7 @@ object EnglishCurriculum {
                   PracticeQuestion(
                     id = "ex_eng_05_6",
                     topic = "Passive Continuous",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "Change to Passive: 'The mechanics are servicing the school bus.'",
                     options = listOf(
@@ -801,7 +801,7 @@ object EnglishCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Relative Pronoun Inside 'One of the Boys Who...'",
-                    examSource = "JAMB UTME 2024 • Use of English Q25",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "Compare: (A) 'One of the boys ____ missing.' vs (B) 'She is one of the girls who ____ always early.'",
                     steps =
@@ -814,7 +814,7 @@ object EnglishCurriculum {
                   ),
                   WorkedExample(
                     title = "Along With vs Neither/Nor",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q24",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Choose right verbs: (1) 'The choir leader, together with twenty singers, ____ arrived.' (2) 'Neither Ada nor her friends ____ coming.'",
                     steps =
                       listOf(
@@ -898,7 +898,7 @@ object EnglishCurriculum {
                   PracticeQuestion(
                     id = "ex_eng_06_6",
                     topic = "Plural-Form Singular Nouns",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "Mathematics, alongside Physics and Economics, ____ logical reasoning.",
                     options = listOf("require", "requires", "are requiring", "have required"),

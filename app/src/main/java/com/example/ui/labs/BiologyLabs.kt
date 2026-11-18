@@ -28,7 +28,7 @@ internal fun BiologyLabDispatcher(lessonId: String, labType: PracticalLabType) {
     PracticalLabType.CELL_OSMOSIS_LAB -> {
       if (lessonId == "bio_01_diversity_microscopy") MicroscopyMagnificationLab() else OsmosisCellBathLab()
     }
-    PracticalLabType.BIOENERGETICS_ENZYME_LAB -> EnzymeActivityLab()
+    PracticalLabType.BIOENERGETICS_ENZYME_LAB -> BioenergeticsAndEnzymeLab()
     PracticalLabType.NUTRITION_TRANSPORT_LAB -> {
       if (lessonId == "bio_04_nutrition_digestion") FoodTestsBenchLab() else HeartCirculationLab()
     }
@@ -36,11 +36,15 @@ internal fun BiologyLabDispatcher(lessonId: String, labType: PracticalLabType) {
     PracticalLabType.NERVOUS_ENDOCRINE_LAB -> {
       if (lessonId == "bio_07_nervous_eye_ear") EyeAccommodationDefectsLab() else BloodSugarHormoneLab()
     }
-    PracticalLabType.REPRODUCTION_FLOWER_LAB -> MenstrualHormoneCycleLab()
+    PracticalLabType.REPRODUCTION_FLOWER_LAB -> ReproductionAndCycleLab()
     PracticalLabType.MENDELIAN_GENETICS -> PunnettGeneticsLab()
     PracticalLabType.EVOLUTION_VARIATION_LAB -> VariationSelectionLab()
-    PracticalLabType.ECOLOGY_ENERGY_PYRAMID -> TrophicEnergyPyramidLab()
-    PracticalLabType.BIOGEOCHEMICAL_SOIL_LAB -> NitrogenCycleSoilLab()
+    PracticalLabType.ECOLOGY_ENERGY_PYRAMID -> {
+      if (lessonId == "bio_13_biomes_adaptations") NigerianBiomesLab() else TrophicEnergyPyramidLab()
+    }
+    PracticalLabType.BIOGEOCHEMICAL_SOIL_LAB -> {
+      if (lessonId == "bio_15_microbes_vectors_conservation") DiseaseVectorsConservationLab() else NitrogenCycleSoilLab()
+    }
     else -> OsmosisCellBathLab()
   }
 }
@@ -92,6 +96,40 @@ private fun OsmosisCellBathLab() {
       )
     )
     ScientificText("Plant: ${plantState[bathIdx]}\nAnimal RBC: ${rbcState[bathIdx]}", style = MaterialTheme.typography.bodySmall)
+  }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun BioenergeticsAndEnzymeLab() {
+  var mode by remember { mutableIntStateOf(0) } // 0=Enzymes, 1=Photosynthesis & ATP
+  Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+      FilterChip(selected = mode == 0, onClick = { mode = 0 }, label = { Text("Enzyme Temp & pH") })
+      FilterChip(selected = mode == 1, onClick = { mode = 1 }, label = { Text("Photosynthesis & ATP") })
+    }
+    if (mode == 0) {
+      EnzymeActivityLab()
+    } else {
+      var lightIntensity by remember { mutableFloatStateOf(70f) }
+      var co2Pct by remember { mutableFloatStateOf(0.04f) }
+      val limiting =
+        when {
+          lightIntensity < 35f -> "Light Intensity (Light-dependent ATP/NADPH)"
+          co2Pct < 0.04f -> "CO₂ Concentration (Calvin Cycle)"
+          else -> "Temperature / Enzyme Saturation"
+        }
+      LabMetricBanner(
+        listOf(
+          "O₂ Bubbles" to "${((lightIntensity * co2Pct * 12f).roundToInt()).coerceAtLeast(1)}/min",
+          "Aerobic ATP" to "38 ATP / Glucose",
+          "Limiting Factor" to limiting.substringBefore(" ("),
+        )
+      )
+      Slider(value = lightIntensity, onValueChange = { lightIntensity = it }, valueRange = 10f..100f)
+      Slider(value = co2Pct, onValueChange = { co2Pct = it }, valueRange = 0.01f..0.10f)
+      ScientificText("Active Constraint: $limiting", style = MaterialTheme.typography.bodySmall)
+    }
   }
 }
 
@@ -227,6 +265,36 @@ private fun BloodSugarHormoneLab() {
   }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun ReproductionAndCycleLab() {
+  var plantMode by remember { mutableStateOf(false) }
+  Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+      FilterChip(selected = !plantMode, onClick = { plantMode = false }, label = { Text("Human 28-Day Cycle") })
+      FilterChip(selected = plantMode, onClick = { plantMode = true }, label = { Text("Flower Double Fertilization") })
+    }
+    if (!plantMode) {
+      MenstrualHormoneCycleLab()
+    } else {
+      var stage by remember { mutableIntStateOf(0) }
+      val flowerSteps = listOf(
+        "Pollen Grain Lands" to "Insect or wind transfers haploid pollen (n) onto sticky stigma; pollen tube digests style.",
+        "Male Gamete 1 + Egg" to "Fuses with haploid egg cell inside ovule → Diploid Zygote (2n) → Embryo.",
+        "Male Gamete 2 + Polar Nuclei" to "Fuses with 2 polar nuclei → Triploid Primary Endosperm Nucleus (3n) food store!",
+        "Ovary → Fruit; Ovule → Seed" to "Ovary wall (pericarp) swells into Fruit while hardened ovule integuments form Testa (seed coat).",
+      )
+      FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        flowerSteps.forEachIndexed { idx, (label, _) ->
+          FilterChip(selected = stage == idx, onClick = { stage = idx }, label = { Text(label.substringBefore(" +")) })
+        }
+      }
+      LabMetricBanner(listOf("Angiosperm Stage" to flowerSteps[stage].first))
+      ScientificText(flowerSteps[stage].second, style = MaterialTheme.typography.bodySmall)
+    }
+  }
+}
+
 @Composable
 private fun MenstrualHormoneCycleLab() {
   var day by remember { mutableIntStateOf(14) }
@@ -328,6 +396,27 @@ private fun TrophicEnergyPyramidLab() {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
+private fun NigerianBiomesLab() {
+  var biomeIdx by remember { mutableIntStateOf(0) }
+  val biomes = listOf(
+    "Mangrove Swamp" to "Niger Delta tidal waterlogging • Red Mangrove stilt roots & pneumatophores for anaerobic O₂ breathing.",
+    "Tropical Rainforest" to "Southern Nigeria (>2000 mm rain) • Stratified multi-canopy trees, buttress roots, broad drip-tip leaves.",
+    "Guinea / Sudan Savanna" to "Middle Belt to North • Tall grasses, scattered fire-resistant Baobab & Shea trees, thick corky bark.",
+    "Sahel Xerophyte Zone" to "Far Northeast (<500 mm rain) • Acacia thorns, waxy cuticle, sunken stomata & deep taproots.",
+  )
+  Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+      biomes.forEachIndexed { i, (label, _) ->
+        FilterChip(selected = biomeIdx == i, onClick = { biomeIdx = i }, label = { Text(label.substringBefore(" ")) })
+      }
+    }
+    LabMetricBanner(listOf("Nigerian Biome" to biomes[biomeIdx].first))
+    ScientificText(biomes[biomeIdx].second, style = MaterialTheme.typography.bodySmall)
+  }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
 private fun NitrogenCycleSoilLab() {
   var stage by remember { mutableIntStateOf(0) }
   val steps = listOf(
@@ -344,5 +433,26 @@ private fun NitrogenCycleSoilLab() {
     }
     LabMetricBanner(listOf("Process" to steps[stage].first))
     ScientificText(steps[stage].second, style = MaterialTheme.typography.bodySmall)
+  }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun DiseaseVectorsConservationLab() {
+  var idx by remember { mutableIntStateOf(0) }
+  val items = listOf(
+    "Anopheles (Malaria)" to "Pathogen: Plasmodium protozoon • Control: Clear stagnant gutters, larvicide & insecticide-treated nets.",
+    "Tsetse Fly (Sleeping Sickness)" to "Pathogen: Trypanosoma • Control: Clear riverside brush & treat infected cattle.",
+    "Freshwater Snail (Bilharzia)" to "Pathogen: Schistosoma • Control: Avoid wading in infested streams & enforce sanitation.",
+    "Biodiversity Reserves" to "Yankari Game Reserve & Cross River National Park protect endangered wildlife via anti-poaching & reforestation.",
+  )
+  Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+      items.forEachIndexed { i, (label, _) ->
+        FilterChip(selected = idx == i, onClick = { idx = i }, label = { Text(label.substringBefore(" (")) })
+      }
+    }
+    LabMetricBanner(listOf("Public Health Target" to items[idx].first))
+    ScientificText(items[idx].second, style = MaterialTheme.typography.bodySmall)
   }
 }

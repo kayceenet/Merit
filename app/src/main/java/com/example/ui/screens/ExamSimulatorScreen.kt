@@ -144,7 +144,7 @@ fun ExamSimulatorScreen(
               ) {
                 Surface(color = CourseraAzureAccent, shape = RoundedCornerShape(6.dp)) {
                   Text(
-                    text = "TIMED CBT & WAEC ENGINE",
+                    text = "TIMED CBT • JAMB • WAEC • NECO",
                     style = MaterialTheme.typography.labelSmall,
                     color = CourseraAzureInk,
                     fontWeight = FontWeight.Bold,
@@ -153,12 +153,12 @@ fun ExamSimulatorScreen(
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                  text = "JAMB CBT & WAEC Exam Lab",
+                  text = "JAMB, WAEC & NECO Exam Lab",
                   style = MaterialTheme.typography.headlineSmall,
                   color = Color.White,
                 )
                 Text(
-                  text = "2018–2026 past-question bank, state-managed timer, and detailed post-exam summary.",
+                  text = "Syllabus-aligned practice bank, state-managed timer, and detailed post-exam diagnostics.",
                   style = MaterialTheme.typography.bodySmall,
                   color = Color(0xFFE2E8F0),
                 )
@@ -185,13 +185,14 @@ fun ExamSimulatorScreen(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
               ) {
-                listOf("JAMB", "WAEC", "ALL").forEach { board ->
+                listOf("JAMB", "WAEC", "NECO", "ALL").forEach { board ->
                   val selected = selectedExamBoard == board
                   val boardLabel =
                     when (board) {
                       "JAMB" -> "JAMB UTME CBT"
-                      "WAEC" -> "WAEC SSCE + Marking Scheme"
-                      else -> "JAMB + WAEC Combined"
+                      "WAEC" -> "WAEC WASSCE + Scheme"
+                      "NECO" -> "NECO SSCE + Scheme"
+                      else -> "All 3 Boards Combined"
                     }
                   FilterChip(
                     selected = selected,
@@ -293,7 +294,7 @@ fun ExamSimulatorScreen(
               ) {
                 Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                   Text(
-                    text = "Offline Paper Blueprint: $effectiveCount of $availableCount Local Past Questions",
+                    text = "Offline Paper Blueprint: $effectiveCount of $availableCount Syllabus Practice Questions",
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                   )
@@ -304,8 +305,10 @@ fun ExamSimulatorScreen(
                           "Fetched from local Room SQLite bank with live countdown clock, per-question timing & post-exam review."
                         "WAEC" ->
                           "Includes WAEC Objective + Method/Accuracy (M1/A1) examiner marking schemes & offline DataStore sync."
+                        "NECO" ->
+                          "Includes NECO SSCE-style conceptual & practical prompts with full step-by-step derivations."
                         else ->
-                          "Combined JAMB UTME & WAEC SSCE multi-year paper bank with full step-by-step derivations."
+                          "Combined JAMB UTME, WAEC WASSCE & NECO SSCE syllabus practice bank with complete worked solutions."
                       },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -506,7 +509,7 @@ fun ExamSimulatorScreen(
                   verticalAlignment = Alignment.CenterVertically,
                 ) {
                   Text(
-                    text = "Q${currentIndex + 1}/${questions.size} • ${question.examType} ${question.year} • ${question.topic}",
+                    text = "Q${currentIndex + 1}/${questions.size} • ${question.boardStyleLabel} • ${question.topic}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,

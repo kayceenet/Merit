@@ -59,7 +59,7 @@ object ChemistryCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Separating a 3-Way Dry Mixture",
-                    examSource = "WAEC SSCE 2024 • Paper 2 Q1",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "Describe how to obtain pure dry samples of Iron filings, Sand, and Common Salt (NaCl) from their mixture.",
                     steps =
@@ -73,7 +73,7 @@ object ChemistryCurriculum {
                   ),
                   WorkedExample(
                     title = "Identifying Pure Water by Boiling Range",
-                    examSource = "JAMB UTME 2023 • Chem Q2",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "A colourless liquid boils steadily at 100.0°C and freezes at 0.0°C at 1 atm. A second sample boils from 102°C to 105°C. Identify both.",
                     steps =
@@ -158,7 +158,7 @@ object ChemistryCurriculum {
                   PracticeQuestion(
                     id = "ex_chem_01_6",
                     topic = "Crystallization",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "Why is hydrated CuSO₄·5H₂O recovered by crystallization rather than heating to dryness?",
                     options = listOf("It sublimates", "Strong heating drives off water of crystallization", "It catches fire", "It is insoluble"),
@@ -205,7 +205,7 @@ object ChemistryCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Calculating Relative Atomic Mass of Chlorine",
-                    examSource = "JAMB UTME 2024 • Chem Q4",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "Chlorine consists of 75% ³⁵Cl and 25% ³⁷Cl. Calculate its relative atomic mass.",
                     steps =
@@ -218,7 +218,7 @@ object ChemistryCurriculum {
                   ),
                   WorkedExample(
                     title = "Subshell Configuration of Fe³⁺ (Z = 26)",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q5",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Write the electron configuration of Iron(III) ion, ₂₆Fe³⁺.",
                     steps =
                       listOf(
@@ -303,7 +303,7 @@ object ChemistryCurriculum {
                   PracticeQuestion(
                     id = "ex_chem_02_6",
                     topic = "Isotope Properties",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "Which property differs between ³⁵Cl and ³⁷Cl?",
                     options = listOf("Number of protons", "Valence electrons", "Chemical reactivity", "Rate of diffusion"),
@@ -350,7 +350,7 @@ object ChemistryCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Predicting Compound Formula & Bond Type from Z",
-                    examSource = "JAMB UTME 2024 • Chem Q7",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "Element X (Z = 12) combines with Y (Z = 17). Predict the formula, bond type, and melting point behaviour.",
                     steps =
@@ -364,7 +364,7 @@ object ChemistryCurriculum {
                   ),
                   WorkedExample(
                     title = "Why Water Boils at 100°C vs H₂S at −60°C",
-                    examSource = "WAEC SSCE 2023 • Paper 2 Q3",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Oxygen and Sulphur are both in Group 16, yet H₂O is liquid at 25°C while H₂S is a gas. Explain.",
                     steps =
                       listOf(
@@ -449,7 +449,7 @@ object ChemistryCurriculum {
                   PracticeQuestion(
                     id = "ex_chem_03_6",
                     topic = "Ionic Conductance",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "Solid NaCl does not conduct electricity because its:",
                     options = listOf("Electrons are shared", "Ions are locked in a rigid crystal lattice", "Molecules are neutral", "Sodium evaporates"),
@@ -506,7 +506,7 @@ object ChemistryCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Gas Volume at STP from Marble Decomposition",
-                    examSource = "JAMB UTME 2024 • Chem Q10",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "What volume of CO₂ at STP is liberated when 25 g of CaCO₃ is heated completely? (Ca=40, C=12, O=16; 1 mol gas = 22.4 dm³)",
                     steps =
@@ -520,7 +520,7 @@ object ChemistryCurriculum {
                   ),
                   WorkedExample(
                     title = "Empirical to Molecular Formula from Vapour Density",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q14",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "A hydrocarbon contains 85.7% C and 14.3% H, and its vapour density is 21. Find its molecular formula. (C=12, H=1)",
                     steps =
@@ -606,7 +606,7 @@ object ChemistryCurriculum {
                   PracticeQuestion(
                     id = "ex_chem_04_6",
                     topic = "Water Dilution",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "100 cm³ of 0.5 M HCl is diluted with distilled water to 500 cm³. Find the new molarity.",
                     options = listOf("0.1 M", "0.2 M", "0.25 M", "2.5 M"),
@@ -653,7 +653,7 @@ object ChemistryCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Combined Gas Law Heating Under Pressure",
-                    examSource = "JAMB UTME 2024 • Chem Q12",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "A gas occupies 400 cm³ at 27°C and 760 mmHg. What volume will it occupy at 127°C and 380 mmHg?",
                     steps =
@@ -667,7 +667,7 @@ object ChemistryCurriculum {
                   ),
                   WorkedExample(
                     title = "Graham Diffusion Molar Mass of Unknown Gas",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q18",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "100 cm³ of Oxygen (Mᵣ = 32) diffuses in 20 s. Under the same conditions, 100 cm³ of gas Y diffuses in 10 s. Find Mᵣ of Y.",
                     steps =
@@ -753,7 +753,7 @@ object ChemistryCurriculum {
                   PracticeQuestion(
                     id = "ex_chem_05_6",
                     topic = "Ideal Gas Equation",
-                    examType = "JAMB",
+                    examType = "NECO",
                     year = 2024,
                     question = "In PV = nRT, which two graphs produce a straight line through the origin at constant T and n?",
                     options = listOf("P vs V", "P vs 1/V", "V vs T(°C)", "P vs V²"),
@@ -800,7 +800,7 @@ object ChemistryCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Diprotic Acid H₂SO₄ vs NaOH Titration",
-                    examSource = "WAEC SSCE 2024 • Practical Paper 3",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "25.0 cm³ of 0.10 mol/dm³ NaOH completely neutralized 20.0 cm³ of H₂SO₄. Calculate the concentration of H₂SO₄ in g/dm³ (H=1, S=32, O=16).",
                     steps =
@@ -814,7 +814,7 @@ object ChemistryCurriculum {
                   ),
                   WorkedExample(
                     title = "pH of Diluted HCl & Alkaline NaOH",
-                    examSource = "JAMB UTME 2023 • Chem Q17",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "Calculate the pH of (a) 0.001 M HCl and (b) 0.01 M NaOH at 25°C.",
                     steps =
                       listOf(
@@ -898,7 +898,7 @@ object ChemistryCurriculum {
                   PracticeQuestion(
                     id = "ex_chem_06_6",
                     topic = "Basicity of Acid",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "What is the basicity of Ethanoic Acid (CH₃COOH)?",
                     options = listOf("1", "2", "3", "4"),

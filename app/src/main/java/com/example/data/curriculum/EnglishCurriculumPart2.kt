@@ -48,7 +48,7 @@ object EnglishCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Trap Tags: Disguised Negatives & Imperatives",
-                    examSource = "JAMB UTME 2024 • Use of English Q27",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "Add correct tags to: (1) 'Few students passed the test, ____?' (2) 'Let's take a break, ____?'",
                     steps =
                       listOf(
@@ -60,7 +60,7 @@ object EnglishCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Everyone / Nobody Pronoun Tag",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q27",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Complete: 'Nobody called while I was out, ____?'",
                     steps =
                       listOf(
@@ -144,7 +144,7 @@ object EnglishCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_eng_07_6",
                     topic = "Imperative Tag",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "Pass me that beaker carefully, ____?",
                     options = listOf("shall you", "will you", "aren't you", "don't you"),
@@ -191,7 +191,7 @@ object EnglishCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Contrast Signal Cracking Antonym ('frugal' vs 'profligate')",
-                    examSource = "JAMB UTME 2024 • Lexis Q31",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "Opposite in meaning: 'While Kemi is remarkably FRUGAL with her allowance, her twin brother is quite ____.'",
                     steps =
@@ -204,7 +204,7 @@ object EnglishCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Decoding Word in Context ('ameliorate')",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q33",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "Nearest in meaning: 'The new rural road network will AMELIORATE farmers' transport hardships.'",
                     steps =
@@ -289,7 +289,7 @@ object EnglishCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_eng_08_6",
                     topic = "Root Decoding",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "NEAREST in meaning: 'Smartphones have become UBIQUITOUS in modern cities.'",
                     options = listOf("obsolete", "found everywhere", "illegal", "fragile"),
@@ -336,7 +336,7 @@ object EnglishCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Decoding Classic JAMB Idiom & Eliminating Literal Trap",
-                    examSource = "JAMB UTME 2024 • Use of English Q36",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "Choose exact interpretation: 'The chairman decided to throw in the towel after losing key board support.'",
                     steps =
@@ -349,7 +349,7 @@ object EnglishCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Distinguishing 'Turn Down' vs 'Turn Up'",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q38",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Select right phrasal verb: 'Because the salary was too low, Nkechi ____ the job offer.'",
                     steps =
                       listOf(
@@ -433,7 +433,7 @@ object EnglishCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_eng_09_6",
                     topic = "Proverbial Idiom",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "To say the lawyer 'BEAT ABOUT THE BUSH' during cross-examination means he:",
                     options = listOf("Searched a garden", "Avoided tackling the main point directly", "Won quickly", "Whispered softly"),
@@ -490,7 +490,7 @@ object EnglishCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Eliminating Verb Redundancies & Fixing Prepositions",
-                    examSource = "JAMB UTME 2024 • Use of English Q40",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "Spot errors in: 'We discussed about our preference for Science than Arts and entered inside the lab.'",
                     steps =
@@ -504,7 +504,7 @@ object EnglishCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Stationary vs Stationery & Preposition Pair",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q41",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Complete: 'The clerk ordered fresh office ____ and congratulated Bode ____ his promotion.'",
                     steps =
                       listOf(
@@ -588,7 +588,7 @@ object EnglishCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_eng_10_6",
                     topic = "Affect vs Effect",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "How will rising fuel prices ____ daily transport fares?",
                     options = listOf("effect", "affect", "effective", "affection"),
@@ -635,7 +635,7 @@ object EnglishCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Cloze Domain Choice: Hospital vs Judiciary",
-                    examSource = "WAEC SSCE 2024 • Section 6 Cloze",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "Fill blanks: 'After examining the X-ray, the physician confirmed a positive ____ (prognosis/verdict) and wrote a ____ (recipe/prescription) for antibiotics.'",
                     steps =
@@ -648,7 +648,7 @@ object EnglishCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Choosing Correct Crowd Word in Context",
-                    examSource = "JAMB UTME 2023 • Cloze Passage",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "'Over 60,000 enthusiastic ____ packed the National Stadium for the Cup Final.'",
                     steps =
                       listOf(
@@ -732,7 +732,7 @@ object EnglishCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_eng_11_6",
                     topic = "Medical Register",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "To prevent infection during surgery, nurses ____ all scalpels in high-pressure steam.",
                     options = listOf("evaporate", "sterilize", "immunize", "diagnose"),
@@ -779,7 +779,7 @@ object EnglishCurriculumPart2 {
                 listOf(
                   WorkedExample(
                     title = "Cracking /eɪ/ vs /iː/ in 'ea' Spellings",
-                    examSource = "JAMB UTME 2024 • Oral English Q46",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "Which word has the SAME vowel sound as 'GREAT': (A) meat  (B) bread  (C) steak  (D) hear?",
                     steps =
                       listOf(
@@ -791,7 +791,7 @@ object EnglishCurriculumPart2 {
                   ),
                   WorkedExample(
                     title = "Identifying the Central Vowel /ɜː/",
-                    examSource = "WAEC SSCE 2023 • Paper 3 Orals Q5",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement = "Match the vowel sound in 'CURSE' (/ɜː/): (A) heart  (B) word  (C) lord  (D) war.",
                     steps =
                       listOf(
@@ -875,7 +875,7 @@ object EnglishCurriculumPart2 {
                   PracticeQuestion(
                     id = "ex_eng_12_6",
                     topic = "Diphthong /eə/",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "Which word shares the vowel sound of 'h<u>eir</u>' (/eə/)?",
                     options = listOf("here", "bear", "fear", "clear"),

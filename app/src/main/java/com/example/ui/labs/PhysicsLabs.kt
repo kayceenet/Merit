@@ -47,7 +47,7 @@ internal fun PhysicsLabDispatcher(lessonId: String, labType: PracticalLabType) {
     }
     PracticalLabType.PROJECTILE_KINEMATICS -> ProjectileKinematicsLab()
     PracticalLabType.TORQUE_MACHINES_LAB -> {
-      if (lessonId == "phys_05_machines_pressure") SimpleMachineEfficiencyLab() else MomentBalanceLab()
+      if (lessonId == "phys_05_work_machines") SimpleMachineEfficiencyLab() else MomentBalanceLab()
     }
     PracticalLabType.SHM_FLUIDS_LAB -> {
       if (lessonId == "phys_07_fluids_elasticity") ArchimedesBuoyancyLab() else PendulumShmLab()
@@ -63,11 +63,9 @@ internal fun PhysicsLabDispatcher(lessonId: String, labType: PracticalLabType) {
     }
     PracticalLabType.ELECTROSTATIC_CAPACITOR_LAB -> CapacitorNetworkLab()
     PracticalLabType.OHMS_CIRCUIT -> OhmsCircuitLab()
-    PracticalLabType.EM_TRANSFORMER_AC_LAB -> {
-      if (lessonId == "phys_14_em_ac") TransformerAcResonanceLab() else LogicGateCircuitLab()
-    }
+    PracticalLabType.EM_TRANSFORMER_AC_LAB -> TransformerAcResonanceLab()
     PracticalLabType.QUANTUM_NUCLEAR_LAB -> {
-      if (lessonId == "phys_16_nuclear") HalfLifeDecayLab() else PhotoelectricQuantumLab()
+      if (lessonId == "phys_16_nuclear") HalfLifeDecayLab() else PhotoelectricAndElectronicsLab()
     }
     else -> ProjectileKinematicsLab()
   }
@@ -516,6 +514,23 @@ private fun LogicGateCircuitLab() {
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
       FilterChip(selected = inA, onClick = { inA = !inA }, label = { Text("Toggle A (${if (inA) 1 else 0})") })
       FilterChip(selected = inB, onClick = { inB = !inB }, label = { Text("Toggle B (${if (inB) 1 else 0})") })
+    }
+  }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun PhotoelectricAndElectronicsLab() {
+  var showLogicGates by remember { mutableStateOf(false) }
+  Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+      FilterChip(selected = !showLogicGates, onClick = { showLogicGates = false }, label = { Text("Photoelectric Threshold") })
+      FilterChip(selected = showLogicGates, onClick = { showLogicGates = true }, label = { Text("Digital Logic Gates") })
+    }
+    if (showLogicGates) {
+      LogicGateCircuitLab()
+    } else {
+      PhotoelectricQuantumLab()
     }
   }
 }

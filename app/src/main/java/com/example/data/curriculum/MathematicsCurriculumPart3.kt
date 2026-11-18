@@ -47,7 +47,7 @@ object MathematicsCurriculumPart3 {
               listOf(
                 WorkedExample(
                   title = "Finding Local Maximum / Minimum Points",
-                  examSource = "JAMB UTME 2024 • Maths Q34",
+                  examSource = "JAMB UTME-Style Worked Problem",
                   problemStatement = "Find the coordinates of the minimum point on y = x² − 4x + 7.",
                   steps =
                     listOf(
@@ -60,7 +60,7 @@ object MathematicsCurriculumPart3 {
                 ),
                 WorkedExample(
                   title = "Definite Integral Area Under Parabola",
-                  examSource = "WAEC Further / JAMB 2023 • Q36",
+                  examSource = "WAEC WASSCE-Style Worked Problem",
                   problemStatement = "Evaluate the area bounded by y = 3x² + 2, the x-axis, x = 0, and x = 2.",
                   steps =
                     listOf(
@@ -144,7 +144,7 @@ object MathematicsCurriculumPart3 {
                 PracticeQuestion(
                   id = "ex_math_13_6",
                   topic = "Optimization",
-                  examType = "WAEC",
+                  examType = "NECO",
                   year = 2024,
                   question = "Two positive numbers add up to 20. What is the maximum possible product?",
                   options = listOf("96", "100", "84", "64"),
@@ -191,7 +191,7 @@ object MathematicsCurriculumPart3 {
               listOf(
                 WorkedExample(
                   title = "Committee Selection with Minimum Condition",
-                  examSource = "JAMB UTME 2024 • Maths Q38",
+                  examSource = "JAMB UTME-Style Worked Problem",
                   problemStatement =
                     "In how many ways can a committee of 3 be chosen from 4 boys and 3 girls if it must include 2 boys and 1 girl?",
                   steps =
@@ -205,7 +205,7 @@ object MathematicsCurriculumPart3 {
                 ),
                 WorkedExample(
                   title = "Drawing Balls Without Replacement",
-                  examSource = "WAEC SSCE 2023 • Paper 1 Q35",
+                  examSource = "WAEC WASSCE-Style Worked Problem",
                   problemStatement =
                     "A bag holds 4 red and 6 blue balls. Two balls are picked without replacement. Find P(both red).",
                     steps =
@@ -291,7 +291,7 @@ object MathematicsCurriculumPart3 {
                 PracticeQuestion(
                   id = "ex_math_14_6",
                   topic = "Independent Events",
-                  examType = "JAMB",
+                  examType = "NECO",
                   year = 2021,
                   question = "P(A passes) = 2/3 and P(B passes) = 3/4. Find P(only A passes).",
                   options = listOf("1/6", "1/2", "5/12", "1/12"),
@@ -338,7 +338,7 @@ object MathematicsCurriculumPart3 {
               listOf(
                 WorkedExample(
                   title = "Standard Deviation of a Small Set",
-                  examSource = "JAMB UTME 2024 • Maths Q40",
+                  examSource = "JAMB UTME-Style Worked Problem",
                   problemStatement = "Find the standard deviation of the numbers 2, 4, 6, 8, 10.",
                   steps =
                     listOf(
@@ -351,7 +351,7 @@ object MathematicsCurriculumPart3 {
                 ),
                 WorkedExample(
                   title = "Median from Frequency Table",
-                  examSource = "WAEC SSCE 2023 • Paper 1 Q39",
+                  examSource = "WAEC WASSCE-Style Worked Problem",
                   problemStatement =
                     "Scores 1, 2, 3, 4 have frequencies 3, 5, 4, 3 respectively. Find the median and mean.",
                     steps =
@@ -437,7 +437,7 @@ object MathematicsCurriculumPart3 {
                 PracticeQuestion(
                   id = "ex_math_15_6",
                   topic = "Scaling SD",
-                  examType = "JAMB",
+                  examType = "NECO",
                   year = 2023,
                   question = "The standard deviation of {a, b, c} is 2.5. What is the standard deviation of {2a, 2b, 2c}?",
                   options = listOf("2.5", "5.0", "10.0", "1.25"),
@@ -456,25 +456,25 @@ object MathematicsCurriculumPart3 {
       PracticeQuestion("pq_math_02", "Modular Arithmetic", "WAEC", 2024, "Find the least positive integer x such that 4x ≡ 3 (mod 5).", listOf("1", "2", "3", "4"), 1, "Test x = 2: 8 ≡ 3 (mod 5).", "4(2) = 8 = 5(1) + 3."),
       PracticeQuestion("pq_math_03", "Indices", "JAMB", 2024, "If 8^(x/2) = 2^(3/2) × 4^x, find x.", listOf("−3", "−2", "2", "3"), 0, "Convert to base 2: 2^(3x/2) = 2^(3/2 + 2x).", "(3/2)x = 3/2 + 2x ⇒ −x/2 = 3/2 ⇒ x = −3."),
       PracticeQuestion("pq_math_04", "Logarithms", "WAEC", 2023, "Evaluate log₂ 8 + log₂ 4 − log₂ 2.", listOf("4", "5", "3", "6"), 0, "3 + 2 − 1.", "log₂(8×4/2) = log₂ 16 = 4."),
-      PracticeQuestion("pq_math_05", "Surds", "JAMB", 2023, "If √50 − √18 = k√2, find k.", listOf("2", "3", "4", "8"), 0, "5√2 − 3√2.", "2√2 ⇒ k = 2."),
+      PracticeQuestion("pq_math_05", "Surds", "NECO", 2023, "If √50 − √18 = k√2, find k.", listOf("2", "3", "4", "8"), 0, "5√2 − 3√2.", "2√2 ⇒ k = 2."),
       PracticeQuestion("pq_math_06", "Sets & Venn", "WAEC", 2024, "Of 60 pupils, 35 like Maths, 30 like English, 10 like neither. How many like BOTH?", listOf("15", "20", "10", "5"), 0, "Union = 60 − 10 = 50.", "35 + 30 − 50 = 15."),
       PracticeQuestion("pq_math_07", "Variation", "JAMB", 2025, "If x varies directly as y³ and x = 16 when y = 2, find x when y = 3.", listOf("54", "24", "48", "27"), 0, "k = 16/8 = 2.", "x = 2(3³) = 54."),
       PracticeQuestion("pq_math_08", "Inequalities", "WAEC", 2022, "Solve (x + 2)(x − 4) < 0.", listOf("−2 < x < 4", "x < −2 or x > 4", "−4 < x < 2", "x < 4"), 0, "Negative product traps x between roots.", "−2 < x < 4."),
       PracticeQuestion("pq_math_09", "Quadratics", "JAMB", 2024, "If α and β are roots of x² + 5x − 3 = 0, find α + β − αβ.", listOf("−2", "−8", "8", "2"), 0, "α+β = −5, αβ = −3.", "−5 − (−3) = −2."),
-      PracticeQuestion("pq_math_10", "Polynomials", "WAEC", 2021, "Find the remainder when 2x³ − 3x + 5 is divided by (x + 1).", listOf("6", "4", "0", "10"), 0, "Evaluate P(−1).", "2(−1) − 3(−1) + 5 = −2 + 3 + 5 = 6."),
+      PracticeQuestion("pq_math_10", "Polynomials", "NECO", 2021, "Find the remainder when 2x³ − 3x + 5 is divided by (x + 1).", listOf("6", "4", "0", "10"), 0, "Evaluate P(−1).", "2(−1) − 3(−1) + 5 = −2 + 3 + 5 = 6."),
       PracticeQuestion("pq_math_11", "AP Sequence", "JAMB", 2023, "The 4th term of an AP is 13 and the 7th term is 22. Find the first term.", listOf("4", "3", "5", "1"), 0, "3d = 9 ⇒ d = 3.", "a = 13 − 3(3) = 4."),
       PracticeQuestion("pq_math_12", "GP Sequence", "WAEC", 2025, "Find the 5th term of the GP: 81, 27, 9, ...", listOf("1", "3", "1/3", "1/9"), 0, "r = 1/3.", "81 × (1/3)⁴ = 1."),
       PracticeQuestion("pq_math_13", "Binary Operations", "JAMB", 2022, "If m * n = m² − n², evaluate 5 * (3 * 2).", listOf("0", "−24", "24", "−5"), 0, "Compute inner 3*2 = 9−4 = 5 first.", "5 * 5 = 25 − 25 = 0."),
       PracticeQuestion("pq_math_14", "Matrices", "WAEC", 2024, "Find x if det [[x+1, 2], [3, x]] = 0 (take x > 0).", listOf("2", "3", "1", "6"), 0, "x(x+1) − 6 = 0 ⇒ x² + x − 6 = 0.", "(x+3)(x−2) = 0 ⇒ x = 2."),
-      PracticeQuestion("pq_math_15", "Polygons", "JAMB", 2021, "The exterior angle of a regular polygon is 40°. Find the sum of its interior angles.", listOf("1260°", "1080°", "1440°", "900°"), 0, "n = 360/40 = 9.", "(9 − 2) × 180° = 1260°."),
+      PracticeQuestion("pq_math_15", "Polygons", "NECO", 2021, "The exterior angle of a regular polygon is 40°. Find the sum of its interior angles.", listOf("1260°", "1080°", "1440°", "900°"), 0, "n = 360/40 = 9.", "(9 − 2) × 180° = 1260°."),
       PracticeQuestion("pq_math_16", "Circle Theorems", "WAEC", 2023, "A,B,C,D on circle; chord AD parallel BC. If ∠DAB = 72°, find ∠DCB.", listOf("108°", "72°", "36°", "144°"), 0, "Opposite angles in cyclic quad sum to 180°.", "180° − 72° = 108°."),
       PracticeQuestion("pq_math_17", "Mensuration", "JAMB", 2024, "A cylinder and cone have equal base radius and equal volume. Find ratio of cylinder height to cone height.", listOf("1 : 3", "3 : 1", "1 : 2", "2 : 3"), 0, "πr²h₁ = (1/3)πr²h₂.", "h₁ / h₂ = 1/3."),
       PracticeQuestion("pq_math_18", "Trigonometry", "WAEC", 2022, "Evaluate sin 30° cos 60° + cos 30° sin 60°.", listOf("1", "1/2", "√3/2", "0"), 0, "Equals sin(30°+60°) = sin 90°.", "(0.5)(0.5) + (√3/2)(√3/2) = 1/4 + 3/4 = 1."),
       PracticeQuestion("pq_math_19", "Bearings", "JAMB", 2020, "Point Y is 5 km due East of X and Z is 5 km due South of Y. Find the bearing of Z from X.", listOf("135°", "045°", "225°", "315°"), 0, "East = 090°, South turns 45° diagonal into SE.", "090° + 45° = 135°."),
-      PracticeQuestion("pq_math_20", "Coordinate Geometry", "WAEC", 2025, "Find the y-intercept of the line 4x − 2y + 10 = 0.", listOf("5", "−5", "2", "−2.5"), 0, "Set x = 0.", "−2y = −10 ⇒ y = 5."),
+      PracticeQuestion("pq_math_20", "Coordinate Geometry", "NECO", 2025, "Find the y-intercept of the line 4x − 2y + 10 = 0.", listOf("5", "−5", "2", "−2.5"), 0, "Set x = 0.", "−2y = −10 ⇒ y = 5."),
       PracticeQuestion("pq_math_21", "Differentiation", "JAMB", 2024, "Find the gradient of curve y = 2x³ − 4x at point x = 1.", listOf("2", "−2", "6", "0"), 0, "dy/dx = 6x² − 4.", "6(1)² − 4 = 2."),
       PracticeQuestion("pq_math_22", "Integration", "WAEC", 2023, "Evaluate ∫₀² 3x² dx.", listOf("8", "12", "6", "4"), 0, "[x³] from 0 to 2.", "2³ − 0³ = 8."),
       PracticeQuestion("pq_math_23", "Probability", "JAMB", 2021, "A card is drawn at random from a standard 52-card pack. Find P(Ace or King).", listOf("2/13", "1/13", "1/26", "4/13"), 0, "4 Aces + 4 Kings = 8 cards.", "8/52 = 2/13."),
-      PracticeQuestion("pq_math_24", "Statistics", "WAEC", 2024, "If the mean of x, x+2, x+4, x+6 is 11, find x.", listOf("8", "9", "7", "10"), 0, "Middle of symmetric sequence = 11 ⇒ x + 3 = 11.", "(4x + 12)/4 = 11 ⇒ x + 3 = 11 ⇒ x = 8."),
+      PracticeQuestion("pq_math_24", "Statistics", "NECO", 2024, "If the mean of x, x+2, x+4, x+6 is 11, find x.", listOf("8", "9", "7", "10"), 0, "Middle of symmetric sequence = 11 ⇒ x + 3 = 11.", "(4x + 12)/4 = 11 ⇒ x + 3 = 11 ⇒ x = 8."),
     )
 }

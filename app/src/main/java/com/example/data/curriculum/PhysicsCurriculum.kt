@@ -59,7 +59,7 @@ object PhysicsCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Finding Dimensions of Pressure and Power",
-                    examSource = "JAMB UTME 2024 • Physics Q1",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement = "Express the dimensions of (a) Pressure and (b) Power using M, L, and T.",
                     steps =
                       listOf(
@@ -72,7 +72,7 @@ object PhysicsCurriculum {
                   ),
                   WorkedExample(
                     title = "Micrometer Screw Gauge with Positive Zero Error",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q2",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "A micrometer has a zero error of +0.03 mm. When measuring a wire, the sleeve shows 2.5 mm and the 34th thimble mark lines up (1 div = 0.01 mm). Find true diameter.",
                     steps =
@@ -159,7 +159,7 @@ object PhysicsCurriculum {
                   PracticeQuestion(
                     id = "ex_phy_01_6",
                     topic = "Units & Dimensions",
-                    examType = "WAEC",
+                    examType = "NECO",
                     year = 2024,
                     question = "Which pair of physical quantities shares the exact same dimensions M L² T⁻²?",
                     options = listOf("Power and Force", "Work and Torque (Moment)", "Pressure and Impulse", "Acceleration and Velocity"),
@@ -206,7 +206,7 @@ object PhysicsCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Boat Crossing a Flowing River",
-                    examSource = "JAMB UTME 2023 • Physics Q5",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "A boat heads straight North across a river at 4.0 m/s while the water current pushes East at 3.0 m/s. Find the boat's actual resultant speed.",
                     steps =
@@ -219,7 +219,7 @@ object PhysicsCurriculum {
                   ),
                   WorkedExample(
                     title = "Pulling a Suitcase at 60°",
-                    examSource = "WAEC SSCE 2024 • Paper 1 Q4",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "A traveler pulls a suitcase handle with 50 N at 60° above horizontal ground. Find the horizontal dragging force.",
                     steps =
@@ -306,7 +306,7 @@ object PhysicsCurriculum {
                   PracticeQuestion(
                     id = "ex_phy_02_6",
                     topic = "Relative Velocity",
-                    examType = "JAMB",
+                    examType = "NECO",
                     year = 2020,
                     question = "Two cars travel in OPPOSITE directions along a straight highway at 25 m/s and 15 m/s. Find their relative speed.",
                     options = listOf("10 m/s", "20 m/s", "40 m/s", "375 m/s"),
@@ -352,7 +352,7 @@ object PhysicsCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Braking Car Distance from v-t Area",
-                    examSource = "WAEC SSCE 2024 • Paper 2 Q2",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "A car slows uniformly from 20 m/s to a full stop in 5 s. Find deceleration and braking distance.",
                     steps =
@@ -365,7 +365,7 @@ object PhysicsCurriculum {
                   ),
                   WorkedExample(
                     title = "Football Projectile Range & Max Height",
-                    examSource = "JAMB UTME 2025 • Physics Q7",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "A ball is kicked at 40 m/s at 30° to level ground (g = 10 m/s²). Calculate Time of Flight T and Range R.",
                     steps =
@@ -453,7 +453,7 @@ object PhysicsCurriculum {
                   PracticeQuestion(
                     id = "ex_phy_03_6",
                     topic = "SUVAT",
-                    examType = "JAMB",
+                    examType = "NECO",
                     year = 2020,
                     question = "A bullet enters a wood block at 100 m/s and stops after penetrating 0.25 m. Find its deceleration.",
                     options = listOf("2,000 m/s²", "10,000 m/s²", "20,000 m/s²", "40,000 m/s²"),
@@ -499,7 +499,7 @@ object PhysicsCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Inelastic Coupling of Two Railway Wagons",
-                    examSource = "JAMB UTME 2024 • Physics Q9",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "A 4,000 kg truck moving at 6 m/s collides and sticks to a stationary 2,000 kg car. Find their shared speed afterward.",
                     steps =
@@ -513,7 +513,7 @@ object PhysicsCurriculum {
                   ),
                   WorkedExample(
                     title = "Finding Unknown Weight on a Uniform Metre Rule",
-                    examSource = "WAEC SSCE 2023 • Paper 2 Q3",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "A uniform metre rule balances at the 40 cm mark when a 60 N mass hangs at the 10 cm mark. Find the weight W of the rule.",
                     steps =
@@ -601,7 +601,7 @@ object PhysicsCurriculum {
                   PracticeQuestion(
                     id = "ex_phy_04_6",
                     topic = "Couple",
-                    examType = "JAMB",
+                    examType = "NECO",
                     year = 2020,
                     question = "Two equal, opposite parallel forces separated by distance d form a:",
                     options = listOf("Resultant force", "Couple", "Centroid", "Upthrust"),
@@ -656,7 +656,7 @@ object PhysicsCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Pulley System Efficiency",
-                    examSource = "WAEC SSCE 2024 • Paper 2 Q4",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "A block-and-tackle pulley system with 4 ropes (VR = 4) lifts an 800 N engine using 250 N effort. Find MA and Efficiency.",
                     steps =
@@ -669,7 +669,7 @@ object PhysicsCurriculum {
                   ),
                   WorkedExample(
                     title = "Roller Coaster Speed Conservation",
-                    examSource = "JAMB UTME 2023 • Physics Q11",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "A 2 kg trolley slides from rest down a smooth 5 m high ramp (g = 10 m/s²). Find speed at bottom.",
                     steps =
@@ -756,7 +756,7 @@ object PhysicsCurriculum {
                   PracticeQuestion(
                     id = "ex_phy_05_6",
                     topic = "Power",
-                    examType = "JAMB",
+                    examType = "NECO",
                     year = 2020,
                     question = "A car engine exerts a constant forward force of 1,500 N while cruising at 20 m/s. What power is delivered?",
                     options = listOf("75 W", "3,000 W", "30,000 W", "15,000 W"),
@@ -801,7 +801,7 @@ object PhysicsCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Pendulum Clock Length Scaling",
-                    examSource = "JAMB UTME 2024 • Physics Q13",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "A simple pendulum has period 2.0 s when length is 1.0 m. What length gives period 4.0 s?",
                     steps =
@@ -815,7 +815,7 @@ object PhysicsCurriculum {
                   ),
                   WorkedExample(
                     title = "Maximum Speed of Oscillating Piston",
-                    examSource = "WAEC SSCE 2022 • Paper 1 Q11",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "A particle in SHM oscillates with angular frequency ω = 10 rad/s and amplitude A = 0.05 m. Find maximum speed.",
                     steps =
@@ -902,7 +902,7 @@ object PhysicsCurriculum {
                   PracticeQuestion(
                     id = "ex_phy_06_6",
                     topic = "SHM Acceleration",
-                    examType = "JAMB",
+                    examType = "NECO",
                     year = 2020,
                     question = "A body executes SHM with ω = 4 rad/s. Find acceleration when displacement x = 0.25 m.",
                     options = listOf("1 m/s²", "2 m/s²", "4 m/s²", "16 m/s²"),
@@ -947,7 +947,7 @@ object PhysicsCurriculum {
                 listOf(
                   WorkedExample(
                     title = "Relative Density via Archimedes Loss in Weight",
-                    examSource = "JAMB UTME 2024 • Physics Q15",
+                    examSource = "JAMB UTME-Style Worked Problem",
                     problemStatement =
                       "A brass statue weighs 40 N in air and 35 N when completely dipped in water. Find its Relative Density.",
                     steps =
@@ -960,7 +960,7 @@ object PhysicsCurriculum {
                   ),
                   WorkedExample(
                     title = "Spring Elastic Potential Energy",
-                    examSource = "WAEC SSCE 2023 • Paper 1 Q13",
+                    examSource = "WAEC WASSCE-Style Worked Problem",
                     problemStatement =
                       "A 20 N weight stretches a spring from 10.0 cm to 14.0 cm. Find work stored in the spring.",
                     steps =
@@ -1047,7 +1047,7 @@ object PhysicsCurriculum {
                   PracticeQuestion(
                     id = "ex_phy_07_6",
                     topic = "Flotation",
-                    examType = "JAMB",
+                    examType = "NECO",
                     year = 2021,
                     question = "An ice block of density 900 kg/m³ floats in water of density 1,000 kg/m³. What fraction is submerged?",
                     options = listOf("10%", "80%", "90%", "100%"),
