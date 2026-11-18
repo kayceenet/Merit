@@ -693,7 +693,7 @@ object ChemistryAcademyPacks {
         dep = "Alkanes, alkenes, alkynes, isomerism, and benzene build the entire scaffold for Alkanols, Esters, Soaps & Polymers.",
         vocab = listOf(
           VocabularyEntry("Homologous Series", "Organic family sharing general formula, functional group, CH₂ steps (+14 mass), and graded b.p.", "Family ladder climbing +CH₂ per rung.", "Members show similar chemistry while b.p./viscosity rise with chain length."),
-          VocabularyEntry("Structural Isomers", "Same molecular formula, DIFFERENT carbon connectivity/shape (e.g., butane vs 2-methylpropane).", "Same LEGO bricks snapped into different shapes.", "Alkanes start isomerism strictly at n=4 (Butane has 2 isomers; Pentane has 3!)."),
+          VocabularyEntry("Structural Isomers", "Same molecular formula, DIFFERENT carbon connectivity/shape (e.g., butane vs 2-methylpropane).", "Identical atom counts arranged into distinct structural skeletons.", "Alkanes start isomerism strictly at n=4 (Butane has 2 isomers; Pentane has 3!)."),
           VocabularyEntry("Unsaturation Test", "Alkenes/alkynes rapidly decolourize orange Br₂/water & purple KMnO₄.", "Double/triple bond grabbing reagents in addition.", "Alkanes stay unchanged in the dark (need UV light to substitute!)."),
           VocabularyEntry("Terminal Alkyne Test", "Alkyne with C≡C−H at chain end gives red-brown precipitate with ammoniacal CuCl!", "Unique acidic terminal proton detector.", "Propyne (1-propyne) tests positive; But-2-yne (internal!) fails cleanly!"),
         ),

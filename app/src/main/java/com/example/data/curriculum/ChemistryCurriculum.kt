@@ -39,20 +39,20 @@ object ChemistryCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Elements, Compounds vs Mixtures (Lego Blocks vs Trail Mix)",
+                    heading = "1. Elements, Compounds, and Mixtures",
                     explanation =
-                      "An Element is made of ONLY one type of atom (like pure Gold bricks). A Compound locks different atoms together with glue (like H₂O water—you can't filter hydrogen out of water!). A Mixture is just a bowl of peanuts and cashew nuts shaken together: each keeps its own taste and you can separate them with physical tricks!",
+                      "An Element consists solely of atoms with the same atomic number (such as pure gold Au or oxygen O₂), whereas a Compound chemically bonds two or more elements in a fixed mass ratio (like H₂O, which cannot be separated by filtration). A Mixture physically blends two or more substances whose components retain their individual properties and can be separated via boiling point, density, solubility, or adsorption differences. In paper chromatography, the retention factor R_f equals the distance moved by the solute spot divided by the distance moved by the solvent front.",
                     keyFormula = "\\text{Air} = \\text{Mixture (N}_2 + \\text{O}_2 + \\text{Ar)}   |   \\text{Brass} = \\text{Cu} + \\text{Zn (Alloy)}   |   R_f = \\frac{\\text{Solute distance}}{\\text{Solvent front}}",
                     examTip =
-                      "Match the trick to the pair: Immiscible oil + water → Separating Funnel; Two liquids with close boiling points (ethanol 78°C + water 100°C) → Fractional Distillation; Iodine/Ammonium Chloride/Camphor → Sublimation!",
+                      "Match method to property: Immiscible liquids (oil + water) → Separating Funnel; Miscible liquids with close boiling points (ethanol 78°C + water 100°C) → Fractional Distillation; Sublimable solids (NH₄Cl, I₂, camphor) → Sublimation.",
                   ),
                   ConceptBlock(
-                    heading = "2. Kinetic Theory & Flat Boiling Plateaus",
+                    heading = "2. Kinetic Theory, Heating Plateaus & Purity Criteria",
                     explanation =
-                      "In a solid, particles wiggle in fixed seats. Heat ice and it warms up until 0°C—then temperature STALLS completely flat! Why? Every bit of heat goes into snapping the rigid bonds (Latent Heat) instead of speeding particles up. A pure substance melts at ONE sharp temperature; impurities LOWER the melting point and RAISE the boiling point!",
+                      "In a solid, particles vibrate about fixed lattice positions. Heating ice raises temperature until 0°C, where the thermometer stalls horizontally because supplied energy breaks rigid intermolecular bonds (latent heat of fusion) rather than raising average kinetic energy. A pure substance melts at one sharp melting point (MP) and boils at one sharp boiling point (BP); dissolved impurities depress MP below 0°C and elevate BP above 100°C.",
                     keyFormula = "\\text{Impurity added} \\implies \\text{MP drops below } 0^\\circ\\text{C},\\quad \\text{BP rises above } 100^\\circ\\text{C}",
                     examTip =
-                      "Brownian motion (jittering pollen/smoke) proves fluid molecules are tiny, fast, and constantly colliding!",
+                      "Brownian motion—the erratic motion of smoke or pollen suspended in a fluid—provides direct kinetic evidence of invisible, rapidly colliding molecules.",
                   ),
                 ),
               workedExamples =

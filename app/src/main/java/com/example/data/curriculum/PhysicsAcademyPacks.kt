@@ -118,8 +118,8 @@ object PhysicsAcademyPacks {
           dep = "Every Physics topic from Vectors and Kinematics through Nuclear Energy depends on converting quantities into clean SI base units (kg, m, s, A, K, mol) and inspecting dimensional consistency.",
           vocab =
             listOf(
-              VocabularyEntry("Fundamental Quantity", "Independent physical quantity measured directly without combining others.", "The 7 starter bricks: Mass, Length, Time, Current, Temperature, Amount, Luminous intensity.", "JAMB tests identifying which quantity in a mixed list is derived vs fundamental."),
-              VocabularyEntry("Derived Quantity", "Quantity formed by multiplying or dividing fundamental quantities.", "Built by mixing the starter bricks, e.g., Force = Mass × Length / Time².", "WAEC Paper 2 asks candidates to deduce SI units from dimensional formulas."),
+              VocabularyEntry("Fundamental Quantity", "Independent physical quantity measured directly without combining others.", "The 7 base SI standards: Mass (m, kg), Length (l, m), Time (t, s), Current (I, A), Temperature (T, K), Amount (n, mol), Luminous intensity (I_v, cd).", "JAMB tests identifying which quantity in a mixed list is derived vs fundamental."),
+              VocabularyEntry("Derived Quantity", "Quantity formed by multiplying or dividing fundamental quantities according to physical laws.", "Combined from base quantities, e.g., Force F = m × a = kg·m·s⁻².", "WAEC Paper 2 asks candidates to deduce SI units from dimensional formulas."),
               VocabularyEntry("Zero Error", "Non-zero reading shown by a vernier caliper or micrometer when its jaws are completely closed.", "A pre-existing offset on the scale before you measure anything.", "Positive zero error must be SUBTRACTED; negative zero error must be ADDED."),
               VocabularyEntry("Dimensional Analysis", "Method of expressing a quantity in powers of [M], [L], and [T] to check equation validity.", "An algebraic unit check proving both sides of an equation measure the same thing.", "Examiners ask for dimensions of Pressure, Impulse, Power, or Gravitational Constant G."),
             ),
@@ -130,7 +130,7 @@ object PhysicsAcademyPacks {
           recap1 = "Seven fundamental quantities form the entire measurement language of Physics.",
           recap2 = "Always subtract signed zero error: True = Observed − (Signed Zero Error).",
           sec3Title = "3. Precision vs Accuracy, Parallax & Instrument Selection",
-          sec3Body = "Accuracy measures closeness to the true accepted value, whereas precision measures how closely repeated readings cluster together. Choosing the right instrument balances range and least count: metre rule (1 mm) for bench lengths, vernier caliper (0.1 mm) for tube diameters, and micrometer screw gauge (0.01 mm) for wire gauges.",
+          sec3Body = "Accuracy measures closeness to the true accepted value, whereas precision measures how closely repeated readings cluster together. When an instrument shows a non-zero offset with jaws closed—denoted as signed zero error e₀ (in mm or cm)—correct the reading by subtracting (±e₀). Choosing the right instrument balances range and least count: metre rule (1 mm) for bench lengths, vernier caliper (0.1 mm) for tube diameters, and micrometer screw gauge (0.01 mm) for wire gauges.",
           sec3Formula = "\\text{True Reading} = \\text{Observed} - (\\pm e_0)   |   [\\text{Work}] = [\\text{Torque}] = M L^2 T^{-2}",
           sec3Tip = "Never confuse a zero-error systematic offset (affects accuracy) with hand jitter (random error affecting precision).",
           sec3Mech = "Random errors scatter above and below the true reading and shrink when you average multiple trials; systematic zero errors shift every trial equally until mathematically corrected.",
@@ -840,7 +840,7 @@ object PhysicsAcademyPacks {
       sec3Intel = "NECO/JAMB love asking how X-ray intensity (filament current) differs from X-ray hardness/penetration (anode accelerating voltage!).",
       sec3Recap = "1 eV = 1.6×10⁻¹⁹ J; Hardness = anode kV; Intensity = filament current.",
       sec4Title = "4. Solar Rooftops, Phone Chargers & Hospital X-Ray Rooms",
-      sec4Body = "Photovoltaic panels on Nigerian clinic roofs convert sunlight photons straight into DC electricity via large silicon p-n junctions. Meanwhile, your laptop/phone charger bricks step 240 V AC down, rectify it with 4 diodes, and smooth ripples with large capacitors into clean 5 V–20 V DC.",
+      sec4Body = "Photovoltaic panels on Nigerian clinic roofs convert sunlight photons straight into DC electricity via large silicon p-n junctions. Meanwhile, modern laptop and phone power adapters step 240 V AC down, rectify it with 4 diodes, and smooth ripples with large capacitors into clean 5 V–20 V DC.",
       sec4Tip = "Heating a pure semiconductor LOWERS its resistance (unlike metals!) because extra electron-hole pairs break free.",
       sec5Title = "5. Stopping-Voltage & Unit-Conversion Guardrails",
       sec5Body = "Do NOT confuse Stopping Potential V_s in Volts with electron Kinetic Energy in eV—numerically, a 2.4 V stopping voltage equals 2.4 eV max kinetic energy! Multiply eV by 1.6×10⁻¹⁹ every time Planck h = 6.63×10⁻³⁴ J·s enters.",

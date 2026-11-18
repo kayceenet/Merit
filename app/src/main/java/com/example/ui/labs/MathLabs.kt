@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -86,9 +85,20 @@ private fun NumberBaseModularLab() {
         FilterChip(selected = base == b, onClick = { base = b }, label = { Text("Base $b") })
       }
     }
-    Text("Decimal Number: $value10  |  Modulo Clock: Mod $modN", style = MaterialTheme.typography.labelLarge)
-    Slider(value = value10.toFloat(), onValueChange = { value10 = it.roundToInt() }, valueRange = 1f..255f)
-    Slider(value = modN.toFloat(), onValueChange = { modN = it.roundToInt() }, valueRange = 2f..12f)
+    LabeledLabSlider(
+      label = "Decimal Number (Base 10)",
+      valueText = "$value10",
+      value = value10.toFloat(),
+      onValueChange = { value10 = it.roundToInt() },
+      valueRange = 1f..255f,
+    )
+    LabeledLabSlider(
+      label = "Modulo Clock Base (mod n)",
+      valueText = "Mod $modN",
+      value = modN.toFloat(),
+      onValueChange = { modN = it.roundToInt() },
+      valueRange = 2f..12f,
+    )
   }
 }
 
@@ -112,8 +122,13 @@ private fun IndicesLogSimulatorLab() {
         FilterChip(selected = base == b, onClick = { base = b }, label = { Text("Base $b") })
       }
     }
-    Text("Exponent Power n = $exp", style = MaterialTheme.typography.labelLarge)
-    Slider(value = exp.toFloat(), onValueChange = { exp = it.roundToInt() }, valueRange = 1f..6f)
+    LabeledLabSlider(
+      label = "Exponent Power n",
+      valueText = "n = $exp",
+      value = exp.toFloat(),
+      onValueChange = { exp = it.roundToInt() },
+      valueRange = 1f..6f,
+    )
   }
 }
 
@@ -147,10 +162,27 @@ private fun VennDiagramLab() {
         "Neither" to "$neither",
       )
     )
-    Text("n(U) = $nU  •  n(A) = $nA  •  n(B) = $nB  •  n(A∪B) = $union", style = MaterialTheme.typography.labelLarge)
-    Slider(value = nA.toFloat(), onValueChange = { nA = it.roundToInt() }, valueRange = 5f..40f)
-    Slider(value = nB.toFloat(), onValueChange = { nB = it.roundToInt() }, valueRange = 5f..40f)
-    Slider(value = clampedOverlap.toFloat(), onValueChange = { overlap = it.roundToInt() }, valueRange = 0f..maxOverlap.toFloat().coerceAtLeast(1f))
+    LabeledLabSlider(
+      label = "Set A Size n(A)",
+      valueText = "$nA elements",
+      value = nA.toFloat(),
+      onValueChange = { nA = it.roundToInt() },
+      valueRange = 5f..40f,
+    )
+    LabeledLabSlider(
+      label = "Set B Size n(B)",
+      valueText = "$nB elements",
+      value = nB.toFloat(),
+      onValueChange = { nB = it.roundToInt() },
+      valueRange = 5f..40f,
+    )
+    LabeledLabSlider(
+      label = "Intersection Overlap n(A ∩ B)",
+      valueText = "$clampedOverlap elements (Union = $union)",
+      value = clampedOverlap.toFloat(),
+      onValueChange = { overlap = it.roundToInt() },
+      valueRange = 0f..maxOverlap.toFloat().coerceAtLeast(1f),
+    )
   }
 }
 
@@ -174,8 +206,20 @@ private fun VariationInequalityLab() {
       FilterChip(selected = isDirect, onClick = { isDirect = true }, label = { Text("Direct (y = kx)") })
       FilterChip(selected = !isDirect, onClick = { isDirect = false }, label = { Text("Inverse (y = k/x)") })
     }
-    Slider(value = k, onValueChange = { k = it }, valueRange = 2f..36f)
-    Slider(value = xVal, onValueChange = { xVal = it }, valueRange = 1f..12f)
+    LabeledLabSlider(
+      label = "Variation Constant k",
+      valueText = String.format("%.1f", k),
+      value = k,
+      onValueChange = { k = it },
+      valueRange = 2f..36f,
+    )
+    LabeledLabSlider(
+      label = "Independent Variable x",
+      valueText = String.format("%.1f", xVal),
+      value = xVal,
+      onValueChange = { xVal = it },
+      valueRange = 1f..12f,
+    )
   }
 }
 
@@ -213,9 +257,20 @@ private fun QuadraticRootsVertexLab() {
         "Sum α+β / Prod" to String.format("%.1f / %.1f", -b / a, c / a),
       )
     )
-    Text("b = ${String.format("%.1f", b)}  |  c = ${String.format("%.1f", c)}", style = MaterialTheme.typography.labelLarge)
-    Slider(value = b, onValueChange = { b = (it * 2).roundToInt() / 2f }, valueRange = -8f..8f)
-    Slider(value = c, onValueChange = { c = (it * 2).roundToInt() / 2f }, valueRange = -8f..8f)
+    LabeledLabSlider(
+      label = "Linear Coefficient b (in x^2 + bx + c = 0)",
+      valueText = String.format("b = %.1f", b),
+      value = b,
+      onValueChange = { b = (it * 2).roundToInt() / 2f },
+      valueRange = -8f..8f,
+    )
+    LabeledLabSlider(
+      label = "Constant Term c (y-intercept)",
+      valueText = String.format("c = %.1f", c),
+      value = c,
+      onValueChange = { c = (it * 2).roundToInt() / 2f },
+      valueRange = -8f..8f,
+    )
   }
 }
 
@@ -241,9 +296,20 @@ private fun ApGpProgressionLab() {
       FilterChip(selected = !isGp, onClick = { isGp = false }, label = { Text("Arithmetic (AP)") })
       FilterChip(selected = isGp, onClick = { isGp = true; if (step > 3f) step = 2f }, label = { Text("Geometric (GP)") })
     }
-    Text("a = ${a.roundToInt()}  |  ${if (isGp) "r" else "d"} = ${String.format("%.1f", step)}  |  n = $n", style = MaterialTheme.typography.labelLarge)
-    Slider(value = step, onValueChange = { step = (it * 2).roundToInt() / 2f }, valueRange = if (isGp) 0.5f..3.0f else 1f..8f)
-    Slider(value = n.toFloat(), onValueChange = { n = it.roundToInt() }, valueRange = 2f..8f)
+    LabeledLabSlider(
+      label = if (isGp) "Common Ratio r" else "Common Difference d",
+      valueText = String.format("%.1f", step),
+      value = step,
+      onValueChange = { step = (it * 2).roundToInt() / 2f },
+      valueRange = if (isGp) 0.5f..3.0f else 1f..8f,
+    )
+    LabeledLabSlider(
+      label = "Term Position n",
+      valueText = "n = $n (a = ${a.roundToInt()})",
+      value = n.toFloat(),
+      onValueChange = { n = it.roundToInt() },
+      valueRange = 2f..8f,
+    )
   }
 }
 
@@ -263,10 +329,27 @@ private fun MatrixDeterminantLab() {
         "Invertible?" to if (det != 0) "YES (A⁻¹ exists)" else "SINGULAR (0!)",
       )
     )
-    Text("Adjust Row 1 [a=$a, b=$b] and d=$d", style = MaterialTheme.typography.labelLarge)
-    Slider(value = a.toFloat(), onValueChange = { a = it.roundToInt() }, valueRange = -5f..8f)
-    Slider(value = b.toFloat(), onValueChange = { b = it.roundToInt() }, valueRange = -5f..8f)
-    Slider(value = d.toFloat(), onValueChange = { d = it.roundToInt() }, valueRange = -5f..8f)
+    LabeledLabSlider(
+      label = "Top-Left Element a",
+      valueText = "$a",
+      value = a.toFloat(),
+      onValueChange = { a = it.roundToInt() },
+      valueRange = -5f..8f,
+    )
+    LabeledLabSlider(
+      label = "Top-Right Element b",
+      valueText = "$b",
+      value = b.toFloat(),
+      onValueChange = { b = it.roundToInt() },
+      valueRange = -5f..8f,
+    )
+    LabeledLabSlider(
+      label = "Bottom-Right Element d (with c = $c)",
+      valueText = "$d",
+      value = d.toFloat(),
+      onValueChange = { d = it.roundToInt() },
+      valueRange = -5f..8f,
+    )
   }
 }
 
@@ -285,8 +368,13 @@ private fun PolygonAngleLab() {
         "Exterior Angle" to String.format("%.1f°", eachExt),
       )
     )
-    Text("Regular Polygon Sides n = $n  •  Interior Sum = $sumInt°", style = MaterialTheme.typography.labelLarge)
-    Slider(value = n.toFloat(), onValueChange = { n = it.roundToInt() }, valueRange = 3f..12f)
+    LabeledLabSlider(
+      label = "Number of Regular Polygon Sides n",
+      valueText = "$n sides (Sum = $sumInt°)",
+      value = n.toFloat(),
+      onValueChange = { n = it.roundToInt() },
+      valueRange = 3f..12f,
+    )
   }
 }
 
@@ -320,7 +408,13 @@ private fun CircleTheoremWorkbenchLab() {
         "Cyclic Opposite" to "${cyclicOpp}°",
       )
     )
-    Slider(value = circAngleDeg.toFloat(), onValueChange = { circAngleDeg = it.roundToInt() }, valueRange = 20f..80f)
+    LabeledLabSlider(
+      label = "Inscribed Circumference Angle θ",
+      valueText = "$circAngleDeg°",
+      value = circAngleDeg.toFloat(),
+      onValueChange = { circAngleDeg = it.roundToInt() },
+      valueRange = 20f..80f,
+    )
   }
 }
 
@@ -357,9 +451,22 @@ private fun MensurationSolidsLab() {
         FilterChip(selected = solid == i, onClick = { solid = i }, label = { Text(s) })
       }
     }
-    Text("Radius r = ${r.roundToInt()} cm  |  Height h = ${h.roundToInt()} cm", style = MaterialTheme.typography.labelLarge)
-    Slider(value = r, onValueChange = { r = it }, valueRange = 2f..14f)
-    if (solid != 2) Slider(value = h, onValueChange = { h = it }, valueRange = 3f..20f)
+    LabeledLabSlider(
+      label = "Base Radius r",
+      valueText = "${r.roundToInt()} cm",
+      value = r,
+      onValueChange = { r = it },
+      valueRange = 2f..14f,
+    )
+    if (solid != 2) {
+      LabeledLabSlider(
+        label = "Vertical Height h",
+        valueText = "${h.roundToInt()} cm",
+        value = h,
+        onValueChange = { h = it },
+        valueRange = 3f..20f,
+      )
+    }
   }
 }
 
@@ -391,7 +498,13 @@ private fun TrigBearingCompassLab() {
         "sin / cos θ" to String.format("%.2f / %.2f", sinV, cosV),
       )
     )
-    Slider(value = bearingDeg.toFloat(), onValueChange = { bearingDeg = it.roundToInt() }, valueRange = 0f..359f)
+    LabeledLabSlider(
+      label = "Three-Figure Bearing θ (Clockwise from North)",
+      valueText = String.format("%03d°", bearingDeg),
+      value = bearingDeg.toFloat(),
+      onValueChange = { bearingDeg = it.roundToInt() },
+      valueRange = 0f..359f,
+    )
   }
 }
 
@@ -430,12 +543,24 @@ private fun CoordinateLineLab() {
         "Distance |AB|" to String.format("%.2f", dist),
       )
     )
-    Text(
-      "A(1, 1) → B(${x2.roundToInt()}, ${y2.roundToInt()})  •  Midpoint = (${String.format("%.1f", (x1 + x2) / 2f)}, ${String.format("%.1f", (y1 + y2) / 2f)})",
+    ScientificText(
+      "Line A(1, 1) → B(${x2.roundToInt()}, ${y2.roundToInt()})  •  Midpoint = (${String.format("%.1f", (x1 + x2) / 2f)}, ${String.format("%.1f", (y1 + y2) / 2f)})",
       style = MaterialTheme.typography.labelLarge,
     )
-    Slider(value = x2, onValueChange = { x2 = it.roundToInt().toFloat() }, valueRange = 2f..9f)
-    Slider(value = y2, onValueChange = { y2 = it.roundToInt().toFloat() }, valueRange = 1f..9f)
+    LabeledLabSlider(
+      label = "Point B Horizontal Coordinate x_2",
+      valueText = "x_2 = ${x2.roundToInt()}",
+      value = x2,
+      onValueChange = { x2 = it.roundToInt().toFloat() },
+      valueRange = 2f..9f,
+    )
+    LabeledLabSlider(
+      label = "Point B Vertical Coordinate y_2",
+      valueText = "y_2 = ${y2.roundToInt()}",
+      value = y2,
+      onValueChange = { y2 = it.roundToInt().toFloat() },
+      valueRange = 1f..9f,
+    )
   }
 }
 
@@ -455,8 +580,13 @@ private fun CalculusTangentAreaLab() {
         "Area ∫₀ˣ⁰ y dx" to String.format("%.2f", area),
       )
     )
-    Text("Slide x₀ along y = ½x²: x₀ = ${String.format("%.1f", x0)}", style = MaterialTheme.typography.labelLarge)
-    Slider(value = x0, onValueChange = { x0 = (it * 2).roundToInt() / 2f }, valueRange = 0.5f..5.0f)
+    LabeledLabSlider(
+      label = "Point x_0 Along Curve y = ½x²",
+      valueText = String.format("x₀ = %.1f", x0),
+      value = x0,
+      onValueChange = { x0 = (it * 2).roundToInt() / 2f },
+      valueRange = 0.5f..5.0f,
+    )
   }
 }
 
@@ -477,9 +607,20 @@ private fun PermCombProbLab() {
         "1-Draw Odds" to "1 / $nCr",
       )
     )
-    Text("Pool Size n = $n  |  Choose r = $safeR", style = MaterialTheme.typography.labelLarge)
-    Slider(value = n.toFloat(), onValueChange = { n = it.roundToInt() }, valueRange = 3f..9f)
-    Slider(value = safeR.toFloat(), onValueChange = { r = it.roundToInt() }, valueRange = 1f..n.toFloat())
+    LabeledLabSlider(
+      label = "Total Available Items n",
+      valueText = "n = $n",
+      value = n.toFloat(),
+      onValueChange = { n = it.roundToInt() },
+      valueRange = 3f..9f,
+    )
+    LabeledLabSlider(
+      label = "Number of Items Selected r",
+      valueText = "r = $safeR",
+      value = safeR.toFloat(),
+      onValueChange = { r = it.roundToInt() },
+      valueRange = 1f..n.toFloat(),
+    )
   }
 }
 
@@ -502,8 +643,19 @@ private fun StatisticsDispersionLab() {
       )
     )
     Text("Data Set: ${data.joinToString(", ")}", style = MaterialTheme.typography.labelLarge)
-    Text("Add Constant (+$shift) — Notice SD stays constant! Multiply (×$scale) — Scales SD!", style = MaterialTheme.typography.bodySmall)
-    Slider(value = shift.toFloat(), onValueChange = { shift = it.roundToInt() }, valueRange = 0f..10f)
-    Slider(value = scale.toFloat(), onValueChange = { scale = it.roundToInt() }, valueRange = 1f..3f)
+    LabeledLabSlider(
+      label = "Additive Shift (+k to every score — SD unchanged)",
+      valueText = "+$shift",
+      value = shift.toFloat(),
+      onValueChange = { shift = it.roundToInt() },
+      valueRange = 0f..10f,
+    )
+    LabeledLabSlider(
+      label = "Scale Multiplier (×m to every score — scales SD)",
+      valueText = "×$scale",
+      value = scale.toFloat(),
+      onValueChange = { scale = it.roundToInt() },
+      valueRange = 1f..3f,
+    )
   }
 }

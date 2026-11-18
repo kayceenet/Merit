@@ -235,6 +235,15 @@ data class GuidedPracticeTask(
   val completeSolution: String,
 )
 
+data class ProjectVerificationTask(
+  val id: String,
+  val criterionTitle: String,
+  val prompt: String,
+  val options: List<String>,
+  val correctIndex: Int,
+  val feedback: String,
+)
+
 data class TopicMasteryProject(
   val title: String,
   val format: String,
@@ -242,6 +251,7 @@ data class TopicMasteryProject(
   val stages: List<String>,
   val rubricCriteria: List<String>,
   val modelResponse: String,
+  val verificationTasks: List<ProjectVerificationTask> = emptyList(),
 )
 
 data class TopicCheatSheet(

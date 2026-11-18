@@ -9,6 +9,7 @@ import com.example.data.curriculum.CurriculumProgression
 import com.example.data.curriculum.Lesson
 import com.example.data.curriculum.LessonPillar
 import com.example.data.curriculum.QuestionShuffler
+import com.example.data.local.FontSizeScale
 import com.example.data.local.OfflineProgressSnapshot
 import com.example.data.local.ThemeMode
 import com.example.data.local.ThemePreferences
@@ -161,6 +162,10 @@ class MeritPrepViewModel(
 
   fun setUseDynamicColor(enabled: Boolean) {
     viewModelScope.launch { repository.setUseDynamicColor(enabled) }
+  }
+
+  fun setFontSizeScale(scale: FontSizeScale) {
+    viewModelScope.launch { repository.setFontSizeScale(scale) }
   }
 
   // --- CBT Mock Exam Engine (Room-backed Questions + State-Managed Timer) ---

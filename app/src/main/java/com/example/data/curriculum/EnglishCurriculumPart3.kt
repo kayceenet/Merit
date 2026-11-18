@@ -29,7 +29,7 @@ object EnglishCurriculumPart3 {
                 ConceptBlock(
                   heading = "1. Put Two Fingers on Your Throat! (Voiced vs Voiceless & '-ed / -s' Rules)",
                   explanation =
-                      "Rest two fingers lightly on your throat and whisper 'SSSS' (no buzz = Voiceless!) then hum 'ZZZZ' (throat vibrates = Voiced!). Here is magic: Past tense '-ed' copies its neighbour! After Voiceless (/p, k, f, s, ʃ, tʃ/), '-ed' sounds like /t/ ('kissed = kist', 'laughed = laft')! After Voiced sounds, '-ed' sounds like /d/ ('played')! After /t/ or /d/ itself, it adds a whole syllable /ɪd/ ('wanted, landed')!",
+                      "Place two fingers lightly on your larynx and whisper 'SSSS' (no vibration = Voiceless) then hum 'ZZZZ' (vocal-cord vibration = Voiced). By phonetic assimilation, the past-tense suffix '-ed' matches the preceding sound: after voiceless consonants (/p, k, f, s, ʃ, tʃ/), '-ed' is pronounced /t/ ('kissed' = /kɪst/, 'laughed' = /lɑːft/); after voiced sounds, it is /d/ ('played'); after /t/ or /d/ itself, it inserts a vowel to become /ɪd/ ('wanted', 'landed').",
                   keyFormula = "-\\text{ed}:\\; /\\text{t}/\\text{ after voiceless}   |   /\\text{d}/\\text{ after voiced}   |   /\\text{ɪd}/\\text{ after } t,d",
                   examTip =
                       "Watch the two 'TH' sounds: THin / θink / breath = Voiceless /θ/; THe / THis / breathe / brother = Voiced /ð/!",

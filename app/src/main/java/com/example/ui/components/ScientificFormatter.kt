@@ -1,11 +1,11 @@
 package com.example.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -35,7 +36,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.example.ui.theme.CodeFormulaText
 import com.example.ui.theme.CodeSurface
@@ -87,49 +90,84 @@ object ScientificNotationEngine {
       'ₚ' to "p",
     )
 
+  // Longest tokens first so prefixes like \le never shadow \left or \leq
   private val latexReplacements =
     listOf(
       "\\rightleftharpoons" to "⇌",
       "\\longrightarrow" to "→",
+      "\\leftrightarrow" to "↔",
       "\\Rightarrow" to "⇒",
       "\\rightarrow" to "→",
       "\\leftarrow" to "←",
-      "\\times" to "×",
-      "\\cdot" to "·",
-      "\\div" to "÷",
-      "\\pm" to "±",
-      "\\mp" to "∓",
-      "\\approx" to "≈",
-      "\\equiv" to "≡",
-      "\\propto" to "∝",
-      "\\infty" to "∞",
-      "\\leq" to "≤",
-      "\\geq" to "≥",
-      "\\neq" to "≠",
-      "\\theta" to "θ",
-      "\\Theta" to "Θ",
-      "\\alpha" to "α",
-      "\\beta" to "β",
-      "\\gamma" to "γ",
-      "\\Delta" to "Δ",
-      "\\delta" to "δ",
-      "\\lambda" to "λ",
-      "\\mu" to "μ",
-      "\\pi" to "π",
-      "\\sigma" to "σ",
-      "\\omega" to "ω",
-      "\\Omega" to "Ω",
-      "\\phi" to "φ",
-      "\\rho" to "ρ",
+      "\\downarrow" to "↓",
+      "\\uparrow" to "↑",
+      "\\implies" to "⇒",
+      "\\emptyset" to "∅",
+      "\\varepsilon" to "ε",
       "\\epsilon" to "ε",
+      "\\qquad" to "     ",
+      "\\quad" to "   ",
+      "\\angle" to "∠",
+      "\\approx" to "≈",
       "\\degree" to "°",
       "^{\\circ}" to "°",
       "^\\circ" to "°",
+      "\\equiv" to "≡",
+      "\\infty" to "∞",
+      "\\Lambda" to "Λ",
+      "\\lambda" to "λ",
+      "\\Omega" to "Ω",
+      "\\omega" to "ω",
+      "\\propto" to "∝",
+      "\\right" to "",
+      "\\left" to "",
+      "\\Sigma" to "Σ",
+      "\\sigma" to "σ",
+      "\\Theta" to "Θ",
+      "\\theta" to "θ",
+      "\\times" to "×",
+      "\\alpha" to "α",
+      "\\Delta" to "Δ",
+      "\\delta" to "δ",
+      "\\gamma" to "γ",
+      "\\cdot" to "·",
+      "\\beta" to "β",
+      "\\dots" to "…",
+      "\\perp" to "⊥",
+      "\\cdot" to "·",
+      "\\iff" to "⇔",
+      "\\geq" to "≥",
+      "\\leq" to "≤",
+      "\\neq" to "≠",
+      "\\Phi" to "Φ",
+      "\\phi" to "φ",
+      "\\psi" to "ψ",
+      "\\rho" to "ρ",
+      "\\sum" to "Σ",
+      "\\tau" to "τ",
+      "\\eta" to "η",
+      "\\cap" to "∩",
+      "\\cup" to "∪",
+      "\\div" to "÷",
+      "\\int" to "∫",
+      "\\max" to "max",
+      "\\det" to "det",
       "\\sin" to "sin",
       "\\cos" to "cos",
       "\\tan" to "tan",
       "\\log" to "log",
       "\\ln" to "ln",
+      "\\big" to "",
+      "\\geq" to "≥",
+      "\\ge" to "≥",
+      "\\le" to "≤",
+      "\\mu" to "μ",
+      "\\mp" to "∓",
+      "\\pi" to "π",
+      "\\pm" to "±",
+      "\\to" to "→",
+      "\\," to " ",
+      "\\;" to " ",
       "<=>" to "⇌",
       "=>" to "⇒",
       "->" to "→",
@@ -142,23 +180,38 @@ object ScientificNotationEngine {
    * Normalizes LaTeX, AsciiMath, Markdown math delimiters, scientific e-notation, and chemical
    * syntax into a uniform internal representation with `^{...}` / `_{...}` markers before rendering.
    */
-  fun normalizeMarkup(raw: String): String {
+  fun normalizeMarkup(raw: String): String =
+    preNormalizeCore(raw, collapseFractions = true)
+
+  private fun preNormalizeWithoutCollapsingFrac(raw: String): String =
+    preNormalizeCore(raw, collapseFractions = false)
+
+  private fun preNormalizeCore(raw: String, collapseFractions: Boolean): String {
     var s = raw
     // Strip outer Markdown math delimiters ($...$, $$...$$, \(...\), \[...\])
     s = s.replace("$$", "").replace("\\(", "").replace("\\)", "").replace("\\[", "").replace("\\]", "")
     s = Regex("""\$([^$]+)\$""").replace(s) { it.groupValues[1] }
 
-    // Replace \text{...} and \mathrm{...} with their inner content
-    s = Regex("""\\(?:text|mathrm|mathbf)\{([^}]*)\}""").replace(s) { it.groupValues[1] }
+    // Replace matrices \begin{pmatrix} a & b \\ c & d \end{pmatrix} cleanly
+    s = replaceMatrices(s)
 
-    // Replace \sqrt{...} and sqrt(...)
-    s = Regex("""\\sqrt\{([^}]+)\}""").replace(s) { m ->
-      val inner = m.groupValues[1]
-      if (inner.length <= 2) "√$inner" else "√($inner)"
-    }
+    // Replace \xrightarrow{label} and \underset{sub}{base}
+    s = replaceCommandWithSingleBraceArg(s, "\\xrightarrow") { arg -> " →[$arg] " }
+    s = replaceTwoBraceCommand(s, "\\underset") { sub, base -> "$base ($sub)" }
+    s = replaceCommandWithSingleBraceArg(s, "\\pmod") { arg -> " (mod $arg)" }
+    s = replaceCommandWithSingleBraceArg(s, "\\bar") { arg -> applyCombiningOverline(arg) }
+    s = replaceCommandWithSingleBraceArg(s, "\\vec") { arg -> "${arg}\u20D7" }
+
+    // Replace \text{...}, \mathrm{...}, \mathbf{...}
+    s = replaceCommandWithSingleBraceArg(s, "\\text") { it }
+    s = replaceCommandWithSingleBraceArg(s, "\\mathrm") { it }
+    s = replaceCommandWithSingleBraceArg(s, "\\mathbf") { it }
+
+    // Replace \sqrt{...} with full nested brace support and sqrt(...)
+    s = replaceNestedSqrt(s)
     s = Regex("""\bsqrt\(([^)]+)\)""").replace(s) { m -> "√(${m.groupValues[1]})" }
 
-    // Apply symbol replacements
+    // Apply symbol replacements (longest matches first)
     for ((token, symbol) in latexReplacements) {
       s = s.replace(token, symbol)
     }
@@ -188,17 +241,149 @@ object ScientificNotationEngine {
         "_{$decoded}"
       }
 
-    // Inline fallback for \frac{num}{den} when not already split by stacked fraction layout
-    s =
-      Regex("""\\frac\{([^{}]+)\}\{([^{}]+)\}""").replace(s) { m ->
-        val num = m.groupValues[1]
-        val den = m.groupValues[2]
-        val wrappedNum = if (num.length > 2 && ' ' in num) "($num)" else num
-        val wrappedDen = if (den.length > 2 && ' ' in den) "($den)" else den
-        "$wrappedNum/$wrappedDen"
-      }
+    if (collapseFractions) {
+      s = collapseInlineLatexFractions(s)
+    }
 
-    return s
+    return s.replace(Regex(""" {2,}"""), " ")
+  }
+
+  private fun applyCombiningOverline(arg: String): String {
+    val trimmed = arg.trim()
+    return if (trimmed.length == 1) "$trimmed\u0304"
+    else trimmed.map { if (it.isLetterOrDigit()) "$it\u0304" else it.toString() }.joinToString("")
+  }
+
+  private fun replaceMatrices(input: String): String {
+    val regex = Regex("""\\begin\{[pbv]?matrix\}(.*?)\\end\{[pbv]?matrix\}""", RegexOption.DOT_MATCHES_ALL)
+    return regex.replace(input) { match ->
+      val body = match.groupValues[1].trim()
+      val rows =
+        body.split("\\\\")
+          .map { row -> row.split("&").joinToString("   ") { it.trim() } }
+          .filter { it.isNotEmpty() }
+      "[ ${rows.joinToString(" ; ")} ]"
+    }
+  }
+
+  private fun replaceCommandWithSingleBraceArg(
+    input: String,
+    command: String,
+    transform: (String) -> String,
+  ): String {
+    val needle = "$command{"
+    if (!input.contains(needle)) return input
+    val sb = StringBuilder()
+    var i = 0
+    while (i < input.length) {
+      if (input.startsWith(needle, i)) {
+        val openIdx = i + command.length
+        val closeIdx = findMatchingBrace(input, openIdx)
+        if (closeIdx != -1) {
+          val inner = input.substring(openIdx + 1, closeIdx)
+          sb.append(transform(inner))
+          i = closeIdx + 1
+          continue
+        }
+      }
+      sb.append(input[i])
+      i++
+    }
+    return sb.toString()
+  }
+
+  private fun replaceTwoBraceCommand(
+    input: String,
+    command: String,
+    transform: (String, String) -> String,
+  ): String {
+    val needle = "$command{"
+    if (!input.contains(needle)) return input
+    val sb = StringBuilder()
+    var i = 0
+    while (i < input.length) {
+      if (input.startsWith(needle, i)) {
+        val open1 = i + command.length
+        val close1 = findMatchingBrace(input, open1)
+        if (close1 != -1 && close1 + 1 < input.length && input[close1 + 1] == '{') {
+          val close2 = findMatchingBrace(input, close1 + 1)
+          if (close2 != -1) {
+            val arg1 = input.substring(open1 + 1, close1)
+            val arg2 = input.substring(close1 + 2, close2)
+            sb.append(transform(arg1, arg2))
+            i = close2 + 1
+            continue
+          }
+        }
+      }
+      sb.append(input[i])
+      i++
+    }
+    return sb.toString()
+  }
+
+  private fun replaceNestedSqrt(input: String): String {
+    var current = input
+    var guard = 0
+    while (current.contains("\\sqrt{") && guard < 8) {
+      guard++
+      val sb = StringBuilder()
+      var i = 0
+      var replacedAny = false
+      while (i < current.length) {
+        if (current.startsWith("\\sqrt{", i)) {
+          val openIdx = i + 5
+          val closeIdx = findMatchingBrace(current, openIdx)
+          if (closeIdx != -1) {
+            val inner = current.substring(openIdx + 1, closeIdx)
+            val formatted = if (inner.length <= 2 && !inner.contains('\\')) "√$inner" else "√($inner)"
+            sb.append(formatted)
+            i = closeIdx + 1
+            replacedAny = true
+            continue
+          }
+        }
+        sb.append(current[i])
+        i++
+      }
+      current = sb.toString()
+      if (!replacedAny) break
+    }
+    return current
+  }
+
+  private fun collapseInlineLatexFractions(input: String): String {
+    var current = input
+    var guard = 0
+    while (current.contains("\\frac{") && guard < 8) {
+      guard++
+      val sb = StringBuilder()
+      var i = 0
+      var replacedAny = false
+      while (i < current.length) {
+        if (current.startsWith("\\frac{", i)) {
+          val numClose = findMatchingBrace(current, i + 5)
+          if (numClose != -1 && numClose + 1 < current.length && current[numClose + 1] == '{') {
+            val denClose = findMatchingBrace(current, numClose + 1)
+            if (denClose != -1) {
+              val num = current.substring(i + 6, numClose).trim()
+              val den = current.substring(numClose + 2, denClose).trim()
+              val wrappedNum = if (num.length > 2 && ' ' in num) "($num)" else num
+              val wrappedDen = if (den.length > 2 && ' ' in den) "($den)" else den
+              sb.append("$wrappedNum/$wrappedDen")
+              i = denClose + 1
+              replacedAny = true
+              continue
+            }
+          }
+        }
+        sb.append(current[i])
+        i++
+      }
+      current = sb.toString()
+      if (!replacedAny) break
+    }
+    return current
   }
 
   /**
@@ -207,11 +392,11 @@ object ScientificNotationEngine {
    */
   fun formatAnnotated(
     raw: String,
-    baseFontSizeSp: Float = 14f,
+    baseFontSizeSp: Float = 15f,
     codeFontFamily: FontFamily = FontFamily.Monospace,
   ): AnnotatedString {
     val text = normalizeMarkup(raw)
-    val scriptSize = (baseFontSizeSp * 0.72f).coerceAtLeast(9f).sp
+    val scriptSize = (baseFontSizeSp * 0.70f).coerceAtLeast(10f).sp
 
     return buildAnnotatedString {
       var i = 0
@@ -260,9 +445,10 @@ object ScientificNotationEngine {
 
   private fun AnnotatedString.Builder.appendFormattedCore(
     chunk: String,
-    scriptSize: androidx.compose.ui.unit.TextUnit,
+    scriptSize: TextUnit,
   ) {
     var i = 0
+    var lastWasSubscript = false
     while (i < chunk.length) {
       val c = chunk[i]
 
@@ -272,16 +458,19 @@ object ScientificNotationEngine {
           val close = findMatchingBrace(chunk, i + 1)
           if (close != -1) {
             val inner = chunk.substring(i + 2, close).replace("-", "−")
+            if (lastWasSubscript) append("\u200A")
             pushStyle(
               SpanStyle(
                 fontSize = scriptSize,
-                baselineShift = BaselineShift.Superscript,
+                baselineShift = BaselineShift(0.40f),
                 fontWeight = FontWeight.SemiBold,
+                letterSpacing = 0.02.em,
               )
             )
             append(inner)
             pop()
             i = close + 1
+            lastWasSubscript = false
             continue
           }
         } else {
@@ -298,16 +487,19 @@ object ScientificNotationEngine {
           }
           if (end > i + 1) {
             val exp = chunk.substring(i + 1, end).replace("-", "−")
+            if (lastWasSubscript) append("\u200A")
             pushStyle(
               SpanStyle(
                 fontSize = scriptSize,
-                baselineShift = BaselineShift.Superscript,
+                baselineShift = BaselineShift(0.40f),
                 fontWeight = FontWeight.SemiBold,
+                letterSpacing = 0.02.em,
               )
             )
             append(exp)
             pop()
             i = end
+            lastWasSubscript = false
             continue
           }
         }
@@ -322,13 +514,14 @@ object ScientificNotationEngine {
             pushStyle(
               SpanStyle(
                 fontSize = scriptSize,
-                baselineShift = BaselineShift.Subscript,
+                baselineShift = BaselineShift(-0.32f),
                 fontWeight = FontWeight.Medium,
               )
             )
             append(inner)
             pop()
             i = close + 1
+            lastWasSubscript = true
             continue
           }
         } else if (chunk[i + 1].isDigit()) {
@@ -340,13 +533,14 @@ object ScientificNotationEngine {
           pushStyle(
             SpanStyle(
               fontSize = scriptSize,
-              baselineShift = BaselineShift.Subscript,
+              baselineShift = BaselineShift(-0.32f),
               fontWeight = FontWeight.Medium,
             )
           )
           append(sub)
           pop()
           i = end
+          lastWasSubscript = true
           continue
         } else if (chunk[i + 1].isLetter()) {
           var end = i + 1
@@ -357,18 +551,19 @@ object ScientificNotationEngine {
           pushStyle(
             SpanStyle(
               fontSize = scriptSize,
-              baselineShift = BaselineShift.Subscript,
+              baselineShift = BaselineShift(-0.32f),
               fontWeight = FontWeight.Medium,
             )
           )
           append(sub)
           pop()
           i = end
+          lastWasSubscript = true
           continue
         }
       }
 
-      // Italicize single mathematical variable before '=' or in trig/algebra? Keep crisp upright/mixed
+      lastWasSubscript = false
       append(c)
       i++
     }
@@ -394,7 +589,6 @@ object ScientificNotationEngine {
    * while preserving physical unit slashes like `m/s` or `mol/dm³` inline.
    */
   fun tokenizeEquationWithFractions(rawExpression: String): List<FormulaToken> {
-    // First keep \frac{...}{...} intact by doing symbol normalization EXCEPT inline \frac collapse
     val prepared = preNormalizeWithoutCollapsingFrac(rawExpression.trim())
     val tokens = mutableListOf<FormulaToken>()
     val inlineBuffer = StringBuilder()
@@ -409,7 +603,7 @@ object ScientificNotationEngine {
 
     var i = 0
     while (i < prepared.length) {
-      // Case 1: LaTeX \frac{num}{den}
+      // Case 1: LaTeX \frac{num}{den} (only stack top-level \frac; nested \frac inside √(...) collapses cleanly inside)
       if (prepared.startsWith("\\frac{", i)) {
         val numClose = findMatchingBrace(prepared, i + 5)
         if (numClose != -1 && numClose + 1 < prepared.length && prepared[numClose + 1] == '{') {
@@ -550,35 +744,11 @@ object ScientificNotationEngine {
   private fun shouldStackSimpleFraction(num: String, den: String): Boolean {
     if (num.isEmpty() || den.isEmpty()) return false
     if (isUnitDenominator(num, den)) return false
-    // Skip prose word pairs like "Yes/No" or "JAMB/WAEC"
     if (num.length >= 4 && num.all { it.isLetter() } && den.length >= 4 && den.all { it.isLetter() }) {
       return false
     }
     return num.any { it.isDigit() || it in "_^{}Δαβθπ" || it.isLetter() } &&
-      (den.length <= 12)
-  }
-
-  private fun preNormalizeWithoutCollapsingFrac(raw: String): String {
-    var s = raw
-    s = s.replace("$$", "").replace("\\(", "").replace("\\)", "").replace("\\[", "").replace("\\]", "")
-    s = Regex("""\$([^$]+)\$""").replace(s) { it.groupValues[1] }
-    s = Regex("""\\(?:text|mathrm|mathbf)\{([^}]*)\}""").replace(s) { it.groupValues[1] }
-    s = Regex("""\\sqrt\{([^}]+)\}""").replace(s) { m ->
-      val inner = m.groupValues[1]
-      if (inner.length <= 2) "√$inner" else "√($inner)"
-    }
-    s = Regex("""\bsqrt\(([^)]+)\)""").replace(s) { m -> "√(${m.groupValues[1]})" }
-    for ((token, symbol) in latexReplacements) {
-      s = s.replace(token, symbol)
-    }
-    s =
-      Regex("""(\d+(?:\.\d+)?)[eE]([+-]?\d+)""")
-        .replace(s) { m ->
-          val mantissa = m.groupValues[1]
-          val exp = m.groupValues[2].removePrefix("+").replace("-", "−")
-          "$mantissa × 10^{$exp}"
-        }
-    return s
+      den.length <= 12
   }
 }
 
@@ -591,28 +761,35 @@ fun ScientificText(
   fontWeight: FontWeight? = null,
   fontStyle: FontStyle? = null,
   maxLines: Int = Int.MAX_VALUE,
+  softWrap: Boolean = true,
   overflow: TextOverflow = TextOverflow.Clip,
   textAlign: TextAlign? = null,
 ) {
-  val baseSp = if (style.fontSize.value > 0f) style.fontSize.value else 14f
+  val baseSp = if (style.fontSize.value > 0f) style.fontSize.value else 15f
   val annotated =
     remember(text, baseSp) {
       ScientificNotationEngine.formatAnnotated(raw = text, baseFontSizeSp = baseSp)
     }
+  val effectiveLineHeight =
+    if (style.lineHeight != TextUnit.Unspecified && style.lineHeight.value >= baseSp * 1.40f) {
+      style.lineHeight
+    } else {
+      (baseSp * 1.46f).sp
+    }
   Text(
     text = annotated,
     modifier = modifier,
-    style = style,
+    style = style.copy(lineHeight = effectiveLineHeight),
     color = color,
     fontWeight = fontWeight,
     fontStyle = fontStyle,
     maxLines = maxLines,
+    softWrap = softWrap,
     overflow = overflow,
     textAlign = textAlign,
   )
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun EquationDisplayCard(
   formula: String,
@@ -635,14 +812,15 @@ fun EquationDisplayCard(
       modifier
         .fillMaxWidth()
         .height(IntrinsicSize.Min)
-        .clip(RoundedCornerShape(12.dp))
-        .background(containerColor),
+        .clip(RoundedCornerShape(14.dp))
+        .background(containerColor)
+        .border(1.dp, accentColor.copy(alpha = 0.28f), RoundedCornerShape(14.dp)),
   ) {
     Box(modifier = Modifier.width(4.dp).fillMaxHeight().background(accentColor))
 
     Column(
-      modifier = Modifier.weight(1f).padding(horizontal = 14.dp, vertical = 12.dp),
-      verticalArrangement = Arrangement.spacedBy(10.dp),
+      modifier = Modifier.weight(1f).padding(horizontal = 16.dp, vertical = 14.dp),
+      verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
       if (!badgeLabel.isNullOrBlank()) {
         Surface(
@@ -661,9 +839,10 @@ fun EquationDisplayCard(
 
       expressions.forEach { expr ->
         val tokens = remember(expr) { ScientificNotationEngine.tokenizeEquationWithFractions(expr) }
-        FlowRow(
+        Row(
+          modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
           horizontalArrangement = Arrangement.spacedBy(4.dp),
-          verticalArrangement = Arrangement.spacedBy(6.dp),
+          verticalAlignment = Alignment.CenterVertically,
         ) {
           tokens.forEach { token ->
             when (token) {
@@ -671,12 +850,13 @@ fun EquationDisplayCard(
                 ScientificText(
                   text = token.text,
                   style =
-                    MaterialTheme.typography.bodyMedium.copy(
-                      fontFamily = FontFamily.Monospace,
-                      fontWeight = FontWeight.Bold,
+                    MaterialTheme.typography.bodyLarge.copy(
+                      fontFamily = FontFamily.Serif,
+                      fontWeight = FontWeight.SemiBold,
                     ),
                   color = textColor,
-                  modifier = Modifier.align(Alignment.CenterVertically),
+                  maxLines = 1,
+                  softWrap = false,
                 )
               }
 
@@ -684,41 +864,42 @@ fun EquationDisplayCard(
                 Column(
                   modifier =
                     Modifier.width(IntrinsicSize.Max)
-                      .widthIn(min = 26.dp)
-                      .padding(horizontal = 3.dp)
-                      .align(Alignment.CenterVertically),
+                      .widthIn(min = 32.dp)
+                      .padding(horizontal = 4.dp),
                   horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                   ScientificText(
                     text = token.numerator,
                     style =
-                      MaterialTheme.typography.bodySmall.copy(
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 13.sp,
+                      MaterialTheme.typography.bodyMedium.copy(
+                        fontFamily = FontFamily.Serif,
+                        fontWeight = FontWeight.SemiBold,
                       ),
                     color = textColor,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 4.dp),
+                    maxLines = 1,
+                    softWrap = false,
+                    modifier = Modifier.padding(horizontal = 6.dp),
                   )
                   Box(
                     modifier =
                       Modifier.fillMaxWidth()
-                        .padding(vertical = 2.dp)
+                        .padding(vertical = 3.dp)
                         .height(1.5.dp)
-                        .background(textColor.copy(alpha = 0.85f))
+                        .background(textColor.copy(alpha = 0.9f))
                   )
                   ScientificText(
                     text = token.denominator,
                     style =
-                      MaterialTheme.typography.bodySmall.copy(
-                        fontFamily = FontFamily.Monospace,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 13.sp,
+                      MaterialTheme.typography.bodyMedium.copy(
+                        fontFamily = FontFamily.Serif,
+                        fontWeight = FontWeight.SemiBold,
                       ),
                     color = textColor,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 4.dp),
+                    maxLines = 1,
+                    softWrap = false,
+                    modifier = Modifier.padding(horizontal = 6.dp),
                   )
                 }
               }

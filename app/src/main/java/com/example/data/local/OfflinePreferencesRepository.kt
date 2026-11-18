@@ -25,9 +25,17 @@ enum class ThemeMode(val label: String) {
   DARK("Dark"),
 }
 
+enum class FontSizeScale(val label: String, val multiplier: Float) {
+  COMPACT("Small", 0.94f),
+  STANDARD("Medium", 1.08f),
+  LARGE("Large", 1.22f),
+  EXTRA_LARGE("Extra Large", 1.36f),
+}
+
 data class ThemePreferences(
   val themeMode: ThemeMode = ThemeMode.SYSTEM,
   val useDynamicColor: Boolean = true,
+  val fontSizeScale: FontSizeScale = FontSizeScale.STANDARD,
 )
 
 data class CachedExamResultSnapshot(
@@ -61,7 +69,14 @@ class OfflinePreferencesRepository(private val dataStore: DataStore<Preferences>
       val mode =
         ThemeMode.entries.find { it.name == modeName } ?: ThemeMode.SYSTEM
       val dynamicColor = prefs[KEY_USE_DYNAMIC_COLOR] ?: true
-      ThemePreferences(themeMode = mode, useDynamicColor = dynamicColor)
+      val fontScaleName = prefs[KEY_FONT_SCALE] ?: FontSizeScale.STANDARD.name
+      val fontScale =
+        FontSizeScale.entries.find { it.name == fontScaleName } ?: FontSizeScale.STANDARD
+      ThemePreferences(
+        themeMode = mode,
+        useDynamicColor = dynamicColor,
+        fontSizeScale = fontScale,
+      )
     }
 
   val offlineSnapshot: Flow<OfflineProgressSnapshot> =
@@ -87,6 +102,10 @@ class OfflinePreferencesRepository(private val dataStore: DataStore<Preferences>
 
   suspend fun setUseDynamicColor(enabled: Boolean) {
     dataStore.edit { prefs -> prefs[KEY_USE_DYNAMIC_COLOR] = enabled }
+  }
+
+  suspend fun setFontSizeScale(scale: FontSizeScale) {
+    dataStore.edit { prefs -> prefs[KEY_FONT_SCALE] = scale.name }
   }
 
   suspend fun getCurriculumVersion(): Int = dataStore.data.first()[KEY_CURRICULUM_VERSION] ?: 0
@@ -178,6 +197,7 @@ class OfflinePreferencesRepository(private val dataStore: DataStore<Preferences>
   private companion object {
     val KEY_THEME_MODE = stringPreferencesKey("theme_mode")
     val KEY_USE_DYNAMIC_COLOR = booleanPreferencesKey("use_dynamic_color")
+    val KEY_FONT_SCALE = stringPreferencesKey("font_scale")
     val KEY_COMPLETED_LESSON_IDS = stringSetPreferencesKey("completed_lesson_ids")
     val KEY_LAST_LESSON_ID = stringPreferencesKey("last_lesson_id")
     val KEY_LAST_EXAM_SUBJECT_ID = stringPreferencesKey("last_exam_subject_id")

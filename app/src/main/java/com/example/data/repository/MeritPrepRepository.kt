@@ -6,6 +6,7 @@ import com.example.data.curriculum.CurriculumCatalog
 import com.example.data.curriculum.CurriculumEntityMapper
 import com.example.data.curriculum.PracticeQuestion
 import com.example.data.local.CachedExamResultSnapshot
+import com.example.data.local.FontSizeScale
 import com.example.data.local.MeritPrepDao
 import com.example.data.local.MeritPrepDatabase
 import com.example.data.local.OfflinePreferencesRepository
@@ -48,6 +49,10 @@ class MeritPrepRepository(
 
   suspend fun setUseDynamicColor(enabled: Boolean) {
     preferencesRepository?.setUseDynamicColor(enabled)
+  }
+
+  suspend fun setFontSizeScale(scale: FontSizeScale) {
+    preferencesRepository?.setFontSizeScale(scale)
   }
 
   suspend fun seedCurriculumIfNeeded() {
@@ -374,6 +379,6 @@ class MeritPrepRepository(
   }
 
   private companion object {
-    const val CURRENT_CURRICULUM_VERSION = 5
+    const val CURRENT_CURRICULUM_VERSION = 6
   }
 }

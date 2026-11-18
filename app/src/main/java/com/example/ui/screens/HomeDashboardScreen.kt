@@ -38,6 +38,7 @@ import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Science
+import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.TrackChanges
 import androidx.compose.material.icons.outlined.Biotech
 import androidx.compose.material3.Button
@@ -49,7 +50,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -69,9 +73,13 @@ import com.example.data.curriculum.CurriculumProgression
 import com.example.data.curriculum.Lesson
 import com.example.data.curriculum.LessonPillar
 import com.example.data.curriculum.SubjectTrack
+import com.example.data.local.FontSizeScale
+import com.example.data.local.ThemeMode
+import com.example.data.local.ThemePreferences
 import com.example.data.model.ExamAttempt
 import com.example.data.model.LessonProgress
 import com.example.data.model.UserProfile
+import com.example.ui.components.DisplaySettingsDialog
 import com.example.ui.theme.CourseraAzureAccent
 import com.example.ui.theme.CourseraAzureInk
 import com.example.ui.theme.CourseraBlue
@@ -88,12 +96,17 @@ fun HomeDashboardScreen(
   progressList: List<LessonProgress>,
   attempts: List<ExamAttempt>,
   isDarkTheme: Boolean,
+  themePreferences: ThemePreferences = ThemePreferences(),
   onToggleDarkTheme: () -> Unit,
+  onSetThemeMode: (ThemeMode) -> Unit = {},
+  onSetUseDynamicColor: (Boolean) -> Unit = {},
+  onSetFontSizeScale: (FontSizeScale) -> Unit = {},
   onOpenLesson: (Lesson) -> Unit,
   onOpenTrack: (SubjectTrack) -> Unit,
   onOpenExamLab: (String) -> Unit,
   modifier: Modifier = Modifier,
 ) {
+  var showDisplaySettings by remember { mutableStateOf(false) }
   val allLessons =
     remember(structuredModules) {
       val dbLessons = structuredModules.flatMap { it.lessons }
@@ -204,6 +217,22 @@ fun HomeDashboardScreen(
                 contentColor = Color(0xFFBAE6FD),
                 borderColor = CourseraAzureAccent,
               )
+              IconButton(
+                onClick = { showDisplaySettings = true },
+                modifier =
+                  Modifier.size(40.dp)
+                    .clip(CircleShape)
+                    .background(CourseraNavyElevated)
+                    .border(1.dp, Color(0xFF28559A), CircleShape)
+                    .testTag("home_display_settings_button"),
+              ) {
+                Icon(
+                  imageVector = Icons.Filled.TextFields,
+                  contentDescription = "Text size and display settings",
+                  tint = Color.White,
+                  modifier = Modifier.size(20.dp),
+                )
+              }
               IconButton(
                 onClick = onToggleDarkTheme,
                 modifier =
@@ -502,6 +531,16 @@ fun HomeDashboardScreen(
         }
       }
     }
+  }
+
+  if (showDisplaySettings) {
+    DisplaySettingsDialog(
+      themePreferences = themePreferences,
+      onSetThemeMode = onSetThemeMode,
+      onSetUseDynamicColor = onSetUseDynamicColor,
+      onSetFontSizeScale = onSetFontSizeScale,
+      onDismiss = { showDisplaySettings = false },
+    )
   }
 }
 

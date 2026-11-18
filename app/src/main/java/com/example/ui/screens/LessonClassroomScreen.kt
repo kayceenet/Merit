@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -31,17 +33,17 @@ import androidx.compose.material.icons.filled.BookmarkAdd
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.TextFields
+import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -74,10 +76,13 @@ import com.example.data.curriculum.LessonPillar
 import com.example.data.curriculum.PracticeQuestion
 import com.example.data.curriculum.QuestionShuffler
 import com.example.data.curriculum.TopicMasteryProject
+import com.example.data.local.FontSizeScale
+import com.example.data.local.ThemeMode
+import com.example.data.local.ThemePreferences
 import com.example.data.model.LessonProgress
+import com.example.ui.components.DisplaySettingsDialog
 import com.example.ui.components.EquationDisplayCard
 import com.example.ui.components.ScientificText
-import com.example.ui.components.SubjectHeroGraphic
 import com.example.ui.components.TopicDiagramCard
 import com.example.ui.labs.PracticalLabWorkspace
 import com.example.ui.theme.CourseraAzureAccent
@@ -88,6 +93,10 @@ fun LessonClassroomScreen(
   lesson: Lesson,
   progress: LessonProgress?,
   nextLesson: Lesson? = null,
+  themePreferences: ThemePreferences = ThemePreferences(),
+  onSetThemeMode: (ThemeMode) -> Unit = {},
+  onSetUseDynamicColor: (Boolean) -> Unit = {},
+  onSetFontSizeScale: (FontSizeScale) -> Unit = {},
   onBack: () -> Unit,
   onMarkPillarComplete: (LessonPillar, Long?) -> Unit,
   onSaveNote: (title: String, content: String) -> Unit,
@@ -104,7 +113,13 @@ fun LessonClassroomScreen(
     mutableStateOf(firstIncomplete ?: LessonPillar.CONCEPT)
   }
   var showNoteDialog by remember { mutableStateOf(false) }
+  var showDisplaySettings by remember { mutableStateOf(false) }
   var lockNoticeMessage by remember { mutableStateOf<String?>(null) }
+  val projectVerificationAnswers = remember(lesson.id) { mutableStateMapOf<String, Int>() }
+  val verificationTasks = lesson.masteryProject?.verificationTasks.orEmpty()
+  val isProjectVerified =
+    verificationTasks.isEmpty() ||
+      verificationTasks.all { projectVerificationAnswers[it.id] == it.correctIndex }
 
   val semantics = MaterialTheme.semanticColors
   val classroomRatio = completedSteps.size / LessonPillar.entries.size.toFloat()
@@ -142,6 +157,16 @@ fun LessonClassroomScreen(
             text = "${lesson.syllabusTag} • ${completedSteps.size}/${LessonPillar.entries.size} sections completed",
             style = MaterialTheme.typography.labelSmall,
             color = semantics.classroomSubtext,
+          )
+        }
+        IconButton(
+          onClick = { showDisplaySettings = true },
+          modifier = Modifier.testTag("classroom_display_settings_button"),
+        ) {
+          Icon(
+            Icons.Filled.TextFields,
+            contentDescription = "Text size and display settings",
+            tint = semantics.onClassroomBar,
           )
         }
         IconButton(
@@ -271,6 +296,8 @@ fun LessonClassroomScreen(
             progress = progress,
             nextLesson = nextLesson,
             selectedPillar = selectedPillar,
+            projectVerificationAnswers = projectVerificationAnswers,
+            isProjectVerified = isProjectVerified,
             modifier = Modifier.weight(1f).fillMaxHeight(),
             onMarkExerciseComplete = { score -> onMarkPillarComplete(selectedPillar, score) },
             onOpenNextLesson = onOpenNextLesson,
@@ -368,6 +395,8 @@ fun LessonClassroomScreen(
             progress = progress,
             nextLesson = nextLesson,
             selectedPillar = selectedPillar,
+            projectVerificationAnswers = projectVerificationAnswers,
+            isProjectVerified = isProjectVerified,
             modifier = Modifier.weight(1f).fillMaxWidth(),
             onMarkExerciseComplete = { score -> onMarkPillarComplete(selectedPillar, score) },
             onOpenNextLesson = onOpenNextLesson,
@@ -401,36 +430,60 @@ fun LessonClassroomScreen(
       }
 
       if (selectedPillar != LessonPillar.EXERCISE) {
+        val projectGateActive =
+          selectedPillar == LessonPillar.PROJECT && !isCurrentDone && !isProjectVerified
         OutlinedButton(
           onClick = {
-            lockNoticeMessage = null
-            onMarkPillarComplete(selectedPillar, null)
+            if (projectGateActive) {
+              lockNoticeMessage =
+                "Pass all Project Verification Checkpoints above before completing Stage 5."
+            } else {
+              lockNoticeMessage = null
+              onMarkPillarComplete(selectedPillar, null)
+            }
           },
           modifier = Modifier.weight(1f).height(48.dp).testTag("mark_pillar_complete"),
           shape = RoundedCornerShape(10.dp),
         ) {
           Text(
-            text = if (isCurrentDone) "Completed ✓" else "Mark Complete",
+            text =
+              when {
+                isCurrentDone -> "Completed ✓"
+                projectGateActive -> "Verify Project"
+                else -> "Mark Complete"
+              },
             maxLines = 1,
           )
         }
 
         Button(
           onClick = {
-            lockNoticeMessage = null
-            if (!isCurrentDone) onMarkPillarComplete(selectedPillar, null)
-            val nextIdx = (selectedPillar.ordinal + 1).coerceAtMost(LessonPillar.entries.lastIndex)
-            selectedPillar = LessonPillar.entries[nextIdx]
+            if (projectGateActive) {
+              lockNoticeMessage =
+                "Complete and pass every Project Verification Checkpoint above to unlock Stage 6."
+            } else {
+              lockNoticeMessage = null
+              if (!isCurrentDone) onMarkPillarComplete(selectedPillar, null)
+              val nextIdx = (selectedPillar.ordinal + 1).coerceAtMost(LessonPillar.entries.lastIndex)
+              selectedPillar = LessonPillar.entries[nextIdx]
+            }
           },
           modifier = Modifier.weight(1f).height(48.dp).testTag("next_pillar_button"),
           shape = RoundedCornerShape(10.dp),
           colors =
             ButtonDefaults.buttonColors(
-              containerColor = MaterialTheme.colorScheme.primary,
-              contentColor = MaterialTheme.colorScheme.onPrimary,
+              containerColor =
+                if (projectGateActive) MaterialTheme.colorScheme.surfaceVariant
+                else MaterialTheme.colorScheme.primary,
+              contentColor =
+                if (projectGateActive) MaterialTheme.colorScheme.onSurfaceVariant
+                else MaterialTheme.colorScheme.onPrimary,
             ),
         ) {
-          Text("Next Section →", fontWeight = FontWeight.Bold)
+          Text(
+            text = if (projectGateActive) "Pass Checks First" else "Next Section →",
+            fontWeight = FontWeight.Bold,
+          )
         }
       } else {
         Spacer(modifier = Modifier.weight(1f))
@@ -481,14 +534,26 @@ fun LessonClassroomScreen(
       },
     )
   }
+  if (showDisplaySettings) {
+    DisplaySettingsDialog(
+      themePreferences = themePreferences,
+      onSetThemeMode = onSetThemeMode,
+      onSetUseDynamicColor = onSetUseDynamicColor,
+      onSetFontSizeScale = onSetFontSizeScale,
+      onDismiss = { showDisplaySettings = false },
+    )
+  }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun LessonPillarBody(
   lesson: Lesson,
   progress: LessonProgress?,
   nextLesson: Lesson?,
   selectedPillar: LessonPillar,
+  projectVerificationAnswers: MutableMap<String, Int>,
+  isProjectVerified: Boolean,
   onMarkExerciseComplete: (Long?) -> Unit,
   onOpenNextLesson: ((Lesson) -> Unit)?,
   modifier: Modifier = Modifier,
@@ -582,7 +647,7 @@ private fun LessonPillarBody(
             verticalArrangement = Arrangement.spacedBy(10.dp),
           ) {
             Text(
-              text = "KEY VOCABULARY MATRIX (ZERO ASSUMED JARGON)",
+              text = "KEY TERMS & SYMBOL DEFINITIONS",
               style = MaterialTheme.typography.labelSmall,
               color = MaterialTheme.colorScheme.primary,
               fontWeight = FontWeight.Bold,
@@ -622,7 +687,6 @@ private fun LessonPillarBody(
           }
         }
 
-        SubjectHeroGraphic(subjectId = lesson.subjectId)
         TopicDiagramCard(lesson = lesson)
 
         lesson.concepts.forEachIndexed { idx, block ->
@@ -676,7 +740,7 @@ private fun LessonPillarBody(
             if (!block.keyFormula.isNullOrBlank()) {
               EquationDisplayCard(
                 formula = block.keyFormula,
-                badgeLabel = "SCIENTIFIC FORMULA",
+                badgeLabel = null,
               )
             }
             if (block.examIntelligence.isNotBlank()) {
@@ -948,54 +1012,180 @@ private fun LessonPillarBody(
               Modifier.fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp))
                 .background(MaterialTheme.colorScheme.surface)
-                .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
+                .border(1.5.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.65f), RoundedCornerShape(16.dp))
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
           ) {
-            Text(
-              text = "TOPIC CHEAT SHEET & SPACED REVISION",
-              style = MaterialTheme.typography.labelSmall,
-              color = MaterialTheme.colorScheme.primary,
-              fontWeight = FontWeight.Bold,
-            )
-            ScientificText(
-              text = cheat.overview,
-              style = MaterialTheme.typography.bodyMedium,
-              color = MaterialTheme.colorScheme.onSurface,
-            )
-            if (cheat.symbolLegend.isNotEmpty()) {
-              ScientificText(
-                text = "Key Legend: ${cheat.symbolLegend.joinToString("  •  ")}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-              )
-            }
-            if (cheat.commonTraps.isNotEmpty()) {
-              ScientificText(
-                text = "Top Traps: ${cheat.commonTraps.joinToString(" | ")}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.error,
-              )
-            }
-            Surface(
-              color = MaterialTheme.colorScheme.tertiaryContainer,
-              shape = RoundedCornerShape(10.dp),
+            Row(
               modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically,
+            ) {
+              Text(
+                text = "TOPIC SUMMARY & REVISION PLAN",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+              )
+              Surface(
+                color = MaterialTheme.colorScheme.primaryContainer,
+                shape = RoundedCornerShape(99.dp),
+              ) {
+                Text(
+                  text = "QUICK REFERENCE",
+                  style = MaterialTheme.typography.labelSmall,
+                  color = MaterialTheme.colorScheme.onPrimaryContainer,
+                  fontWeight = FontWeight.Bold,
+                  modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                )
+              }
+            }
+
+            Surface(
+              color = MaterialTheme.colorScheme.background,
+              shape = RoundedCornerShape(12.dp),
+              modifier =
+                Modifier.fillMaxWidth()
+                  .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(12.dp)),
             ) {
               ScientificText(
-                text = "Memory Anchor: ${cheat.memoryAid}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                text = cheat.overview,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(10.dp),
+                modifier = Modifier.padding(12.dp),
               )
             }
-            Text(
-              text = "Spaced Review Plan: Days ${cheat.spacedRevisionDays.joinToString(", ")}",
-              style = MaterialTheme.typography.labelSmall,
-              color = MaterialTheme.colorScheme.secondary,
-              fontWeight = FontWeight.Bold,
-            )
+
+            if (cheat.symbolLegend.isNotEmpty()) {
+              Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(
+                  text = "SYMBOLS & CONSTANTS KEY",
+                  style = MaterialTheme.typography.labelSmall,
+                  color = MaterialTheme.colorScheme.secondary,
+                  fontWeight = FontWeight.Bold,
+                )
+                cheat.symbolLegend.forEach { entry ->
+                  Row(
+                    modifier =
+                      Modifier.fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f))
+                        .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(10.dp))
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                  ) {
+                    Text(
+                      text = "•",
+                      style = MaterialTheme.typography.titleSmall,
+                      color = MaterialTheme.colorScheme.primary,
+                      fontWeight = FontWeight.Bold,
+                    )
+                    ScientificText(
+                      text = entry,
+                      style = MaterialTheme.typography.bodySmall,
+                      color = MaterialTheme.colorScheme.onSurface,
+                    )
+                  }
+                }
+              }
+            }
+
+            if (cheat.commonTraps.isNotEmpty()) {
+              Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(
+                  text = "HIGH-FREQUENCY EXAM TRAPS",
+                  style = MaterialTheme.typography.labelSmall,
+                  color = MaterialTheme.colorScheme.error,
+                  fontWeight = FontWeight.Bold,
+                )
+                cheat.commonTraps.forEach { trap ->
+                  Row(
+                    modifier =
+                      Modifier.fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.55f))
+                        .border(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.45f), RoundedCornerShape(10.dp))
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                  ) {
+                    Icon(
+                      imageVector = Icons.Filled.WarningAmber,
+                      contentDescription = null,
+                      tint = MaterialTheme.colorScheme.error,
+                      modifier = Modifier.size(16.dp),
+                    )
+                    ScientificText(
+                      text = trap,
+                      style = MaterialTheme.typography.bodySmall,
+                      color = MaterialTheme.colorScheme.onErrorContainer,
+                    )
+                  }
+                }
+              }
+            }
+
+            Surface(
+              color = MaterialTheme.colorScheme.tertiaryContainer,
+              shape = RoundedCornerShape(12.dp),
+              modifier =
+                Modifier.fillMaxWidth()
+                  .border(1.dp, MaterialTheme.colorScheme.tertiary.copy(alpha = 0.55f), RoundedCornerShape(12.dp)),
+            ) {
+              Column(
+                modifier = Modifier.padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+              ) {
+                Text(
+                  text = "MEMORY ANCHOR",
+                  style = MaterialTheme.typography.labelSmall,
+                  color = MaterialTheme.colorScheme.onTertiaryContainer,
+                  fontWeight = FontWeight.Bold,
+                )
+                ScientificText(
+                  text = cheat.memoryAid,
+                  style = MaterialTheme.typography.bodySmall,
+                  color = MaterialTheme.colorScheme.onTertiaryContainer,
+                  fontWeight = FontWeight.Medium,
+                )
+              }
+            }
+
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+              Text(
+                text = "RECOMMENDED SPACED REVIEW SCHEDULE",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.secondary,
+                fontWeight = FontWeight.Bold,
+              )
+              FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+              ) {
+                cheat.spacedRevisionDays.forEach { day ->
+                  Surface(
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = RoundedCornerShape(8.dp),
+                    modifier =
+                      Modifier.border(
+                        1.dp,
+                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f),
+                        RoundedCornerShape(8.dp),
+                      ),
+                  ) {
+                    Text(
+                      text = "Day $day",
+                      style = MaterialTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
+                      color = MaterialTheme.colorScheme.onSecondaryContainer,
+                      fontWeight = FontWeight.Bold,
+                      modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                    )
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1011,7 +1201,12 @@ private fun LessonPillarBody(
       LessonPillar.PROJECT -> {
         val project = lesson.masteryProject
         if (project != null) {
-          TopicMasteryProjectCard(lessonId = lesson.id, project = project)
+          TopicMasteryProjectCard(
+            lessonId = lesson.id,
+            project = project,
+            selectedAnswers = projectVerificationAnswers,
+            isProjectVerified = isProjectVerified,
+          )
         } else {
           Surface(
             color = MaterialTheme.colorScheme.surface,
@@ -1147,10 +1342,16 @@ private fun GuidedPracticeCard(lessonId: String, task: GuidedPracticeTask) {
 }
 
 @Composable
-private fun TopicMasteryProjectCard(lessonId: String, project: TopicMasteryProject) {
-  val checkedRubric = remember(lessonId) { mutableStateMapOf<Int, Boolean>() }
+private fun TopicMasteryProjectCard(
+  lessonId: String,
+  project: TopicMasteryProject,
+  selectedAnswers: MutableMap<String, Int>,
+  isProjectVerified: Boolean,
+) {
   var showModel by remember(lessonId) { mutableStateOf(false) }
   val semantics = MaterialTheme.semanticColors
+  val tasks = project.verificationTasks
+  val passedCount = tasks.count { selectedAnswers[it.id] == it.correctIndex }
 
   Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
     Column(
@@ -1190,77 +1391,256 @@ private fun TopicMasteryProjectCard(lessonId: String, project: TopicMasteryProje
         color = MaterialTheme.colorScheme.onSurface,
       )
       Text(
-        text = "ACTION STAGES",
+        text = "DELIVERABLE WORKFLOW STAGES",
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.secondary,
         fontWeight = FontWeight.Bold,
       )
       project.stages.forEachIndexed { idx, stage ->
-        ScientificText(
-          text = "${idx + 1}. $stage",
-          style = MaterialTheme.typography.bodySmall,
-          color = MaterialTheme.colorScheme.onSurface,
-        )
-      }
-    }
-
-    Column(
-      modifier =
-        Modifier.fillMaxWidth()
-          .clip(RoundedCornerShape(16.dp))
-          .background(MaterialTheme.colorScheme.surface)
-          .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
-          .padding(16.dp),
-      verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-      Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-      ) {
-        Icon(
-          Icons.Filled.Checklist,
-          contentDescription = null,
-          tint = semantics.success,
-          modifier = Modifier.size(18.dp),
-        )
-        Text(
-          text = "SELF-EVALUATION RUBRIC",
-          style = MaterialTheme.typography.labelSmall,
-          color = semantics.success,
-          fontWeight = FontWeight.Bold,
-        )
-      }
-      project.rubricCriteria.forEachIndexed { idx, criterion ->
-        val checked = checkedRubric[idx] == true
         Row(
           modifier =
             Modifier.fillMaxWidth()
               .clip(RoundedCornerShape(10.dp))
-              .clickable { checkedRubric[idx] = !checked }
-              .padding(vertical = 4.dp),
-          verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.spacedBy(6.dp),
+              .background(MaterialTheme.colorScheme.background)
+              .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(10.dp))
+              .padding(10.dp),
+          horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-          Checkbox(checked = checked, onCheckedChange = { checkedRubric[idx] = it })
+          Text(
+            text = "${idx + 1}.",
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold,
+          )
           ScientificText(
-            text = criterion,
+            text = stage,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurface,
           )
         }
       }
+    }
+
+    // Udacity-style Interactive App-Graded Project Verification
+    Column(
+      modifier =
+        Modifier.fillMaxWidth()
+          .clip(RoundedCornerShape(16.dp))
+          .background(MaterialTheme.colorScheme.surface)
+          .border(
+            1.5.dp,
+            if (isProjectVerified) semantics.success else MaterialTheme.colorScheme.primary,
+            RoundedCornerShape(16.dp),
+          )
+          .padding(16.dp),
+      verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+      Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+      ) {
+        Row(
+          modifier = Modifier.weight(1f),
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+          Icon(
+            imageVector = Icons.Filled.VerifiedUser,
+            contentDescription = null,
+            tint = if (isProjectVerified) semantics.success else MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(18.dp),
+          )
+          Text(
+            text = "INTERACTIVE PROJECT VERIFICATION",
+            style = MaterialTheme.typography.labelSmall,
+            color = if (isProjectVerified) semantics.success else MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold,
+          )
+        }
+        Surface(
+          color =
+            if (isProjectVerified) semantics.successContainer
+            else MaterialTheme.colorScheme.primaryContainer,
+          shape = RoundedCornerShape(99.dp),
+        ) {
+          Text(
+            text = "$passedCount/${tasks.size} PASSED",
+            style = MaterialTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
+            color =
+              if (isProjectVerified) semantics.onSuccessContainer
+              else MaterialTheme.colorScheme.onPrimaryContainer,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+          )
+        }
+      }
+
+      Text(
+        text =
+          if (isProjectVerified) {
+            "All project verification checks passed! Inspect the reviewer model solution below or advance to Stage 6."
+          } else {
+            "Demonstrate hands-on mastery by passing every interactive checkpoint below. You can revise wrong answers immediately."
+          },
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+      )
+
+      tasks.forEachIndexed { idx, task ->
+        val picked = selectedAnswers[task.id]
+        val isCorrect = picked == task.correctIndex
+        Column(
+          modifier =
+            Modifier.fillMaxWidth()
+              .clip(RoundedCornerShape(12.dp))
+              .background(MaterialTheme.colorScheme.background)
+              .border(
+                1.dp,
+                when {
+                  picked == null -> MaterialTheme.colorScheme.outlineVariant
+                  isCorrect -> semantics.success
+                  else -> MaterialTheme.colorScheme.error
+                },
+                RoundedCornerShape(12.dp),
+              )
+              .padding(12.dp),
+          verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+          Text(
+            text = "CHECK ${idx + 1} • ${task.criterionTitle.uppercase()}",
+            style = MaterialTheme.typography.labelSmall,
+            color = if (isCorrect) semantics.success else MaterialTheme.colorScheme.secondary,
+            fontWeight = FontWeight.Bold,
+          )
+          ScientificText(
+            text = task.prompt,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.SemiBold,
+          )
+          task.options.forEachIndexed { optIdx, optText ->
+            val selected = picked == optIdx
+            val optBg =
+              when {
+                selected && optIdx == task.correctIndex -> semantics.successContainer
+                selected -> MaterialTheme.colorScheme.errorContainer
+                else -> MaterialTheme.colorScheme.surface
+              }
+            val optBorder =
+              when {
+                selected && optIdx == task.correctIndex -> semantics.success
+                selected -> MaterialTheme.colorScheme.error
+                else -> MaterialTheme.colorScheme.outlineVariant
+              }
+            val optFg =
+              when {
+                selected && optIdx == task.correctIndex -> semantics.onSuccessContainer
+                selected -> MaterialTheme.colorScheme.onErrorContainer
+                else -> MaterialTheme.colorScheme.onSurface
+              }
+            Row(
+              modifier =
+                Modifier.fillMaxWidth()
+                  .clip(RoundedCornerShape(10.dp))
+                  .background(optBg)
+                  .border(1.2.dp, optBorder, RoundedCornerShape(10.dp))
+                  .clickable { selectedAnswers[task.id] = optIdx }
+                  .padding(horizontal = 12.dp, vertical = 10.dp),
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+              Text(
+                text = "${'A' + optIdx}.",
+                style = MaterialTheme.typography.labelLarge,
+                color = optFg,
+                fontWeight = FontWeight.Bold,
+              )
+              ScientificText(
+                text = optText,
+                style = MaterialTheme.typography.bodySmall,
+                color = optFg,
+                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+              )
+            }
+          }
+
+          if (picked != null) {
+            Surface(
+              color =
+                if (isCorrect) semantics.successContainer
+                else MaterialTheme.colorScheme.errorContainer,
+              shape = RoundedCornerShape(8.dp),
+              modifier = Modifier.fillMaxWidth(),
+            ) {
+              ScientificText(
+                text =
+                  if (isCorrect) "Verified: ${task.feedback}"
+                  else "Needs Revision: Re-check the project principles and select the scientifically accurate choice.",
+                style = MaterialTheme.typography.bodySmall,
+                color =
+                  if (isCorrect) semantics.onSuccessContainer
+                  else MaterialTheme.colorScheme.onErrorContainer,
+                modifier = Modifier.padding(10.dp),
+              )
+            }
+          }
+        }
+      }
+
+      if (project.rubricCriteria.isNotEmpty()) {
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+          Text(
+            text = "RUBRIC STANDARDS VERIFIED BY CHECKS ABOVE",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = FontWeight.Bold,
+          )
+          project.rubricCriteria.forEach { criterion ->
+            Row(
+              horizontalArrangement = Arrangement.spacedBy(6.dp),
+              verticalAlignment = Alignment.Top,
+            ) {
+              Icon(
+                imageVector = if (isProjectVerified) Icons.Filled.CheckCircle else Icons.Filled.Check,
+                contentDescription = null,
+                tint = if (isProjectVerified) semantics.success else MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(15.dp),
+              )
+              ScientificText(
+                text = criterion,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+              )
+            }
+          }
+        }
+      }
+
       OutlinedButton(
-        onClick = { showModel = !showModel },
-        modifier = Modifier.fillMaxWidth().height(48.dp),
+        onClick = { if (isProjectVerified) showModel = !showModel },
+        enabled = isProjectVerified,
+        modifier = Modifier.fillMaxWidth().height(48.dp).testTag("toggle_project_model_solution"),
         shape = RoundedCornerShape(10.dp),
       ) {
-        Text(if (showModel) "Hide Model Examiner Response" else "Compare With High-Scoring Model Response")
+        Text(
+          text =
+            when {
+              !isProjectVerified -> "Pass All ${tasks.size} Checks Above to Unlock Model Solution"
+              showModel -> "Hide Reviewer Model Solution"
+              else -> "Compare With Reviewer Model Solution"
+            },
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis,
+        )
       }
-      if (showModel) {
+      if (showModel && isProjectVerified) {
         Surface(
           color = semantics.successContainer,
           shape = RoundedCornerShape(12.dp),
-          modifier = Modifier.fillMaxWidth(),
+          modifier =
+            Modifier.fillMaxWidth()
+              .border(1.dp, semantics.success, RoundedCornerShape(12.dp)),
         ) {
           ScientificText(
             text = project.modelResponse,

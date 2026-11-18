@@ -806,7 +806,7 @@ object EnglishCurriculumPart2 {
                 listOf(
                   RealLifeScenario(
                     title = "Broadcast Pronunciation & Automatic Speech Recognition",
-                    industryDomain = "Media & AI Speech Systems",
+                    industryDomain = "Broadcast Media & Speech Phonetics",
                     narrative =
                       "Clear contrast between /iː/ ('sheep, leave, seat') and /ɪ/ ('ship, live, sit') prevents embarrassing mix-ups in international broadcasting and voice dictation.",
                     examConnection = "Test of Orals accounts for 15+ guaranteed marks in JAMB & 60 marks in WAEC Paper 3!",

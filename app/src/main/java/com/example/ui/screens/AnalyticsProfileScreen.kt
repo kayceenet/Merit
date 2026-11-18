@@ -62,6 +62,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.data.curriculum.CurriculumCatalog
+import com.example.data.local.FontSizeScale
 import com.example.data.local.OfflineProgressSnapshot
 import com.example.data.local.ThemeMode
 import com.example.data.local.ThemePreferences
@@ -100,6 +101,7 @@ fun AnalyticsProfileScreen(
   themePreferences: ThemePreferences,
   onSetThemeMode: (ThemeMode) -> Unit,
   onSetUseDynamicColor: (Boolean) -> Unit,
+  onSetFontSizeScale: (FontSizeScale) -> Unit = {},
   onPracticeWeakSubject: (String) -> Unit,
   onUpdateGoal: (displayName: String, targetExam: String, targetScore: Long) -> Unit,
   modifier: Modifier = Modifier,
@@ -720,6 +722,31 @@ fun AnalyticsProfileScreen(
               enabled = supportsDynamic,
               modifier = Modifier.testTag("dynamic_color_switch"),
             )
+          }
+
+          Text(
+            text = "Reading Text Size (Character Scale)",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+          )
+          FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+          ) {
+            FontSizeScale.entries.forEach { scale ->
+              val selected = themePreferences.fontSizeScale == scale
+              FilterChip(
+                selected = selected,
+                onClick = { onSetFontSizeScale(scale) },
+                label = { Text(scale.label, fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium) },
+                colors =
+                  FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                  ),
+                modifier = Modifier.testTag("font_scale_${scale.name.lowercase()}"),
+              )
+            }
           }
         }
       }

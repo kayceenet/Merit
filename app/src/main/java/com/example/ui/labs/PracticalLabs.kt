@@ -382,3 +382,56 @@ internal fun LabMetricBanner(items: List<Pair<String, String>>) {
     }
   }
 }
+
+@Composable
+internal fun LabeledLabSlider(
+  label: String,
+  valueText: String,
+  value: Float,
+  onValueChange: (Float) -> Unit,
+  valueRange: ClosedFloatingPointRange<Float>,
+  modifier: Modifier = Modifier,
+) {
+  Column(
+    modifier =
+      modifier
+        .fillMaxWidth()
+        .clip(RoundedCornerShape(12.dp))
+        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f))
+        .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(12.dp))
+        .padding(horizontal = 12.dp, vertical = 8.dp),
+    verticalArrangement = Arrangement.spacedBy(2.dp),
+  ) {
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      ScientificText(
+        text = label,
+        style = MaterialTheme.typography.labelLarge,
+        color = MaterialTheme.colorScheme.onSurface,
+        fontWeight = FontWeight.SemiBold,
+        modifier = Modifier.weight(1f).padding(end = 8.dp),
+      )
+      Surface(
+        color = MaterialTheme.colorScheme.primaryContainer,
+        shape = RoundedCornerShape(8.dp),
+      ) {
+        Text(
+          text = valueText,
+          style = MaterialTheme.typography.labelMedium.copy(fontFeatureSettings = "tnum"),
+          color = MaterialTheme.colorScheme.onPrimaryContainer,
+          fontWeight = FontWeight.Bold,
+          modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+        )
+      }
+    }
+    androidx.compose.material3.Slider(
+      value = value,
+      onValueChange = onValueChange,
+      valueRange = valueRange,
+      modifier = Modifier.fillMaxWidth(),
+    )
+  }
+}

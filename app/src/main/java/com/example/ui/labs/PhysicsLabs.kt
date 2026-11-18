@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -87,13 +86,28 @@ private fun VernierMicrometerLab() {
         "True Diameter" to String.format("%.2f mm", trueReading),
       )
     )
-    Text("Main Sleeve: ${String.format("%.1f", sleeveMm)} mm", style = MaterialTheme.typography.labelLarge)
-    Slider(value = sleeveMm, onValueChange = { sleeveMm = (it * 2f).roundToInt() / 2f }, valueRange = 0f..10f)
-    Text("Thimble Division (×0.01 mm): $thimbleDiv", style = MaterialTheme.typography.labelLarge)
-    Slider(value = thimbleDiv.toFloat(), onValueChange = { thimbleDiv = it.roundToInt() }, valueRange = 0f..49f)
-    Text("Zero Error: ${String.format("%+.2f", zeroErrorMm)} mm", style = MaterialTheme.typography.labelLarge)
-    Slider(value = zeroErrorMm, onValueChange = { zeroErrorMm = (it * 100f).roundToInt() / 100f }, valueRange = -0.10f..0.10f)
-    ScientificText("True Reading = Observed − Zero Error (Positive error subtracts; Negative error adds!)", style = MaterialTheme.typography.bodySmall)
+    LabeledLabSlider(
+      label = "Main Sleeve Reading",
+      valueText = String.format("%.1f mm", sleeveMm),
+      value = sleeveMm,
+      onValueChange = { sleeveMm = (it * 2f).roundToInt() / 2f },
+      valueRange = 0f..10f,
+    )
+    LabeledLabSlider(
+      label = "Thimble Circular Scale Division (×0.01 mm)",
+      valueText = "$thimbleDiv div (${String.format("%.2f mm", thimbleDiv * 0.01f)})",
+      value = thimbleDiv.toFloat(),
+      onValueChange = { thimbleDiv = it.roundToInt() },
+      valueRange = 0f..49f,
+    )
+    LabeledLabSlider(
+      label = "Instrument Zero Error",
+      valueText = String.format("%+.2f mm", zeroErrorMm),
+      value = zeroErrorMm,
+      onValueChange = { zeroErrorMm = (it * 100f).roundToInt() / 100f },
+      valueRange = -0.10f..0.10f,
+    )
+    ScientificText("True Reading = Observed − Zero Error (Positive error subtracts; Negative error adds.)", style = MaterialTheme.typography.bodySmall)
   }
 }
 
@@ -128,10 +142,27 @@ private fun VectorParallelogramLab() {
         "Equilibrant" to String.format("%.1f N opp", r),
       )
     )
-    Text("Force F₁: ${f1.roundToInt()} N  |  Force F₂: ${f2.roundToInt()} N  |  θ = ${angleDeg.roundToInt()}°", style = MaterialTheme.typography.labelLarge)
-    Slider(value = f1, onValueChange = { f1 = it }, valueRange = 10f..60f)
-    Slider(value = f2, onValueChange = { f2 = it }, valueRange = 10f..60f)
-    Slider(value = angleDeg, onValueChange = { angleDeg = it }, valueRange = 0f..180f)
+    LabeledLabSlider(
+      label = "Force F_1 Magnitude",
+      valueText = "${f1.roundToInt()} N",
+      value = f1,
+      onValueChange = { f1 = it },
+      valueRange = 10f..60f,
+    )
+    LabeledLabSlider(
+      label = "Force F_2 Magnitude",
+      valueText = "${f2.roundToInt()} N",
+      value = f2,
+      onValueChange = { f2 = it },
+      valueRange = 10f..60f,
+    )
+    LabeledLabSlider(
+      label = "Angle θ Between Forces",
+      valueText = "${angleDeg.roundToInt()}°",
+      value = angleDeg,
+      onValueChange = { angleDeg = it },
+      valueRange = 0f..180f,
+    )
   }
 }
 
@@ -174,9 +205,27 @@ private fun ProjectileKinematicsLab() {
         "Time T" to String.format("%.2f s", flightTime),
       )
     )
-    Text("Speed u = ${speed.roundToInt()} m/s  |  Angle θ = ${angleDeg.roundToInt()}°  |  g = ${String.format("%.1f", gravity)} m/s²", style = MaterialTheme.typography.labelLarge)
-    Slider(value = speed, onValueChange = { speed = it }, valueRange = 10f..60f)
-    Slider(value = angleDeg, onValueChange = { angleDeg = it }, valueRange = 10f..85f)
+    LabeledLabSlider(
+      label = "Initial Launch Speed u",
+      valueText = "${speed.roundToInt()} m/s",
+      value = speed,
+      onValueChange = { speed = it },
+      valueRange = 10f..60f,
+    )
+    LabeledLabSlider(
+      label = "Projection Angle θ",
+      valueText = "${angleDeg.roundToInt()}°",
+      value = angleDeg,
+      onValueChange = { angleDeg = it },
+      valueRange = 10f..85f,
+    )
+    LabeledLabSlider(
+      label = "Gravitational Acceleration g",
+      valueText = String.format("%.1f m/s²", gravity),
+      value = gravity,
+      onValueChange = { gravity = (it * 10f).roundToInt() / 10f },
+      valueRange = 1.6f..12.0f,
+    )
   }
 }
 
@@ -197,11 +246,27 @@ private fun MomentBalanceLab() {
         "Pivot Reaction" to String.format("%.1f N", fLeft + balancingFright),
       )
     )
-    Text("Left Force F₁: ${fLeft.roundToInt()} N at ${String.format("%.1f", dLeft)} m", style = MaterialTheme.typography.labelLarge)
-    Slider(value = fLeft, onValueChange = { fLeft = it }, valueRange = 10f..80f)
-    Slider(value = dLeft, onValueChange = { dLeft = it }, valueRange = 0.5f..5.0f)
-    Text("Right Lever Arm d₂: ${String.format("%.1f", dRight)} m", style = MaterialTheme.typography.labelLarge)
-    Slider(value = dRight, onValueChange = { dRight = it }, valueRange = 0.5f..5.0f)
+    LabeledLabSlider(
+      label = "Left Force F_1",
+      valueText = "${fLeft.roundToInt()} N",
+      value = fLeft,
+      onValueChange = { fLeft = it },
+      valueRange = 10f..80f,
+    )
+    LabeledLabSlider(
+      label = "Left Lever Arm d_1",
+      valueText = String.format("%.1f m", dLeft),
+      value = dLeft,
+      onValueChange = { dLeft = it },
+      valueRange = 0.5f..5.0f,
+    )
+    LabeledLabSlider(
+      label = "Right Lever Arm d_2",
+      valueText = String.format("%.1f m", dRight),
+      value = dRight,
+      onValueChange = { dRight = it },
+      valueRange = 0.5f..5.0f,
+    )
     ScientificText("Equilibrium requires ∑F = 0 and Clockwise Moment = Anticlockwise Moment.", color = semantics.success, style = MaterialTheme.typography.bodySmall)
   }
 }
@@ -228,9 +293,20 @@ private fun SimpleMachineEfficiencyLab() {
         FilterChip(selected = vr == pulleys, onClick = { vr = pulleys }, label = { Text("VR = $pulleys") })
       }
     }
-    Text("Load L = ${load.roundToInt()} N  |  Effort E = ${effort.roundToInt()} N", style = MaterialTheme.typography.labelLarge)
-    Slider(value = load, onValueChange = { load = it }, valueRange = 100f..800f)
-    Slider(value = effort, onValueChange = { effort = it }, valueRange = (load / vr).coerceAtLeast(30f)..400f)
+    LabeledLabSlider(
+      label = "Load Force L",
+      valueText = "${load.roundToInt()} N",
+      value = load,
+      onValueChange = { load = it },
+      valueRange = 100f..800f,
+    )
+    LabeledLabSlider(
+      label = "Applied Effort E",
+      valueText = "${effort.roundToInt()} N",
+      value = effort,
+      onValueChange = { effort = it },
+      valueRange = (load / vr).coerceAtLeast(30f)..400f,
+    )
   }
 }
 
@@ -250,8 +326,13 @@ private fun PendulumShmLab() {
         "T² / L" to String.format("%.2f s²/m", (period * period) / lengthM),
       )
     )
-    Text("String Length L: ${String.format("%.2f", lengthM)} m", style = MaterialTheme.typography.labelLarge)
-    Slider(value = lengthM, onValueChange = { lengthM = it }, valueRange = 0.25f..2.50f)
+    LabeledLabSlider(
+      label = "Pendulum String Length L",
+      valueText = String.format("%.2f m", lengthM),
+      value = lengthM,
+      onValueChange = { lengthM = it },
+      valueRange = 0.25f..2.50f,
+    )
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
       FilterChip(selected = gravity > 9f, onClick = { gravity = 9.81f }, label = { Text("Earth (9.81)") })
       FilterChip(selected = gravity < 3f, onClick = { gravity = 1.62f }, label = { Text("Moon (1.62)") })
@@ -315,10 +396,20 @@ private fun LinearExpansionLab() {
         FilterChip(selected = materialIdx == i, onClick = { materialIdx = i }, label = { Text(n) })
       }
     }
-    Text("Temperature Rise Δθ: ${deltaT.roundToInt()} °C", style = MaterialTheme.typography.labelLarge)
-    Slider(value = deltaT, onValueChange = { deltaT = it }, valueRange = 10f..250f)
-    Text("Original Bar Length L₀: ${String.format("%.1f", l0)} m", style = MaterialTheme.typography.labelLarge)
-    Slider(value = l0, onValueChange = { l0 = it }, valueRange = 1f..10f)
+    LabeledLabSlider(
+      label = "Temperature Rise Δθ",
+      valueText = "${deltaT.roundToInt()} °C",
+      value = deltaT,
+      onValueChange = { deltaT = it },
+      valueRange = 10f..250f,
+    )
+    LabeledLabSlider(
+      label = "Original Bar Length L_0",
+      valueText = String.format("%.1f m", l0),
+      value = l0,
+      onValueChange = { l0 = it },
+      valueRange = 1f..10f,
+    )
   }
 }
 
@@ -346,9 +437,14 @@ private fun CalorimetryPhaseLab() {
         "Phase State" to phase.substringBefore(" ("),
       )
     )
-    Text("Total Thermal Energy Applied to 1 kg H₂O: ${heatKj.roundToInt()} kJ", style = MaterialTheme.typography.labelLarge)
-    Slider(value = heatKj, onValueChange = { heatKj = it }, valueRange = 0f..900f)
-    ScientificText("Status: $phase — Notice Temperature freezes flat across phase changes!", style = MaterialTheme.typography.bodySmall)
+    LabeledLabSlider(
+      label = "Thermal Energy Q Applied to 1 kg Ice/Water",
+      valueText = "${heatKj.roundToInt()} kJ",
+      value = heatKj,
+      onValueChange = { heatKj = it },
+      valueRange = 0f..900f,
+    )
+    ScientificText("Status: $phase — Temperature remains constant across phase changes.", style = MaterialTheme.typography.bodySmall)
   }
 }
 
@@ -373,8 +469,14 @@ private fun SoundHarmonicsPipeLab() {
       FilterChip(selected = isClosed, onClick = { isClosed = true }, label = { Text("Closed Pipe (L = λ/4)") })
       FilterChip(selected = !isClosed, onClick = { isClosed = false }, label = { Text("Open Pipe (L = λ/2)") })
     }
-    Text("Air Column Length L = ${String.format("%.2f", pipeLen)} m  |  Pattern: $overtoneRatio", style = MaterialTheme.typography.labelLarge)
-    Slider(value = pipeLen, onValueChange = { pipeLen = it }, valueRange = 0.25f..1.50f)
+    LabeledLabSlider(
+      label = "Air Column Length L",
+      valueText = String.format("%.2f m", pipeLen),
+      value = pipeLen,
+      onValueChange = { pipeLen = it },
+      valueRange = 0.25f..1.50f,
+    )
+    ScientificText("Supported Overtone Series: $overtoneRatio", style = MaterialTheme.typography.bodySmall)
   }
 }
 
@@ -395,10 +497,21 @@ private fun WaveOpticsBenchLab() {
         "Image v" to String.format("%.1f cm", vDist),
       )
     )
-    Text("Magnification M = ${String.format("%.2f", mag)}×  •  Nature: $imageNature", style = MaterialTheme.typography.labelLarge)
-    Slider(value = focal, onValueChange = { focal = it }, valueRange = 10f..25f)
-    Text("Object Distance u = ${uDist.roundToInt()} cm", style = MaterialTheme.typography.labelLarge)
-    Slider(value = uDist, onValueChange = { uDist = it }, valueRange = 5f..60f)
+    ScientificText("Magnification M = ${String.format("%.2f", mag)}×  •  Nature: $imageNature", style = MaterialTheme.typography.labelLarge)
+    LabeledLabSlider(
+      label = "Convex Lens Focal Length f",
+      valueText = "${focal.roundToInt()} cm",
+      value = focal,
+      onValueChange = { focal = it },
+      valueRange = 10f..25f,
+    )
+    LabeledLabSlider(
+      label = "Object Distance u",
+      valueText = "${uDist.roundToInt()} cm",
+      value = uDist,
+      onValueChange = { uDist = it },
+      valueRange = 5f..60f,
+    )
   }
 }
 
@@ -424,10 +537,27 @@ private fun CapacitorNetworkLab() {
       FilterChip(selected = isParallel, onClick = { isParallel = true }, label = { Text("Parallel (C₁+C₂)") })
       FilterChip(selected = !isParallel, onClick = { isParallel = false }, label = { Text("Series (1/C₁+1/C₂)") })
     }
-    Text("C₁ = ${c1.roundToInt()} μF  |  C₂ = ${c2.roundToInt()} μF  |  V = ${voltage.roundToInt()} V", style = MaterialTheme.typography.labelLarge)
-    Slider(value = c1, onValueChange = { c1 = it }, valueRange = 1f..20f)
-    Slider(value = c2, onValueChange = { c2 = it }, valueRange = 1f..20f)
-    Slider(value = voltage, onValueChange = { voltage = it }, valueRange = 3f..24f)
+    LabeledLabSlider(
+      label = "Capacitor C_1 Capacitance",
+      valueText = "${c1.roundToInt()} μF",
+      value = c1,
+      onValueChange = { c1 = it },
+      valueRange = 1f..20f,
+    )
+    LabeledLabSlider(
+      label = "Capacitor C_2 Capacitance",
+      valueText = "${c2.roundToInt()} μF",
+      value = c2,
+      onValueChange = { c2 = it },
+      valueRange = 1f..20f,
+    )
+    LabeledLabSlider(
+      label = "Supply Voltage V",
+      valueText = "${voltage.roundToInt()} V",
+      value = voltage,
+      onValueChange = { voltage = it },
+      valueRange = 3f..24f,
+    )
   }
 }
 
@@ -455,10 +585,34 @@ private fun OhmsCircuitLab() {
       FilterChip(selected = isSeries, onClick = { isSeries = true }, label = { Text("Series R₁+R₂") })
       FilterChip(selected = !isSeries, onClick = { isSeries = false }, label = { Text("Parallel R₁||R₂") })
     }
-    Text("EMF = ${emf.roundToInt()} V • Internal r = ${String.format("%.1f", internalR)} Ω • R₁=${r1.roundToInt()}Ω, R₂=${r2.roundToInt()}Ω", style = MaterialTheme.typography.labelLarge)
-    Slider(value = emf, onValueChange = { emf = it }, valueRange = 3f..24f)
-    Slider(value = r1, onValueChange = { r1 = it }, valueRange = 1f..20f)
-    Slider(value = r2, onValueChange = { r2 = it }, valueRange = 1f..20f)
+    LabeledLabSlider(
+      label = "Battery Electromotive Force (EMF, E)",
+      valueText = "${emf.roundToInt()} V",
+      value = emf,
+      onValueChange = { emf = it },
+      valueRange = 3f..24f,
+    )
+    LabeledLabSlider(
+      label = "External Resistor R_1",
+      valueText = "${r1.roundToInt()} Ω",
+      value = r1,
+      onValueChange = { r1 = it },
+      valueRange = 1f..20f,
+    )
+    LabeledLabSlider(
+      label = "External Resistor R_2",
+      valueText = "${r2.roundToInt()} Ω",
+      value = r2,
+      onValueChange = { r2 = it },
+      valueRange = 1f..20f,
+    )
+    LabeledLabSlider(
+      label = "Cell Internal Resistance r",
+      valueText = String.format("%.1f Ω", internalR),
+      value = internalR,
+      onValueChange = { internalR = (it * 10f).roundToInt() / 10f },
+      valueRange = 0.0f..3.0f,
+    )
   }
 }
 
@@ -478,9 +632,27 @@ private fun TransformerAcResonanceLab() {
         "Type" to kind,
       )
     )
-    Text("Primary Turns Np = $np  |  Secondary Turns Ns = $ns  |  Vp = ${vp.roundToInt()} V", style = MaterialTheme.typography.labelLarge)
-    Slider(value = np.toFloat(), onValueChange = { np = it.roundToInt() }, valueRange = 100f..1000f)
-    Slider(value = ns.toFloat(), onValueChange = { ns = it.roundToInt() }, valueRange = 20f..1200f)
+    LabeledLabSlider(
+      label = "Primary Input Voltage V_p",
+      valueText = "${vp.roundToInt()} V",
+      value = vp,
+      onValueChange = { vp = it },
+      valueRange = 110f..440f,
+    )
+    LabeledLabSlider(
+      label = "Primary Coil Turns N_p",
+      valueText = "$np turns",
+      value = np.toFloat(),
+      onValueChange = { np = it.roundToInt() },
+      valueRange = 100f..1000f,
+    )
+    LabeledLabSlider(
+      label = "Secondary Coil Turns N_s",
+      valueText = "$ns turns",
+      value = ns.toFloat(),
+      onValueChange = { ns = it.roundToInt() },
+      valueRange = 20f..1200f,
+    )
   }
 }
 
@@ -557,8 +729,13 @@ private fun PhotoelectricQuantumLab() {
       FilterChip(selected = workFunctionEv in 2.2f..3.0f, onClick = { workFunctionEv = 2.4f }, label = { Text("Sodium (2.4 eV)") })
       FilterChip(selected = workFunctionEv > 3.5f, onClick = { workFunctionEv = 4.3f }, label = { Text("Zinc (4.3 eV)") })
     }
-    Text("Light Frequency f = ${String.format("%.1f", freqFactor)} × 10¹⁴ Hz", style = MaterialTheme.typography.labelLarge)
-    Slider(value = freqFactor, onValueChange = { freqFactor = it }, valueRange = 4.0f..14.0f)
+    LabeledLabSlider(
+      label = "Incident Light Frequency f",
+      valueText = String.format("%.1f × 10¹⁴ Hz", freqFactor),
+      value = freqFactor,
+      onValueChange = { freqFactor = it },
+      valueRange = 4.0f..14.0f,
+    )
   }
 }
 
@@ -576,8 +753,13 @@ private fun HalfLifeDecayLab() {
         "Remaining N" to "${remaining.roundToInt()}",
       )
     )
-    Text("Number of Half-Lives Elapsed (t / t½): ${String.format("%.1f", halfLives)}", style = MaterialTheme.typography.labelLarge)
-    Slider(value = halfLives, onValueChange = { halfLives = (it * 2f).roundToInt() / 2f }, valueRange = 0f..5f)
-    ScientificText("Formula: N = N₀ × (1/2)ⁿ — Remaining fraction = ${String.format("%.1f%%", 100f * 0.5f.pow(halfLives))}.", style = MaterialTheme.typography.bodySmall)
+    LabeledLabSlider(
+      label = "Number of Half-Lives Elapsed (t / t_{1/2})",
+      valueText = String.format("%.1f half-lives", halfLives),
+      value = halfLives,
+      onValueChange = { halfLives = (it * 2f).roundToInt() / 2f },
+      valueRange = 0f..5f,
+    )
+    ScientificText("Formula: N = N_0 × (1/2)^n — Remaining fraction = ${String.format("%.1f%%", 100f * 0.5f.pow(halfLives))}.", style = MaterialTheme.typography.bodySmall)
   }
 }

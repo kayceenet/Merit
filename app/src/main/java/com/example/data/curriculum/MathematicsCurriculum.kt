@@ -192,9 +192,9 @@ object MathematicsCurriculum {
                       "Any time you see 2^x = 1/8 or 9^(x+1) = 27^x, rewrite every term to the SAME small prime base (2 or 3) and equate powers!",
                   ),
                   ConceptBlock(
-                    heading = "2. Surds & Conjugates: Cleaning Ugly Square Roots",
+                    heading = "2. Surds & Conjugates: Simplifying Irrational Denominators",
                     explanation =
-                      "√4 = 2 is neat, but √12 has an untidy root inside. Split 12 into a square partner × leftover: √(4 × 3) = 2√3. Mathematicians hate square roots sitting at the bottom of a fraction, so to clean 1/(a + √b), multiply top and bottom by its twin opposite (a − √b). The square roots magically vanish because (a + √b)(a − √b) = a² − b!",
+                      "For any non-perfect square, factor out the largest perfect square inside the radical—for instance, √12 = √(4 × 3) = 2√3. Standard mathematical notation avoids irrational roots in denominators; to rationalize 1/(a + √b), multiply both numerator and denominator by the conjugate (a − √b) so that the difference of two squares eliminates the radical: (a + √b)(a − √b) = a² − b.",
                     keyFormula = "\\frac{1}{a + \\sqrt{b}} = \\frac{a - \\sqrt{b}}{a^2 - b}",
                     examTip =
                       "Also know Profit % = (Profit / Cost Price) × 100 and Compound Interest A = P(1 + r/100)ⁿ!",

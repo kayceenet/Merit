@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -71,7 +70,13 @@ private fun MicroscopyMagnificationLab() {
         FilterChip(selected = objective == obj, onClick = { objective = obj }, label = { Text("×$obj Obj") })
       }
     }
-    Slider(value = drawingCm, onValueChange = { drawingCm = it }, valueRange = 1f..10f)
+    LabeledLabSlider(
+      label = "Measured Diagram Size on Paper",
+      valueText = String.format("%.1f cm", drawingCm),
+      value = drawingCm,
+      onValueChange = { drawingCm = it },
+      valueRange = 1f..10f,
+    )
   }
 }
 
@@ -126,8 +131,20 @@ private fun BioenergeticsAndEnzymeLab() {
           "Limiting Factor" to limiting.substringBefore(" ("),
         )
       )
-      Slider(value = lightIntensity, onValueChange = { lightIntensity = it }, valueRange = 10f..100f)
-      Slider(value = co2Pct, onValueChange = { co2Pct = it }, valueRange = 0.01f..0.10f)
+      LabeledLabSlider(
+        label = "Incident Light Intensity",
+        valueText = "${lightIntensity.roundToInt()}%",
+        value = lightIntensity,
+        onValueChange = { lightIntensity = it },
+        valueRange = 10f..100f,
+      )
+      LabeledLabSlider(
+        label = "Dissolved CO_2 Concentration",
+        valueText = String.format("%.2f%%", co2Pct),
+        value = co2Pct,
+        onValueChange = { co2Pct = it },
+        valueRange = 0.01f..0.10f,
+      )
       ScientificText("Active Constraint: $limiting", style = MaterialTheme.typography.bodySmall)
     }
   }
@@ -159,7 +176,13 @@ private fun EnzymeActivityLab() {
         "Status" to state.substringBefore(" ("),
       )
     )
-    Slider(value = tempC, onValueChange = { tempC = it }, valueRange = 0f..65f)
+    LabeledLabSlider(
+      label = "Water Bath Temperature",
+      valueText = "${tempC.roundToInt()} °C",
+      value = tempC,
+      onValueChange = { tempC = it },
+      valueRange = 0f..65f,
+    )
   }
 }
 
@@ -222,8 +245,13 @@ private fun BreathingKidneyLab() {
         "Urine Output" to urine.substringBefore(" "),
       )
     )
-    Text("Body Dehydration Level: ${(dehydration * 100).roundToInt()}%  •  $urine", style = MaterialTheme.typography.labelLarge)
-    Slider(value = dehydration, onValueChange = { dehydration = it }, valueRange = 0.1f..1.0f)
+    LabeledLabSlider(
+      label = "Body Dehydration Level",
+      valueText = "${(dehydration * 100).roundToInt()}% ($urine)",
+      value = dehydration,
+      onValueChange = { dehydration = it },
+      valueRange = 0.1f..1.0f,
+    )
   }
 }
 
@@ -260,7 +288,13 @@ private fun BloodSugarHormoneLab() {
         "Pancreas Release" to activeHormone.substringBefore(" ("),
       )
     )
-    Slider(value = glucoseMg, onValueChange = { glucoseMg = it }, valueRange = 45f..210f)
+    LabeledLabSlider(
+      label = "Blood Glucose Concentration",
+      valueText = "${glucoseMg.roundToInt()} mg/dL",
+      value = glucoseMg,
+      onValueChange = { glucoseMg = it },
+      valueRange = 45f..210f,
+    )
     ScientificText(activeHormone, style = MaterialTheme.typography.bodySmall)
   }
 }
@@ -311,7 +345,13 @@ private fun MenstrualHormoneCycleLab() {
         "Peak Event" to if (day == 14) "LH Surge + Ovum!" else phase.substringBefore(" ("),
       )
     )
-    Slider(value = day.toFloat(), onValueChange = { day = it.roundToInt() }, valueRange = 1f..28f)
+    LabeledLabSlider(
+      label = "Menstrual Cycle Day",
+      valueText = "Day $day / 28",
+      value = day.toFloat(),
+      onValueChange = { day = it.roundToInt() },
+      valueRange = 1f..28f,
+    )
     ScientificText(phase, style = MaterialTheme.typography.bodySmall)
   }
 }
@@ -368,7 +408,13 @@ private fun VariationSelectionLab() {
         "Pale Moths" to "${100 - darkPct}%",
       )
     )
-    Slider(value = generation.toFloat(), onValueChange = { generation = it.roundToInt() }, valueRange = 0f..5f)
+    LabeledLabSlider(
+      label = "Selective Pressure Over Generations",
+      valueText = "Generation $generation",
+      value = generation.toFloat(),
+      onValueChange = { generation = it.roundToInt() },
+      valueRange = 0f..5f,
+    )
   }
 }
 
@@ -389,8 +435,13 @@ private fun TrophicEnergyPyramidLab() {
         "Hawk 3°" to "${tertiary.roundToInt()} kJ",
       )
     )
-    Text("Producer Grass: ${producerKcal.roundToInt()} kJ  |  Transfer Efficiency: ${effPct.roundToInt()}%", style = MaterialTheme.typography.labelLarge)
-    Slider(value = effPct, onValueChange = { effPct = it.roundToInt().toFloat() }, valueRange = 5f..20f)
+    LabeledLabSlider(
+      label = "Ecological Trophic Transfer Efficiency",
+      valueText = "${effPct.roundToInt()}% (Producer = ${producerKcal.roundToInt()} kJ)",
+      value = effPct,
+      onValueChange = { effPct = it.roundToInt().toFloat() },
+      valueRange = 5f..20f,
+    )
   }
 }
 

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -108,7 +107,13 @@ private fun BohrOrbitalBuilderLab() {
         "Group Type" to if (k + l + m + n == atomicZ && atomicZ in listOf(2, 10, 18)) "Noble Gas" else if ((atomicZ <= 2 && atomicZ == 1) || listOf(3, 4, 11, 12, 13, 19, 20).contains(atomicZ)) "Metal" else "Non-Metal",
       )
     )
-    Slider(value = atomicZ.toFloat(), onValueChange = { atomicZ = it.roundToInt() }, valueRange = 1f..20f)
+    LabeledLabSlider(
+      label = "Atomic Number (Protons Z)",
+      valueText = "Z = $atomicZ (${symbols[atomicZ]})",
+      value = atomicZ.toFloat(),
+      onValueChange = { atomicZ = it.roundToInt() },
+      valueRange = 1f..20f,
+    )
   }
 }
 
@@ -144,9 +149,21 @@ private fun StoichiometryLimitingLab() {
         "STP Vol" to String.format("%.1f dm³", waterMoles * 22.4f),
       )
     )
-    Text("2H₂ + O₂ → 2H₂O  •  Moles H₂: ${String.format("%.1f", h2Moles)} | Moles O₂: ${String.format("%.1f", o2Moles)}", style = MaterialTheme.typography.labelLarge)
-    Slider(value = h2Moles, onValueChange = { h2Moles = (it * 2).roundToInt() / 2f }, valueRange = 1f..8f)
-    Slider(value = o2Moles, onValueChange = { o2Moles = (it * 2).roundToInt() / 2f }, valueRange = 0.5f..5f)
+    ScientificText("Reaction Equation: 2H_2 + O_2 → 2H_2O", style = MaterialTheme.typography.labelLarge)
+    LabeledLabSlider(
+      label = "Moles of Hydrogen H_2 Supplied",
+      valueText = String.format("%.1f mol", h2Moles),
+      value = h2Moles,
+      onValueChange = { h2Moles = (it * 2).roundToInt() / 2f },
+      valueRange = 1f..8f,
+    )
+    LabeledLabSlider(
+      label = "Moles of Oxygen O_2 Supplied",
+      valueText = String.format("%.1f mol", o2Moles),
+      value = o2Moles,
+      onValueChange = { o2Moles = (it * 2).roundToInt() / 2f },
+      valueRange = 0.5f..5f,
+    )
   }
 }
 
@@ -173,8 +190,20 @@ private fun GasLawPistonLab() {
       FilterChip(selected = molarMass in 30f..34f, onClick = { molarMass = 32f }, label = { Text("O₂ (M=32)") })
       FilterChip(selected = molarMass > 60f, onClick = { molarMass = 64f }, label = { Text("SO₂ (M=64)") })
     }
-    Slider(value = tempK, onValueChange = { tempK = it }, valueRange = 200f..600f)
-    Slider(value = pressAtm, onValueChange = { pressAtm = it }, valueRange = 0.5f..4.0f)
+    LabeledLabSlider(
+      label = "Absolute Temperature T",
+      valueText = "${tempK.roundToInt()} K (${tempK.roundToInt() - 273}°C)",
+      value = tempK,
+      onValueChange = { tempK = it },
+      valueRange = 200f..600f,
+    )
+    LabeledLabSlider(
+      label = "Gas Pressure P",
+      valueText = String.format("%.2f atm", pressAtm),
+      value = pressAtm,
+      onValueChange = { pressAtm = it },
+      valueRange = 0.5f..4.0f,
+    )
   }
 }
 
@@ -203,7 +232,13 @@ private fun AcidBaseTitrationLab() {
       FilterChip(selected = !weakAcid, onClick = { weakAcid = false }, label = { Text("Strong HCl (Eq pH 7)") })
       FilterChip(selected = weakAcid, onClick = { weakAcid = true }, label = { Text("Weak CH₃COOH (Eq pH 8.7)") })
     }
-    Slider(value = naohMl, onValueChange = { naohMl = it }, valueRange = 0f..40f)
+    LabeledLabSlider(
+      label = "Volume of 0.1 M NaOH Delivered from Burette",
+      valueText = String.format("%.1f cm³", naohMl),
+      value = naohMl,
+      onValueChange = { naohMl = it },
+      valueRange = 0f..40f,
+    )
     ScientificText("Observation: $indicatorColor", style = MaterialTheme.typography.bodySmall)
   }
 }
@@ -247,9 +282,21 @@ private fun LeChatelierHaberLab() {
         "NH₃ Yield" to String.format("%.1f%%", yieldPct),
       )
     )
-    Slider(value = pressureAtm, onValueChange = { pressureAtm = it }, valueRange = 50f..400f)
-    Slider(value = tempC, onValueChange = { tempC = it }, valueRange = 250f..650f)
-    ScientificText("4 gas mol → 2 gas mol: High Pressure boosts NH₃ yield; Low T favors Exo forward yet Fe catalyst needs ~450°C for fast rate.", style = MaterialTheme.typography.bodySmall)
+    LabeledLabSlider(
+      label = "Reaction Chamber Pressure P",
+      valueText = "${pressureAtm.roundToInt()} atm",
+      value = pressureAtm,
+      onValueChange = { pressureAtm = it },
+      valueRange = 50f..400f,
+    )
+    LabeledLabSlider(
+      label = "Furnace Temperature T",
+      valueText = "${tempC.roundToInt()} °C",
+      value = tempC,
+      onValueChange = { tempC = it },
+      valueRange = 250f..650f,
+    )
+    ScientificText("N_2 + 3H_2 ⇌ 2NH_3 (4 mol gas → 2 mol gas): High pressure raises NH_3 yield; ~450 °C balances rate with iron catalyst.", style = MaterialTheme.typography.bodySmall)
   }
 }
 
@@ -297,9 +344,20 @@ private fun FaradayElectrolysisLab() {
         FilterChip(selected = ionIdx == i, onClick = { ionIdx = i }, label = { Text(label) })
       }
     }
-    Text("Current I = ${String.format("%.1f", currentA)} A  |  Duration t = ${mins.roundToInt()} min", style = MaterialTheme.typography.labelLarge)
-    Slider(value = currentA, onValueChange = { currentA = it }, valueRange = 0.5f..10f)
-    Slider(value = mins, onValueChange = { mins = it }, valueRange = 5f..60f)
+    LabeledLabSlider(
+      label = "Steady Electrolysis Current I",
+      valueText = String.format("%.1f A", currentA),
+      value = currentA,
+      onValueChange = { currentA = it },
+      valueRange = 0.5f..10f,
+    )
+    LabeledLabSlider(
+      label = "Electrolysis Duration t",
+      valueText = "${mins.roundToInt()} min",
+      value = mins,
+      onValueChange = { mins = it },
+      valueRange = 5f..60f,
+    )
   }
 }
 

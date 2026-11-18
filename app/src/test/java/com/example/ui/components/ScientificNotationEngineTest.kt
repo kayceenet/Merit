@@ -17,6 +17,22 @@ class ScientificNotationEngineTest {
   }
 
   @Test
+  fun `handles sigma sum quad bar matrix and nested sqrt latex cleanly`() {
+    val stats = ScientificNotationEngine.normalizeMarkup("""s = \sqrt{\frac{\Sigma(x - \bar{x})^2}{N}}""")
+    assertTrue(stats.startsWith("s = √("))
+    assertTrue(stats.contains("Σ"))
+    assertTrue(stats.contains("x\u0304"))
+
+    val vec = ScientificNotationEngine.tokenizeEquationWithFractions("""\tan(\alpha) = \frac{\Sigma F_y}{\Sigma F_x}""")
+    assertEquals(FormulaToken.Inline("tan(α) = "), vec[0])
+    assertEquals(FormulaToken.StackedFraction("Σ F_y", "Σ F_x"), vec[1])
+
+    val quadFormula = ScientificNotationEngine.normalizeMarkup("""R = \sqrt{F_1^2 + F_2^2 + 2 F_1 F_2 \cos(\theta)} \quad (90^\circ)""")
+    assertTrue(!quadFormula.contains("\\quad"))
+    assertTrue(quadFormula.contains("90°"))
+  }
+
+  @Test
   fun `formats chemical formulas and subscripts without swallowing trailing atoms`() {
     val annotated = ScientificNotationEngine.formatAnnotated("Na_2CO_3 + 2HCl -> 2NaCl + H_2O + CO_2")
     assertEquals("Na2CO3 + 2HCl → 2NaCl + H2O + CO2", annotated.text)
@@ -28,6 +44,13 @@ class ScientificNotationEngineTest {
     assertEquals(1, subSpans.size)
     assertEquals(2, subSpans.first().start)
     assertEquals(3, subSpans.first().end)
+
+    // Verify F_1^2 separates subscript 1 and superscript 2 cleanly
+    val f1Sq = ScientificNotationEngine.formatAnnotated("F_1^2")
+    val fSpans = f1Sq.spanStyles.filter { it.item.baselineShift != null }
+    assertEquals(2, fSpans.size)
+    assertTrue(fSpans[0].item.baselineShift!!.multiplier < 0f)
+    assertTrue(fSpans[1].item.baselineShift!!.multiplier > 0f)
   }
 
   @Test

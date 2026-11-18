@@ -300,6 +300,23 @@ object CurriculumEntityMapper {
             put("stages", JSONArray(mp.stages))
             put("rubricCriteria", JSONArray(mp.rubricCriteria))
             put("modelResponse", mp.modelResponse)
+            put(
+              "verificationTasks",
+              JSONArray().apply {
+                mp.verificationTasks.forEach { task ->
+                  put(
+                    JSONObject().apply {
+                      put("id", task.id)
+                      put("criterionTitle", task.criterionTitle)
+                      put("prompt", task.prompt)
+                      put("options", JSONArray(task.options))
+                      put("correctIndex", task.correctIndex)
+                      put("feedback", task.feedback)
+                    }
+                  )
+                }
+              },
+            )
           },
         )
       }
@@ -365,6 +382,19 @@ object CurriculumEntityMapper {
       val mpObj = obj.optJSONObject("masteryProject")
       val mp =
         mpObj?.let {
+          val vtArr = it.optJSONArray("verificationTasks") ?: JSONArray()
+          val vTasks =
+            List(vtArr.length()) { idx ->
+              val v = vtArr.getJSONObject(idx)
+              ProjectVerificationTask(
+                id = v.optString("id", "vt_$idx"),
+                criterionTitle = v.optString("criterionTitle", ""),
+                prompt = v.optString("prompt", ""),
+                options = jsonArrayToStrings(v.optJSONArray("options")),
+                correctIndex = v.optInt("correctIndex", 0),
+                feedback = v.optString("feedback", ""),
+              )
+            }
           TopicMasteryProject(
             title = it.optString("title", ""),
             format = it.optString("format", "Applied Investigation"),
@@ -372,6 +402,7 @@ object CurriculumEntityMapper {
             stages = jsonArrayToStrings(it.optJSONArray("stages")),
             rubricCriteria = jsonArrayToStrings(it.optJSONArray("rubricCriteria")),
             modelResponse = it.optString("modelResponse", ""),
+            verificationTasks = vTasks,
           )
         }
       val csObj = obj.optJSONObject("cheatSheet")

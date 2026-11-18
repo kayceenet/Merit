@@ -39,12 +39,12 @@ object PhysicsCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. The 7 Basic Lego Bricks of Physics",
+                    heading = "1. The Seven Fundamental Quantities & Dimensional Equations",
                     explanation =
-                      "Imagine Physics as building with Lego. Just 7 basic bricks—Length (metre, m), Mass (kilogram, kg), Time (second, s), Current (ampere, A), Temperature (kelvin, K), Amount of substance (mole, mol), and Light brightness (candela, cd)—snap together to make every other quantity! Speed (m/s) uses Length ÷ Time. Force (newton, N) uses Mass × Length ÷ Time².",
+                      "Just as all English words are formed from a fixed alphabet, every physical measurement in Physics reduces to seven independent base standards: Length l (metre, m), Mass m (kilogram, kg), Time t (second, s), Electric Current I (ampere, A), Thermodynamic Temperature T (kelvin, K), Amount of Substance n (mole, mol), and Luminous Intensity I_v (candela, cd). Derived quantities combine these base units—for example, velocity v = displacement / time (m/s), force F = mass × acceleration (kg·m/s² = N), work/energy E = force × distance (J), and power P = work / time (W). Dimensions represent Mass, Length, and Time generically as [M], [L], and [T].",
                     keyFormula = "[v] = L T^{-1}   |   [F] = M L T^{-2}   |   [E] = M L^{2} T^{-2}   |   [P] = M L^{2} T^{-3}",
                     examTip =
-                      "Mass (kg) is how much stuff is inside an object; Weight (N) is how hard Earth pulls on it. Mass never changes on the Moon, Weight does!",
+                      "Mass m (kg) measures quantity of matter and remains invariant anywhere; Weight W = mg (N) is gravitational pull and changes with local field strength g.",
                   ),
                   ConceptBlock(
                     heading = "2. Choosing the Right Measuring Tool & Removing Zero Error",
@@ -186,20 +186,20 @@ object PhysicsCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Imagine Giving Directions to a Friend",
+                    heading = "1. Scalar vs Vector Quantities & Resultant Addition",
                     explanation =
-                      "Saying 'Walk 5 km' leaves your friend lost—that's Distance (a SCALAR, just a number). Saying 'Walk 5 km North' tells them exactly where to go—that's Displacement (a VECTOR: size + arrow!). Energy, mass, speed, time, and temperature are scalars. Force, velocity, acceleration, momentum, and electric field are vectors.",
-                    keyFormula = "R = \\sqrt{F_1^2 + F_2^2 + 2 F_1 F_2 \\cos(\\theta)}   \\quad (\\text{At } 90^{\\circ}: R = \\sqrt{F_1^2 + F_2^2})",
+                      "Giving only a magnitude such as '5 km' describes Distance—a SCALAR completely defined by size and unit (e.g., mass m, speed v, time t, energy E, temperature T, pressure P). Specifying '5 km due North' gives Displacement—a VECTOR requiring both magnitude and direction (e.g., force F, velocity, acceleration a, momentum p). Two non-parallel forces F_1 and F_2 separated by angle θ combine via the parallelogram cosine law to produce resultant magnitude R.",
+                    keyFormula = "R = \\sqrt{F_1^2 + F_2^2 + 2 F_1 F_2 \\cos(\\theta)}   \\quad (\\text{At } \\theta = 90^{\\circ}:\\; R = \\sqrt{F_1^2 + F_2^2})",
                     examTip =
-                      "Remember this shortcut: Two EQUAL forces F pulling at 120° apart cancel slightly to give a resultant of exactly F!",
+                      "Two equal forces of magnitude F inclined at 120° produce a resultant of exact magnitude F.",
                   ),
                   ConceptBlock(
-                    heading = "2. Splitting One Tilted Pull Into Sideways & Upward Pulls",
+                    heading = "2. Orthogonal Force Resolution (X and Y Components)",
                     explanation =
-                      "When a child pulls a toy wagon handle tilted at angle θ above the floor, part of their pull drags it forward (horizontal = F·cos θ) and part lifts it upward (vertical = F·sin θ). The arm that HUGS the angle θ always gets cos θ!",
+                      "Consider a warehouse technician towing a cargo trolley via a handle tilted at angle θ above horizontal ground. Part of the applied pull F acts horizontally forward (F_x = F cos θ, adjacent to θ) while part lifts vertically upward (F_y = F sin θ, opposite θ). For three or more coplanar forces, sum all horizontal components (ΣF_x) and all vertical components (ΣF_y) separately, then compute the resultant angle α relative to the horizontal axis.",
                     keyFormula = "F_x = F\\cos(\\theta)   |   F_y = F\\sin(\\theta)   |   \\tan(\\alpha) = \\frac{\\Sigma F_y}{\\Sigma F_x}",
                     examTip =
-                      "If θ is measured from the vertical instead of horizontal, then vertical gets F·cos θ and horizontal gets F·sin θ!",
+                      "When angle θ is measured from the vertical rather than horizontal, cos θ assigns to the vertical component and sin θ to the horizontal.",
                   ),
                 ),
               workedExamples =

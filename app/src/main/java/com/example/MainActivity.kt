@@ -51,7 +51,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.data.curriculum.Lesson
+import com.example.data.local.FontSizeScale
 import com.example.data.local.ThemeMode
+import com.example.data.local.ThemePreferences
 import com.example.data.model.UserProfile
 import com.example.data.repository.MeritPrepRepository
 import com.example.ui.screens.AnalyticsProfileScreen
@@ -118,6 +120,7 @@ private fun MeritPrepAppRoot(
   MeritPrepTheme(
     darkTheme = effectiveDarkTheme,
     dynamicColor = themePreferences.useDynamicColor,
+    fontSizeScale = themePreferences.fontSizeScale,
   ) {
     MeritPrepAppShell(
       viewModel = viewModel,
@@ -178,6 +181,10 @@ private fun MeritPrepAppShell(
       lesson = openLesson,
       progress = lessonProgress,
       nextLesson = nextLesson,
+      themePreferences = themePreferences,
+      onSetThemeMode = viewModel::setThemeMode,
+      onSetUseDynamicColor = viewModel::setUseDynamicColor,
+      onSetFontSizeScale = viewModel::setFontSizeScale,
       onBack = { activeLesson = null },
       onMarkPillarComplete = { pillar, score ->
         viewModel.markPillarCompleted(openLesson, pillar, lessonProgress, score)
@@ -268,7 +275,11 @@ private fun MeritPrepAppShell(
               progressList = progressList,
               attempts = attempts,
               isDarkTheme = isDarkTheme,
+              themePreferences = themePreferences,
               onToggleDarkTheme = { viewModel.toggleDarkTheme(isDarkTheme) },
+              onSetThemeMode = viewModel::setThemeMode,
+              onSetUseDynamicColor = viewModel::setUseDynamicColor,
+              onSetFontSizeScale = viewModel::setFontSizeScale,
               onOpenLesson = { lesson -> activeLesson = lesson },
               onOpenTrack = { track ->
                 selectedCatalogSubjectId = track.id
@@ -330,6 +341,7 @@ private fun MeritPrepAppShell(
               themePreferences = themePreferences,
               onSetThemeMode = viewModel::setThemeMode,
               onSetUseDynamicColor = viewModel::setUseDynamicColor,
+              onSetFontSizeScale = viewModel::setFontSizeScale,
               onPracticeWeakSubject = { subjectId ->
                 selectedExamSubjectId = subjectId
                 activeTab = TopTab.EXAMS

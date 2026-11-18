@@ -8,6 +8,7 @@ import com.example.data.curriculum.CurriculumCatalog
 import com.example.data.curriculum.CurriculumProgression
 import com.example.data.curriculum.LessonPillar
 import com.example.data.curriculum.QuestionShuffler
+import com.example.data.local.FontSizeScale
 import com.example.data.local.MeritPrepDatabase
 import com.example.data.local.OfflinePreferencesRepository
 import com.example.data.local.ThemeMode
@@ -181,6 +182,10 @@ class MeritPrepRepositoryTest {
 
     repository.setUseDynamicColor(false)
     assertFalse(repository.themePreferences.first().useDynamicColor)
+
+    assertEquals(FontSizeScale.STANDARD, initial.fontSizeScale)
+    repository.setFontSizeScale(FontSizeScale.LARGE)
+    assertEquals(FontSizeScale.LARGE, repository.themePreferences.first().fontSizeScale)
   }
 
   @Test
@@ -249,6 +254,7 @@ class MeritPrepRepositoryTest {
             it.misconceptions.isNotEmpty() &&
             it.guidedPractice != null &&
             it.masteryProject != null &&
+            it.masteryProject!!.verificationTasks.size >= 2 &&
             it.cheatSheet != null &&
             it.exercises.size >= 6
         }
@@ -286,7 +292,7 @@ class MeritPrepRepositoryTest {
       prefsRepo.setCurriculumVersion(1)
       repository.seedCurriculumIfNeeded()
 
-      assertEquals(5, prefsRepo.getCurriculumVersion())
+      assertEquals(6, prefsRepo.getCurriculumVersion())
       assertEquals(76, repository.observeStructuredModules().first().flatMap { it.lessons }.size)
       val preserved =
         repository.observeLessonProgress(UserProfile.DEFAULT_PROFILE_ID).first()

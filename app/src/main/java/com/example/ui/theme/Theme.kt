@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import com.example.data.local.FontSizeScale
 
 @Immutable
 data class MeritSemanticColors(
@@ -62,6 +63,8 @@ private val DarkSemanticColors =
   )
 
 val LocalMeritSemanticColors = staticCompositionLocalOf { LightSemanticColors }
+
+val LocalFontScale = staticCompositionLocalOf { FontSizeScale.STANDARD.multiplier }
 
 val MaterialTheme.semanticColors: MeritSemanticColors
   @Composable get() = LocalMeritSemanticColors.current
@@ -160,6 +163,7 @@ private fun ColorScheme.withHighContrastAccessibility(darkTheme: Boolean): Color
 fun MeritPrepTheme(
   darkTheme: Boolean = isSystemInDarkTheme(),
   dynamicColor: Boolean = true,
+  fontSizeScale: FontSizeScale = FontSizeScale.STANDARD,
   content: @Composable () -> Unit,
 ) {
   val colorScheme =
@@ -187,10 +191,13 @@ fun MeritPrepTheme(
     }
   }
 
-  CompositionLocalProvider(LocalMeritSemanticColors provides semantics) {
+  CompositionLocalProvider(
+    LocalMeritSemanticColors provides semantics,
+    LocalFontScale provides fontSizeScale.multiplier,
+  ) {
     MaterialTheme(
       colorScheme = colorScheme,
-      typography = Typography,
+      typography = scaledTypography(fontSizeScale.multiplier),
       shapes = MeritPrepShapes,
       content = content,
     )
