@@ -5,6 +5,9 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-apk:
     runs-on: ubuntu-latest
@@ -23,7 +26,7 @@ jobs:
         run: |
           SDK_DIR="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
           mkdir -p "$SDK_DIR/licenses"
-          printf "\n24333f8a63b6825ea9c5514f83c2829b004d1fee\n" >> "$SDK_DIR/licenses/android-sdk-license"
+          printf "\n24333f8a63b6825ea9c5514f83c2829b004d1fee\nd56f5187479451eabf01fb78af6dfcb131a6481e\n" >> "$SDK_DIR/licenses/android-sdk-license"
           printf "\n84831b9409646a918e30573bab4c9c91346d8abd\n" >> "$SDK_DIR/licenses/android-sdk-preview-license"
 
       - name: Set up Gradle 9.3.1
@@ -53,9 +56,25 @@ jobs:
       - name: Build Debug APK
         run: gradle :app:assembleDebug --no-daemon --stacktrace -Dorg.gradle.jvmargs="-Xmx3g -Dfile.encoding=UTF-8"
 
-      - name: Upload MeritPrep APK
+      - name: Prepare release APK
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk MeritPrep.apk
+
+      - name: Upload MeritPrep APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: MeritPrep-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: MeritPrep.apk
           if-no-files-found: error
+
+      - name: Publish APK to GitHub Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view latest >/dev/null 2>&1; then
+            gh release upload latest MeritPrep.apk --clobber
+          else
+            gh release create latest MeritPrep.apk \
+              --title "MeritPrep Android APK (Latest)" \
+              --notes "Auto-built Android APK for MeritPrep (JAMB UTME, WAEC WASSCE & NECO SSCE offline prep). Download MeritPrep.apk below to install on Android."
+          fi
