@@ -68,4 +68,77 @@ class ScientificNotationEngineTest {
     val unitTokens = ScientificNotationEngine.tokenizeEquationWithFractions("v = 40 m/s")
     assertTrue(unitTokens.none { it is FormulaToken.StackedFraction })
   }
+
+  @Test
+  fun `renders advanced latex expressions from user audit without broken breaks`() {
+    val pctTokens =
+      ScientificNotationEngine.tokenizeEquationWithFractions(
+        """\%Error = \frac{|E|}{|\text{True}|} \times 100\%"""
+      )
+    assertEquals(3, pctTokens.size)
+    assertEquals(FormulaToken.Inline("%Error = "), pctTokens[0])
+    assertEquals(FormulaToken.StackedFraction("|E|", "|True|"), pctTokens[1])
+    assertEquals(FormulaToken.Inline(" × 100%"), pctTokens[2])
+
+    val rootPower = ScientificNotationEngine.normalizeMarkup("""a^{p/q} = (\sqrt[q]{a})^p""")
+    assertTrue(rootPower.contains("^{p/q}"))
+    assertTrue(rootPower.contains("^{q}√(a)^{p}") || rootPower.contains("q") && rootPower.contains("√"))
+
+    val logDiff = ScientificNotationEngine.tokenizeEquationWithFractions("""\log_a\!(x/y) = \log_a x - \log_a y""")
+    assertTrue(logDiff.any { it == FormulaToken.StackedFraction("x", "y") })
+
+    val lines =
+      ScientificNotationEngine.splitFormulaLines(
+        """\%Error = \frac{|E|}{|\text{True}|} \times 100\% \;|\; n = \frac{m}{M}"""
+      )
+    assertEquals(2, lines.size)
+
+    val evalSin = ScientificExpressionEvaluator.evaluate("sin(30)")
+    assertEquals(0.5, evalSin.getOrThrow(), 1e-6)
+
+    val evalLog = ScientificExpressionEvaluator.evaluate("2^3 + sqrt(16) + log(100)")
+    assertEquals(14.0, evalLog.getOrThrow(), 1e-6)
+
+    val evalDivZero = ScientificExpressionEvaluator.evaluate("5 / 0")
+    assertTrue(evalDivZero.isFailure)
+  }
+
+  @Test
+  fun `tokenizes latex matrices and piecewise cases into multi-line MatrixBlock tokens`() {
+    val matrixTokens =
+      ScientificNotationEngine.tokenizeEquationWithFractions(
+        """A = \begin{pmatrix} a & b \\ c & d \end{pmatrix}"""
+      )
+    assertEquals(2, matrixTokens.size)
+    assertEquals(FormulaToken.Inline("A = "), matrixTokens[0])
+    assertEquals(
+      FormulaToken.MatrixBlock(
+        leftDelim = "(",
+        rightDelim = ")",
+        rows = listOf(listOf("a", "b"), listOf("c", "d")),
+        isCases = false,
+      ),
+      matrixTokens[1],
+    )
+
+    val casesTokens =
+      ScientificNotationEngine.tokenizeEquationWithFractions(
+        """|x| = \begin{cases} x & x \ge 0 \\ -x & x < 0 \end{cases}"""
+      )
+    assertEquals(2, casesTokens.size)
+    assertEquals(FormulaToken.Inline("|x| = "), casesTokens[0])
+    assertEquals(
+      FormulaToken.MatrixBlock(
+        leftDelim = "{",
+        rightDelim = "",
+        rows = listOf(listOf("x", "x ≥ 0"), listOf("-x", "x < 0")),
+        isCases = true,
+      ),
+      casesTokens[1],
+    )
+
+    val inlineNormalized =
+      ScientificNotationEngine.normalizeMarkup("""\det\begin{bmatrix} 2 & 1 \\ 4 & 3 \end{bmatrix}""")
+    assertEquals("det[ 2 1 ; 4 3 ]", inlineNormalized)
+  }
 }

@@ -478,6 +478,160 @@ object EnglishCurriculumPart3 {
       PracticeQuestion("pq_eng_21", "Word Stress", "JAMB", 2022, "Which word is stressed on the THIRD syllable?", listOf("DEmocracy", "photoGRAphic", "uniVERsity", "Both photoGRAphic and uniVERsity"), 3, "pho-to-GRA-phic (3rd) and u-ni-VER-si-ty (3rd).", "Both follow -ic (2nd-last) and -ty (3rd-last) rules onto syllable 3."),
       PracticeQuestion("pq_eng_22", "Emphatic Stress", "WAEC", 2024, "Answer: 'Ngozi visited her AUNT in Abuja.' Pick the matching question.", listOf("Did Ngozi visit her uncle in Abuja?", "Did Kemi visit her aunt in Abuja?", "Did Ngozi visit her aunt in Kano?", "Did Ngozi phone her aunt in Abuja?"), 0, "Contradict ONLY 'AUNT' (→ uncle).", "Everything else stays identical; 'uncle' opposes 'AUNT'."),
       PracticeQuestion("pq_eng_23", "Rhymes", "JAMB", 2021, "Which word rhymes cleanly with 'CATCH'?", listOf("watch", "hatch", "wash", "much"), 1, "Same /ætʃ/ rime.", "Catch and hatch rhyme (/ætʃ/)."),
-      PracticeQuestion("pq_eng_24", "Comprehension Summary", "NECO", 2025, "Which closing punctuation & capitalization is right for a Formal Letter?", listOf("Yours faithfully,", "Your's Faithfully,", "Yours Sincerely,", "Faithfully your's,"), 0, "No apostrophe; lowercase second word; trailing comma.", "Yours faithfully,"),
+      PracticeQuestion("pq_eng_24", "Comprehension Summary", "NECO", 2023, "Which closing punctuation & capitalization is right for a Formal Letter?", listOf("Yours faithfully,", "Your's Faithfully,", "Yours Sincerely,", "Faithfully your's,"), 0, "No apostrophe; lowercase second word; trailing comma.", "Yours faithfully,"),
+      // --- PASSAGE SET 1: READING COMPREHENSION (5 JAMB Qs) ---
+      PracticeQuestion(
+        id = "pq_eng_25",
+        topic = "Reading Comprehension (Passage I)",
+        examType = "JAMB",
+        year = 2022,
+        question = "According to the passage, why did municipal solar mini-grids win trust faster than kerosene lamps?",
+        options = listOf("They eliminated fuel price shocks and indoor smoke while offering metered daytime power", "They required zero wiring", "Municipalities outlawed candles permanently", "Kerosene became odourless"),
+        correctIndex = 0,
+        hint = "Check paragraph 1 for dual benefits of solar mini-grids.",
+        stepByStepSolution = "Paragraph 1 attributes rapid adoption to predictable costs, cleaner air, and daytime artisan electricity.",
+        passageText =
+          "PASSAGE I — READING COMPREHENSION\n" +
+            "For decades, twilight across the agrarian settlement meant blinking kerosene lanterns that stained ceiling beams and drained meagre weekly earnings whenever tanker strikes drove fuel prices upward. When a cooperative installed a metered solar mini-grid beside the grain mill, skepticism quickly gave way to relief: barbers, welders, and evening prep classes gained steady light free of soot and price spikes.\n\n" +
+            "Yet engineers noticed an unexpected social ripple. Rather than abandoning communal storytelling circles, families gathered around the cold-storage depot where surplus harvests once spoiled before dawn trucks arrived. Cheap overnight refrigeration extended tomato shelf life from two days to nearly a fortnight—proving that infrastructure succeeds not merely through megawatts, but when anchored around local livelihoods.",
+      ),
+      PracticeQuestion(
+        id = "pq_eng_26",
+        topic = "Reading Comprehension (Passage I)",
+        examType = "JAMB",
+        year = 2022,
+        question = "In Paragraph 1, the expression 'drained meagre weekly earnings' portrays kerosene costs as:",
+        options = listOf("Modest and easily ignored", "Relentlessly depleting modest household incomes", "Generating spare cooperative profits", "Seasonal only during dry harmattan"),
+        correctIndex = 1,
+        hint = "'Meagre' means scarce/small; 'drained' conveys steady exhaustion.",
+        stepByStepSolution = "The metaphor highlights how rising fuel bills eroded small household budgets.",
+        passageText =
+          "PASSAGE I — READING COMPREHENSION\n" +
+            "For decades, twilight across the agrarian settlement meant blinking kerosene lanterns that stained ceiling beams and drained meagre weekly earnings whenever tanker strikes drove fuel prices upward. When a cooperative installed a metered solar mini-grid beside the grain mill, skepticism quickly gave way to relief: barbers, welders, and evening prep classes gained steady light free of soot and price spikes.\n\n" +
+            "Yet engineers noticed an unexpected social ripple. Rather than abandoning communal storytelling circles, families gathered around the cold-storage depot where surplus harvests once spoiled before dawn trucks arrived. Cheap overnight refrigeration extended tomato shelf life from two days to nearly a fortnight—proving that infrastructure succeeds not merely through megawatts, but when anchored around local livelihoods.",
+      ),
+      PracticeQuestion(
+        id = "pq_eng_27",
+        topic = "Reading Comprehension (Passage I)",
+        examType = "JAMB",
+        year = 2022,
+        question = "What does the phrase 'a fortnight' in Paragraph 2 mean?",
+        options = listOf("Four hours", "Two weeks (14 days)", "Forty nights", "One harvest season"),
+        correctIndex = 1,
+        hint = "Fourteen nights = two weeks.",
+        stepByStepSolution = "Standard English lexis: a fortnight equals 14 days (two weeks).",
+        passageText =
+          "PASSAGE I — READING COMPREHENSION\n" +
+            "For decades, twilight across the agrarian settlement meant blinking kerosene lanterns that stained ceiling beams and drained meagre weekly earnings whenever tanker strikes drove fuel prices upward. When a cooperative installed a metered solar mini-grid beside the grain mill, skepticism quickly gave way to relief: barbers, welders, and evening prep classes gained steady light free of soot and price spikes.\n\n" +
+            "Yet engineers noticed an unexpected social ripple. Rather than abandoning communal storytelling circles, families gathered around the cold-storage depot where surplus harvests once spoiled before dawn trucks arrived. Cheap overnight refrigeration extended tomato shelf life from two days to nearly a fortnight—proving that infrastructure succeeds not merely through megawatts, but when anchored around local livelihoods.",
+      ),
+      PracticeQuestion(
+        id = "pq_eng_28",
+        topic = "Reading Comprehension (Passage I)",
+        examType = "JAMB",
+        year = 2022,
+        question = "Which grammatical name and function fit 'where surplus harvests once spoiled before dawn trucks arrived'?",
+        options = listOf("Noun clause functioning as object of 'around'", "Adjectival / Relative clause qualifying 'the cold-storage depot'", "Adverbial clause of concession", "Prepositional phrase"),
+        correctIndex = 1,
+        hint = "Follows and specifies which 'depot'.",
+        stepByStepSolution = "Introduced by relative adverb 'where' modifying the noun phrase 'the cold-storage depot', so it is an Adjectival clause.",
+        passageText =
+          "PASSAGE I — READING COMPREHENSION\n" +
+            "For decades, twilight across the agrarian settlement meant blinking kerosene lanterns that stained ceiling beams and drained meagre weekly earnings whenever tanker strikes drove fuel prices upward. When a cooperative installed a metered solar mini-grid beside the grain mill, skepticism quickly gave way to relief: barbers, welders, and evening prep classes gained steady light free of soot and price spikes.\n\n" +
+            "Yet engineers noticed an unexpected social ripple. Rather than abandoning communal storytelling circles, families gathered around the cold-storage depot where surplus harvests once spoiled before dawn trucks arrived. Cheap overnight refrigeration extended tomato shelf life from two days to nearly a fortnight—proving that infrastructure succeeds not merely through megawatts, but when anchored around local livelihoods.",
+      ),
+      PracticeQuestion(
+        id = "pq_eng_29",
+        topic = "Reading Comprehension (Passage I)",
+        examType = "JAMB",
+        year = 2022,
+        question = "What best summarizes the writer's overall attitude and central thesis?",
+        options = listOf("Hostile toward modern electricity", "Constructively optimistic that infrastructure succeeds best when aligned with community livelihoods", "Indifferent to post-harvest waste", "Convinced storytelling vanished"),
+        correctIndex = 1,
+        hint = "Examine the concluding sentence.",
+        stepByStepSolution = "The closing reflection praises cold-storage integration because it directly served local farmers' economic habits.",
+        passageText =
+          "PASSAGE I — READING COMPREHENSION\n" +
+            "For decades, twilight across the agrarian settlement meant blinking kerosene lanterns that stained ceiling beams and drained meagre weekly earnings whenever tanker strikes drove fuel prices upward. When a cooperative installed a metered solar mini-grid beside the grain mill, skepticism quickly gave way to relief: barbers, welders, and evening prep classes gained steady light free of soot and price spikes.\n\n" +
+            "Yet engineers noticed an unexpected social ripple. Rather than abandoning communal storytelling circles, families gathered around the cold-storage depot where surplus harvests once spoiled before dawn trucks arrived. Cheap overnight refrigeration extended tomato shelf life from two days to nearly a fortnight—proving that infrastructure succeeds not merely through megawatts, but when anchored around local livelihoods.",
+      ),
+      // --- PASSAGE SET 2: CLOZE REGISTER PASSAGE (5 JAMB Qs) ---
+      PracticeQuestion(
+        id = "pq_eng_30",
+        topic = "Cloze Passage — Judicial Register",
+        examType = "JAMB",
+        year = 2023,
+        question = "Select the most appropriate word for blank [1] in Cloze Passage II:",
+        options = listOf("plaintiff", "referee", "spectator", "auditor"),
+        correctIndex = 0,
+        hint = "The party initiating a civil suit in court.",
+        stepByStepSolution = "In civil procedure, the aggrieved party bringing the claim is the 'plaintiff' (vs 'defendant').",
+        passageText =
+          "PASSAGE II — CLOZE REGISTER (JUDICIAL PROCESS)\n" +
+            "After prolonged boundary negotiations failed, the aggrieved [1] ____ filed a formal civil action at the State High Court seeking an immediate [2] ____ to halt further excavation on the disputed plot. During pre-trial chambers, counsel on both sides submitted sworn [3] ____ detailing survey beacons installed decades earlier. When proceedings opened, the presiding judge warned journalists against commentary that might [4] ____ fair adjudication while witnesses testified under [5] ____.",
+      ),
+      PracticeQuestion(
+        id = "pq_eng_31",
+        topic = "Cloze Passage — Judicial Register",
+        examType = "JAMB",
+        year = 2023,
+        question = "Select the most appropriate word for blank [2] in Cloze Passage II:",
+        options = listOf("injunction", "verdict", "parole", "amnesty"),
+        correctIndex = 0,
+        hint = "A court order restraining an action until the dispute is decided.",
+        stepByStepSolution = "An interlocutory 'injunction' orders a party to stop excavation pending final judgment.",
+        passageText =
+          "PASSAGE II — CLOZE REGISTER (JUDICIAL PROCESS)\n" +
+            "After prolonged boundary negotiations failed, the aggrieved [1] ____ filed a formal civil action at the State High Court seeking an immediate [2] ____ to halt further excavation on the disputed plot. During pre-trial chambers, counsel on both sides submitted sworn [3] ____ detailing survey beacons installed decades earlier. When proceedings opened, the presiding judge warned journalists against commentary that might [4] ____ fair adjudication while witnesses testified under [5] ____.",
+      ),
+      PracticeQuestion(
+        id = "pq_eng_32",
+        topic = "Cloze Passage — Judicial Register",
+        examType = "JAMB",
+        year = 2023,
+        question = "Select the most appropriate word for blank [3] in Cloze Passage II:",
+        options = listOf("affidavits", "manuscripts", "receipts", "ballots"),
+        correctIndex = 0,
+        hint = "Written statements confirmed by oath for court filings.",
+        stepByStepSolution = "Sworn written evidentiary statements presented to a court are 'affidavits'.",
+        passageText =
+          "PASSAGE II — CLOZE REGISTER (JUDICIAL PROCESS)\n" +
+            "After prolonged boundary negotiations failed, the aggrieved [1] ____ filed a formal civil action at the State High Court seeking an immediate [2] ____ to halt further excavation on the disputed plot. During pre-trial chambers, counsel on both sides submitted sworn [3] ____ detailing survey beacons installed decades earlier. When proceedings opened, the presiding judge warned journalists against commentary that might [4] ____ fair adjudication while witnesses testified under [5] ____.",
+      ),
+      PracticeQuestion(
+        id = "pq_eng_33",
+        topic = "Cloze Passage — Judicial Register",
+        examType = "JAMB",
+        year = 2023,
+        question = "Select the most appropriate word for blank [4] in Cloze Passage II:",
+        options = listOf("prejudice", "accelerate", "celebrate", "notarize"),
+        correctIndex = 0,
+        hint = "Harm or bias the impartiality of a sub judice trial.",
+        stepByStepSolution = "Media comment that biases ongoing hearings is said to 'prejudice' fair adjudication.",
+        passageText =
+          "PASSAGE II — CLOZE REGISTER (JUDICIAL PROCESS)\n" +
+            "After prolonged boundary negotiations failed, the aggrieved [1] ____ filed a formal civil action at the State High Court seeking an immediate [2] ____ to halt further excavation on the disputed plot. During pre-trial chambers, counsel on both sides submitted sworn [3] ____ detailing survey beacons installed decades earlier. When proceedings opened, the presiding judge warned journalists against commentary that might [4] ____ fair adjudication while witnesses testified under [5] ____.",
+      ),
+      PracticeQuestion(
+        id = "pq_eng_34",
+        topic = "Cloze Passage — Judicial Register",
+        examType = "JAMB",
+        year = 2023,
+        question = "Select the most appropriate word for blank [5] in Cloze Passage II:",
+        options = listOf("oath", "bail", "appeal", "escort"),
+        correctIndex = 0,
+        hint = "Standard fixed phrase for truthful courtroom testimony.",
+        stepByStepSolution = "Witnesses formally testify 'under oath'.",
+        passageText =
+          "PASSAGE II — CLOZE REGISTER (JUDICIAL PROCESS)\n" +
+            "After prolonged boundary negotiations failed, the aggrieved [1] ____ filed a formal civil action at the State High Court seeking an immediate [2] ____ to halt further excavation on the disputed plot. During pre-trial chambers, counsel on both sides submitted sworn [3] ____ detailing survey beacons installed decades earlier. When proceedings opened, the presiding judge warned journalists against commentary that might [4] ____ fair adjudication while witnesses testified under [5] ____.",
+      ),
+      // --- ADDITIONAL JAMB LEXIS, STRUCTURE & ORAL QUESTIONS FOR 60+ ENGLISH POOL ---
+      PracticeQuestion("pq_eng_35", "Correlative Concord", "JAMB", 2021, "Every one of the newly accredited delegates ____ expected to sign the attendance register.", listOf("are", "were", "is", "have been"), 2, "'Every one' is strictly singular despite 'of the delegates'.", "Match singular pronoun 'Every one' with singular 'is'."),
+      PracticeQuestion("pq_eng_36", "Idiomatic Usage", "JAMB", 2022, "After two failed prototypes, Tobi decided to 'throw in the towel', meaning he:", listOf("Cleaned the laboratory table", "Surrendered / gave up the struggle", "Washed his jerseys", "Requested extra funding"), 1, "Boxing metaphor for conceding defeat.", "'Throw in the towel' means quit or concede defeat."),
+      PracticeQuestion("pq_eng_37", "Opposite in Meaning", "JAMB", 2023, "Choose the word OPPOSITE in meaning to the capitalized word: 'Unlike her GREGARIOUS twin, Zaynab prefers solitary library corners.'", listOf("sociable", "introverted / reclusive", "talkative", "cheerful"), 1, "Gregarious = fond of company.", "'Reclusive / introverted' directly opposes 'gregarious'."),
+      PracticeQuestion("pq_eng_38", "Same Vowel Sound", "JAMB", 2021, "Which option contains the same vowel sound /ɜː/ as in 'w<u>or</u>k'?", listOf("fork", "pork", "learn", "born"), 2, "Check long central /ɜː/ vs /ɔː/.", "'Learn' /lɜːn/ matches 'work' /wɜːk/; others contain /ɔː/."),
+      PracticeQuestion("pq_eng_39", "Word Stress", "JAMB", 2022, "Identify the correct primary stress pattern for the word 'ELECTRONIC':", listOf("E-lec-tro-nic", "e-LEC-tro-nic", "e-lec-TRO-nic", "e-lec-tro-NIC"), 2, "Words ending in '-ic' stress the penultimate (2nd-last) syllable.", "Penalty rule places stress right before '-ic': e-lec-TRO-nic."),
+      PracticeQuestion("pq_eng_40", "Prepositional Collocation", "JAMB", 2023, "All four regional branches now comply strictly ____ central safety directives.", listOf("to", "with", "for", "at"), 1, "Standard verb-preposition pairing: comply WITH.", "One 'complies WITH' rules and 'conforms TO' standards."),
     )
 }

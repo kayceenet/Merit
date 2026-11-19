@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.curriculum.Lesson
 import com.example.data.curriculum.PracticalLabType
+import com.example.ui.theme.semanticColors
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.pow
@@ -51,7 +53,9 @@ fun TopicDiagramCard(
   val errorColor = MaterialTheme.colorScheme.error
   val onSurface = MaterialTheme.colorScheme.onSurface
   val surfaceBg = MaterialTheme.colorScheme.surface
-  val outline = MaterialTheme.colorScheme.outlineVariant
+  val outline = MaterialTheme.colorScheme.outline
+  val isDark = surfaceBg.luminance() < 0.5f
+  val successColor = MaterialTheme.semanticColors.success
   val textMeasurer = rememberTextMeasurer()
 
   Column(
@@ -221,15 +225,21 @@ fun TopicDiagramCard(
 
         "bio_04_nutrition_digestion", "bio_05_transport_circulation" -> {
           // 4-Chamber Heart Diagram (RA, RV, LA, LV)
+          val deoxyCol = if (isDark) Color(0xFF60A5FA) else Color(0xFF1565C0)
+          val oxyCol = if (isDark) Color(0xFFF87171) else Color(0xFFC62828)
           val hLeft = w * 0.24f
           val hW = w * 0.52f
           val midX = hLeft + hW * 0.5f
           val topY = h * 0.12f
           val boxH = h * 0.62f
-          drawRoundRect(Color(0xFF1565C0).copy(alpha = 0.25f), topLeft = Offset(hLeft, topY), size = Size(hW * 0.48f, boxH * 0.46f), cornerRadius = CornerRadius(10f, 10f))
-          drawRoundRect(Color(0xFF1565C0).copy(alpha = 0.38f), topLeft = Offset(hLeft, topY + boxH * 0.50f), size = Size(hW * 0.48f, boxH * 0.50f), cornerRadius = CornerRadius(10f, 10f))
-          drawRoundRect(Color(0xFFC62828).copy(alpha = 0.25f), topLeft = Offset(midX + 4f, topY), size = Size(hW * 0.48f, boxH * 0.46f), cornerRadius = CornerRadius(10f, 10f))
-          drawRoundRect(Color(0xFFC62828).copy(alpha = 0.40f), topLeft = Offset(midX + 4f, topY + boxH * 0.50f), size = Size(hW * 0.48f, boxH * 0.50f), cornerRadius = CornerRadius(10f, 10f))
+          drawRoundRect(deoxyCol.copy(alpha = 0.24f), topLeft = Offset(hLeft, topY), size = Size(hW * 0.48f, boxH * 0.46f), cornerRadius = CornerRadius(10f, 10f))
+          drawRoundRect(deoxyCol, topLeft = Offset(hLeft, topY), size = Size(hW * 0.48f, boxH * 0.46f), cornerRadius = CornerRadius(10f, 10f), style = Stroke(2.5f))
+          drawRoundRect(deoxyCol.copy(alpha = 0.34f), topLeft = Offset(hLeft, topY + boxH * 0.50f), size = Size(hW * 0.48f, boxH * 0.50f), cornerRadius = CornerRadius(10f, 10f))
+          drawRoundRect(deoxyCol, topLeft = Offset(hLeft, topY + boxH * 0.50f), size = Size(hW * 0.48f, boxH * 0.50f), cornerRadius = CornerRadius(10f, 10f), style = Stroke(3f))
+          drawRoundRect(oxyCol.copy(alpha = 0.24f), topLeft = Offset(midX + 4f, topY), size = Size(hW * 0.48f, boxH * 0.46f), cornerRadius = CornerRadius(10f, 10f))
+          drawRoundRect(oxyCol, topLeft = Offset(midX + 4f, topY), size = Size(hW * 0.48f, boxH * 0.46f), cornerRadius = CornerRadius(10f, 10f), style = Stroke(2.5f))
+          drawRoundRect(oxyCol.copy(alpha = 0.34f), topLeft = Offset(midX + 4f, topY + boxH * 0.50f), size = Size(hW * 0.48f, boxH * 0.50f), cornerRadius = CornerRadius(10f, 10f))
+          drawRoundRect(oxyCol, topLeft = Offset(midX + 4f, topY + boxH * 0.50f), size = Size(hW * 0.48f, boxH * 0.50f), cornerRadius = CornerRadius(10f, 10f), style = Stroke(3.5f))
           drawCenteredLabel(textMeasurer, "RA (Deoxy)", Offset(hLeft + hW * 0.24f, topY + boxH * 0.23f), labelStyle)
           drawCenteredLabel(textMeasurer, "RV → Lungs", Offset(hLeft + hW * 0.24f, topY + boxH * 0.75f), labelStyle)
           drawCenteredLabel(textMeasurer, "LA (O₂)", Offset(midX + hW * 0.25f, topY + boxH * 0.23f), labelStyle)
@@ -608,11 +618,14 @@ fun TopicDiagramCard(
 
         PracticalLabType.INORGANIC_GASES_METALS_LAB, PracticalLabType.QUALITATIVE_ANALYSIS_LAB -> {
           // 3 Diagnostic Test Tubes
-          val tubes = listOf("Cu²⁺ → Blue/Royal NH₃" to Color(0xFF1E88E5), "Fe²⁺ → Dirty Green" to Color(0xFF2E7D32), "Fe³⁺ → Red-Brown" to Color(0xFFB45309))
+          val blueSol = if (isDark) Color(0xFF60A5FA) else Color(0xFF1E88E5)
+          val greenSol = if (isDark) Color(0xFF4ADE80) else Color(0xFF2E7D32)
+          val amberSol = if (isDark) Color(0xFFFBBF24) else Color(0xFFB45309)
+          val tubes = listOf("Cu²⁺ → Blue/Royal NH₃" to blueSol, "Fe²⁺ → Dirty Green" to greenSol, "Fe³⁺ → Red-Brown" to amberSol)
           tubes.forEachIndexed { idx, (label, col) ->
             val x = w * (0.18f + idx * 0.28f)
             drawRoundRect(outline, topLeft = Offset(x, h * 0.18f), size = Size(w * 0.14f, h * 0.54f), cornerRadius = CornerRadius(18f, 18f), style = Stroke(3f))
-            drawRoundRect(col.copy(alpha = 0.55f), topLeft = Offset(x + 3f, h * 0.42f), size = Size(w * 0.14f - 6f, h * 0.28f), cornerRadius = CornerRadius(14f, 14f))
+            drawRoundRect(col.copy(alpha = 0.58f), topLeft = Offset(x + 3f, h * 0.42f), size = Size(w * 0.14f - 6f, h * 0.28f), cornerRadius = CornerRadius(14f, 14f))
             drawCenteredLabel(textMeasurer, label, Offset(x + w * 0.07f, h * 0.84f), labelStyle)
           }
         }
@@ -630,8 +643,8 @@ fun TopicDiagramCard(
 
         PracticalLabType.CELL_OSMOSIS_LAB -> {
           // Hypotonic Turgid vs Hypertonic Plasmolyzed Cell
-          drawRoundRect(Color(0xFF2E7D32).copy(alpha = 0.20f), topLeft = Offset(w * 0.12f, h * 0.20f), size = Size(w * 0.30f, h * 0.52f), cornerRadius = CornerRadius(10f, 10f))
-          drawRoundRect(Color(0xFF2E7D32), topLeft = Offset(w * 0.12f, h * 0.20f), size = Size(w * 0.30f, h * 0.52f), cornerRadius = CornerRadius(10f, 10f), style = Stroke(3.5f))
+          drawRoundRect(successColor.copy(alpha = 0.20f), topLeft = Offset(w * 0.12f, h * 0.20f), size = Size(w * 0.30f, h * 0.52f), cornerRadius = CornerRadius(10f, 10f))
+          drawRoundRect(successColor, topLeft = Offset(w * 0.12f, h * 0.20f), size = Size(w * 0.30f, h * 0.52f), cornerRadius = CornerRadius(10f, 10f), style = Stroke(3.5f))
           drawRoundRect(errorColor.copy(alpha = 0.18f), topLeft = Offset(w * 0.58f, h * 0.20f), size = Size(w * 0.30f, h * 0.52f), cornerRadius = CornerRadius(10f, 10f))
           drawRoundRect(outline, topLeft = Offset(w * 0.58f, h * 0.20f), size = Size(w * 0.30f, h * 0.52f), cornerRadius = CornerRadius(10f, 10f), style = Stroke(3.5f))
           drawOval(errorColor.copy(alpha = 0.45f), topLeft = Offset(w * 0.65f, h * 0.30f), size = Size(w * 0.16f, h * 0.30f))
@@ -807,6 +820,39 @@ fun TopicDiagramCard(
           drawCenteredLabel(textMeasurer, "2. Paraphrase", Offset(w * 0.50f, h * 0.34f), accentStyle)
           drawCenteredLabel(textMeasurer, "3. One Sentence", Offset(w * 0.79f, h * 0.34f), labelStyle)
           drawCenteredLabel(textMeasurer, "Avoid Lifted-Phrase Penalties • Format Formal Letters Properly", Offset(w * 0.50f, h * 0.80f), labelStyle)
+        }
+
+        PracticalLabType.ECONOMICS_ELASTICITY_MARKET_LAB -> {
+          drawLine(onSurface, Offset(w * 0.14f, h * 0.12f), Offset(w * 0.14f, h * 0.78f), 2.5f)
+          drawLine(onSurface, Offset(w * 0.14f, h * 0.78f), Offset(w * 0.62f, h * 0.78f), 2.5f)
+          drawLine(primary, Offset(w * 0.20f, h * 0.18f), Offset(w * 0.58f, h * 0.70f), 4f)
+          drawLine(successColor, Offset(w * 0.20f, h * 0.70f), Offset(w * 0.58f, h * 0.18f), 4f)
+          drawLine(errorColor, Offset(w * 0.20f, h * 0.56f), Offset(w * 0.58f, h * 0.08f), 3f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 6f), 0f))
+          drawCircle(tertiary, radius = 7f, center = Offset(w * 0.39f, h * 0.44f))
+          drawCenteredLabel(textMeasurer, "E* (P*, Q*)", Offset(w * 0.46f, h * 0.48f), accentStyle)
+          drawCenteredLabel(textMeasurer, "|PED| = %ΔQ / %ΔP", Offset(w * 0.79f, h * 0.26f), accentStyle)
+          drawCenteredLabel(textMeasurer, "Excise Tax Shift", Offset(w * 0.79f, h * 0.50f), errStyle)
+          drawCenteredLabel(textMeasurer, "Demand & Supply Equilibrium • Elasticity & Cost Curves", Offset(w * 0.50f, h * 0.90f), labelStyle)
+        }
+
+        PracticalLabType.ECONOMICS_MACRO_POLICY_LAB -> {
+          drawRoundRect(primary.copy(alpha = 0.16f), topLeft = Offset(w * 0.08f, h * 0.22f), size = Size(w * 0.26f, 44f), cornerRadius = CornerRadius(8f, 8f))
+          drawRoundRect(secondary.copy(alpha = 0.18f), topLeft = Offset(w * 0.37f, h * 0.22f), size = Size(w * 0.26f, 44f), cornerRadius = CornerRadius(8f, 8f))
+          drawRoundRect(tertiary.copy(alpha = 0.18f), topLeft = Offset(w * 0.66f, h * 0.22f), size = Size(w * 0.26f, 44f), cornerRadius = CornerRadius(8f, 8f))
+          drawCenteredLabel(textMeasurer, "k = 1 / (1−MPC)", Offset(w * 0.21f, h * 0.36f), accentStyle)
+          drawCenteredLabel(textMeasurer, "MV = PT", Offset(w * 0.50f, h * 0.36f), labelStyle)
+          drawCenteredLabel(textMeasurer, "ToT = Px/Pm×100", Offset(w * 0.79f, h * 0.36f), labelStyle)
+          drawCenteredLabel(textMeasurer, "Circular Flow: I + G + X = S + T + M • CBN OMO Policy", Offset(w * 0.50f, h * 0.80f), labelStyle)
+        }
+
+        PracticalLabType.GOVERNMENT_ORGANS_FEDERALISM_LAB -> {
+          drawRoundRect(primary.copy(alpha = 0.16f), topLeft = Offset(w * 0.08f, h * 0.18f), size = Size(w * 0.25f, 42f), cornerRadius = CornerRadius(8f, 8f))
+          drawRoundRect(secondary.copy(alpha = 0.18f), topLeft = Offset(w * 0.375f, h * 0.18f), size = Size(w * 0.25f, 42f), cornerRadius = CornerRadius(8f, 8f))
+          drawRoundRect(tertiary.copy(alpha = 0.18f), topLeft = Offset(w * 0.67f, h * 0.18f), size = Size(w * 0.25f, 42f), cornerRadius = CornerRadius(8f, 8f))
+          drawCenteredLabel(textMeasurer, "Legislature", Offset(w * 0.205f, h * 0.31f), accentStyle)
+          drawCenteredLabel(textMeasurer, "Executive", Offset(w * 0.50f, h * 0.31f), labelStyle)
+          drawCenteredLabel(textMeasurer, "Judiciary", Offset(w * 0.795f, h * 0.31f), labelStyle)
+          drawCenteredLabel(textMeasurer, "Federal Lists: Exclusive (Fed) • Concurrent • Residual (States)", Offset(w * 0.50f, h * 0.78f), accentStyle)
         }
       }
     }

@@ -177,8 +177,8 @@ object MathematicsCurriculum {
               syllabusTag = "JAMB Sec. 1.2–1.5 • WAEC Indices, Logs & Surds",
               learningOutcomes =
                 listOf(
-                  "Apply negative and fractional powers: x⁻ⁿ = 1/xⁿ and x^(a/b) = (ᵇ√x)ᵃ.",
-                  "Switch smoothly between exponential aˣ = N and logarithm logₐ N = x.",
+                  "Apply negative and fractional powers: x^{-n} = \\frac{1}{x^n} and x^{a/b} = (\\sqrt[b]{x})^a.",
+                  "Switch smoothly between exponential a^x = N and logarithm \\log_a N = x.",
                   "Simplify surds and rationalize denominators using conjugate pairs.",
                 ),
               concepts =
@@ -186,18 +186,18 @@ object MathematicsCurriculum {
                   ConceptBlock(
                     heading = "1. Indices & Logarithms: Twin Opposite Buttons",
                     explanation =
-                      "An index (power) tells you how many times to multiply a base: 2³ = 8. A Logarithm simply asks the backwards question: '2 to WHAT power gives 8?' Answer: log₂ 8 = 3! Because indices and logs are opposites, multiplying inside a log turns into ADDING two logs, and dividing turns into SUBTRACTING.",
+                      "An index (power) tells you how many times to multiply a base: 2^3 = 8. A Logarithm simply asks the backwards question: '2 to what power gives 8?' Answer: \\log_2 8 = 3. Because indices and logs are inverses, multiplying inside a log turns into ADDING two logs, and dividing turns into SUBTRACTING.",
                     keyFormula = "a^0 = 1,\\quad a^{m/n} = (\\sqrt[n]{a})^m   |   \\log_b(xy) = \\log_b x + \\log_b y,\\quad \\log_b(x^k) = k\\log_b x",
                     examTip =
-                      "Any time you see 2^x = 1/8 or 9^(x+1) = 27^x, rewrite every term to the SAME small prime base (2 or 3) and equate powers!",
+                      "Any time you see 2^x = \\frac{1}{8} or 9^{x+1} = 27^x, rewrite every term to the SAME small prime base (2 or 3) and equate powers!",
                   ),
                   ConceptBlock(
                     heading = "2. Surds & Conjugates: Simplifying Irrational Denominators",
                     explanation =
-                      "For any non-perfect square, factor out the largest perfect square inside the radical—for instance, √12 = √(4 × 3) = 2√3. Standard mathematical notation avoids irrational roots in denominators; to rationalize 1/(a + √b), multiply both numerator and denominator by the conjugate (a − √b) so that the difference of two squares eliminates the radical: (a + √b)(a − √b) = a² − b.",
+                      "For any non-perfect square, factor out the largest perfect square inside the radical—for instance, \\sqrt{12} = \\sqrt{4 \\times 3} = 2\\sqrt{3}. Standard mathematical notation avoids irrational roots in denominators; to rationalize \\frac{1}{a + \\sqrt{b}}, multiply both numerator and denominator by the conjugate (a - \\sqrt{b}) so that the difference of two squares eliminates the radical: (a + \\sqrt{b})(a - \\sqrt{b}) = a^2 - b.",
                     keyFormula = "\\frac{1}{a + \\sqrt{b}} = \\frac{a - \\sqrt{b}}{a^2 - b}",
                     examTip =
-                      "Also know Profit % = (Profit / Cost Price) × 100 and Compound Interest A = P(1 + r/100)ⁿ!",
+                      "Also know Profit \\% = \\frac{\\text{Profit}}{\\text{Cost Price}} \\times 100\\% and Compound Interest A = P(1 + \\frac{r}{100})^n!",
                   ),
                 ),
               workedExamples =
@@ -205,27 +205,27 @@ object MathematicsCurriculum {
                   WorkedExample(
                     title = "Exponential Equation with Base 3",
                     examSource = "JAMB UTME-Style Worked Problem",
-                    problemStatement = "Solve for x: 9^(2x − 1) = 27^(x + 1).",
+                    problemStatement = "Solve for x: 9^{2x - 1} = 27^{x + 1}.",
                     steps =
                       listOf(
-                        "Step 1 — Write 9 = 3² and 27 = 3³.",
-                        "Step 2 — 3^(2(2x−1)) = 3^(3(x+1)) ⇒ 4x − 2 = 3x + 3.",
+                        "Step 1 — Write 9 = 3^2 and 27 = 3^3.",
+                        "Step 2 — 3^{2(2x - 1)} = 3^{3(x + 1)} \\implies 4x - 2 = 3x + 3.",
                         "Step 3 — x = 5.",
                       ),
                     finalAnswer = "x = 5",
-                    examinerTrap = "Multiply the outer exponent by BOTH terms inside (2x − 1), not just 2x!",
+                    examinerTrap = "Multiply the outer exponent by BOTH terms inside (2x - 1), not just 2x!",
                   ),
                   WorkedExample(
                     title = "Rationalizing Surd Fractions",
                     examSource = "WAEC WASSCE-Style Worked Problem",
-                    problemStatement = "Simplify 6 / (√5 − √2) in the form a√5 + b√2.",
+                    problemStatement = "Simplify \\frac{6}{\\sqrt{5} - \\sqrt{2}} in the form a\\sqrt{5} + b\\sqrt{2}.",
                     steps =
                       listOf(
-                        "Step 1 — Multiply top and bottom by conjugate (√5 + √2).",
-                        "Step 2 — Denominator = (√5)² − (√2)² = 5 − 2 = 3.",
-                        "Step 3 — 6(√5 + √2) / 3 = 2√5 + 2√2.",
+                        "Step 1 — Multiply numerator and denominator by conjugate (\\sqrt{5} + \\sqrt{2}).",
+                        "Step 2 — Denominator = (\\sqrt{5})^2 - (\\sqrt{2})^2 = 5 - 2 = 3.",
+                        "Step 3 — \\frac{6(\\sqrt{5} + \\sqrt{2})}{3} = 2\\sqrt{5} + 2\\sqrt{2}.",
                       ),
-                    finalAnswer = "2√5 + 2√2",
+                    finalAnswer = "2\\sqrt{5} + 2\\sqrt{2}",
                     examinerTrap = "Always simplify the denominator before cancelling with the numerator!",
                   ),
                 ),
@@ -241,7 +241,7 @@ object MathematicsCurriculum {
                 ),
               labType = PracticalLabType.NUMBER_BASE_INDICES_LAB,
               labBrief =
-                "Test fractional/negative powers a^(m/n), check log_b(x) transformations, and compare simple vs compound growth live.",
+                "Test fractional and negative powers a^{m/n}, check \\log_b(x) transformations, and compare simple vs compound growth live.",
               exercises =
                 listOf(
                   PracticeQuestion(
@@ -249,11 +249,11 @@ object MathematicsCurriculum {
                     topic = "Indices",
                     examType = "JAMB",
                     year = 2024,
-                    question = "Evaluate (27/8)^(−2/3).",
-                    options = listOf("4/9", "9/4", "−9/4", "2/3"),
+                    question = "Evaluate \\left(\\frac{27}{8}\\right)^{-2/3}.",
+                    options = listOf("\\frac{4}{9}", "\\frac{9}{4}", "-\\frac{9}{4}", "\\frac{2}{3}"),
                     correctIndex = 0,
-                    hint = "Negative power flips the fraction to (8/27)^(2/3).",
-                    stepByStepSolution = "(³√(8/27))² = (2/3)² = 4/9.",
+                    hint = "A negative power flips the fraction to \\left(\\frac{8}{27}\\right)^{2/3}.",
+                    stepByStepSolution = "\\left(\\sqrt[3]{\\frac{8}{27}}\\right)^2 = \\left(\\frac{2}{3}\\right)^2 = \\frac{4}{9}.",
                   ),
                   PracticeQuestion(
                     id = "ex_math_02_2",
@@ -478,7 +478,7 @@ object MathematicsCurriculum {
               syllabusTag = "JAMB Sec. 2.2–2.4 • WAEC Variation & Inequalities",
               learningOutcomes =
                 listOf(
-                  "Translate Direct (y ∝ x), Inverse (y ∝ 1/x), Joint, and Partial Variation sentences into equations.",
+                  "Translate Direct (y \\propto x), Inverse (y \\propto \\frac{1}{x}), Joint, and Partial Variation sentences into equations.",
                   "Solve linear simultaneous equations and quadratic inequalities cleanly.",
                   "Flip inequality signs ONLY when multiplying or dividing by a NEGATIVE number.",
                 ),
@@ -487,7 +487,7 @@ object MathematicsCurriculum {
                   ConceptBlock(
                     heading = "1. The 4 Variation Recipes (Always Find Constant k First!)",
                     explanation =
-                      "Think of Variation as a recipe ratio: Direct (y ∝ x) means when x doubles, y doubles (y = kx). Inverse (y ∝ 1/x) means more workers take LESS time (y = k/x). Partial Variation has a fixed base fee PLUS a rate—just like a ride-hailing taxi: Base fare + Naira/km ⇒ C = a + bx!",
+                      "Think of Variation as a recipe ratio: Direct (y \\propto x) means when x doubles, y doubles (y = kx). Inverse (y \\propto \\frac{1}{x}) means more workers take LESS time (y = \\frac{k}{x}). Partial Variation has a fixed base fee PLUS a variable rate—just like a ride-hailing taxi: Base fare + Naira/km \\implies C = a + bx.",
                     keyFormula = "\\text{Direct: } y = kx   |   \\text{Inverse: } y = \\frac{k}{x}   |   \\text{Partial: } y = a + bx",
                     examTip =
                       "Read wording carefully: 'varies PARTLY as x and partly as x²' needs TWO constants: y = ax + bx², not one!",

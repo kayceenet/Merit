@@ -201,6 +201,20 @@ enum class PracticalLabType(val title: String, val subtitle: String) {
     title = "WAEC Summary Paraphrase & Formal/Informal Essay Lab",
     subtitle = "Spot lifted phrase penalties vs own-word sentences and verify WAEC letter format rules",
   ),
+
+  // Economics & Government
+  ECONOMICS_ELASTICITY_MARKET_LAB(
+    title = "Demand Elasticity & Market Equilibrium Lab",
+    subtitle = "Adjust PED |ε|, demand/supply shifts, and indirect tax per unit to track revenue & tax incidence",
+  ),
+  ECONOMICS_MACRO_POLICY_LAB(
+    title = "National Income, Inflation & CBN Monetary Lab",
+    subtitle = "Simulate GDP = C + I + G + (X − M), credit multiplier 1/r, and CBN Cash Reserve / MPR levers",
+  ),
+  GOVERNMENT_ORGANS_FEDERALISM_LAB(
+    title = "Separation of Powers & Nigerian Federalism Lab",
+    subtitle = "Inspect executive-legislative-judicial checks, revenue allocation, and 1963 vs 1979 vs 1999 constitutions",
+  ),
 }
 
 enum class LessonPillar(val key: String, val shortLabel: String, val fullLabel: String) {
@@ -302,6 +316,7 @@ data class PracticeQuestion(
   val cognitiveLevel: String = "Application",
   val marks: Int = 20,
   val remediationTip: String = "",
+  val passageText: String? = null,
 ) {
   val boardStyleLabel: String
     get() =

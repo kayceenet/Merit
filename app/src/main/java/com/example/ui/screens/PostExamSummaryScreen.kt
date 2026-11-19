@@ -26,8 +26,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.BookmarkAdd
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Timer
@@ -55,9 +57,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.data.curriculum.CurriculumProgression
 import com.example.ui.components.ScientificText
-import com.example.ui.theme.CourseraAzureAccent
-import com.example.ui.theme.CourseraAzureInk
-import com.example.ui.theme.CourseraNavyElevated
 import com.example.ui.theme.semanticColors
 import com.example.ui.viewmodel.ExamResultSummary
 import com.example.ui.viewmodel.QuestionReviewItem
@@ -74,6 +73,8 @@ private enum class ReviewFilter(val label: String) {
 fun PostExamSummaryScreen(
   summary: ExamResultSummary,
   onRetakeMock: () -> Unit,
+  onDrillMissed: (() -> Unit)? = null,
+  onSaveToNotebook: ((subjectId: String, title: String, content: String) -> Unit)? = null,
   onBackToSetup: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
@@ -109,12 +110,13 @@ fun PostExamSummaryScreen(
     ) {
       // Coursera Deep Navy Post-Exam Hero Report Card
       item {
+        val missedCount = summary.reviewItems.count { !it.isCorrect }
         Column(
           modifier =
             Modifier.fillMaxWidth()
               .clip(RoundedCornerShape(22.dp))
               .background(semantics.classroomBar)
-              .border(1.5.dp, CourseraNavyElevated, RoundedCornerShape(22.dp))
+              .border(1.5.dp, semantics.classroomAccent.copy(alpha = 0.45f), RoundedCornerShape(22.dp))
               .padding(20.dp),
           verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
@@ -123,11 +125,11 @@ fun PostExamSummaryScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
           ) {
-            Surface(color = CourseraAzureAccent, shape = RoundedCornerShape(6.dp)) {
+            Surface(color = semantics.classroomAccent, shape = RoundedCornerShape(6.dp)) {
               Text(
                 text = "${summary.examBoard} • ${summary.subjectTitle.uppercase()}",
                 style = MaterialTheme.typography.labelSmall,
-                color = CourseraAzureInk,
+                color = Color(0xFF0A1628),
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
               )
@@ -157,17 +159,22 @@ fun PostExamSummaryScreen(
           ) {
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
               Text(
-                text = "${summary.percentage}%",
+                text =
+                  if (summary.isUtmeCombo && summary.utmeAggregateOutOf400 != null) {
+                    "${summary.utmeAggregateOutOf400} / 400"
+                  } else {
+                    "${summary.percentage}%"
+                  },
                 style =
                   MaterialTheme.typography.displaySmall.copy(
                     fontFeatureSettings = "tnum"
                   ),
-                color = Color.White,
+                color = semantics.onClassroomBar,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.testTag("post_exam_percentage"),
               )
               Text(
-                text = "${summary.correctCount} of ${summary.totalQuestions} questions correct",
+                text = "${summary.correctCount} of ${summary.totalQuestions} questions correct (${summary.percentage}%)",
                 style = MaterialTheme.typography.titleSmall,
                 color = semantics.classroomSubtext,
               )
@@ -181,7 +188,7 @@ fun PostExamSummaryScreen(
                 Icon(
                   Icons.Filled.Timer,
                   contentDescription = "Time taken",
-                  tint = CourseraAzureAccent,
+                  tint = semantics.classroomAccent,
                   modifier = Modifier.size(16.dp),
                 )
                 Text(
@@ -190,7 +197,7 @@ fun PostExamSummaryScreen(
                     MaterialTheme.typography.titleSmall.copy(
                       fontFeatureSettings = "tnum"
                     ),
-                  color = Color.White,
+                  color = semantics.onClassroomBar,
                   fontWeight = FontWeight.Bold,
                   modifier = Modifier.testTag("post_exam_time_taken"),
                 )
@@ -215,11 +222,33 @@ fun PostExamSummaryScreen(
             }
           }
 
+          if (summary.isUtmeCombo && summary.comboBreakdowns.isNotEmpty()) {
+            FlowRow(
+              horizontalArrangement = Arrangement.spacedBy(8.dp),
+              verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+              summary.comboBreakdowns.forEach { bd ->
+                Surface(
+                  color = Color.White.copy(alpha = 0.14f),
+                  shape = RoundedCornerShape(99.dp),
+                ) {
+                  Text(
+                    text = "${bd.subjectName}: ${bd.scaledOutOf100}/100",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = semantics.onClassroomBar,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                  )
+                }
+              }
+            }
+          }
+
           LinearProgressIndicator(
             progress = { (summary.percentage / 100f).coerceIn(0.03f, 1f) },
             modifier = Modifier.fillMaxWidth().height(8.dp).clip(CircleShape),
-            color = if (summary.percentage >= 70) semantics.success else CourseraAzureAccent,
-            trackColor = CourseraNavyElevated,
+            color = if (summary.percentage >= 70) semantics.success else semantics.classroomAccent,
+            trackColor = Color.White.copy(alpha = 0.22f),
           )
 
           Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -229,7 +258,7 @@ fun PostExamSummaryScreen(
               shape = RoundedCornerShape(12.dp),
               colors =
                 ButtonDefaults.outlinedButtonColors(
-                  contentColor = Color.White,
+                  contentColor = semantics.onClassroomBar,
                 ),
             ) {
               Text("Exam Lab", fontWeight = FontWeight.SemiBold)
@@ -240,13 +269,30 @@ fun PostExamSummaryScreen(
               shape = RoundedCornerShape(12.dp),
               colors =
                 ButtonDefaults.buttonColors(
-                  containerColor = CourseraAzureAccent,
-                  contentColor = CourseraAzureInk,
+                  containerColor = semantics.classroomAccent,
+                  contentColor = Color(0xFF0A1628),
                 ),
             ) {
               Icon(Icons.Filled.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
               Spacer(modifier = Modifier.width(6.dp))
               Text("Retake Paper", fontWeight = FontWeight.Bold)
+            }
+          }
+
+          if (missedCount > 0 && onDrillMissed != null) {
+            Button(
+              onClick = onDrillMissed,
+              modifier = Modifier.fillMaxWidth().height(48.dp).testTag("drill_missed_questions_button"),
+              shape = RoundedCornerShape(12.dp),
+              colors =
+                ButtonDefaults.buttonColors(
+                  containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                  contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                ),
+            ) {
+              Icon(Icons.Filled.FitnessCenter, contentDescription = null, modifier = Modifier.size(18.dp))
+              Spacer(modifier = Modifier.width(6.dp))
+              Text("Drill Missed Questions Now ($missedCount Qs)", fontWeight = FontWeight.Bold)
             }
           }
         }
@@ -370,7 +416,10 @@ fun PostExamSummaryScreen(
 
       // Detailed Question Cards with User Answer vs Correct Answer
       items(filteredItems, key = { it.questionIndex }) { item ->
-        QuestionReviewCard(item = item)
+        QuestionReviewCard(
+          item = item,
+          onSaveToNotebook = onSaveToNotebook,
+        )
       }
 
       item { Spacer(modifier = Modifier.height(16.dp)) }
@@ -413,7 +462,10 @@ private fun BreakdownMetricCard(
 }
 
 @Composable
-private fun QuestionReviewCard(item: QuestionReviewItem) {
+private fun QuestionReviewCard(
+  item: QuestionReviewItem,
+  onSaveToNotebook: ((subjectId: String, title: String, content: String) -> Unit)? = null,
+) {
   val semantics = MaterialTheme.semanticColors
   val q = item.question
   val statusBg =
@@ -486,6 +538,21 @@ private fun QuestionReviewCard(item: QuestionReviewItem) {
         style = MaterialTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
         color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
+    }
+
+    if (!q.passageText.isNullOrBlank()) {
+      Surface(
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        shape = RoundedCornerShape(10.dp),
+        modifier = Modifier.fillMaxWidth(),
+      ) {
+        ScientificText(
+          text = q.passageText,
+          style = MaterialTheme.typography.bodySmall,
+          color = MaterialTheme.colorScheme.onSecondaryContainer,
+          modifier = Modifier.padding(10.dp),
+        )
+      }
     }
 
     ScientificText(
@@ -607,6 +674,23 @@ private fun QuestionReviewCard(item: QuestionReviewItem) {
           color = MaterialTheme.colorScheme.tertiary,
           fontWeight = FontWeight.Medium,
         )
+      }
+      if (onSaveToNotebook != null) {
+        OutlinedButton(
+          onClick = {
+            onSaveToNotebook(
+              item.subjectId.ifBlank { "physics" },
+              "${q.topic} — Solution",
+              "${q.question}\n\n${q.stepByStepSolution}",
+            )
+          },
+          shape = RoundedCornerShape(10.dp),
+          modifier = Modifier.fillMaxWidth().padding(top = 4.dp).height(48.dp),
+        ) {
+          Icon(Icons.Filled.BookmarkAdd, contentDescription = null, modifier = Modifier.size(16.dp))
+          Spacer(Modifier.width(6.dp))
+          Text("Save Explanation to Notebook", fontWeight = FontWeight.SemiBold)
+        }
       }
     }
   }

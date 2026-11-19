@@ -61,7 +61,7 @@ object AcademyCurriculumEnricher {
             options = listOf("1.46 mm", "1.48 mm", "1.50 mm", "1.52 mm"),
             correctIndex = 2,
             feedback =
-              "Verified: True Reading = Observed − (Signed Zero Error) = 1.48 − (−0.02) = 1.50 mm. Subtracting a negative offset adds its magnitude.",
+              "True Reading = Observed − (Signed Zero Error) = 1.48 − (−0.02) = 1.50 mm. Subtracting a negative offset adds its magnitude.",
           ),
           ProjectVerificationTask(
             id = "vp_phys_01_3",
@@ -77,7 +77,7 @@ object AcademyCurriculumEnricher {
               ),
             correctIndex = 1,
             feedback =
-              "Confirmed: dimensionless constants π and 4 drop out, leaving [d²·L] = [L³] for volume and [M L⁻³] for density.",
+              "dimensionless constants π and 4 drop out, leaving [d²·L] = [L³] for volume and [M L⁻³] for density.",
           ),
         ),
       "phys_02_vectors" to
@@ -96,7 +96,7 @@ object AcademyCurriculumEnricher {
               ),
             correctIndex = 1,
             feedback =
-              "Confirmed: to cancel 3.0 m/s East, the Westward engine component 5.0 sin θ must equal 3.0 m/s, giving sin θ = 0.6 (36.9°).",
+              "to cancel 3.0 m/s East, the Westward engine component 5.0 sin θ must equal 3.0 m/s, giving sin θ = 0.6 (36.9°).",
           ),
           ProjectVerificationTask(
             id = "vp_phys_02_2",
@@ -112,7 +112,7 @@ object AcademyCurriculumEnricher {
               ),
             correctIndex = 2,
             feedback =
-              "Verified: resultant North speed v_N = √(5.0² − 3.0²) = 4.0 m/s (3-4-5 right triangle), so crossing time t = 400 / 4.0 = 100 s.",
+              "resultant North speed v_N = √(5.0² − 3.0²) = 4.0 m/s (3-4-5 right triangle), so crossing time t = 400 / 4.0 = 100 s.",
           ),
           ProjectVerificationTask(
             id = "vp_phys_02_3",
@@ -128,7 +128,7 @@ object AcademyCurriculumEnricher {
               ),
             correctIndex = 1,
             feedback =
-              "Confirmed: the equilibrant always matches the resultant magnitude (60.8 N) while pointing exactly 180° opposite (34.7° South of West).",
+              "the equilibrant always matches the resultant magnitude (60.8 N) while pointing exactly 180° opposite (34.7° South of West).",
           ),
         ),
       "chem_01_separation_kinetic" to
@@ -147,7 +147,7 @@ object AcademyCurriculumEnricher {
               ),
             correctIndex = 1,
             feedback =
-              "Verified: insoluble solids come out first by filtration, immiscible liquids split cleanly in a separating funnel, and pure water is distilled from brine.",
+              "insoluble solids come out first by filtration, immiscible liquids split cleanly in a separating funnel, and pure water is distilled from brine.",
           ),
           ProjectVerificationTask(
             id = "vp_chem_01_2",
@@ -163,7 +163,7 @@ object AcademyCurriculumEnricher {
               ),
             correctIndex = 1,
             feedback =
-              "Confirmed: CuSO₄ only detects the presence of water, whereas sharp constant MP/BP proves purity (impurities raise BP and lower MP).",
+              "CuSO₄ only detects the presence of water, whereas sharp constant MP/BP proves purity (impurities raise BP and lower MP).",
           ),
           ProjectVerificationTask(
             id = "vp_chem_01_3",
@@ -192,7 +192,7 @@ object AcademyCurriculumEnricher {
             options = listOf("101100₂", "101101₂", "110101₂", "100111₂"),
             correctIndex = 1,
             feedback =
-              "Verified: 45 = 32 + 8 + 4 + 1 = 1·2⁵ + 0·2⁴ + 1·2³ + 1·2² + 0·2¹ + 1·2⁰ = 101101₂.",
+              "45 = 32 + 8 + 4 + 1 = 1·2⁵ + 0·2⁴ + 1·2³ + 1·2² + 0·2¹ + 1·2⁰ = 101101₂.",
           ),
           ProjectVerificationTask(
             id = "vp_math_01_2",
@@ -202,7 +202,7 @@ object AcademyCurriculumEnricher {
             options = listOf("Tuesday", "Wednesday", "Friday", "Saturday"),
             correctIndex = 2,
             feedback =
-              "Confirmed: 52 ≡ 3 (mod 7) since 52 = 7×7 + 3; counting 3 days forward from Tuesday lands on Friday.",
+              "52 ≡ 3 (mod 7) since 52 = 7×7 + 3; counting 3 days forward from Tuesday lands on Friday.",
           ),
           ProjectVerificationTask(
             id = "vp_math_01_3",
@@ -218,7 +218,7 @@ object AcademyCurriculumEnricher {
               ),
             correctIndex = 1,
             feedback =
-              "Confirmed: base-b place notation permits only digits 0 through (b − 1). Here 2b + 3 = 19 solves to b = 8.",
+              "base-b place notation permits only digits 0 through (b − 1). Here 2b + 3 = 19 solves to b = 8.",
           ),
         ),
       "bio_01_diversity_microscopy" to
@@ -237,7 +237,7 @@ object AcademyCurriculumEnricher {
               ),
             correctIndex = 1,
             feedback =
-              "Confirmed: binomial names capitalize only the Genus, keep the specific epithet lowercase, and italicize (or underline separately by hand).",
+              "binomial names capitalize only the Genus, keep the specific epithet lowercase, and italicize (or underline separately by hand).",
           ),
           ProjectVerificationTask(
             id = "vp_bio_01_2",
@@ -247,7 +247,7 @@ object AcademyCurriculumEnricher {
             options = listOf("15 μm", "150 μm", "600 μm", "2400 μm"),
             correctIndex = 1,
             feedback =
-              "Verified: Actual Size = Drawing Size / Magnification = (6.0 × 10,000 μm) / 400 = 150 μm.",
+              "Actual Size = Drawing Size / Magnification = (6.0 × 10,000 μm) / 400 = 150 μm.",
           ),
           ProjectVerificationTask(
             id = "vp_bio_01_3",
@@ -263,7 +263,7 @@ object AcademyCurriculumEnricher {
               ),
             correctIndex = 1,
             feedback =
-              "Confirmed: prokaryotes lack a true membrane-bound nucleus and mitochondria, distinguishing Monera from all eukaryotic kingdoms.",
+              "prokaryotes lack a true membrane-bound nucleus and mitochondria, distinguishing Monera from all eukaryotic kingdoms.",
           ),
         ),
       "eng_01_parts_affixes" to
@@ -282,7 +282,7 @@ object AcademyCurriculumEnricher {
               ),
             correctIndex = 1,
             feedback =
-              "Confirmed: 'furniture' and 'information' are non-count nouns—they take no '-s', reject 'a/an', and pair with 'much/pieces of' rather than 'many'.",
+              "'furniture' and 'information' are non-count nouns—they take no '-s', reject 'a/an', and pair with 'much/pieces of' rather than 'many'.",
           ),
           ProjectVerificationTask(
             id = "vp_eng_01_2",
@@ -298,7 +298,7 @@ object AcademyCurriculumEnricher {
               ),
             correctIndex = 1,
             feedback =
-              "Verified: 'between' is a preposition requiring object case ('you and me'), and plural count nouns ('students') require 'fewer', not 'less'.",
+              "'between' is a preposition requiring object case ('you and me'), and plural count nouns ('students') require 'fewer', not 'less'.",
           ),
           ProjectVerificationTask(
             id = "vp_eng_01_3",
@@ -314,7 +314,7 @@ object AcademyCurriculumEnricher {
               ),
             correctIndex = 1,
             feedback =
-              "Confirmed: Size ('large') → Age ('new') → Colour ('brown') → Origin ('Nigerian') → Material ('wooden') → Purpose ('study') follows OSASCOMP order.",
+              "Size ('large') → Age ('new') → Colour ('brown') → Origin ('Nigerian') → Material ('wooden') → Purpose ('study') follows OSASCOMP order.",
           ),
         ),
     )
@@ -439,7 +439,7 @@ object AcademyCurriculumEnricher {
         prompt = "To execute Stage 1 (${stage1}) in \"${project.title}\", which specification satisfies the engineering/academic standard?",
         options = opts1,
         correctIndex = idx1,
-        feedback = "Verified: $crit1." + (ex1?.examinerTrap?.let { " Key safeguard: $it" } ?: ""),
+        feedback = "$crit1." + (ex1?.examinerTrap?.let { " Key safeguard: $it" } ?: ""),
       )
     )
 
@@ -465,7 +465,7 @@ object AcademyCurriculumEnricher {
             "Field Review Alert: A teammate's draft for \"${project.title}\" assumes: \"${misc1.wrongBelief}\". Which correction should replace it?",
           options = opts2,
           correctIndex = idx2,
-          feedback = "Confirmed: ${misc1.correctUnderstanding} Rule: ${misc1.avoidanceRule}",
+          feedback = "${misc1.correctUnderstanding} Rule: ${misc1.avoidanceRule}",
         )
       )
     }
@@ -496,7 +496,7 @@ object AcademyCurriculumEnricher {
           },
         options = opts3,
         correctIndex = idx3,
-        feedback = "Passed: ${misc2?.avoidanceRule ?: crit3}",
+        feedback = misc2?.avoidanceRule ?: crit3,
       )
     )
 

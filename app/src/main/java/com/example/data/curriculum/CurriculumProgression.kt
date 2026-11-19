@@ -54,20 +54,27 @@ object CurriculumProgression {
       else -> MasteryBand.NOT_YET_COMPETENT
     }
 
-  fun isLessonMastered(progress: LessonProgress?): Boolean {
+  fun isLessonMastered(
+    progress: LessonProgress?,
+    passThresholdPercent: Long = PASS_THRESHOLD_PERCENT,
+  ): Boolean {
     if (progress == null) return false
-    return progress.isCompleted
+    return progress.isCompleted ||
+      (progress.exerciseScore >= passThresholdPercent &&
+        LessonPillar.entries.all { it.key in progress.completedSteps })
   }
 
   fun unlockStateForLesson(
     orderedTrackLessons: List<Lesson>,
     lessonId: String,
     progressMap: Map<String, LessonProgress>,
+    placementPassedSubjects: Set<String> = emptySet(),
+    passThresholdPercent: Long = PASS_THRESHOLD_PERCENT,
   ): LessonUnlockState {
     val index = orderedTrackLessons.indexOfFirst { it.id == lessonId }
     val prog = progressMap[lessonId]
     val completedCount = prog?.completedSteps?.distinct()?.size ?: 0
-    val mastered = isLessonMastered(prog)
+    val mastered = isLessonMastered(prog, passThresholdPercent)
     if (index <= 0) {
       return LessonUnlockState(
         isUnlocked = true,
@@ -77,10 +84,14 @@ object CurriculumProgression {
         exerciseScore = prog?.exerciseScore ?: 0L,
       )
     }
+    val lessonSubjectId = orderedTrackLessons[index].subjectId
+    val placementUnlockLimit = ((orderedTrackLessons.size * 3) / 5).coerceAtLeast(1)
+    val unlockedViaPlacement =
+      lessonSubjectId in placementPassedSubjects && index <= placementUnlockLimit
     val previousLesson = orderedTrackLessons[index - 1]
-    val prevMastered = isLessonMastered(progressMap[previousLesson.id])
+    val prevMastered = isLessonMastered(progressMap[previousLesson.id], passThresholdPercent)
     return LessonUnlockState(
-      isUnlocked = prevMastered || mastered,
+      isUnlocked = prevMastered || mastered || unlockedViaPlacement,
       isMastered = mastered,
       prerequisiteLessonTitle = previousLesson.title,
       completedPillarsCount = completedCount,
@@ -98,11 +109,20 @@ object CurriculumProgression {
   fun nextUnlockedLesson(
     orderedTrackLessons: List<Lesson>,
     progressMap: Map<String, LessonProgress>,
+    placementPassedSubjects: Set<String> = emptySet(),
+    passThresholdPercent: Long = PASS_THRESHOLD_PERCENT,
   ): Lesson? {
     if (orderedTrackLessons.isEmpty()) return null
     val firstIncomplete =
       orderedTrackLessons.firstOrNull { lesson ->
-        val state = unlockStateForLesson(orderedTrackLessons, lesson.id, progressMap)
+        val state =
+          unlockStateForLesson(
+            orderedTrackLessons = orderedTrackLessons,
+            lessonId = lesson.id,
+            progressMap = progressMap,
+            placementPassedSubjects = placementPassedSubjects,
+            passThresholdPercent = passThresholdPercent,
+          )
         state.isUnlocked && !state.isMastered
       }
     return firstIncomplete ?: orderedTrackLessons.first()

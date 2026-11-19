@@ -9,7 +9,25 @@ object CurriculumCatalog {
       ChemistryCurriculum.track,
       BiologyCurriculum.track,
       EnglishCurriculum.track,
+      EconomicsCurriculum.track,
+      GovernmentCurriculum.track,
     )
+
+  private val passageLookupByEntityId: Map<String, String> by lazy {
+    buildMap {
+      tracks.forEach { track ->
+        val allQs = track.pastQuestions + track.allLessons.flatMap { it.exercises }
+        allQs.forEach { q ->
+          if (!q.passageText.isNullOrBlank()) {
+            put("${track.id}_${q.id}", q.passageText)
+            put(q.id, q.passageText)
+          }
+        }
+      }
+    }
+  }
+
+  fun passageForEntityId(entityId: String): String? = passageLookupByEntityId[entityId]
 
   fun trackById(subjectId: String): SubjectTrack? = tracks.find { it.id == subjectId }
 

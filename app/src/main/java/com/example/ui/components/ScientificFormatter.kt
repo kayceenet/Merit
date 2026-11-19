@@ -16,10 +16,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.BookmarkAdd
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -43,10 +48,18 @@ import androidx.compose.ui.unit.sp
 import com.example.ui.theme.CodeFormulaText
 import com.example.ui.theme.CodeSurface
 import com.example.ui.theme.CourseraAzureAccent
+import com.example.ui.theme.LocalBoldEquations
+import com.example.ui.theme.LocalLineSpacingMultiplier
 
 sealed interface FormulaToken {
   data class Inline(val text: String) : FormulaToken
   data class StackedFraction(val numerator: String, val denominator: String) : FormulaToken
+  data class MatrixBlock(
+    val leftDelim: String,
+    val rightDelim: String,
+    val rows: List<List<String>>,
+    val isCases: Boolean = false,
+  ) : FormulaToken
 }
 
 object ScientificNotationEngine {
@@ -65,8 +78,31 @@ object ScientificNotationEngine {
       '⁹' to "9",
       '⁺' to "+",
       '⁻' to "−",
-      'ⁿ' to "n",
+      'ᵃ' to "a",
+      'ᵇ' to "b",
+      'ᶜ' to "c",
+      'ᵈ' to "d",
+      'ᵉ' to "e",
+      'ᶠ' to "f",
+      'ᵍ' to "g",
+      'ʰ' to "h",
       'ⁱ' to "i",
+      'ʲ' to "j",
+      'ᵏ' to "k",
+      'ˡ' to "l",
+      'ᵐ' to "m",
+      'ⁿ' to "n",
+      'ᵒ' to "o",
+      'ᵖ' to "p",
+      'ʳ' to "r",
+      'ˢ' to "s",
+      'ᵗ' to "t",
+      'ᵘ' to "u",
+      'ᵛ' to "v",
+      'ʷ' to "w",
+      'ˣ' to "x",
+      'ʸ' to "y",
+      'ᶻ' to "z",
     )
 
   private val unicodeSubscripts =
@@ -83,11 +119,24 @@ object ScientificNotationEngine {
       '₉' to "9",
       '₊' to "+",
       '₋' to "−",
-      'ₓ' to "x",
-      'ᵧ' to "y",
       'ₐ' to "a",
       'ₑ' to "e",
+      'ₕ' to "h",
+      'ᵢ' to "i",
+      'ⱼ' to "j",
+      'ₖ' to "k",
+      'ₗ' to "l",
+      'ₘ' to "m",
+      'ₙ' to "n",
+      'ₒ' to "o",
       'ₚ' to "p",
+      'ᵣ' to "r",
+      'ₛ' to "s",
+      'ₜ' to "t",
+      'ᵤ' to "u",
+      'ᵥ' to "v",
+      'ₓ' to "x",
+      'ᵧ' to "y",
     )
 
   // Longest tokens first so prefixes like \le never shadow \left or \leq
@@ -101,10 +150,16 @@ object ScientificNotationEngine {
       "\\leftarrow" to "←",
       "\\downarrow" to "↓",
       "\\uparrow" to "↑",
+      "\\therefore" to "∴",
+      "\\because" to "∵",
+      "\\subseteq" to "⊆",
       "\\implies" to "⇒",
       "\\emptyset" to "∅",
       "\\varepsilon" to "ε",
       "\\epsilon" to "ε",
+      "\\subset" to "⊂",
+      "\\forall" to "∀",
+      "\\exists" to "∃",
       "\\qquad" to "     ",
       "\\quad" to "   ",
       "\\angle" to "∠",
@@ -134,7 +189,6 @@ object ScientificNotationEngine {
       "\\beta" to "β",
       "\\dots" to "…",
       "\\perp" to "⊥",
-      "\\cdot" to "·",
       "\\iff" to "⇔",
       "\\geq" to "≥",
       "\\leq" to "≤",
@@ -143,6 +197,7 @@ object ScientificNotationEngine {
       "\\phi" to "φ",
       "\\psi" to "ψ",
       "\\rho" to "ρ",
+      "\\sim" to "∼",
       "\\sum" to "Σ",
       "\\tau" to "τ",
       "\\eta" to "η",
@@ -157,8 +212,8 @@ object ScientificNotationEngine {
       "\\tan" to "tan",
       "\\log" to "log",
       "\\ln" to "ln",
+      "\\in" to "∈",
       "\\big" to "",
-      "\\geq" to "≥",
       "\\ge" to "≥",
       "\\le" to "≤",
       "\\mu" to "μ",
@@ -166,6 +221,11 @@ object ScientificNotationEngine {
       "\\pi" to "π",
       "\\pm" to "±",
       "\\to" to "→",
+      "\\%" to "%",
+      "\\&" to "&",
+      "\\$" to "$",
+      "\\!" to "",
+      "\\:" to " ",
       "\\," to " ",
       "\\;" to " ",
       "<=>" to "⇌",
@@ -175,6 +235,16 @@ object ScientificNotationEngine {
       ">=" to "≥",
       "!=" to "≠",
     )
+
+  /**
+   * Splits a combined formula block into individual equation rows without breaking absolute-value
+   * bars like `|E|`, `|kA|`, `|x|`, or electrochemical cell bridges.
+   */
+  fun splitFormulaLines(formula: String): List<String> =
+    formula
+      .split(Regex("""\n|\\;\|\\;|\s{2,}\|\s{2,}"""))
+      .map { it.trim() }
+      .filter { it.isNotEmpty() }
 
   /**
    * Normalizes LaTeX, AsciiMath, Markdown math delimiters, scientific e-notation, and chemical
@@ -191,15 +261,18 @@ object ScientificNotationEngine {
     // Strip outer Markdown math delimiters ($...$, $$...$$, \(...\), \[...\])
     s = s.replace("$$", "").replace("\\(", "").replace("\\)", "").replace("\\[", "").replace("\\]", "")
     s = Regex("""\$([^$]+)\$""").replace(s) { it.groupValues[1] }
+    s = s.replace("{}", "")
 
-    // Replace matrices \begin{pmatrix} a & b \\ c & d \end{pmatrix} cleanly
-    s = replaceMatrices(s)
+    // Replace matrices \begin{pmatrix|bmatrix|vmatrix|cases} ... \end{...} cleanly when flattening
+    s = replaceMatrices(s, preserveBlocks = !collapseFractions)
 
     // Replace \xrightarrow{label} and \underset{sub}{base}
     s = replaceCommandWithSingleBraceArg(s, "\\xrightarrow") { arg -> " →[$arg] " }
     s = replaceTwoBraceCommand(s, "\\underset") { sub, base -> "$base ($sub)" }
     s = replaceCommandWithSingleBraceArg(s, "\\pmod") { arg -> " (mod $arg)" }
+    s = replaceCommandWithSingleBraceArg(s, "\\overline") { arg -> applyCombiningOverline(arg) }
     s = replaceCommandWithSingleBraceArg(s, "\\bar") { arg -> applyCombiningOverline(arg) }
+    s = replaceCommandWithSingleBraceArg(s, "\\hat") { arg -> "${arg.trim()}\u0302" }
     s = replaceCommandWithSingleBraceArg(s, "\\vec") { arg -> "${arg}\u20D7" }
 
     // Replace \text{...}, \mathrm{...}, \mathbf{...}
@@ -207,7 +280,7 @@ object ScientificNotationEngine {
     s = replaceCommandWithSingleBraceArg(s, "\\mathrm") { it }
     s = replaceCommandWithSingleBraceArg(s, "\\mathbf") { it }
 
-    // Replace \sqrt{...} with full nested brace support and sqrt(...)
+    // Replace \sqrt[n]{...} and \sqrt{...} with full nested brace support and sqrt(...)
     s = replaceNestedSqrt(s)
     s = Regex("""\bsqrt\(([^)]+)\)""").replace(s) { m -> "√(${m.groupValues[1]})" }
 
@@ -226,7 +299,7 @@ object ScientificNotationEngine {
         }
 
     // Convert runs of Unicode superscript characters into ^{...}
-    val superRegex = Regex("""[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻ⁿⁱ]+""")
+    val superRegex = Regex("""[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖʳˢᵗᵘᵛʷˣʸᶻ]+""")
     s =
       superRegex.replace(s) { m ->
         val decoded = m.value.map { unicodeSuperscripts[it] ?: it.toString() }.joinToString("")
@@ -234,7 +307,7 @@ object ScientificNotationEngine {
       }
 
     // Convert runs of Unicode subscript characters into _{...}
-    val subRegex = Regex("""[₀₁₂₃₄₅₆₇₈₉₊₋ₓᵧₐₑₚ]+""")
+    val subRegex = Regex("""[₀₁₂₃₄₅₆₇₈₉₊₋ₐₑₕᵢⱼₖₗₘₙₒₚᵣₛₜᵤᵥₓᵧ]+""")
     s =
       subRegex.replace(s) { m ->
         val decoded = m.value.map { unicodeSubscripts[it] ?: it.toString() }.joinToString("")
@@ -254,17 +327,27 @@ object ScientificNotationEngine {
     else trimmed.map { if (it.isLetterOrDigit()) "$it\u0304" else it.toString() }.joinToString("")
   }
 
-  private fun replaceMatrices(input: String): String {
-    val regex = Regex("""\\begin\{[pbv]?matrix\}(.*?)\\end\{[pbv]?matrix\}""", RegexOption.DOT_MATCHES_ALL)
+  private fun replaceMatrices(input: String, preserveBlocks: Boolean = false): String {
+    if (preserveBlocks) return input
+    val regex = Regex("""\\begin\{([pbv]?matrix|cases)\}(.*?)\\end\{\1\}""", RegexOption.DOT_MATCHES_ALL)
     return regex.replace(input) { match ->
-      val body = match.groupValues[1].trim()
+      val env = match.groupValues[1]
+      val body = match.groupValues[2].trim()
       val rows =
         body.split("\\\\")
           .map { row -> row.split("&").joinToString("   ") { it.trim() } }
           .filter { it.isNotEmpty() }
-      "[ ${rows.joinToString(" ; ")} ]"
+      when (env) {
+        "cases" -> "{ ${rows.joinToString(" ; ")} }"
+        "pmatrix" -> "( ${rows.joinToString(" ; ")} )"
+        "vmatrix" -> "| ${rows.joinToString(" ; ")} |"
+        else -> "[ ${rows.joinToString(" ; ")} ]"
+      }
     }
   }
+
+  private fun normalizeBlockCell(rawCell: String): String =
+    preNormalizeCore(rawCell.trim(), collapseFractions = true)
 
   private fun replaceCommandWithSingleBraceArg(
     input: String,
@@ -325,12 +408,27 @@ object ScientificNotationEngine {
   private fun replaceNestedSqrt(input: String): String {
     var current = input
     var guard = 0
-    while (current.contains("\\sqrt{") && guard < 8) {
+    while (current.contains("\\sqrt") && guard < 10) {
       guard++
       val sb = StringBuilder()
       var i = 0
       var replacedAny = false
       while (i < current.length) {
+        if (current.startsWith("\\sqrt[", i)) {
+          val closeBracket = current.indexOf(']', i + 6)
+          if (closeBracket != -1 && closeBracket + 1 < current.length && current[closeBracket + 1] == '{') {
+            val closeBrace = findMatchingBrace(current, closeBracket + 1)
+            if (closeBrace != -1) {
+              val rootIndex = current.substring(i + 6, closeBracket).trim()
+              val inner = current.substring(closeBracket + 2, closeBrace).trim()
+              val radical = if (inner.length <= 2 && !inner.contains('\\')) "√$inner" else "√($inner)"
+              sb.append("^{$rootIndex}$radical")
+              i = closeBrace + 1
+              replacedAny = true
+              continue
+            }
+          }
+        }
         if (current.startsWith("\\sqrt{", i)) {
           val openIdx = i + 5
           val closeIdx = findMatchingBrace(current, openIdx)
@@ -452,10 +550,29 @@ object ScientificNotationEngine {
     while (i < chunk.length) {
       val c = chunk[i]
 
-      // Handle grouped or single-token superscript ^
+      // Handle grouped or single-token superscript ^ (supports ^{...}, ^(...), and ^2 / ^-3)
       if (c == '^' && i + 1 < chunk.length) {
         if (chunk[i + 1] == '{') {
           val close = findMatchingBrace(chunk, i + 1)
+          if (close != -1) {
+            val inner = chunk.substring(i + 2, close).replace("-", "−")
+            if (lastWasSubscript) append("\u200A")
+            pushStyle(
+              SpanStyle(
+                fontSize = scriptSize,
+                baselineShift = BaselineShift(0.40f),
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = 0.02.em,
+              )
+            )
+            append(inner)
+            pop()
+            i = close + 1
+            lastWasSubscript = false
+            continue
+          }
+        } else if (chunk[i + 1] == '(') {
+          val close = findMatchingParen(chunk, i + 1)
           if (close != -1) {
             val inner = chunk.substring(i + 2, close).replace("-", "−")
             if (lastWasSubscript) append("\u200A")
@@ -509,6 +626,23 @@ object ScientificNotationEngine {
       if (c == '_' && i + 1 < chunk.length && i > 0 && !chunk[i - 1].isWhitespace()) {
         if (chunk[i + 1] == '{') {
           val close = findMatchingBrace(chunk, i + 1)
+          if (close != -1) {
+            val inner = chunk.substring(i + 2, close)
+            pushStyle(
+              SpanStyle(
+                fontSize = scriptSize,
+                baselineShift = BaselineShift(-0.32f),
+                fontWeight = FontWeight.Medium,
+              )
+            )
+            append(inner)
+            pop()
+            i = close + 1
+            lastWasSubscript = true
+            continue
+          }
+        } else if (chunk[i + 1] == '(') {
+          val close = findMatchingParen(chunk, i + 1)
           if (close != -1) {
             val inner = chunk.substring(i + 2, close)
             pushStyle(
@@ -602,9 +736,55 @@ object ScientificNotationEngine {
     }
 
     var i = 0
+    var braceDepth = 0
     while (i < prepared.length) {
-      // Case 1: LaTeX \frac{num}{den} (only stack top-level \frac; nested \frac inside √(...) collapses cleanly inside)
-      if (prepared.startsWith("\\frac{", i)) {
+      if (prepared[i] == '{') {
+        braceDepth++
+        inlineBuffer.append('{')
+        i++
+        continue
+      }
+      if (prepared[i] == '}') {
+        braceDepth = (braceDepth - 1).coerceAtLeast(0)
+        inlineBuffer.append('}')
+        i++
+        continue
+      }
+
+      // Case 0: Multi-line Matrix or Piecewise Cases \begin{pmatrix|bmatrix|vmatrix|cases} ... \end{...}
+      if (braceDepth == 0 && prepared.startsWith("\\begin{", i)) {
+        val envEnd = prepared.indexOf('}', i + 7)
+        if (envEnd != -1) {
+          val env = prepared.substring(i + 7, envEnd)
+          if (env in setOf("pmatrix", "bmatrix", "vmatrix", "matrix", "cases")) {
+            val endTag = "\\end{$env}"
+            val endPos = prepared.indexOf(endTag, envEnd + 1)
+            if (endPos != -1) {
+              flushInline()
+              val body = prepared.substring(envEnd + 1, endPos).trim()
+              val rows =
+                body.split("\\\\")
+                  .map { row ->
+                    row.split("&").map { cell -> normalizeBlockCell(cell) }
+                  }
+                  .filter { row -> row.any { it.isNotEmpty() } }
+              val (leftDelim, rightDelim, isCases) =
+                when (env) {
+                  "pmatrix" -> Triple("(", ")", false)
+                  "vmatrix" -> Triple("|", "|", false)
+                  "cases" -> Triple("{", "", true)
+                  else -> Triple("[", "]", false)
+                }
+              tokens.add(FormulaToken.MatrixBlock(leftDelim, rightDelim, rows, isCases))
+              i = endPos + endTag.length
+              continue
+            }
+          }
+        }
+      }
+
+      // Case 1: LaTeX \frac{num}{den} (only stack top-level \frac; nested \frac inside √(...) or exponents collapses cleanly)
+      if (braceDepth == 0 && prepared.startsWith("\\frac{", i)) {
         val numClose = findMatchingBrace(prepared, i + 5)
         if (numClose != -1 && numClose + 1 < prepared.length && prepared[numClose + 1] == '{') {
           val denClose = findMatchingBrace(prepared, numClose + 1)
@@ -619,8 +799,8 @@ object ScientificNotationEngine {
         }
       }
 
-      // Case 2: Balanced "(numerator) / (denominator)" or "(numerator)/denom"
-      if (prepared[i] == '(') {
+      // Case 2: Balanced "(numerator) / (denominator)" or "(numerator)/denom" at braceDepth == 0
+      if (braceDepth == 0 && prepared[i] == '(') {
         val closeParen = findMatchingParen(prepared, i)
         if (closeParen != -1) {
           var slashIdx = closeParen + 1
@@ -644,7 +824,7 @@ object ScientificNotationEngine {
                 while (
                   denEnd < prepared.length &&
                     !prepared[denEnd].isWhitespace() &&
-                    prepared[denEnd] !in charArrayOf('=', '+', '−', '|', ',', ';')
+                    prepared[denEnd] !in charArrayOf('=', '+', '−', '|', ',', ';', ')')
                 ) {
                   denEnd++
                 }
@@ -661,8 +841,8 @@ object ScientificNotationEngine {
         }
       }
 
-      // Case 3: Algebraic spaced or subscripted ratio like "n_A / n_B" or "Δp/Δt" or "b/a" or "u²/g"
-      if (prepared[i] == '/' && inlineBuffer.isNotEmpty()) {
+      // Case 3: Algebraic spaced or subscripted ratio like "n_A / n_B" or "Δp/Δt" at braceDepth == 0
+      if (braceDepth == 0 && prepared[i] == '/' && inlineBuffer.isNotEmpty()) {
         val leftStr = inlineBuffer.toString()
         val numStart = findFractionTermStart(leftStr)
         val numCandidate = leftStr.substring(numStart).trim()
@@ -678,7 +858,7 @@ object ScientificNotationEngine {
               while (
                 end < prepared.length &&
                   !prepared[end].isWhitespace() &&
-                  prepared[end] !in charArrayOf('=', '+', '−', '|', ',', ';')
+                  prepared[end] !in charArrayOf('=', '+', '−', '|', ',', ';', ')')
               ) {
                 end++
               }
@@ -766,15 +946,16 @@ fun ScientificText(
   textAlign: TextAlign? = null,
 ) {
   val baseSp = if (style.fontSize.value > 0f) style.fontSize.value else 15f
+  val lineMultiplier = LocalLineSpacingMultiplier.current
   val annotated =
     remember(text, baseSp) {
       ScientificNotationEngine.formatAnnotated(raw = text, baseFontSizeSp = baseSp)
     }
   val effectiveLineHeight =
-    if (style.lineHeight != TextUnit.Unspecified && style.lineHeight.value >= baseSp * 1.40f) {
+    if (style.lineHeight != TextUnit.Unspecified && style.lineHeight.value >= baseSp * lineMultiplier) {
       style.lineHeight
     } else {
-      (baseSp * 1.46f).sp
+      (baseSp * lineMultiplier.coerceAtLeast(1.36f)).sp
     }
   Text(
     text = annotated,
@@ -798,14 +979,9 @@ fun EquationDisplayCard(
   textColor: Color = CodeFormulaText,
   accentColor: Color = CourseraAzureAccent,
   badgeLabel: String? = null,
+  onSaveFormula: ((String) -> Unit)? = null,
 ) {
-  val expressions =
-    remember(formula) {
-      formula
-        .split('|', '\n')
-        .map { it.trim() }
-        .filter { it.isNotEmpty() }
-    }
+  val expressions = remember(formula) { ScientificNotationEngine.splitFormulaLines(formula) }
 
   Row(
     modifier =
@@ -822,21 +998,44 @@ fun EquationDisplayCard(
       modifier = Modifier.weight(1f).padding(horizontal = 16.dp, vertical = 14.dp),
       verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-      if (!badgeLabel.isNullOrBlank()) {
-        Surface(
-          color = accentColor.copy(alpha = 0.16f),
-          shape = RoundedCornerShape(6.dp),
+      if (!badgeLabel.isNullOrBlank() || onSaveFormula != null) {
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically,
         ) {
-          Text(
-            text = badgeLabel,
-            style = MaterialTheme.typography.labelSmall,
-            color = textColor,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp),
-          )
+          if (!badgeLabel.isNullOrBlank()) {
+            Surface(
+              color = accentColor.copy(alpha = 0.16f),
+              shape = RoundedCornerShape(6.dp),
+            ) {
+              Text(
+                text = badgeLabel,
+                style = MaterialTheme.typography.labelSmall,
+                color = textColor,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp),
+              )
+            }
+          } else {
+            Box(Modifier)
+          }
+          if (onSaveFormula != null) {
+            IconButton(
+              onClick = { onSaveFormula(formula) },
+              modifier = Modifier.minimumInteractiveComponentSize(),
+            ) {
+              Icon(
+                imageVector = Icons.Outlined.BookmarkAdd,
+                contentDescription = "Save formula to notebook",
+                tint = accentColor,
+              )
+            }
+          }
         }
       }
 
+      val formulaWeight = if (LocalBoldEquations.current) FontWeight.Bold else FontWeight.SemiBold
       expressions.forEach { expr ->
         val tokens = remember(expr) { ScientificNotationEngine.tokenizeEquationWithFractions(expr) }
         Row(
@@ -852,7 +1051,7 @@ fun EquationDisplayCard(
                   style =
                     MaterialTheme.typography.bodyLarge.copy(
                       fontFamily = FontFamily.Serif,
-                      fontWeight = FontWeight.SemiBold,
+                      fontWeight = formulaWeight,
                     ),
                   color = textColor,
                   maxLines = 1,
@@ -873,7 +1072,7 @@ fun EquationDisplayCard(
                     style =
                       MaterialTheme.typography.bodyMedium.copy(
                         fontFamily = FontFamily.Serif,
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = formulaWeight,
                       ),
                     color = textColor,
                     textAlign = TextAlign.Center,
@@ -893,7 +1092,7 @@ fun EquationDisplayCard(
                     style =
                       MaterialTheme.typography.bodyMedium.copy(
                         fontFamily = FontFamily.Serif,
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = formulaWeight,
                       ),
                     color = textColor,
                     textAlign = TextAlign.Center,
@@ -901,6 +1100,102 @@ fun EquationDisplayCard(
                     softWrap = false,
                     modifier = Modifier.padding(horizontal = 6.dp),
                   )
+                }
+              }
+
+              is FormulaToken.MatrixBlock -> {
+                val maxCols = token.rows.maxOfOrNull { it.size } ?: 1
+                Row(
+                  modifier = Modifier.height(IntrinsicSize.Min).padding(horizontal = 4.dp),
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                  // Drawn tall left bracket / paren / determinant bar / curly brace
+                  Box(
+                    modifier =
+                      Modifier.width(if (token.isCases) 10.dp else 7.dp)
+                        .fillMaxHeight()
+                        .padding(vertical = 2.dp),
+                    contentAlignment = Alignment.Center,
+                  ) {
+                    val bracketWidth = if (token.leftDelim == "(") 3.dp else 2.dp
+                    when {
+                      token.isCases -> {
+                        Text(
+                          text = "{",
+                          style =
+                            MaterialTheme.typography.headlineMedium.copy(
+                              fontFamily = FontFamily.Serif,
+                              fontWeight = FontWeight.Light,
+                            ),
+                          color = textColor,
+                        )
+                      }
+                      token.leftDelim == "|" -> {
+                        Box(Modifier.width(2.dp).fillMaxHeight().background(textColor))
+                      }
+                      else -> {
+                        Box(
+                          Modifier.width(6.dp)
+                            .fillMaxHeight()
+                            .border(
+                              width = bracketWidth,
+                              color = textColor,
+                              shape = RoundedCornerShape(topStart = if (token.leftDelim == "(") 10.dp else 2.dp, bottomStart = if (token.leftDelim == "(") 10.dp else 2.dp),
+                            )
+                        )
+                      }
+                    }
+                  }
+
+                  Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    horizontalAlignment = if (token.isCases) Alignment.Start else Alignment.CenterHorizontally,
+                  ) {
+                    token.rows.forEach { rowCells ->
+                      Row(
+                        horizontalArrangement = Arrangement.spacedBy(14.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                      ) {
+                        for (cIdx in 0 until maxCols) {
+                          val cell = rowCells.getOrElse(cIdx) { "" }
+                          ScientificText(
+                            text = cell,
+                            style =
+                              MaterialTheme.typography.bodyMedium.copy(
+                                fontFamily = FontFamily.Serif,
+                                fontWeight = formulaWeight,
+                              ),
+                            color = textColor,
+                            maxLines = 1,
+                            softWrap = false,
+                          )
+                        }
+                      }
+                    }
+                  }
+
+                  if (token.rightDelim.isNotEmpty()) {
+                    Box(
+                      modifier = Modifier.width(7.dp).fillMaxHeight().padding(vertical = 2.dp),
+                      contentAlignment = Alignment.Center,
+                    ) {
+                      val bracketWidth = if (token.rightDelim == ")") 3.dp else 2.dp
+                      if (token.rightDelim == "|") {
+                        Box(Modifier.width(2.dp).fillMaxHeight().background(textColor))
+                      } else {
+                        Box(
+                          Modifier.width(6.dp)
+                            .fillMaxHeight()
+                            .border(
+                              width = bracketWidth,
+                              color = textColor,
+                              shape = RoundedCornerShape(topEnd = if (token.rightDelim == ")") 10.dp else 2.dp, bottomEnd = if (token.rightDelim == ")") 10.dp else 2.dp),
+                            )
+                        )
+                      }
+                    }
+                  }
                 }
               }
             }

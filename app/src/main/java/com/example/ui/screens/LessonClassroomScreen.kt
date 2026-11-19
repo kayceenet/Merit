@@ -31,6 +31,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.BookmarkAdd
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Lightbulb
@@ -77,15 +78,18 @@ import com.example.data.curriculum.PracticeQuestion
 import com.example.data.curriculum.QuestionShuffler
 import com.example.data.curriculum.TopicMasteryProject
 import com.example.data.local.FontSizeScale
+import com.example.data.local.LineSpacingScale
 import com.example.data.local.ThemeMode
+import com.example.data.local.ThemePalette
 import com.example.data.local.ThemePreferences
 import com.example.data.model.LessonProgress
 import com.example.ui.components.DisplaySettingsDialog
 import com.example.ui.components.EquationDisplayCard
+import com.example.ui.components.ScientificCalculatorSheet
 import com.example.ui.components.ScientificText
 import com.example.ui.components.TopicDiagramCard
+import com.example.ui.components.TopRightMenuButton
 import com.example.ui.labs.PracticalLabWorkspace
-import com.example.ui.theme.CourseraAzureAccent
 import com.example.ui.theme.semanticColors
 
 @Composable
@@ -94,9 +98,15 @@ fun LessonClassroomScreen(
   progress: LessonProgress?,
   nextLesson: Lesson? = null,
   themePreferences: ThemePreferences = ThemePreferences(),
+  dueReviewsCount: Int = 0,
   onSetThemeMode: (ThemeMode) -> Unit = {},
+  onSetThemePalette: (ThemePalette) -> Unit = {},
+  onSetHighContrastBoost: (Boolean) -> Unit = {},
   onSetUseDynamicColor: (Boolean) -> Unit = {},
   onSetFontSizeScale: (FontSizeScale) -> Unit = {},
+  onSetLineSpacingScale: (LineSpacingScale) -> Unit = {},
+  onSetBoldEquations: (Boolean) -> Unit = {},
+  onOpenMenu: (() -> Unit)? = null,
   onBack: () -> Unit,
   onMarkPillarComplete: (LessonPillar, Long?) -> Unit,
   onSaveNote: (title: String, content: String) -> Unit,
@@ -114,6 +124,7 @@ fun LessonClassroomScreen(
   }
   var showNoteDialog by remember { mutableStateOf(false) }
   var showDisplaySettings by remember { mutableStateOf(false) }
+  var showCalculator by remember { mutableStateOf(false) }
   var lockNoticeMessage by remember { mutableStateOf<String?>(null) }
   val projectVerificationAnswers = remember(lesson.id) { mutableStateMapOf<String, Int>() }
   val verificationTasks = lesson.masteryProject?.verificationTasks.orEmpty()
@@ -136,7 +147,7 @@ fun LessonClassroomScreen(
       Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
       ) {
         IconButton(onClick = onBack, modifier = Modifier.testTag("classroom_back_button")) {
           Icon(
@@ -159,15 +170,17 @@ fun LessonClassroomScreen(
             color = semantics.classroomSubtext,
           )
         }
-        IconButton(
-          onClick = { showDisplaySettings = true },
-          modifier = Modifier.testTag("classroom_display_settings_button"),
-        ) {
-          Icon(
-            Icons.Filled.TextFields,
-            contentDescription = "Text size and display settings",
-            tint = semantics.onClassroomBar,
-          )
+        if (themePreferences.cbtShowCalculator) {
+          IconButton(
+            onClick = { showCalculator = true },
+            modifier = Modifier.testTag("classroom_calculator_button"),
+          ) {
+            Icon(
+              Icons.Filled.Calculate,
+              contentDescription = "Scientific calculator",
+              tint = semantics.onClassroomBar,
+            )
+          }
         }
         IconButton(
           onClick = { showNoteDialog = true },
@@ -179,12 +192,30 @@ fun LessonClassroomScreen(
             tint = semantics.classroomAccent,
           )
         }
+        if (onOpenMenu != null) {
+          TopRightMenuButton(
+            badgeCount = dueReviewsCount,
+            onClick = onOpenMenu,
+            useOnBarColors = true,
+          )
+        } else {
+          IconButton(
+            onClick = { showDisplaySettings = true },
+            modifier = Modifier.testTag("classroom_display_settings_button"),
+          ) {
+            Icon(
+              Icons.Filled.TextFields,
+              contentDescription = "Text size and display settings",
+              tint = semantics.onClassroomBar,
+            )
+          }
+        }
       }
       LinearProgressIndicator(
         progress = { classroomRatio.coerceAtLeast(0.05f) },
         modifier = Modifier.fillMaxWidth().height(4.dp),
-        color = CourseraAzureAccent,
-        trackColor = Color(0xFF143C7B),
+        color = semantics.classroomAccent,
+        trackColor = Color.White.copy(alpha = 0.22f),
       )
     }
 
@@ -295,10 +326,12 @@ fun LessonClassroomScreen(
             lesson = lesson,
             progress = progress,
             nextLesson = nextLesson,
+            passThresholdPercent = themePreferences.masteryPassPercent.toLong(),
             selectedPillar = selectedPillar,
             projectVerificationAnswers = projectVerificationAnswers,
             isProjectVerified = isProjectVerified,
             modifier = Modifier.weight(1f).fillMaxHeight(),
+            onSaveNote = onSaveNote,
             onMarkExerciseComplete = { score -> onMarkPillarComplete(selectedPillar, score) },
             onOpenNextLesson = onOpenNextLesson,
           )
@@ -394,10 +427,12 @@ fun LessonClassroomScreen(
             lesson = lesson,
             progress = progress,
             nextLesson = nextLesson,
+            passThresholdPercent = themePreferences.masteryPassPercent.toLong(),
             selectedPillar = selectedPillar,
             projectVerificationAnswers = projectVerificationAnswers,
             isProjectVerified = isProjectVerified,
             modifier = Modifier.weight(1f).fillMaxWidth(),
+            onSaveNote = onSaveNote,
             onMarkExerciseComplete = { score -> onMarkPillarComplete(selectedPillar, score) },
             onOpenNextLesson = onOpenNextLesson,
           )
@@ -540,8 +575,15 @@ fun LessonClassroomScreen(
       onSetThemeMode = onSetThemeMode,
       onSetUseDynamicColor = onSetUseDynamicColor,
       onSetFontSizeScale = onSetFontSizeScale,
+      onSetThemePalette = onSetThemePalette,
+      onSetHighContrastBoost = onSetHighContrastBoost,
+      onSetLineSpacingScale = onSetLineSpacingScale,
+      onSetBoldEquations = onSetBoldEquations,
       onDismiss = { showDisplaySettings = false },
     )
+  }
+  if (showCalculator) {
+    ScientificCalculatorSheet(onDismiss = { showCalculator = false })
   }
 }
 
@@ -551,9 +593,11 @@ private fun LessonPillarBody(
   lesson: Lesson,
   progress: LessonProgress?,
   nextLesson: Lesson?,
+  passThresholdPercent: Long,
   selectedPillar: LessonPillar,
   projectVerificationAnswers: MutableMap<String, Int>,
   isProjectVerified: Boolean,
+  onSaveNote: (title: String, content: String) -> Unit,
   onMarkExerciseComplete: (Long?) -> Unit,
   onOpenNextLesson: ((Lesson) -> Unit)?,
   modifier: Modifier = Modifier,
@@ -741,6 +785,9 @@ private fun LessonPillarBody(
               EquationDisplayCard(
                 formula = block.keyFormula,
                 badgeLabel = null,
+                onSaveFormula = { savedFormula ->
+                  onSaveNote("${lesson.title.take(26)} — ${block.heading.take(24)}", savedFormula)
+                },
               )
             }
             if (block.examIntelligence.isNotBlank()) {
@@ -792,7 +839,11 @@ private fun LessonPillarBody(
       }
 
       LessonPillar.EXAMPLES -> {
-        lesson.workedExamples.forEach { example ->
+        lesson.workedExamples.forEachIndexed { exIdx, example ->
+          var revealedCount by remember(lesson.id, exIdx) { mutableIntStateOf(0) }
+          val totalSteps = example.steps.size
+          val allRevealed = totalSteps == 0 || revealedCount >= totalSteps
+
           Column(
             modifier =
               Modifier.fillMaxWidth()
@@ -825,58 +876,103 @@ private fun LessonPillarBody(
               color = MaterialTheme.colorScheme.onSurface,
               fontWeight = FontWeight.SemiBold,
             )
-            Column(
-              modifier =
-                Modifier.fillMaxWidth()
-                  .clip(RoundedCornerShape(12.dp))
-                  .background(MaterialTheme.colorScheme.background)
-                  .padding(12.dp),
-              verticalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-              example.steps.forEach { step ->
-                ScientificText(
-                  text = step,
-                  style = MaterialTheme.typography.bodyMedium,
-                  color = MaterialTheme.colorScheme.onSurface,
+
+            if (revealedCount == 0 && totalSteps > 0) {
+              Surface(
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.fillMaxWidth(),
+              ) {
+                Text(
+                  text = "Try setting up your formula on paper first, then reveal steps one at a time.",
+                  style = MaterialTheme.typography.bodySmall,
+                  color = MaterialTheme.colorScheme.onSurfaceVariant,
+                  modifier = Modifier.padding(10.dp),
                 )
               }
             }
-            Surface(
-              color = semantics.successContainer,
-              shape = RoundedCornerShape(12.dp),
-              modifier =
-                Modifier.fillMaxWidth()
-                  .border(1.dp, semantics.success, RoundedCornerShape(12.dp)),
-            ) {
-              ScientificText(
-                text = "Final Answer: ${example.finalAnswer}",
-                style = MaterialTheme.typography.titleSmall,
-                color = semantics.onSuccessContainer,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(12.dp),
-              )
+
+            if (revealedCount > 0) {
+              Column(
+                modifier =
+                  Modifier.fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+              ) {
+                example.steps.take(revealedCount).forEach { step ->
+                  ScientificText(
+                    text = step,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                  )
+                }
+              }
             }
-            Row(
-              modifier =
-                Modifier.fillMaxWidth()
-                  .clip(RoundedCornerShape(12.dp))
-                  .background(MaterialTheme.colorScheme.errorContainer)
-                  .border(1.dp, MaterialTheme.colorScheme.error, RoundedCornerShape(12.dp))
-                  .padding(12.dp),
-              horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-              Icon(
-                Icons.Filled.WarningAmber,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onErrorContainer,
-                modifier = Modifier.size(18.dp),
-              )
-              ScientificText(
-                text = "Common Trap: ${example.examinerTrap}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onErrorContainer,
-                fontWeight = FontWeight.Medium,
-              )
+
+            if (totalSteps > 0) {
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+              ) {
+                if (!allRevealed) {
+                  OutlinedButton(
+                    onClick = { revealedCount++ },
+                    modifier = Modifier.weight(1f).height(48.dp).testTag("reveal_step_$exIdx"),
+                    shape = RoundedCornerShape(10.dp),
+                  ) {
+                    Text("Reveal Step ${revealedCount + 1}/$totalSteps", maxLines = 1)
+                  }
+                }
+                Button(
+                  onClick = { revealedCount = if (allRevealed) 0 else totalSteps },
+                  modifier = Modifier.weight(1f).height(48.dp).testTag("reveal_all_steps_$exIdx"),
+                  shape = RoundedCornerShape(10.dp),
+                ) {
+                  Text(if (allRevealed) "Hide Solution" else "Reveal All", fontWeight = FontWeight.Bold)
+                }
+              }
+            }
+
+            if (allRevealed) {
+              Surface(
+                color = semantics.successContainer,
+                shape = RoundedCornerShape(12.dp),
+                modifier =
+                  Modifier.fillMaxWidth()
+                    .border(1.dp, semantics.success, RoundedCornerShape(12.dp)),
+              ) {
+                ScientificText(
+                  text = "Final Answer: ${example.finalAnswer}",
+                  style = MaterialTheme.typography.titleSmall,
+                  color = semantics.onSuccessContainer,
+                  fontWeight = FontWeight.Bold,
+                  modifier = Modifier.padding(12.dp),
+                )
+              }
+              Row(
+                modifier =
+                  Modifier.fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.errorContainer)
+                    .border(1.dp, MaterialTheme.colorScheme.error, RoundedCornerShape(12.dp))
+                    .padding(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+              ) {
+                Icon(
+                  Icons.Filled.WarningAmber,
+                  contentDescription = null,
+                  tint = MaterialTheme.colorScheme.onErrorContainer,
+                  modifier = Modifier.size(18.dp),
+                )
+                ScientificText(
+                  text = "Common Trap: ${example.examinerTrap}",
+                  style = MaterialTheme.typography.bodySmall,
+                  color = MaterialTheme.colorScheme.onErrorContainer,
+                  fontWeight = FontWeight.Medium,
+                )
+              }
             }
           }
         }
@@ -1027,17 +1123,27 @@ private fun LessonPillarBody(
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
               )
-              Surface(
-                color = MaterialTheme.colorScheme.primaryContainer,
+              OutlinedButton(
+                onClick = {
+                  val digest = buildString {
+                    appendLine(cheat.overview)
+                    if (cheat.symbolLegend.isNotEmpty()) {
+                      appendLine()
+                      appendLine(cheat.symbolLegend.joinToString("\n"))
+                    }
+                    if (cheat.memoryAid.isNotBlank()) {
+                      appendLine()
+                      append("Memory Aid: ${cheat.memoryAid}")
+                    }
+                  }
+                  onSaveNote("${lesson.title.take(26)} — Revision Summary", digest)
+                },
                 shape = RoundedCornerShape(99.dp),
+                modifier = Modifier.height(36.dp).testTag("save_cheat_sheet_button"),
               ) {
-                Text(
-                  text = "QUICK REFERENCE",
-                  style = MaterialTheme.typography.labelSmall,
-                  color = MaterialTheme.colorScheme.onPrimaryContainer,
-                  fontWeight = FontWeight.Bold,
-                  modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
-                )
+                Icon(Icons.Filled.BookmarkAdd, contentDescription = null, modifier = Modifier.size(15.dp))
+                Spacer(Modifier.width(4.dp))
+                Text("Save Summary", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
               }
             }
 
@@ -1227,6 +1333,7 @@ private fun LessonPillarBody(
           lessonId = lesson.id,
           questions = lesson.exercises,
           isAlreadyMastered = progress?.isCompleted == true,
+          passThresholdPercent = passThresholdPercent,
           nextLesson = nextLesson,
           onGraded = { pct -> onMarkExerciseComplete(pct) },
           onOpenNextLesson = onOpenNextLesson,
@@ -1575,8 +1682,17 @@ private fun TopicMasteryProjectCard(
             ) {
               ScientificText(
                 text =
-                  if (isCorrect) "Verified: ${task.feedback}"
-                  else "Needs Revision: Re-check the project principles and select the scientifically accurate choice.",
+                  if (isCorrect) {
+                    val cleaned =
+                      task.feedback
+                        .removePrefix("Verified: ")
+                        .removePrefix("Confirmed: ")
+                        .removePrefix("Passed: ")
+                        .trim()
+                    "Verified: $cleaned"
+                  } else {
+                    "Needs Revision: Re-check the project principles and select the scientifically accurate choice."
+                  },
                 style = MaterialTheme.typography.bodySmall,
                 color =
                   if (isCorrect) semantics.onSuccessContainer
@@ -1659,6 +1775,7 @@ private fun InlineExerciseSection(
   lessonId: String,
   questions: List<PracticeQuestion>,
   isAlreadyMastered: Boolean,
+  passThresholdPercent: Long,
   nextLesson: Lesson?,
   onGraded: (Long) -> Unit,
   onOpenNextLesson: ((Lesson) -> Unit)?,
@@ -1700,7 +1817,7 @@ private fun InlineExerciseSection(
     ) {
       Text(
         text =
-          "Attempt #${attemptCount + 1} • 100-Mark Mastery Assessment (${activeQuestions.size} Qs from ${questions.size}-item Bank • Pass ≥${CurriculumProgression.PASS_THRESHOLD_PERCENT}%)",
+          "Attempt #${attemptCount + 1} • 100-Mark Mastery Assessment (${activeQuestions.size} Qs from ${questions.size}-item Bank • Pass ≥${passThresholdPercent}%)",
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         fontWeight = FontWeight.SemiBold,
@@ -1726,6 +1843,20 @@ private fun InlineExerciseSection(
           color = MaterialTheme.colorScheme.primary,
           fontWeight = FontWeight.Bold,
         )
+        if (!q.passageText.isNullOrBlank()) {
+          Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.fillMaxWidth(),
+          ) {
+            ScientificText(
+              text = q.passageText,
+              style = MaterialTheme.typography.bodySmall,
+              color = MaterialTheme.colorScheme.onSecondaryContainer,
+              modifier = Modifier.padding(10.dp),
+            )
+          }
+        }
         ScientificText(
           text = q.question,
           style = MaterialTheme.typography.titleMedium,
@@ -1866,7 +1997,7 @@ private fun InlineExerciseSection(
         modifier = Modifier.fillMaxWidth().height(52.dp).testTag("submit_inline_exercise"),
         shape = RoundedCornerShape(12.dp),
       ) {
-        Text("Submit Assessment (≥${CurriculumProgression.PASS_THRESHOLD_PERCENT}% Required)", fontWeight = FontWeight.Bold)
+        Text("Submit Assessment (≥${passThresholdPercent}% Required)", fontWeight = FontWeight.Bold)
       }
     } else {
       val correct = activeQuestions.count { selectedAnswers[it.id] == it.correctIndex }
@@ -1877,7 +2008,7 @@ private fun InlineExerciseSection(
         }.sum()
       val pct = ((earnedMarks * 100L) / totalMarks).coerceIn(0L, 100L)
       val band = CurriculumProgression.bandForPercentage(pct)
-      val passed = pct >= CurriculumProgression.PASS_THRESHOLD_PERCENT || isAlreadyMastered
+      val passed = pct >= passThresholdPercent || isAlreadyMastered
       val missedQuestions = activeQuestions.filter { selectedAnswers[it.id] != it.correctIndex }
 
       Column(
@@ -1898,7 +2029,7 @@ private fun InlineExerciseSection(
             if (passed) {
               "${band.label} • $earnedMarks/$totalMarks marks ($correct/${activeQuestions.size} Qs • ${pct}%)"
             } else {
-              "${band.label} • $earnedMarks/$totalMarks marks (${pct}% — Need ${CurriculumProgression.PASS_THRESHOLD_PERCENT}%)"
+              "${band.label} • $earnedMarks/$totalMarks marks (${pct}% — Need ${passThresholdPercent}%)"
             },
           style = MaterialTheme.typography.titleMedium,
           color = if (passed) semantics.onSuccessContainer else MaterialTheme.colorScheme.onErrorContainer,

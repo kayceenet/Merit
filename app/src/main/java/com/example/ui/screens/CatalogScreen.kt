@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Science
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -40,6 +41,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -63,9 +65,7 @@ import com.example.data.curriculum.CurriculumProgression
 import com.example.data.curriculum.Lesson
 import com.example.data.curriculum.LessonPillar
 import com.example.data.model.LessonProgress
-import com.example.ui.theme.CourseraAzureAccent
-import com.example.ui.theme.CourseraAzureInk
-import com.example.ui.theme.CourseraBlue
+import com.example.ui.components.TopRightMenuButton
 import com.example.ui.theme.semanticColors
 import kotlin.math.roundToInt
 
@@ -74,6 +74,11 @@ fun CatalogScreen(
   initialSubjectId: String?,
   structuredModules: List<CourseModule>,
   progressList: List<LessonProgress>,
+  placementPassedSubjects: Set<String> = emptySet(),
+  passThresholdPercent: Long = CurriculumProgression.PASS_THRESHOLD_PERCENT,
+  dueReviewsCount: Int = 0,
+  onOpenPlacementCheck: (String) -> Unit = {},
+  onOpenMenu: () -> Unit = {},
   onOpenLesson: (Lesson) -> Unit,
   modifier: Modifier = Modifier,
 ) {
@@ -93,8 +98,13 @@ fun CatalogScreen(
   val masteredCount = trackLessons.count { progressMap[it.id]?.isCompleted == true }
   val trackRatio = if (trackLessons.isEmpty()) 0f else masteredCount / trackLessons.size.toFloat()
   val continueLesson =
-    remember(trackLessons, progressMap) {
-      CurriculumProgression.nextUnlockedLesson(trackLessons, progressMap)
+    remember(trackLessons, progressMap, placementPassedSubjects, passThresholdPercent) {
+      CurriculumProgression.nextUnlockedLesson(
+        orderedTrackLessons = trackLessons,
+        progressMap = progressMap,
+        placementPassedSubjects = placementPassedSubjects,
+        passThresholdPercent = passThresholdPercent,
+      )
     }
   val totalMinutes = remember(trackLessons) { trackLessons.sumOf { it.durationMinutes } }
   val bankQuestionCount =
@@ -125,11 +135,19 @@ fun CatalogScreen(
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
       ) {
-        Text(
-          text = "Course Syllabus & Mastery Modules",
-          style = MaterialTheme.typography.headlineMedium,
-          color = MaterialTheme.colorScheme.onSurface,
-        )
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically,
+        ) {
+          Text(
+            text = "Course Syllabus & Mastery",
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f),
+          )
+          TopRightMenuButton(badgeCount = dueReviewsCount, onClick = onOpenMenu)
+        }
         Row(
           modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
           horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -170,7 +188,7 @@ fun CatalogScreen(
               Modifier.fillMaxWidth()
                 .clip(RoundedCornerShape(18.dp))
                 .background(semantics.classroomBar)
-                .border(1.5.dp, Color(0xFF1E4C9A), RoundedCornerShape(18.dp))
+                .border(1.5.dp, semantics.classroomAccent.copy(alpha = 0.45f), RoundedCornerShape(18.dp))
                 .padding(18.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
           ) {
@@ -179,11 +197,11 @@ fun CatalogScreen(
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically,
             ) {
-              Surface(color = CourseraAzureAccent, shape = RoundedCornerShape(6.dp)) {
+              Surface(color = semantics.classroomAccent, shape = RoundedCornerShape(6.dp)) {
                 Text(
                   text = "${modulesForTrack.size} MODULES • ${trackLessons.size} LESSONS",
                   style = MaterialTheme.typography.labelSmall,
-                  color = CourseraAzureInk,
+                  color = Color(0xFF0A1628),
                   fontWeight = FontWeight.Bold,
                   modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                 )
@@ -191,7 +209,7 @@ fun CatalogScreen(
               Text(
                 text = "${(trackRatio * 100).roundToInt()}% Mastered",
                 style = MaterialTheme.typography.labelMedium.copy(fontFeatureSettings = "tnum"),
-                color = CourseraAzureAccent,
+                color = semantics.classroomAccent,
                 fontWeight = FontWeight.Bold,
               )
             }
@@ -204,10 +222,10 @@ fun CatalogScreen(
             Text(
               text = activeTrack.tagline,
               style = MaterialTheme.typography.bodySmall,
-              color = Color(0xFFE2E8F0),
+              color = semantics.classroomSubtext,
             )
             Text(
-              text = "${totalMinutes / 60}h ${totalMinutes % 60}m curriculum • $bankQuestionCount JAMB/WAEC/NECO questions • 80% sequential mastery lock",
+              text = "${totalMinutes / 60}h ${totalMinutes % 60}m curriculum • $bankQuestionCount JAMB/WAEC/NECO questions • ${passThresholdPercent}% mastery lock",
               style = MaterialTheme.typography.labelSmall,
               color = semantics.classroomSubtext,
             )
@@ -215,28 +233,44 @@ fun CatalogScreen(
             LinearProgressIndicator(
               progress = { trackRatio.coerceAtLeast(0.03f) },
               modifier = Modifier.fillMaxWidth().height(7.dp).clip(CircleShape),
-              color = CourseraAzureAccent,
-              trackColor = Color(0xFF143C7B),
+              color = semantics.classroomAccent,
+              trackColor = Color.White.copy(alpha = 0.22f),
             )
 
-            if (continueLesson != null) {
-              Button(
-                onClick = { onOpenLesson(continueLesson) },
-                modifier = Modifier.fillMaxWidth().height(48.dp),
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+              if (continueLesson != null) {
+                Button(
+                  onClick = { onOpenLesson(continueLesson) },
+                  modifier = Modifier.weight(1f).height(48.dp),
+                  shape = RoundedCornerShape(10.dp),
+                  colors =
+                    ButtonDefaults.buttonColors(
+                      containerColor = semantics.classroomAccent,
+                      contentColor = Color(0xFF0A1628),
+                    ),
+                ) {
+                  Icon(Icons.Filled.PlayArrow, contentDescription = null, modifier = Modifier.size(18.dp))
+                  Spacer(modifier = Modifier.width(6.dp))
+                  Text(
+                    text = "Continue: ${continueLesson.title}",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
+                  )
+                }
+              }
+              OutlinedButton(
+                onClick = { onOpenPlacementCheck(activeTrack.id) },
+                modifier = Modifier.height(48.dp).testTag("catalog_placement_button"),
                 shape = RoundedCornerShape(10.dp),
-                colors =
-                  ButtonDefaults.buttonColors(
-                    containerColor = CourseraBlue,
-                    contentColor = Color.White,
-                  ),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = semantics.onClassroomBar),
               ) {
-                Icon(Icons.Filled.PlayArrow, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(6.dp))
+                Icon(Icons.Filled.School, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                  text = "Continue: ${continueLesson.title}",
-                  maxLines = 1,
-                  overflow = TextOverflow.Ellipsis,
-                  style = MaterialTheme.typography.labelLarge,
+                  text = if (activeTrack.id in placementPassedSubjects) "Placed ✓" else "SS3 Check",
+                  style = MaterialTheme.typography.labelMedium,
                   fontWeight = FontWeight.Bold,
                 )
               }
@@ -325,7 +359,13 @@ fun CatalogScreen(
                 courseModule.lessons.forEach { lesson ->
                   val globalLessonIndex = trackLessons.indexOfFirst { it.id == lesson.id } + 1
                   val unlockState =
-                    CurriculumProgression.unlockStateForLesson(trackLessons, lesson.id, progressMap)
+                    CurriculumProgression.unlockStateForLesson(
+                      orderedTrackLessons = trackLessons,
+                      lessonId = lesson.id,
+                      progressMap = progressMap,
+                      placementPassedSubjects = placementPassedSubjects,
+                      passThresholdPercent = passThresholdPercent,
+                    )
                   val isLocked = !unlockState.isUnlocked
                   val isDone = unlockState.isMastered
                   val stepsDone = unlockState.completedPillarsCount
@@ -436,7 +476,7 @@ fun CatalogScreen(
                       }
                       if (isLocked && !unlockState.prerequisiteLessonTitle.isNullOrBlank()) {
                         Text(
-                          text = "Complete \"${unlockState.prerequisiteLessonTitle}\" (≥${CurriculumProgression.PASS_THRESHOLD_PERCENT}% mastery) to unlock",
+                          text = "Complete \"${unlockState.prerequisiteLessonTitle}\" (≥${passThresholdPercent}% mastery) to unlock",
                           style = MaterialTheme.typography.labelSmall,
                           color = MaterialTheme.colorScheme.tertiary,
                           maxLines = 2,
@@ -521,9 +561,9 @@ fun CatalogScreen(
         Text(
           text =
             if (!prereqTitle.isNullOrBlank()) {
-              "\"${lockedLesson.title}\" builds directly on \"$prereqTitle\". Complete all study, lab & project stages and score at least ${CurriculumProgression.PASS_THRESHOLD_PERCENT}% on the Mastery Quiz to unlock this lesson."
+              "\"${lockedLesson.title}\" builds directly on \"$prereqTitle\". Complete all study, lab & project stages and score at least ${passThresholdPercent}% on the Mastery Quiz to unlock this lesson."
             } else {
-              "Complete the prerequisite lesson (≥${CurriculumProgression.PASS_THRESHOLD_PERCENT}% quiz score) to unlock \"${lockedLesson.title}\"."
+              "Complete the prerequisite lesson (≥${passThresholdPercent}% quiz score) to unlock \"${lockedLesson.title}\"."
             },
           style = MaterialTheme.typography.bodyMedium,
         )

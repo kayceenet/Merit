@@ -9,11 +9,20 @@ enum class CbtExamStage {
   SUMMARY,
 }
 
+data class ComboSubjectBreakdown(
+  val subjectId: String,
+  val subjectName: String,
+  val correctCount: Int,
+  val totalQuestions: Int,
+  val scaledOutOf100: Int,
+)
+
 data class QuestionReviewItem(
   val questionIndex: Int,
   val question: PracticeQuestion,
   val selectedOptionIndex: Int?,
   val timeSpentSeconds: Int,
+  val subjectId: String = "",
 ) {
   val isCorrect: Boolean
     get() = selectedOptionIndex != null && selectedOptionIndex == question.correctIndex
@@ -36,6 +45,9 @@ data class ExamResultSummary(
   val xpEarned: Long,
   val weakTopics: List<String>,
   val reviewItems: List<QuestionReviewItem>,
+  val isUtmeCombo: Boolean = false,
+  val utmeAggregateOutOf400: Int? = null,
+  val comboBreakdowns: List<ComboSubjectBreakdown> = emptyList(),
 )
 
 data class CbtExamState(
@@ -43,6 +55,11 @@ data class CbtExamState(
   val selectedSubjectId: String = CurriculumCatalog.tracks.first().id,
   val selectedExamBoard: String = "JAMB",
   val selectedQuestionLimit: Int = 15,
+  val isUtmeComboMode: Boolean = false,
+  val selectedComboElectives: List<String> = listOf("mathematics", "physics", "chemistry"),
+  val comboQuestionSubjects: List<String> = emptyList(),
+  val comboSubjectTabs: List<String> = emptyList(),
+  val activeComboSubjectTab: String? = null,
   val questions: List<PracticeQuestion> = emptyList(),
   val currentIndex: Int = 0,
   val selectedAnswers: Map<Int, Int> = emptyMap(),

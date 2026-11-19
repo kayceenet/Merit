@@ -239,14 +239,18 @@ class MeritPrepRepositoryTest {
     }
 
   @Test
-  fun `full five-subject jamb waec curriculum seeds and resync preserves user progress`() =
+  fun `full seven-subject jamb waec curriculum seeds and resync preserves user progress`() =
     runTest(testDispatcher) {
       repository.seedCurriculumIfNeeded()
 
+      assertEquals(7, CurriculumCatalog.tracks.size)
+      assertNotNull(CurriculumCatalog.trackById("economics"))
+      assertNotNull(CurriculumCatalog.trackById("government"))
+
       val modules = repository.observeStructuredModules().first()
-      assertEquals(25, modules.size)
+      assertEquals(35, modules.size)
       val lessons = modules.flatMap { it.lessons }
-      assertEquals(76, lessons.size)
+      assertEquals(96, lessons.size)
       assertTrue(
         lessons.all {
           it.concepts.size >= 5 &&
@@ -277,6 +281,13 @@ class MeritPrepRepositoryTest {
         )
       }
 
+      // Verify English Comprehension & Cloze passages survive Room persistence
+      val englishJamb = repository.fetchPastQuestionsForCbt("english", "JAMB")
+      val comprehensionQs = englishJamb.filter { !it.passageText.isNullOrBlank() }
+      assertTrue("Expected >= 10 English passage questions, got ${comprehensionQs.size}", comprehensionQs.size >= 10)
+      assertTrue(comprehensionQs.any { it.id.contains("pq_eng_25") })
+      assertTrue(comprehensionQs.any { it.id.contains("pq_eng_30") })
+
       // Save user lesson progress before simulating an outdated curriculum version
       val firstLesson = CurriculumCatalog.tracks.first().allLessons.first()
       repository.saveLessonProgress(
@@ -292,8 +303,8 @@ class MeritPrepRepositoryTest {
       prefsRepo.setCurriculumVersion(1)
       repository.seedCurriculumIfNeeded()
 
-      assertEquals(6, prefsRepo.getCurriculumVersion())
-      assertEquals(76, repository.observeStructuredModules().first().flatMap { it.lessons }.size)
+      assertEquals(8, prefsRepo.getCurriculumVersion())
+      assertEquals(96, repository.observeStructuredModules().first().flatMap { it.lessons }.size)
       val preserved =
         repository.observeLessonProgress(UserProfile.DEFAULT_PROFILE_ID).first()
           .firstOrNull { it.lessonId == firstLesson.id }
@@ -430,6 +441,135 @@ class MeritPrepRepositoryTest {
       val attempt2Ids = viewModel.cbtState.value.questions.map { it.id }.toSet()
       assertEquals(10, attempt2Ids.size)
       assertTrue((attempt1Ids intersect attempt2Ids).isEmpty())
+      viewModel.returnToCbtSetup()
+    }
+
+  @Test
+  fun `expanded theme and study settings persist across repository updates`() =
+    runTest(testDispatcher) {
+      repository.setThemePalette(com.example.data.local.ThemePalette.OLED_HIGH_CONTRAST)
+      repository.setHighContrastBoost(true)
+      repository.setLineSpacingScale(com.example.data.local.LineSpacingScale.RELAXED)
+      repository.setBoldEquations(true)
+      repository.setCbtSecondsPerQuestion(90)
+      repository.setCbtAutoAdvance(true)
+      repository.setCbtShowCalculator(false)
+      repository.setShuffleOptionsOnRetry(false)
+      repository.setMasteryPassPercent(75)
+      repository.setDailyXpTarget(150)
+      repository.setSpacedReviewBatchSize(15)
+
+      val prefs = repository.themePreferences.first()
+      assertEquals(com.example.data.local.ThemePalette.OLED_HIGH_CONTRAST, prefs.themePalette)
+      assertTrue(prefs.highContrastBoost)
+      assertEquals(com.example.data.local.LineSpacingScale.RELAXED, prefs.lineSpacingScale)
+      assertTrue(prefs.boldEquations)
+      assertEquals(90, prefs.cbtSecondsPerQuestion)
+      assertTrue(prefs.cbtAutoAdvance)
+      assertFalse(prefs.cbtShowCalculator)
+      assertFalse(prefs.shuffleOptionsOnRetry)
+      assertEquals(75, prefs.masteryPassPercent)
+      assertEquals(150, prefs.dailyXpTarget)
+      assertEquals(15, prefs.spacedReviewBatchSize)
+    }
+
+  @Test
+  fun `sm2 spaced repetition placement unlock json backup and utme 400 combo work end to end`() =
+    runTest(testDispatcher) {
+      repository.seedCurriculumIfNeeded()
+      val uid = UserProfile.DEFAULT_PROFILE_ID
+      repository.ensureProfile(uid, "Tunde").getOrThrow()
+
+      // 1. SM-2 Spaced Repetition seeding & interval progression
+      val physicsLesson = CurriculumCatalog.trackById("physics")!!.allLessons.first()
+      repository.seedReviewCardsFromLesson(uid, physicsLesson)
+      val allCards = repository.observeAllReviewCards(uid).first()
+      assertTrue(allCards.isNotEmpty())
+      val firstCard = allCards.first()
+      val ratedEasy = repository.rateSpacedReviewCard(firstCard.id, quality = 3).getOrThrow()
+      assertTrue(ratedEasy.intervalDays >= 3)
+      val ratedForgot = repository.rateSpacedReviewCard(firstCard.id, quality = 0).getOrThrow()
+      assertEquals(1, ratedForgot.intervalDays)
+
+      // 2. SS3 Placement fast-unlock opens foundational 60% of track
+      val physicsLessons = CurriculumCatalog.trackById("physics")!!.allLessons
+      val midIndex = (physicsLessons.size * 0.4).toInt().coerceAtLeast(1)
+      val midLesson = physicsLessons[midIndex]
+      assertFalse(
+        CurriculumProgression.unlockStateForLesson(
+          orderedTrackLessons = physicsLessons,
+          lessonId = midLesson.id,
+          progressMap = emptyMap(),
+          placementPassedSubjects = emptySet(),
+        ).isUnlocked
+      )
+      assertTrue(
+        CurriculumProgression.unlockStateForLesson(
+          orderedTrackLessons = physicsLessons,
+          lessonId = midLesson.id,
+          progressMap = emptyMap(),
+          placementPassedSubjects = setOf("physics"),
+        ).isUnlocked
+      )
+
+      // 3. Portable JSON backup export & import round-trip
+      val noteId =
+        repository.createStudyNote(
+          userId = uid,
+          lessonId = physicsLesson.id,
+          subjectId = "physics",
+          title = "Impulse Formula",
+          content = "J = F \\Delta t = m(v - u)",
+          isBookmarked = true,
+        ).getOrThrow()
+      val backupJson = repository.exportBackupJson(uid).getOrThrow()
+      repository.deleteStudyNote(uid, noteId).getOrThrow()
+      assertTrue(repository.observeStudyNotes(uid).first().isEmpty())
+
+      val restoredCount = repository.importBackupJson(uid, backupJson).getOrThrow()
+      assertTrue(restoredCount >= 1)
+      assertTrue(repository.observeStudyNotes(uid).first().any { it.title == "Impulse Formula" })
+
+      // 4. 4-Subject UTME Combo (/400) mode
+      val viewModel = MeritPrepViewModel(repository)
+      runCurrent()
+      viewModel.startUtmeComboExam(electives = listOf("mathematics", "physics", "chemistry"), questionsPerSubject = 5)
+      awaitStage(viewModel, CbtExamStage.RUNNING)
+      val runningCombo = viewModel.cbtState.value
+      assertTrue(runningCombo.isUtmeComboMode)
+      assertEquals(20, runningCombo.questions.size)
+      assertEquals(listOf("english", "mathematics", "physics", "chemistry"), runningCombo.comboSubjectTabs)
+
+      viewModel.submitCbtExam()
+      awaitStage(viewModel, CbtExamStage.SUMMARY)
+      val comboSummary = viewModel.cbtState.value.resultSummary!!
+      assertTrue(comboSummary.isUtmeCombo)
+      assertNotNull(comboSummary.utmeAggregateOutOf400)
+      assertEquals(4, comboSummary.comboBreakdowns.size)
+    }
+
+  @Test
+  fun `authentic 180-question full utme combo allocates 60 english plus 40 per elective with 120 minute timer`() =
+    runTest(testDispatcher) {
+      repository.seedCurriculumIfNeeded()
+      val viewModel = MeritPrepViewModel(repository)
+      runCurrent()
+
+      viewModel.startUtmeComboExam(
+        electives = listOf("mathematics", "physics", "economics"),
+        isFullUtme180 = true,
+      )
+      awaitStage(viewModel, CbtExamStage.RUNNING)
+
+      val running = viewModel.cbtState.value
+      assertTrue(running.isUtmeComboMode)
+      assertEquals(7200, running.totalAllowedSeconds)
+      assertEquals(180, running.questions.size)
+      assertEquals(listOf("english", "mathematics", "physics", "economics"), running.comboSubjectTabs)
+      assertEquals(60, running.comboQuestionSubjects.count { it == "english" })
+      assertEquals(40, running.comboQuestionSubjects.count { it == "mathematics" })
+      assertEquals(40, running.comboQuestionSubjects.count { it == "physics" })
+      assertEquals(40, running.comboQuestionSubjects.count { it == "economics" })
       viewModel.returnToCbtSetup()
     }
 }

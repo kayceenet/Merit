@@ -1,5 +1,6 @@
 package com.example.ui.viewmodel
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,16 +9,23 @@ import com.example.data.curriculum.CurriculumCatalog
 import com.example.data.curriculum.CurriculumProgression
 import com.example.data.curriculum.Lesson
 import com.example.data.curriculum.LessonPillar
+import com.example.data.curriculum.PracticeQuestion
 import com.example.data.curriculum.QuestionShuffler
 import com.example.data.local.FontSizeScale
+import com.example.data.local.LineSpacingScale
 import com.example.data.local.OfflineProgressSnapshot
 import com.example.data.local.ThemeMode
+import com.example.data.local.ThemePalette
 import com.example.data.local.ThemePreferences
 import com.example.data.model.ExamAttempt
 import com.example.data.model.LessonProgress
+import com.example.data.model.SpacedReviewCardEntity
 import com.example.data.model.StudyNote
 import com.example.data.model.UserProfile
+import com.example.data.remote.GoogleUserSnapshot
+import com.example.data.remote.MeritPrepCloudSync
 import com.example.data.repository.MeritPrepRepository
+import kotlin.math.roundToInt
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -50,6 +58,12 @@ class MeritPrepViewModel(
   private val _cbtState = MutableStateFlow(CbtExamState())
   val cbtState: StateFlow<CbtExamState> = _cbtState.asStateFlow()
 
+  private val _signedInGoogleUser = MutableStateFlow(MeritPrepCloudSync.currentGoogleUser())
+  val signedInGoogleUser: StateFlow<GoogleUserSnapshot?> = _signedInGoogleUser.asStateFlow()
+
+  private val _isCloudSyncing = MutableStateFlow(false)
+  val isCloudSyncing: StateFlow<Boolean> = _isCloudSyncing.asStateFlow()
+
   private var examTimerJob: Job? = null
   private val seenCbtIdsByTrack = mutableMapOf<String, MutableSet<String>>()
   private val lastCbtRoundIdsByTrack = mutableMapOf<String, Set<String>>()
@@ -74,6 +88,32 @@ class MeritPrepViewModel(
       started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
       initialValue = OfflineProgressSnapshot(),
     )
+
+  val dueReviewCards: StateFlow<List<SpacedReviewCardEntity>> =
+    repository
+      .observeDueReviewCards(currentUserId, limit = 30)
+      .catch { error ->
+        if (error is CancellationException) throw error
+        emit(emptyList())
+      }
+      .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
+        initialValue = emptyList(),
+      )
+
+  val allReviewCards: StateFlow<List<SpacedReviewCardEntity>> =
+    repository
+      .observeAllReviewCards(currentUserId)
+      .catch { error ->
+        if (error is CancellationException) throw error
+        emit(emptyList())
+      }
+      .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
+        initialValue = emptyList(),
+      )
 
   val structuredModules: StateFlow<List<CourseModule>> =
     repository
@@ -152,12 +192,26 @@ class MeritPrepViewModel(
     _statusMessage.value = null
   }
 
+  fun postStatusMessage(message: String) {
+    _statusMessage.value = message
+  }
+
+  // --- Display & Study Preferences ---
+
   fun toggleDarkTheme(currentlyDark: Boolean) {
     viewModelScope.launch { repository.toggleDarkTheme(currentlyDark) }
   }
 
   fun setThemeMode(mode: ThemeMode) {
     viewModelScope.launch { repository.setThemeMode(mode) }
+  }
+
+  fun setThemePalette(palette: ThemePalette) {
+    viewModelScope.launch { repository.setThemePalette(palette) }
+  }
+
+  fun setHighContrastBoost(enabled: Boolean) {
+    viewModelScope.launch { repository.setHighContrastBoost(enabled) }
   }
 
   fun setUseDynamicColor(enabled: Boolean) {
@@ -168,7 +222,75 @@ class MeritPrepViewModel(
     viewModelScope.launch { repository.setFontSizeScale(scale) }
   }
 
-  // --- CBT Mock Exam Engine (Room-backed Questions + State-Managed Timer) ---
+  fun setLineSpacingScale(scale: LineSpacingScale) {
+    viewModelScope.launch { repository.setLineSpacingScale(scale) }
+  }
+
+  fun setBoldEquations(enabled: Boolean) {
+    viewModelScope.launch { repository.setBoldEquations(enabled) }
+  }
+
+  fun setCbtSecondsPerQuestion(seconds: Int) {
+    viewModelScope.launch { repository.setCbtSecondsPerQuestion(seconds) }
+  }
+
+  fun setCbtAutoAdvance(enabled: Boolean) {
+    viewModelScope.launch { repository.setCbtAutoAdvance(enabled) }
+  }
+
+  fun setCbtShowCalculator(enabled: Boolean) {
+    viewModelScope.launch { repository.setCbtShowCalculator(enabled) }
+  }
+
+  fun setShuffleOptionsOnRetry(enabled: Boolean) {
+    viewModelScope.launch { repository.setShuffleOptionsOnRetry(enabled) }
+  }
+
+  fun setMasteryPassPercent(percent: Int) {
+    viewModelScope.launch { repository.setMasteryPassPercent(percent) }
+  }
+
+  fun setDailyXpTarget(xpTarget: Int) {
+    viewModelScope.launch { repository.setDailyXpTarget(xpTarget) }
+  }
+
+  fun setSpacedReviewBatchSize(batchSize: Int) {
+    viewModelScope.launch { repository.setSpacedReviewBatchSize(batchSize) }
+  }
+
+  // --- Spaced Repetition & Placement ---
+
+  fun rateSpacedReviewCard(cardId: String, quality: Int) {
+    viewModelScope.launch {
+      val res = repository.rateSpacedReviewCard(cardId, quality)
+      if (res.isSuccess) {
+        val currentStreak =
+          (profileState.value as? UiState.Success)?.data?.streakDays?.coerceAtLeast(1L) ?: 1L
+        repository.awardXp(currentUserId, 5L, currentStreak)
+        val days = res.getOrNull()?.intervalDays ?: 1
+        _statusMessage.value = "Scheduled next recall in $days day(s) (+5 XP)"
+      }
+    }
+  }
+
+  fun completePlacementCheck(subjectId: String, scorePercent: Int) {
+    viewModelScope.launch {
+      val trackName = CurriculumCatalog.trackById(subjectId)?.shortName ?: subjectId
+      if (scorePercent >= 75) {
+        repository.recordPlacementPassed(subjectId)
+        val currentStreak =
+          (profileState.value as? UiState.Success)?.data?.streakDays?.coerceAtLeast(1L) ?: 1L
+        repository.awardXp(currentUserId, 60L, currentStreak)
+        _statusMessage.value =
+          "SS3 Placement Passed ($scorePercent%) — foundational $trackName chapters unlocked (+60 XP)"
+      } else {
+        _statusMessage.value =
+          "Placement scored $scorePercent%. Reach 75%+ or build step-by-step from Lesson 1."
+      }
+    }
+  }
+
+  // --- CBT Mock Exam Engine (Single Subject, 4-Subject UTME Combo /400, Missed Drill) ---
 
   fun selectExamSubject(subjectId: String) {
     _cbtState.update {
@@ -188,6 +310,21 @@ class MeritPrepViewModel(
     }
   }
 
+  fun toggleComboElective(subjectId: String) {
+    if (subjectId == "english") return
+    _cbtState.update { state ->
+      if (state.stage != CbtExamStage.SETUP) return@update state
+      val current = state.selectedComboElectives.toMutableList()
+      if (subjectId in current) {
+        if (current.size > 1) current.remove(subjectId)
+      } else {
+        if (current.size >= 3) current.removeAt(0)
+        current.add(subjectId)
+      }
+      state.copy(selectedComboElectives = current)
+    }
+  }
+
   fun startMockExam(
     subjectId: String? = null,
     examBoard: String? = null,
@@ -197,12 +334,14 @@ class MeritPrepViewModel(
     val targetSubject = subjectId ?: _cbtState.value.selectedSubjectId
     val targetBoard = examBoard ?: _cbtState.value.selectedExamBoard
     val targetLimit = questionLimit ?: _cbtState.value.selectedQuestionLimit
+    val prefs = themePreferences.value
 
     _cbtState.update {
       it.copy(
         selectedSubjectId = targetSubject,
         selectedExamBoard = targetBoard,
         selectedQuestionLimit = targetLimit,
+        isUtmeComboMode = false,
         isLoadingQuestions = true,
       )
     }
@@ -214,12 +353,16 @@ class MeritPrepViewModel(
       val seen = seenCbtIdsByTrack.getOrPut(trackKey) { mutableSetOf() }
       val lastRound = lastCbtRoundIdsByTrack[trackKey].orEmpty()
       val questions =
-        QuestionShuffler.prepareFreshQuestionSet(
-          pool = allQuestions,
-          count = limit,
-          previouslySeenIds = seen,
-          lastRoundIds = lastRound,
-        )
+        if (prefs.shuffleOptionsOnRetry) {
+          QuestionShuffler.prepareFreshQuestionSet(
+            pool = allQuestions,
+            count = limit,
+            previouslySeenIds = seen,
+            lastRoundIds = lastRound,
+          )
+        } else {
+          allQuestions.take(limit)
+        }
       if (questions.isEmpty()) {
         _cbtState.update { it.copy(isLoadingQuestions = false) }
         _statusMessage.value = "No past questions found for this track."
@@ -232,13 +375,18 @@ class MeritPrepViewModel(
         seen.clear()
         seen.addAll(pickedIds)
       }
-      val totalAllowed = (questions.size * 75).coerceAtLeast(180)
+      val totalAllowed = (questions.size * prefs.cbtSecondsPerQuestion).coerceAtLeast(120)
       _cbtState.value =
         CbtExamState(
           stage = CbtExamStage.RUNNING,
           selectedSubjectId = targetSubject,
           selectedExamBoard = targetBoard,
           selectedQuestionLimit = targetLimit,
+          isUtmeComboMode = false,
+          selectedComboElectives = _cbtState.value.selectedComboElectives,
+          comboQuestionSubjects = List(questions.size) { targetSubject },
+          comboSubjectTabs = emptyList(),
+          activeComboSubjectTab = null,
           questions = questions,
           currentIndex = 0,
           selectedAnswers = emptyMap(),
@@ -253,6 +401,155 @@ class MeritPrepViewModel(
         )
       launchExamTimer()
     }
+  }
+
+  fun startUtmeComboExam(
+    electives: List<String>? = null,
+    questionsPerSubject: Int = 10,
+    isFullUtme180: Boolean = false,
+  ) {
+    examTimerJob?.cancel()
+    val chosenElectives = (electives ?: _cbtState.value.selectedComboElectives).distinct().take(3)
+    val comboSubjects = (listOf("english") + chosenElectives).distinct()
+    val prefs = themePreferences.value
+
+    _cbtState.update {
+      it.copy(
+        isUtmeComboMode = true,
+        isLoadingQuestions = true,
+      )
+    }
+
+    viewModelScope.launch {
+      val combinedQuestions = mutableListOf<PracticeQuestion>()
+      val questionSubjectIds = mutableListOf<String>()
+      comboSubjects.forEach { subId ->
+        val targetCount =
+          if (isFullUtme180) {
+            if (subId == "english") 60 else 40
+          } else {
+            questionsPerSubject
+          }
+        val jambPool = repository.fetchPastQuestionsForCbt(subId, "JAMB")
+        val trackKey = "combo_${subId}"
+        val seen = seenCbtIdsByTrack.getOrPut(trackKey) { mutableSetOf() }
+        val lastRound = lastCbtRoundIdsByTrack[trackKey].orEmpty()
+        val pickedJamb =
+          QuestionShuffler.prepareFreshQuestionSet(
+            pool = jambPool,
+            count = minOf(targetCount, jambPool.size),
+            previouslySeenIds = seen,
+            lastRoundIds = lastRound,
+          )
+        val pickedIds = pickedJamb.map { it.id }.toMutableSet()
+        val extraNeeded = (targetCount - pickedJamb.size).coerceAtLeast(0)
+        val toppedUp =
+          if (extraNeeded > 0) {
+            val allPool =
+              repository.fetchPastQuestionsForCbt(subId, "ALL").filter { it.id !in pickedIds }
+            val extra =
+              QuestionShuffler.prepareFreshQuestionSet(
+                pool = allPool,
+                count = minOf(extraNeeded, allPool.size),
+                previouslySeenIds = seen,
+                lastRoundIds = lastRound,
+              )
+            pickedJamb + extra
+          } else {
+            pickedJamb
+          }
+        seen.addAll(toppedUp.map { it.id })
+        lastCbtRoundIdsByTrack[trackKey] = toppedUp.map { it.id }.toSet()
+        toppedUp.forEach { q ->
+          combinedQuestions += q
+          questionSubjectIds += subId
+        }
+      }
+
+      if (combinedQuestions.isEmpty()) {
+        _cbtState.update { it.copy(isLoadingQuestions = false, isUtmeComboMode = false) }
+        _statusMessage.value = "Unable to build 4-subject UTME combo right now."
+        return@launch
+      }
+
+      val totalAllowed =
+        if (isFullUtme180) 7200
+        else (combinedQuestions.size * prefs.cbtSecondsPerQuestion).coerceAtLeast(300)
+      _cbtState.value =
+        CbtExamState(
+          stage = CbtExamStage.RUNNING,
+          selectedSubjectId = "utme_combo",
+          selectedExamBoard = "JAMB",
+          selectedQuestionLimit = combinedQuestions.size,
+          isUtmeComboMode = true,
+          selectedComboElectives = chosenElectives,
+          comboQuestionSubjects = questionSubjectIds,
+          comboSubjectTabs = comboSubjects,
+          activeComboSubjectTab = comboSubjects.firstOrNull(),
+          questions = combinedQuestions,
+          currentIndex = 0,
+          selectedAnswers = emptyMap(),
+          flaggedQuestions = emptySet(),
+          perQuestionSeconds = emptyMap(),
+          remainingSeconds = totalAllowed,
+          elapsedSeconds = 0,
+          totalAllowedSeconds = totalAllowed,
+          isTimerPaused = false,
+          isLoadingQuestions = false,
+          resultSummary = null,
+        )
+      launchExamTimer()
+    }
+  }
+
+  fun switchComboSubjectTab(subjectId: String) {
+    _cbtState.update { state ->
+      if (state.stage != CbtExamStage.RUNNING) return@update state
+      val targetIndex = state.comboQuestionSubjects.indexOfFirst { it == subjectId }
+      if (targetIndex in state.questions.indices) {
+        state.copy(
+          currentIndex = targetIndex,
+          activeComboSubjectTab = subjectId,
+        )
+      } else state
+    }
+  }
+
+  fun startMissedQuestionsDrill(reviewItems: List<QuestionReviewItem>) {
+    val missedQuestions = reviewItems.filter { !it.isCorrect }.map { it.question }
+    if (missedQuestions.isEmpty()) {
+      _statusMessage.value = "Zero missed questions in this paper!"
+      return
+    }
+    examTimerJob?.cancel()
+    val reshuffled =
+      missedQuestions.shuffled().map { q -> QuestionShuffler.shuffleOptions(q) }
+    val pace = themePreferences.value.cbtSecondsPerQuestion
+    val totalAllowed = (reshuffled.size * pace).coerceAtLeast(120)
+    val prevSubject = _cbtState.value.resultSummary?.subjectId ?: _cbtState.value.selectedSubjectId
+    _cbtState.value =
+      CbtExamState(
+        stage = CbtExamStage.RUNNING,
+        selectedSubjectId = prevSubject,
+        selectedExamBoard = "ALL",
+        selectedQuestionLimit = reshuffled.size,
+        isUtmeComboMode = false,
+        comboQuestionSubjects = List(reshuffled.size) { prevSubject },
+        comboSubjectTabs = emptyList(),
+        activeComboSubjectTab = null,
+        questions = reshuffled,
+        currentIndex = 0,
+        selectedAnswers = emptyMap(),
+        flaggedQuestions = emptySet(),
+        perQuestionSeconds = emptyMap(),
+        remainingSeconds = totalAllowed,
+        elapsedSeconds = 0,
+        totalAllowedSeconds = totalAllowed,
+        isTimerPaused = false,
+        isLoadingQuestions = false,
+        resultSummary = null,
+      )
+    launchExamTimer()
   }
 
   private fun launchExamTimer() {
@@ -297,7 +594,11 @@ class MeritPrepViewModel(
   fun goToCbtQuestion(index: Int) {
     _cbtState.update { state ->
       if (state.stage == CbtExamStage.RUNNING && index in state.questions.indices) {
-        state.copy(currentIndex = index)
+        val tabSub = state.comboQuestionSubjects.getOrNull(index)
+        state.copy(
+          currentIndex = index,
+          activeComboSubjectTab = tabSub ?: state.activeComboSubjectTab,
+        )
       } else {
         state
       }
@@ -307,7 +608,11 @@ class MeritPrepViewModel(
   fun nextCbtQuestion() {
     _cbtState.update { state ->
       if (state.stage == CbtExamStage.RUNNING && state.currentIndex < state.questions.lastIndex) {
-        state.copy(currentIndex = state.currentIndex + 1)
+        val nextIdx = state.currentIndex + 1
+        state.copy(
+          currentIndex = nextIdx,
+          activeComboSubjectTab = state.comboQuestionSubjects.getOrNull(nextIdx) ?: state.activeComboSubjectTab,
+        )
       } else {
         state
       }
@@ -317,7 +622,11 @@ class MeritPrepViewModel(
   fun previousCbtQuestion() {
     _cbtState.update { state ->
       if (state.stage == CbtExamStage.RUNNING && state.currentIndex > 0) {
-        state.copy(currentIndex = state.currentIndex - 1)
+        val prevIdx = state.currentIndex - 1
+        state.copy(
+          currentIndex = prevIdx,
+          activeComboSubjectTab = state.comboQuestionSubjects.getOrNull(prevIdx) ?: state.activeComboSubjectTab,
+        )
       } else {
         state
       }
@@ -332,6 +641,18 @@ class MeritPrepViewModel(
         val nextAnswers = state.selectedAnswers.toMutableMap()
         nextAnswers[questionIndex] = optionIndex
         state.copy(selectedAnswers = nextAnswers)
+      }
+    }
+    if (themePreferences.value.cbtAutoAdvance) {
+      viewModelScope.launch {
+        delay(220L)
+        val snap = _cbtState.value
+        if (snap.stage == CbtExamStage.RUNNING &&
+          snap.currentIndex == questionIndex &&
+          snap.currentIndex < snap.questions.lastIndex
+        ) {
+          nextCbtQuestion()
+        }
       }
     }
   }
@@ -359,6 +680,7 @@ class MeritPrepViewModel(
           question = q,
           selectedOptionIndex = state.selectedAnswers[idx],
           timeSpentSeconds = state.perQuestionSeconds[idx] ?: 0,
+          subjectId = state.comboQuestionSubjects.getOrNull(idx) ?: state.selectedSubjectId,
         )
       }
 
@@ -373,8 +695,34 @@ class MeritPrepViewModel(
         .map { it.question.topic }
         .distinct()
     val xpEarned = 30L + (correctCount * 10L)
+
+    val comboBreakdowns =
+      if (state.isUtmeComboMode && state.comboSubjectTabs.isNotEmpty()) {
+        state.comboSubjectTabs.map { subId ->
+          val subItems = reviewItems.filter { it.subjectId == subId }
+          val subTotal = subItems.size.coerceAtLeast(1)
+          val subCorrect = subItems.count { it.isCorrect }
+          val scaled = ((subCorrect.toDouble() / subTotal.toDouble()) * 100.0).roundToInt().coerceIn(0, 100)
+          ComboSubjectBreakdown(
+            subjectId = subId,
+            subjectName = CurriculumCatalog.trackById(subId)?.shortName ?: subId,
+            correctCount = subCorrect,
+            totalQuestions = subItems.size,
+            scaledOutOf100 = scaled,
+          )
+        }
+      } else emptyList()
+
+    val utmeAggregate =
+      if (comboBreakdowns.isNotEmpty()) comboBreakdowns.sumOf { it.scaledOutOf100 }.coerceIn(0, 400)
+      else null
+
     val trackTitle =
-      CurriculumCatalog.trackById(state.selectedSubjectId)?.shortName ?: state.selectedSubjectId
+      if (state.isUtmeComboMode) {
+        "UTME 4-Subject Combo (${utmeAggregate ?: 0}/400)"
+      } else {
+        CurriculumCatalog.trackById(state.selectedSubjectId)?.shortName ?: state.selectedSubjectId
+      }
 
     val summary =
       ExamResultSummary(
@@ -391,6 +739,9 @@ class MeritPrepViewModel(
         xpEarned = xpEarned,
         weakTopics = weakTopics,
         reviewItems = reviewItems,
+        isUtmeCombo = state.isUtmeComboMode,
+        utmeAggregateOutOf400 = utmeAggregate,
+        comboBreakdowns = comboBreakdowns,
       )
 
     _cbtState.update {
@@ -399,6 +750,19 @@ class MeritPrepViewModel(
         isTimerPaused = false,
         resultSummary = summary,
       )
+    }
+
+    // Auto-enqueue missed CBT questions into SM-2 Spaced Repetition Deck
+    viewModelScope.launch {
+      reviewItems.filter { !it.isCorrect }.take(12).forEach { item ->
+        repository.seedReviewCardFromQuestion(
+          userId = currentUserId,
+          subjectId = item.subjectId.ifBlank { state.selectedSubjectId },
+          lessonId = "",
+          question = item.question,
+          dueImmediately = true,
+        )
+      }
     }
 
     recordMockExam(
@@ -425,7 +789,13 @@ class MeritPrepViewModel(
 
   fun retakeLastMock() {
     val state = _cbtState.value
-    startMockExam(state.selectedSubjectId, state.selectedExamBoard)
+    if (state.isUtmeComboMode) {
+      val wasFull180 = state.selectedQuestionLimit >= 180 || state.totalAllowedSeconds == 7200
+      val perSub = if (wasFull180) 40 else (state.selectedQuestionLimit / 4).coerceAtLeast(5)
+      startUtmeComboExam(state.selectedComboElectives, questionsPerSubject = perSub, isFullUtme180 = wasFull180)
+    } else {
+      startMockExam(state.selectedSubjectId, state.selectedExamBoard)
+    }
   }
 
   // --- Learning Modules & Progress ---
@@ -437,10 +807,11 @@ class MeritPrepViewModel(
     exerciseScore: Long? = null,
   ) {
     viewModelScope.launch {
+      val passThreshold = themePreferences.value.masteryPassPercent.toLong()
       val currentSteps = existingProgress?.completedSteps ?: emptyList()
       val passedExercise =
         if (pillar == LessonPillar.EXERCISE) {
-          (exerciseScore ?: 0L) >= CurriculumProgression.PASS_THRESHOLD_PERCENT
+          (exerciseScore ?: 0L) >= passThreshold
         } else {
           true
         }
@@ -457,7 +828,7 @@ class MeritPrepViewModel(
         LessonPillar.entries.all { required -> required.key in updatedSteps }
       val completedNow =
         (existingProgress?.isCompleted == true) ||
-          (allPillarsCompleted && score >= CurriculumProgression.PASS_THRESHOLD_PERCENT)
+          (allPillarsCompleted && score >= passThreshold)
 
       val res =
         repository.saveLessonProgress(
@@ -470,6 +841,9 @@ class MeritPrepViewModel(
           isCompleted = completedNow,
         )
       if (res.isSuccess) {
+        if (completedNow) {
+          repository.seedReviewCardsFromLesson(currentUserId, lesson)
+        }
         val currentStreak =
           (profileState.value as? UiState.Success)?.data?.streakDays?.coerceAtLeast(1L) ?: 1L
         val xpBonus =
@@ -484,7 +858,7 @@ class MeritPrepViewModel(
             pillar == LessonPillar.EXERCISE && passedExercise ->
               "Mastered (${score}%)! Next lesson unlocked (+${xpBonus} XP)"
             pillar == LessonPillar.EXERCISE ->
-              "Scored ${exerciseScore ?: 0}% — reach ${CurriculumProgression.PASS_THRESHOLD_PERCENT}%+ to unlock the next lesson"
+              "Scored ${exerciseScore ?: 0}% — reach ${passThreshold}%+ to unlock the next lesson"
             else -> "Saved ${pillar.shortLabel} (+${xpBonus} XP)"
           }
       } else {
@@ -579,6 +953,57 @@ class MeritPrepViewModel(
     viewModelScope.launch {
       val res = repository.deleteStudyNote(currentUserId, noteId)
       _statusMessage.value = if (res.isSuccess) "Note deleted" else "Could not delete note"
+    }
+  }
+
+  // --- Portable JSON Backup & Optional Google Cloud Sync ---
+
+  suspend fun exportJsonBackup(): Result<String> = repository.exportBackupJson(currentUserId)
+
+  fun importJsonBackup(rawJson: String) {
+    viewModelScope.launch {
+      val res = repository.importBackupJson(currentUserId, rawJson)
+      _statusMessage.value =
+        if (res.isSuccess) {
+          "Restored ${res.getOrDefault(0)} study records from backup"
+        } else {
+          "Backup restore failed: ${res.exceptionOrNull()?.message ?: "Invalid file"}"
+        }
+    }
+  }
+
+  fun signInAndSyncWithGoogle(activityContext: Context) {
+    if (_isCloudSyncing.value) return
+    viewModelScope.launch {
+      _isCloudSyncing.value = true
+      val existing = MeritPrepCloudSync.currentGoogleUser()
+      val userRes =
+        if (existing != null) Result.success(existing)
+        else MeritPrepCloudSync.signInWithGoogle(activityContext)
+      if (userRes.isSuccess) {
+        val account = userRes.getOrNull()
+        _signedInGoogleUser.value = account
+        val syncRes = MeritPrepCloudSync.syncNow(activityContext, repository, currentUserId)
+        _statusMessage.value =
+          if (syncRes.isSuccess) {
+            val s = syncRes.getOrNull()
+            "Cloud synced (${s?.syncedProgressCount ?: 0} lessons, ${s?.syncedAttemptsCount ?: 0} mocks)"
+          } else {
+            "Signed in as ${account?.displayName}; cloud sync paused (${syncRes.exceptionOrNull()?.message ?: "offline"})"
+          }
+      } else {
+        _statusMessage.value =
+          userRes.exceptionOrNull()?.message ?: "Google Sign-In was canceled"
+      }
+      _isCloudSyncing.value = false
+    }
+  }
+
+  fun signOutGoogle(context: Context) {
+    viewModelScope.launch {
+      MeritPrepCloudSync.signOut(context)
+      _signedInGoogleUser.value = null
+      _statusMessage.value = "Signed out of Google Cloud Sync (local progress kept)"
     }
   }
 

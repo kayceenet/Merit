@@ -198,7 +198,7 @@ fun PracticalLabWorkspace(
           modifier = Modifier.fillMaxWidth(),
         ) {
           ScientificText(
-            text = (if (isHit) "Hypothesis Verified: " else "Prediction Check: ") + protocol.hypothesisExplanation,
+            text = (if (isHit) "Hypothesis Confirmed — " else "Prediction Check — ") + protocol.hypothesisExplanation,
             style = MaterialTheme.typography.bodySmall,
             color =
               if (isHit) semantics.onSuccessContainer
@@ -277,6 +277,10 @@ fun PracticalLabWorkspace(
         PracticalLabType.ORAL_ENGLISH_STRESS,
         PracticalLabType.PHONETICS_CONSONANTS_LAB,
         PracticalLabType.COMPREHENSION_ESSAY_LAB -> EnglishLabDispatcher(lessonId = lessonId, labType = labType)
+
+        PracticalLabType.ECONOMICS_ELASTICITY_MARKET_LAB,
+        PracticalLabType.ECONOMICS_MACRO_POLICY_LAB,
+        PracticalLabType.GOVERNMENT_ORGANS_FEDERALISM_LAB -> SocialScienceLabDispatcher(lessonId = lessonId, labType = labType)
       }
     }
 

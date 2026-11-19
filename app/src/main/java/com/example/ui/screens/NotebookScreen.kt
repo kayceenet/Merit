@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -25,6 +26,7 @@ import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.EditNote
+import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -52,10 +54,14 @@ import androidx.compose.ui.unit.dp
 import com.example.data.curriculum.CurriculumCatalog
 import com.example.data.model.StudyNote
 import com.example.ui.components.EquationDisplayCard
+import com.example.ui.components.TopRightMenuButton
 
 @Composable
 fun NotebookScreen(
   notes: List<StudyNote>,
+  dueReviewsCount: Int = 0,
+  onOpenSpacedReview: () -> Unit = {},
+  onOpenMenu: () -> Unit = {},
   onCreateNote: (lessonId: String, subjectId: String, title: String, content: String, isBookmarked: Boolean) -> Unit,
   onToggleBookmark: (StudyNote) -> Unit,
   onDeleteNote: (String) -> Unit,
@@ -86,11 +92,19 @@ fun NotebookScreen(
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
       ) {
-        Text(
-          text = "Formula & Revision Notebook",
-          style = MaterialTheme.typography.headlineMedium,
-          color = MaterialTheme.colorScheme.onSurface,
-        )
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically,
+        ) {
+          Text(
+            text = "Formula & Revision Notebook",
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f),
+          )
+          TopRightMenuButton(badgeCount = dueReviewsCount, onClick = onOpenMenu)
+        }
         OutlinedTextField(
           value = searchQuery,
           onValueChange = { searchQuery = it },
@@ -100,7 +114,10 @@ fun NotebookScreen(
           modifier = Modifier.fillMaxWidth(),
           shape = RoundedCornerShape(14.dp),
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+          modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+          horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
           FilterChip(
             selected = !onlyBookmarked,
             onClick = { onlyBookmarked = false },
@@ -120,6 +137,25 @@ fun NotebookScreen(
                 selectedContainerColor = MaterialTheme.colorScheme.primary,
                 selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
               ),
+          )
+          FilterChip(
+            selected = dueReviewsCount > 0,
+            onClick = onOpenSpacedReview,
+            leadingIcon = {
+              Icon(Icons.Filled.Psychology, contentDescription = null, modifier = Modifier.size(16.dp))
+            },
+            label = {
+              Text(
+                text = if (dueReviewsCount > 0) "Recall Deck ($dueReviewsCount)" else "Recall Deck",
+                fontWeight = FontWeight.SemiBold,
+              )
+            },
+            colors =
+              FilterChipDefaults.filterChipColors(
+                selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                selectedLabelColor = MaterialTheme.colorScheme.onSecondaryContainer,
+              ),
+            modifier = Modifier.testTag("notebook_spaced_review_chip"),
           )
         }
       }
@@ -247,8 +283,11 @@ fun NotebookScreen(
       title = { Text("New Formula / Note Card") },
       text = {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-          Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            CurriculumCatalog.tracks.take(3).forEach { t ->
+          Row(
+            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+          ) {
+            CurriculumCatalog.tracks.forEach { t ->
               FilterChip(
                 selected = subjectId == t.id,
                 onClick = { subjectId = t.id },

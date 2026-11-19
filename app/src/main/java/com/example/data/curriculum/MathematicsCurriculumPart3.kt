@@ -174,7 +174,7 @@ object MathematicsCurriculumPart3 {
                   heading = "1. Permutations (Order Matters) vs Combinations (Order Doesn't!)",
                   explanation =
                     "Picking 3 medals (Gold, Silver, Bronze) from 10 runners? ORDER matters because Gold ≠ Bronze—use Permutation nPr! Picking a 3-person committee to sweep the hall? Chidi+Ada+Bola is the exact same committee as Bola+Chidi+Ada—order does NOT matter, use Combination nCr!",
-                  keyFormula = "^nP_r = \\frac{n!}{(n-r)!}   |   ^nC_r = \\frac{n!}{r!(n-r)!}   |   \\text{Circle: } (n-1)!",
+                  keyFormula = "{}^{n}P_r = \\frac{n!}{(n-r)!}   |   {}^{n}C_r = \\frac{n!}{r!(n-r)!}   |   \\text{Circle: } (n-1)!",
                   examTip =
                     "Counting letter arrangements like 'SUCCESS' (7 letters, 3 S's, 2 C's)? Divide total factorial by repeat factorials: 7! / (3! × 2!)!",
                 ),
@@ -454,7 +454,7 @@ object MathematicsCurriculumPart3 {
     listOf(
       PracticeQuestion("pq_math_01", "Number Bases", "JAMB", 2025, "Convert 213₄ to Base 10.", listOf("39", "35", "41", "45"), 0, "2(16)+1(4)+3(1).", "32+4+3=39."),
       PracticeQuestion("pq_math_02", "Modular Arithmetic", "WAEC", 2024, "Find the least positive integer x such that 4x ≡ 3 (mod 5).", listOf("1", "2", "3", "4"), 1, "Test x = 2: 8 ≡ 3 (mod 5).", "4(2) = 8 = 5(1) + 3."),
-      PracticeQuestion("pq_math_03", "Indices", "JAMB", 2024, "If 8^(x/2) = 2^(3/2) × 4^x, find x.", listOf("−3", "−2", "2", "3"), 0, "Convert to base 2: 2^(3x/2) = 2^(3/2 + 2x).", "(3/2)x = 3/2 + 2x ⇒ −x/2 = 3/2 ⇒ x = −3."),
+      PracticeQuestion("pq_math_03", "Indices", "JAMB", 2024, "If 8^{x/2} = 2^{3/2} \\times 4^x, find x.", listOf("−3", "−2", "2", "3"), 0, "Convert to base 2: 2^{3x/2} = 2^{3/2 + 2x}.", "\\frac{3}{2}x = \\frac{3}{2} + 2x \\implies -\\frac{x}{2} = \\frac{3}{2} \\implies x = -3."),
       PracticeQuestion("pq_math_04", "Logarithms", "WAEC", 2023, "Evaluate log₂ 8 + log₂ 4 − log₂ 2.", listOf("4", "5", "3", "6"), 0, "3 + 2 − 1.", "log₂(8×4/2) = log₂ 16 = 4."),
       PracticeQuestion("pq_math_05", "Surds", "NECO", 2023, "If √50 − √18 = k√2, find k.", listOf("2", "3", "4", "8"), 0, "5√2 − 3√2.", "2√2 ⇒ k = 2."),
       PracticeQuestion("pq_math_06", "Sets & Venn", "WAEC", 2024, "Of 60 pupils, 35 like Maths, 30 like English, 10 like neither. How many like BOTH?", listOf("15", "20", "10", "5"), 0, "Union = 60 − 10 = 50.", "35 + 30 − 50 = 15."),

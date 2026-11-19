@@ -25,6 +25,19 @@ enum class ThemeMode(val label: String) {
   DARK("Dark"),
 }
 
+enum class ThemePalette(
+  val label: String,
+  val tagline: String,
+  val lightSwatchHex: Long,
+  val darkSwatchHex: Long,
+) {
+  ROYAL_INDIGO("Royal Indigo", "Classic academic cobalt & sapphire", 0xFF0056D2, 0xFF60A5FA),
+  EMERALD_SCHOLAR("Emerald Scholar", "Forest green focus & calm contrast", 0xFF047857, 0xFF34D399),
+  WARM_AMBER("Warm Amber", "Cream study paper & amber accents", 0xFFB45309, 0xFFFBBF24),
+  OLED_HIGH_CONTRAST("OLED Contrast", "Pure black & crisp AAA ink", 0xFF003E9B, 0xFF38BDF8),
+  CRIMSON_DISTINCTION("Crimson Honours", "Deep burgundy & bold collegiate tone", 0xFF9F1239, 0xFFFB7185),
+}
+
 enum class FontSizeScale(val label: String, val multiplier: Float) {
   COMPACT("Small", 0.94f),
   STANDARD("Medium", 1.08f),
@@ -32,10 +45,27 @@ enum class FontSizeScale(val label: String, val multiplier: Float) {
   EXTRA_LARGE("Extra Large", 1.36f),
 }
 
+enum class LineSpacingScale(val label: String, val multiplier: Float) {
+  COMPACT("Compact", 1.28f),
+  STANDARD("Standard", 1.44f),
+  RELAXED("Relaxed", 1.64f),
+}
+
 data class ThemePreferences(
   val themeMode: ThemeMode = ThemeMode.SYSTEM,
+  val themePalette: ThemePalette = ThemePalette.ROYAL_INDIGO,
+  val highContrastBoost: Boolean = false,
   val useDynamicColor: Boolean = true,
   val fontSizeScale: FontSizeScale = FontSizeScale.STANDARD,
+  val lineSpacingScale: LineSpacingScale = LineSpacingScale.STANDARD,
+  val boldEquations: Boolean = false,
+  val cbtSecondsPerQuestion: Int = 60,
+  val cbtAutoAdvance: Boolean = false,
+  val cbtShowCalculator: Boolean = true,
+  val shuffleOptionsOnRetry: Boolean = true,
+  val masteryPassPercent: Int = 80,
+  val dailyXpTarget: Int = 100,
+  val spacedReviewBatchSize: Int = 10,
 )
 
 data class CachedExamResultSnapshot(
@@ -51,6 +81,7 @@ data class CachedExamResultSnapshot(
 
 data class OfflineProgressSnapshot(
   val completedLessonIds: Set<String> = emptySet(),
+  val placementPassedSubjects: Set<String> = emptySet(),
   val lastLessonId: String? = null,
   val lastExamSubjectId: String? = null,
   val offlineXp: Long = 0L,
@@ -68,14 +99,32 @@ class OfflinePreferencesRepository(private val dataStore: DataStore<Preferences>
       val modeName = prefs[KEY_THEME_MODE] ?: ThemeMode.SYSTEM.name
       val mode =
         ThemeMode.entries.find { it.name == modeName } ?: ThemeMode.SYSTEM
+      val paletteName = prefs[KEY_THEME_PALETTE] ?: ThemePalette.ROYAL_INDIGO.name
+      val palette =
+        ThemePalette.entries.find { it.name == paletteName } ?: ThemePalette.ROYAL_INDIGO
+      val highContrast = prefs[KEY_HIGH_CONTRAST_BOOST] ?: false
       val dynamicColor = prefs[KEY_USE_DYNAMIC_COLOR] ?: true
       val fontScaleName = prefs[KEY_FONT_SCALE] ?: FontSizeScale.STANDARD.name
       val fontScale =
         FontSizeScale.entries.find { it.name == fontScaleName } ?: FontSizeScale.STANDARD
+      val lineSpacingName = prefs[KEY_LINE_SPACING_SCALE] ?: LineSpacingScale.STANDARD.name
+      val lineSpacing =
+        LineSpacingScale.entries.find { it.name == lineSpacingName } ?: LineSpacingScale.STANDARD
       ThemePreferences(
         themeMode = mode,
+        themePalette = palette,
+        highContrastBoost = highContrast,
         useDynamicColor = dynamicColor,
         fontSizeScale = fontScale,
+        lineSpacingScale = lineSpacing,
+        boldEquations = prefs[KEY_BOLD_EQUATIONS] ?: false,
+        cbtSecondsPerQuestion = (prefs[KEY_CBT_SECONDS_PER_Q] ?: 60).coerceIn(30, 120),
+        cbtAutoAdvance = prefs[KEY_CBT_AUTO_ADVANCE] ?: false,
+        cbtShowCalculator = prefs[KEY_CBT_SHOW_CALCULATOR] ?: true,
+        shuffleOptionsOnRetry = prefs[KEY_SHUFFLE_OPTIONS_ON_RETRY] ?: true,
+        masteryPassPercent = (prefs[KEY_MASTERY_PASS_PERCENT] ?: 80).coerceIn(65, 95),
+        dailyXpTarget = (prefs[KEY_DAILY_XP_TARGET] ?: 100).coerceIn(50, 500),
+        spacedReviewBatchSize = (prefs[KEY_SPACED_REVIEW_BATCH_SIZE] ?: 10).coerceIn(5, 30),
       )
     }
 
@@ -83,6 +132,7 @@ class OfflinePreferencesRepository(private val dataStore: DataStore<Preferences>
     dataStore.data.map { prefs ->
       OfflineProgressSnapshot(
         completedLessonIds = prefs[KEY_COMPLETED_LESSON_IDS] ?: emptySet(),
+        placementPassedSubjects = prefs[KEY_PLACEMENT_PASSED_SUBJECTS] ?: emptySet(),
         lastLessonId = prefs[KEY_LAST_LESSON_ID],
         lastExamSubjectId = prefs[KEY_LAST_EXAM_SUBJECT_ID],
         offlineXp = prefs[KEY_OFFLINE_XP] ?: 0L,
@@ -100,6 +150,14 @@ class OfflinePreferencesRepository(private val dataStore: DataStore<Preferences>
     setThemeMode(if (currentlyDark) ThemeMode.LIGHT else ThemeMode.DARK)
   }
 
+  suspend fun setThemePalette(palette: ThemePalette) {
+    dataStore.edit { prefs -> prefs[KEY_THEME_PALETTE] = palette.name }
+  }
+
+  suspend fun setHighContrastBoost(enabled: Boolean) {
+    dataStore.edit { prefs -> prefs[KEY_HIGH_CONTRAST_BOOST] = enabled }
+  }
+
   suspend fun setUseDynamicColor(enabled: Boolean) {
     dataStore.edit { prefs -> prefs[KEY_USE_DYNAMIC_COLOR] = enabled }
   }
@@ -108,10 +166,60 @@ class OfflinePreferencesRepository(private val dataStore: DataStore<Preferences>
     dataStore.edit { prefs -> prefs[KEY_FONT_SCALE] = scale.name }
   }
 
+  suspend fun setLineSpacingScale(scale: LineSpacingScale) {
+    dataStore.edit { prefs -> prefs[KEY_LINE_SPACING_SCALE] = scale.name }
+  }
+
+  suspend fun setBoldEquations(enabled: Boolean) {
+    dataStore.edit { prefs -> prefs[KEY_BOLD_EQUATIONS] = enabled }
+  }
+
+  suspend fun setCbtSecondsPerQuestion(seconds: Int) {
+    dataStore.edit { prefs -> prefs[KEY_CBT_SECONDS_PER_Q] = seconds.coerceIn(30, 120) }
+  }
+
+  suspend fun setCbtAutoAdvance(enabled: Boolean) {
+    dataStore.edit { prefs -> prefs[KEY_CBT_AUTO_ADVANCE] = enabled }
+  }
+
+  suspend fun setCbtShowCalculator(enabled: Boolean) {
+    dataStore.edit { prefs -> prefs[KEY_CBT_SHOW_CALCULATOR] = enabled }
+  }
+
+  suspend fun setShuffleOptionsOnRetry(enabled: Boolean) {
+    dataStore.edit { prefs -> prefs[KEY_SHUFFLE_OPTIONS_ON_RETRY] = enabled }
+  }
+
+  suspend fun setMasteryPassPercent(percent: Int) {
+    dataStore.edit { prefs -> prefs[KEY_MASTERY_PASS_PERCENT] = percent.coerceIn(65, 95) }
+  }
+
+  suspend fun setDailyXpTarget(xpTarget: Int) {
+    dataStore.edit { prefs -> prefs[KEY_DAILY_XP_TARGET] = xpTarget.coerceIn(50, 500) }
+  }
+
+  suspend fun setSpacedReviewBatchSize(batchSize: Int) {
+    dataStore.edit { prefs -> prefs[KEY_SPACED_REVIEW_BATCH_SIZE] = batchSize.coerceIn(5, 30) }
+  }
+
   suspend fun getCurriculumVersion(): Int = dataStore.data.first()[KEY_CURRICULUM_VERSION] ?: 0
 
   suspend fun setCurriculumVersion(version: Int) {
     dataStore.edit { prefs -> prefs[KEY_CURRICULUM_VERSION] = version }
+  }
+
+  suspend fun recordPlacementPassed(subjectId: String) {
+    dataStore.edit { prefs ->
+      val current = prefs[KEY_PLACEMENT_PASSED_SUBJECTS]?.toMutableSet() ?: mutableSetOf()
+      current.add(subjectId)
+      prefs[KEY_PLACEMENT_PASSED_SUBJECTS] = current
+    }
+  }
+
+  suspend fun syncPlacementPassedSubjects(subjectIds: Set<String>) {
+    dataStore.edit { prefs ->
+      prefs[KEY_PLACEMENT_PASSED_SUBJECTS] = subjectIds
+    }
   }
 
   suspend fun recordLessonSnapshot(
@@ -196,9 +304,21 @@ class OfflinePreferencesRepository(private val dataStore: DataStore<Preferences>
 
   private companion object {
     val KEY_THEME_MODE = stringPreferencesKey("theme_mode")
+    val KEY_THEME_PALETTE = stringPreferencesKey("theme_palette")
+    val KEY_HIGH_CONTRAST_BOOST = booleanPreferencesKey("high_contrast_boost")
     val KEY_USE_DYNAMIC_COLOR = booleanPreferencesKey("use_dynamic_color")
     val KEY_FONT_SCALE = stringPreferencesKey("font_scale")
+    val KEY_LINE_SPACING_SCALE = stringPreferencesKey("line_spacing_scale")
+    val KEY_BOLD_EQUATIONS = booleanPreferencesKey("bold_equations")
+    val KEY_CBT_SECONDS_PER_Q = intPreferencesKey("cbt_seconds_per_q")
+    val KEY_CBT_AUTO_ADVANCE = booleanPreferencesKey("cbt_auto_advance")
+    val KEY_CBT_SHOW_CALCULATOR = booleanPreferencesKey("cbt_show_calculator")
+    val KEY_SHUFFLE_OPTIONS_ON_RETRY = booleanPreferencesKey("shuffle_options_on_retry")
+    val KEY_MASTERY_PASS_PERCENT = intPreferencesKey("mastery_pass_percent")
+    val KEY_DAILY_XP_TARGET = intPreferencesKey("daily_xp_target")
+    val KEY_SPACED_REVIEW_BATCH_SIZE = intPreferencesKey("spaced_review_batch_size")
     val KEY_COMPLETED_LESSON_IDS = stringSetPreferencesKey("completed_lesson_ids")
+    val KEY_PLACEMENT_PASSED_SUBJECTS = stringSetPreferencesKey("placement_passed_subjects")
     val KEY_LAST_LESSON_ID = stringPreferencesKey("last_lesson_id")
     val KEY_LAST_EXAM_SUBJECT_ID = stringPreferencesKey("last_exam_subject_id")
     val KEY_OFFLINE_XP = longPreferencesKey("offline_xp")

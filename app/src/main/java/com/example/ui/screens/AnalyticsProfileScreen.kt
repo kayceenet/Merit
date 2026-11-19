@@ -25,9 +25,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
@@ -65,11 +66,12 @@ import com.example.data.curriculum.CurriculumCatalog
 import com.example.data.local.FontSizeScale
 import com.example.data.local.OfflineProgressSnapshot
 import com.example.data.local.ThemeMode
+import com.example.data.local.ThemePalette
 import com.example.data.local.ThemePreferences
 import com.example.data.model.ExamAttempt
 import com.example.data.model.LessonProgress
 import com.example.data.model.UserProfile
-import com.example.ui.theme.CourseraBlue
+import com.example.ui.components.TopRightMenuButton
 import com.example.ui.theme.semanticColors
 import kotlin.math.roundToInt
 
@@ -99,9 +101,14 @@ fun AnalyticsProfileScreen(
   progressList: List<LessonProgress>,
   offlineSnapshot: OfflineProgressSnapshot,
   themePreferences: ThemePreferences,
+  dueReviewsCount: Int = 0,
   onSetThemeMode: (ThemeMode) -> Unit,
+  onSetThemePalette: (ThemePalette) -> Unit = {},
+  onSetHighContrastBoost: (Boolean) -> Unit = {},
   onSetUseDynamicColor: (Boolean) -> Unit,
   onSetFontSizeScale: (FontSizeScale) -> Unit = {},
+  onOpenSettingsPortal: () -> Unit = {},
+  onOpenMenu: () -> Unit = {},
   onPracticeWeakSubject: (String) -> Unit,
   onUpdateGoal: (displayName: String, targetExam: String, targetScore: Long) -> Unit,
   modifier: Modifier = Modifier,
@@ -144,6 +151,8 @@ fun AnalyticsProfileScreen(
             "mathematics" -> "MTH"
             "chemistry" -> "CHM"
             "biology" -> "BIO"
+            "economics" -> "ECO"
+            "government" -> "GOV"
             else -> "ENG"
           }
         SubjectPerformanceStat(
@@ -169,17 +178,24 @@ fun AnalyticsProfileScreen(
       verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
       item {
-        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-          Text(
-            text = "Performance Dashboard & Settings",
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onBackground,
-          )
-          Text(
-            text = "Offline telemetry synced via Room & DataStore (${offlineSnapshot.totalExamsTaken} offline mocks logged)",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-          )
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically,
+        ) {
+          Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(
+              text = "Performance & Settings",
+              style = MaterialTheme.typography.headlineMedium,
+              color = MaterialTheme.colorScheme.onBackground,
+            )
+            Text(
+              text = "Offline telemetry synced via Room & DataStore (${offlineSnapshot.totalExamsTaken} offline mocks logged)",
+              style = MaterialTheme.typography.bodySmall,
+              color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+          }
+          TopRightMenuButton(badgeCount = dueReviewsCount, onClick = onOpenMenu)
         }
       }
 
@@ -197,7 +213,7 @@ fun AnalyticsProfileScreen(
       item {
         val strongColor = semantics.success
         val weakColor = MaterialTheme.colorScheme.error
-        val masteryColor = CourseraBlue
+        val masteryColor = MaterialTheme.colorScheme.secondary
         val gridColor = MaterialTheme.colorScheme.outline
         val trackBg = MaterialTheme.colorScheme.surfaceVariant
         val selectedStat = subjectStats.getOrNull(inspectedSubjectIdx)
@@ -229,7 +245,7 @@ fun AnalyticsProfileScreen(
               )
             }
             Icon(
-              Icons.Filled.TrendingUp,
+              Icons.AutoMirrored.Filled.TrendingUp,
               contentDescription = null,
               tint = MaterialTheme.colorScheme.primary,
             )
@@ -324,7 +340,7 @@ fun AnalyticsProfileScreen(
           }
 
           // Interactive Subject Selector Pills directly beneath bars
-          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             subjectStats.forEachIndexed { idx, stat ->
               val selected = idx == inspectedSubjectIdx
               Surface(
@@ -692,6 +708,60 @@ fun AnalyticsProfileScreen(
             }
           }
 
+          Text(
+            text = "Theme Palette (${themePreferences.themePalette.label})",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+          )
+          FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+          ) {
+            ThemePalette.entries.forEach { palette ->
+              val selected = themePreferences.themePalette == palette
+              FilterChip(
+                selected = selected,
+                onClick = { onSetThemePalette(palette) },
+                label = { Text(palette.label, fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium) },
+                colors =
+                  FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                    selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                  ),
+                modifier = Modifier.testTag("analytics_palette_${palette.name.lowercase()}"),
+              )
+            }
+          }
+
+          Row(
+            modifier =
+              Modifier.fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.background)
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(12.dp))
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+          ) {
+            Column(modifier = Modifier.weight(1f).padding(end = 10.dp)) {
+              Text(
+                text = "High-Contrast Ink Boost",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+              )
+              Text(
+                text = "Pure black/white surfaces & sharp AAA contrast borders",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+              )
+            }
+            Switch(
+              checked = themePreferences.highContrastBoost,
+              onCheckedChange = onSetHighContrastBoost,
+              modifier = Modifier.testTag("analytics_high_contrast_switch"),
+            )
+          }
+
           Row(
             modifier =
               Modifier.fillMaxWidth()
@@ -710,8 +780,13 @@ fun AnalyticsProfileScreen(
               )
               Text(
                 text =
-                  if (supportsDynamic) "Adapts accents from your wallpaper with high-contrast borders"
-                  else "Requires Android 12+; using MeritPrep high-contrast palette",
+                  when {
+                    !supportsDynamic -> "Requires Android 12+"
+                    themePreferences.highContrastBoost ||
+                      themePreferences.themePalette == ThemePalette.OLED_HIGH_CONTRAST ->
+                      "Paused while High-Contrast palette is active"
+                    else -> "Adapts accents from your wallpaper with high-contrast borders"
+                  },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
               )
@@ -719,7 +794,10 @@ fun AnalyticsProfileScreen(
             Switch(
               checked = themePreferences.useDynamicColor,
               onCheckedChange = onSetUseDynamicColor,
-              enabled = supportsDynamic,
+              enabled =
+                supportsDynamic &&
+                  !themePreferences.highContrastBoost &&
+                  themePreferences.themePalette != ThemePalette.OLED_HIGH_CONTRAST,
               modifier = Modifier.testTag("dynamic_color_switch"),
             )
           }
@@ -747,6 +825,16 @@ fun AnalyticsProfileScreen(
                 modifier = Modifier.testTag("font_scale_${scale.name.lowercase()}"),
               )
             }
+          }
+
+          OutlinedButton(
+            onClick = onOpenSettingsPortal,
+            modifier = Modifier.fillMaxWidth().height(48.dp).testTag("analytics_open_settings_portal"),
+            shape = RoundedCornerShape(12.dp),
+          ) {
+            Icon(Icons.Filled.Settings, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(6.dp))
+            Text("Open Full Settings Portal (CBT, Thresholds & Backup)", fontWeight = FontWeight.Bold)
           }
         }
       }

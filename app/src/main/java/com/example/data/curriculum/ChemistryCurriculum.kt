@@ -178,9 +178,9 @@ object ChemistryCurriculum {
               syllabusTag = "JAMB Sec. 4 • WAEC Atomic Structure & Orbitals",
               learningOutcomes =
                 listOf(
-                  "Count protons, neutrons, and electrons in neutral atoms and ions (Xⁿ⁺, Xᵐ⁻).",
-                  "Calculate Relative Atomic Mass (Aᵣ) from isotope mass percentages.",
-                  "Write s-p-d electron configurations (1s² 2s² 2p⁶...) up to Z = 30 using Aufbau, Pauli & Hund.",
+                  "Count protons, neutrons, and electrons in neutral atoms and ions (X^{n+}, X^{m-}).",
+                  "Calculate Relative Atomic Mass (A_r) from isotope mass percentages.",
+                  "Write s-p-d electron configurations (1s^2\\; 2s^2\\; 2p^6\\ldots) up to Z = 30 using Aufbau, Pauli & Hund.",
                 ),
               concepts =
                 listOf(

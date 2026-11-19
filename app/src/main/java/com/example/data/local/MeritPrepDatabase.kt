@@ -11,11 +11,14 @@ import androidx.room.RoomDatabase
 import androidx.room.Transaction
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.data.model.ExamAttempt
 import com.example.data.model.LearningChapterEntity
 import com.example.data.model.LearningModuleEntity
 import com.example.data.model.LessonProgress
 import com.example.data.model.PastQuestionEntity
+import com.example.data.model.SpacedReviewCardEntity
 import com.example.data.model.StudyNote
 import com.example.data.model.UserProfile
 import kotlinx.coroutines.flow.Flow
@@ -53,6 +56,9 @@ interface MeritPrepDao {
   @Query("SELECT * FROM lesson_progress WHERE userId = :userId")
   fun observeLessonProgress(userId: String): Flow<List<LessonProgress>>
 
+  @Query("SELECT * FROM lesson_progress WHERE userId = :userId")
+  suspend fun getAllLessonProgressOnce(userId: String): List<LessonProgress>
+
   @Query("SELECT * FROM lesson_progress WHERE id = :id LIMIT 1")
   suspend fun getLessonProgressOnce(id: String): LessonProgress?
 
@@ -62,11 +68,17 @@ interface MeritPrepDao {
   @Query("SELECT * FROM exam_attempts WHERE userId = :userId ORDER BY createdAt DESC")
   fun observeExamAttempts(userId: String): Flow<List<ExamAttempt>>
 
+  @Query("SELECT * FROM exam_attempts WHERE userId = :userId ORDER BY createdAt DESC")
+  suspend fun getAllExamAttemptsOnce(userId: String): List<ExamAttempt>
+
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun insertExamAttempt(attempt: ExamAttempt)
 
   @Query("SELECT * FROM study_notes WHERE userId = :userId ORDER BY updatedAt DESC, createdAt DESC")
   fun observeStudyNotes(userId: String): Flow<List<StudyNote>>
+
+  @Query("SELECT * FROM study_notes WHERE userId = :userId ORDER BY updatedAt DESC, createdAt DESC")
+  suspend fun getAllStudyNotesOnce(userId: String): List<StudyNote>
 
   @Query("SELECT * FROM study_notes WHERE id = :id LIMIT 1")
   suspend fun getStudyNoteOnce(id: String): StudyNote?
@@ -76,6 +88,34 @@ interface MeritPrepDao {
 
   @Query("DELETE FROM study_notes WHERE id = :id AND userId = :userId")
   suspend fun deleteStudyNote(userId: String, id: String)
+
+  // Spaced Repetition Active Recall Deck
+  @Query(
+    "SELECT * FROM spaced_review_cards WHERE userId = :userId AND dueAtMillis <= :nowMillis ORDER BY dueAtMillis ASC LIMIT :limit"
+  )
+  fun observeDueReviewCards(
+    userId: String,
+    nowMillis: Long,
+    limit: Int,
+  ): Flow<List<SpacedReviewCardEntity>>
+
+  @Query("SELECT * FROM spaced_review_cards WHERE userId = :userId ORDER BY dueAtMillis ASC")
+  fun observeAllReviewCards(userId: String): Flow<List<SpacedReviewCardEntity>>
+
+  @Query("SELECT * FROM spaced_review_cards WHERE userId = :userId ORDER BY dueAtMillis ASC")
+  suspend fun getAllReviewCardsOnce(userId: String): List<SpacedReviewCardEntity>
+
+  @Query("SELECT * FROM spaced_review_cards WHERE id = :id LIMIT 1")
+  suspend fun getReviewCardOnce(id: String): SpacedReviewCardEntity?
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun upsertReviewCard(card: SpacedReviewCardEntity)
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun upsertReviewCards(cards: List<SpacedReviewCardEntity>)
+
+  @Query("DELETE FROM spaced_review_cards WHERE userId = :userId")
+  suspend fun deleteAllReviewCards(userId: String)
 
   // Structured Learning Modules & Chapters
   @Query("SELECT * FROM learning_modules ORDER BY subjectId ASC, orderIndex ASC")
@@ -148,8 +188,9 @@ interface MeritPrepDao {
       LearningModuleEntity::class,
       LearningChapterEntity::class,
       PastQuestionEntity::class,
+      SpacedReviewCardEntity::class,
     ],
-  version = 2,
+  version = 3,
   exportSchema = false,
 )
 @TypeConverters(StringListConverters::class)
@@ -158,6 +199,33 @@ abstract class MeritPrepDatabase : RoomDatabase() {
 
   companion object {
     @Volatile private var instance: MeritPrepDatabase? = null
+
+    val MIGRATION_2_3 =
+      object : Migration(2, 3) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+          db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS spaced_review_cards (
+              id TEXT NOT NULL PRIMARY KEY,
+              userId TEXT NOT NULL,
+              subjectId TEXT NOT NULL,
+              lessonId TEXT NOT NULL,
+              questionId TEXT NOT NULL,
+              topic TEXT NOT NULL,
+              prompt TEXT NOT NULL,
+              answer TEXT NOT NULL,
+              explanation TEXT NOT NULL,
+              intervalDays INTEGER NOT NULL,
+              easeFactor REAL NOT NULL,
+              repetitions INTEGER NOT NULL,
+              dueAtMillis INTEGER NOT NULL,
+              lastReviewedAtMillis INTEGER NOT NULL,
+              updatedAtMillis INTEGER NOT NULL
+            )
+            """.trimIndent()
+          )
+        }
+      }
 
     fun getInstance(context: Context): MeritPrepDatabase {
       return instance
@@ -168,6 +236,7 @@ abstract class MeritPrepDatabase : RoomDatabase() {
               MeritPrepDatabase::class.java,
               "meritprep.db",
             )
+              .addMigrations(MIGRATION_2_3)
               .fallbackToDestructiveMigration(dropAllTables = true)
               .build()
               .also { instance = it }

@@ -105,3 +105,23 @@ data class PastQuestionEntity(
   val waecMarkingScheme: String?,
   val orderIndex: Int,
 )
+
+@Entity(tableName = "spaced_review_cards")
+data class SpacedReviewCardEntity(
+  @PrimaryKey val id: String,
+  val userId: String = UserProfile.DEFAULT_PROFILE_ID,
+  val subjectId: String,
+  val lessonId: String,
+  val questionId: String,
+  val topic: String,
+  val prompt: String,
+  val answer: String,
+  val explanation: String,
+  val intervalDays: Int = 1,
+  val easeFactor: Double = 2.5,
+  val repetitions: Int = 0,
+  val dueAtMillis: Long = System.currentTimeMillis(),
+  val lastReviewedAtMillis: Long = 0L,
+  val updatedAtMillis: Long = System.currentTimeMillis(),
+)
+

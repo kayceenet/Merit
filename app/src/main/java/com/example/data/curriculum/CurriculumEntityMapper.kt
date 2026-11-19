@@ -135,6 +135,7 @@ object CurriculumEntityMapper {
         hint = entity.hint,
         stepByStepSolution = entity.stepByStepSolution,
         waecMarkingScheme = entity.waecMarkingScheme,
+        passageText = CurriculumCatalog.passageForEntityId(entity.id),
       )
     )
 
@@ -465,6 +466,7 @@ object CurriculumEntityMapper {
             put("cognitiveLevel", q.cognitiveLevel)
             put("marks", q.marks)
             put("remediationTip", q.remediationTip)
+            put("passageText", q.passageText ?: JSONObject.NULL)
           }
         )
       }
@@ -477,12 +479,14 @@ object CurriculumEntityMapper {
         val o = arr.getJSONObject(i)
         val optsArr = o.optJSONArray("options") ?: JSONArray()
         val scheme = o.opt("waecMarkingScheme")
+        val passage = o.opt("passageText")
+        val qId = o.optString("id", "")
         AcademyCurriculumEnricher.sanitizeQuestion(
           PracticeQuestion(
-            id = o.optString("id", ""),
+            id = qId,
             topic = o.optString("topic", ""),
             examType = o.optString("examType", "JAMB"),
-            year = o.optInt("year", 2025),
+            year = o.optInt("year", 2023),
             question = o.optString("question", ""),
             options = List(optsArr.length()) { idx -> optsArr.optString(idx, "") },
             correctIndex = o.optInt("correctIndex", 0),
@@ -492,6 +496,9 @@ object CurriculumEntityMapper {
             cognitiveLevel = o.optString("cognitiveLevel", "Application"),
             marks = o.optInt("marks", 20),
             remediationTip = o.optString("remediationTip", ""),
+            passageText =
+              if (passage == null || passage == JSONObject.NULL) CurriculumCatalog.passageForEntityId(qId)
+              else passage.toString(),
           )
         )
       }
