@@ -27,7 +27,7 @@ object BiologyCurriculumPart3 {
             concepts =
               listOf(
                 ConceptBlock(
-                  heading = "1. The 10% Energy Tax & Why Food Chains Stop at 4–5 Steps",
+                  heading = "The 10% Energy Tax & Why Food Chains Stop at 4–5 Steps",
                   explanation =
                       "Plants trap barely 1–2% of sunshine into food! When a goat eats grass, it burns 90% of that energy moving, breathing, and staying warm—so ONLY ~10% gets stored as goat meat for a lion to eat next! Because 90% leaks as heat at every single meal, a Pyramid of Energy is ALWAYS upright and food chains rarely stretch past 4 or 5 links!",
                   keyFormula = "\\text{10\\% Rule: } E_{n+1} \\approx 0.10\\,E_n   |   \\text{Population Density} = \\frac{\\text{Total Count}}{\\text{No. Throws} \\times \\text{Quadrat Area}}",
@@ -35,7 +35,7 @@ object BiologyCurriculumPart3 {
                       "Can a Pyramid of NUMBERS ever look upside-down? YES—1 giant Iroko tree (producer) feeding 10,000 caterpillars feeding 500 mites!",
                 ),
                 ConceptBlock(
-                  heading = "2. Field Sampling Tools (Quadrat vs Capture-Recapture)",
+                  heading = "Field Sampling Tools (Quadrat vs Capture-Recapture)",
                   explanation =
                       "Never try counting every grass blade in a football pitch! Toss a 1 m² wooden square (Quadrat) randomly 10 times for stationary plants, average the count, and multiply by field area! What about moving grasshoppers or tilapia fish? Catch sample M₁, dab non-toxic paint, release, catch sample M₂ next day, count marked repeats R: Total N = (M₁ × M₂) / R! Measure abiotic clues with Secchi Disc (water transparency!), Anemometer (wind speed), Hygrometer (humidity) & Rain Gauge!",
                   keyFormula = "\\text{Lincoln Index: } N = \\frac{M_1 \\times M_2}{R_{\\text{marked recaptured}}}",
@@ -173,7 +173,7 @@ object BiologyCurriculumPart3 {
             concepts =
               listOf(
                 ConceptBlock(
-                  heading = "1. Biomes from Coastline to Sahel + Ecological Succession",
+                  heading = "Biomes from Coastline to Sahel + Ecological Succession",
                   explanation =
                       "Travel South → North across West Africa and rainfall steadily drops: Coastal salty Mangrove Swamps (Stilt roots + breathing Pneumatophores!) → Dense Canopy Tropical Rainforest (tall buttress trees + lianas + epiphytes) → Guinea Savanna (tall grass + broad fire-resistant trees) → Sudan Savanna → thorny Sahel Savanna! Meanwhile, ecosystems mature step-by-step via Primary Succession: Pioneer Lichens crack bare rock → Mosses trap thin soil → Ferns/Grasses → Shrubs → stable Climax Forest!",
                   keyFormula = "\\text{Bare Rock} \\xrightarrow{\\text{Lichens (Pioneer)}} \\text{Moss} \\to \\text{Grasses} \\to \\text{Shrubs} \\to \\text{Climax Forest}",
@@ -181,7 +181,7 @@ object BiologyCurriculumPart3 {
                       "Secondary Succession (after bush fire or abandoned farmland) is MUCH faster because Soil + Seeds ALREADY exist!",
                 ),
                 ConceptBlock(
-                  heading = "2. Plant & Animal Survival Toolkits (Hydrophyte vs Xerophyte vs Mangrove)",
+                  heading = "Plant & Animal Survival Toolkits (Hydrophyte vs Xerophyte vs Mangrove)",
                   explanation =
                       "Water Lily (Hydrophyte): spongy Aerenchyma air pockets keep leaves floating and Stomata sit ONLY on top! Cactus (Xerophyte): leaves shrunk into sharp SPINES to stop water loss, thick waxy cuticle, swollen green stem for photosynthesis & storage, deep/wide roots! Red Mangrove (Halophyte in airless mud): Stilt roots brace against tides while snorkeling Pneumatophore breathing roots poke UP into the air!",
                   keyFormula = "\\text{Xerophyte} = \\text{Spines + Sunken Stomata + Thick Cuticle}   |   \\text{Mangrove} = \\text{Prop/Stilt + Breathing Pneumatophores}",
@@ -317,7 +317,7 @@ object BiologyCurriculumPart3 {
             concepts =
               listOf(
                 ConceptBlock(
-                  heading = "1. The 4 Hero & Villain Bacteria of the Nitrogen Cycle",
+                  heading = "The 4 Hero & Villain Bacteria of the Nitrogen Cycle",
                   explanation =
                       "Air is 78% Nitrogen (N₂), yet plants can't breathe it—they need NITRATES (NO₃⁻) dissolved in soil water! 4 bacteria groups run the show: (1) FIXERS (Rhizobium in legume roots, Azotobacter, lightning!) pull N₂ out of air into ammonia/nitrates! (2) PUTREFYING decomposers rot dead bodies into Ammonia (NH₄⁺)! (3) NITRIFYING heroes (Nitrosomonas turns NH₄⁺ → Nitrite NO₂⁻; Nitrobacter turns NO₂⁻ → Nitrate NO₃⁻—both need O₂ air!). (4) DENITRIFYING villains (Pseudomonas in soggy airless soil) waste nitrates back to useless N₂ gas!",
                   keyFormula = "\\text{NH}_4^+ \\xrightarrow{\\text{Nitrosomonas}} \\text{NO}_2^- \\xrightarrow{\\text{Nitrobacter}} \\text{NO}_3^-\\; (\\text{Plant Uptake!})   |   \\text{NO}_3^- \\xrightarrow{\\text{Pseudomonas}} \\text{N}_2\\uparrow",
@@ -325,7 +325,7 @@ object BiologyCurriculumPart3 {
                       "How does Eutrophication kill pond fish? Fertilizer runoff sparks huge green Algae bloom → algae die and sink → aerobic Decomposer Bacteria multiply massively using up ALL dissolved O₂ → fish suffocate!",
                 ),
                 ConceptBlock(
-                  heading = "2. Sandy vs Clay vs Loamy Soil (Golden Balanced Mix!)",
+                  heading = "Sandy vs Clay vs Loamy Soil (Golden Balanced Mix!)",
                   explanation =
                       "Sandy soil has big coarse grains: drains water instantly (leaching nutrients!) and warms fast, holding almost no water. Clay soil packs tiny sticky plates: holds tons of water tightly (waterlogged, suffocates roots!). LOAM is the gardener's goldmine—balanced sand + silt + clay + rich dark HUMUS holding both moisture AND air spaces! Calculate % Soil Humus by weighing dry soil before vs after red-hot ignition (humus burns away!)!",
                   keyFormula = "\\%\\text{ Water} = \\frac{\\text{Dry loss at } 105^\\circ\\text{C}}{\\text{Fresh Mass}}\\times 100   |   \\%\\text{ Humus} = \\frac{\\text{Loss on Ignition}}{\\text{Oven-Dry Mass}}\\times 100",
@@ -462,7 +462,7 @@ object BiologyCurriculumPart3 {
             concepts =
               listOf(
                 ConceptBlock(
-                  heading = "1. Germs vs Vectors (Don't Mix Them Up!)",
+                  heading = "Germs vs Vectors (Don't Mix Them Up!)",
                   explanation =
                       "Huge JAMB trap: Mosquito does NOT cause malaria—it is only the DELIVERY TAXI (Vector)! The actual pathogen parasite is microscopic Plasmodium! Know your Top 5: (1) Malaria = Plasmodium carried by female Anopheles mosquito; (2) Sleeping Sickness (Trypanosomiasis) = Trypanosoma carried by Tsetse fly; (3) River Blindness (Onchocerciasis) = Onchocerca worm carried by Blackfly (Simulium); (4) Bilharzia (Schistosomiasis) = Blood fluke carried by Freshwater Snail; (5) Cholera/Typhoid = Bacteria spread by Houseflies & dirty water!",
                   keyFormula = "\\text{Vector (Taxi): Anopheles / Tsetse / Blackfly / Snail} \\neq \\text{Pathogen (Killer): Plasmodium / Trypanosoma / Vibrio}",
@@ -470,7 +470,7 @@ object BiologyCurriculumPart3 {
                       "How does spraying kerosene oil on stagnant ponds kill mosquitoes? It clogs surface tension so breathing siphon tubes of floating Larvae & Pupae suffocate!",
                 ),
                 ConceptBlock(
-                  heading = "2. Immunity (Make Your Own vs Borrow) & Conservation",
+                  heading = "Immunity (Make Your Own vs Borrow) & Conservation",
                   explanation =
                       "Active Immunity means YOUR OWN immune system produces antibodies + lifelong memory cells (either by surviving measles naturally, OR safely via a Vaccine of weakened/dead germs!). Passive Immunity means BORROWING ready-made antibodies (Mom's breastmilk / placenta, or urgent Antivenom snake shot)—works immediately, fades in weeks! Meanwhile, Conservation saves endangered species (Yankari & Kainji National Parks, strict hunting bans, reforestation) for biodiversity!",
                   keyFormula = "\\text{Vaccine} = \\text{Artificial ACTIVE (Long-lasting)}   |   \\text{Antivenom / Breastmilk} = \\text{PASSIVE (Instant, Short)}",

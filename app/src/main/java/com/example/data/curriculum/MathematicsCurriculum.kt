@@ -39,7 +39,7 @@ object MathematicsCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. What Is a Number Base? (Bundles of Fingers!)",
+                    heading = "What Is a Number Base? (Bundles of Fingers!)",
                     explanation =
                       "We normally count in Base 10 because humans have 10 fingers—so every bundle of 10 kicks us into the next column (1s, 10s, 100s). Computers only have ON/OFF switches (2 fingers!), so they count in Base 2 (columns: 1, 2, 4, 8, 16). An alien with 5 fingers uses Base 5 (columns: 1, 5, 25). Rule: digits in Base B are ALWAYS smaller than B!",
                     keyFormula = "(a_2 a_1 a_0)_b = a_2 b^2 + a_1 b^1 + a_0 b^0",
@@ -47,7 +47,7 @@ object MathematicsCurriculum {
                       "To convert from Base 10 to Base b, divide repeatedly by b and read the REMAINDERS from bottom to top!",
                   ),
                   ConceptBlock(
-                    heading = "2. Modular Arithmetic: The 12-Hour Clock Game",
+                    heading = "Modular Arithmetic: The 12-Hour Clock Game",
                     explanation =
                       "If it is 10 o'clock and you wait 5 hours, the clock doesn't say 15—it wraps around past 12 and lands on 3! That is literally 10 + 5 ≡ 3 (mod 12). In mod n arithmetic, you ONLY care about the positive remainder left after dividing by n. Even negative numbers work: add multiples of n until the answer becomes 0, 1, ..., n − 1.",
                     keyFormula = "a \\equiv r \\pmod{n} \\iff a = qn + r,\\quad 0 \\le r < n",
@@ -184,7 +184,7 @@ object MathematicsCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Indices & Logarithms: Twin Opposite Buttons",
+                    heading = "Indices & Logarithms: Twin Opposite Buttons",
                     explanation =
                       "An index (power) tells you how many times to multiply a base: 2^3 = 8. A Logarithm simply asks the backwards question: '2 to what power gives 8?' Answer: \\log_2 8 = 3. Because indices and logs are inverses, multiplying inside a log turns into ADDING two logs, and dividing turns into SUBTRACTING.",
                     keyFormula = "a^0 = 1,\\quad a^{m/n} = (\\sqrt[n]{a})^m   |   \\log_b(xy) = \\log_b x + \\log_b y,\\quad \\log_b(x^k) = k\\log_b x",
@@ -192,7 +192,7 @@ object MathematicsCurriculum {
                       "Any time you see 2^x = \\frac{1}{8} or 9^{x+1} = 27^x, rewrite every term to the SAME small prime base (2 or 3) and equate powers!",
                   ),
                   ConceptBlock(
-                    heading = "2. Surds & Conjugates: Simplifying Irrational Denominators",
+                    heading = "Surds & Conjugates: Simplifying Irrational Denominators",
                     explanation =
                       "For any non-perfect square, factor out the largest perfect square inside the radical—for instance, \\sqrt{12} = \\sqrt{4 \\times 3} = 2\\sqrt{3}. Standard mathematical notation avoids irrational roots in denominators; to rationalize \\frac{1}{a + \\sqrt{b}}, multiply both numerator and denominator by the conjugate (a - \\sqrt{b}) so that the difference of two squares eliminates the radical: (a + \\sqrt{b})(a - \\sqrt{b}) = a^2 - b.",
                     keyFormula = "\\frac{1}{a + \\sqrt{b}} = \\frac{a - \\sqrt{b}}{a^2 - b}",
@@ -329,7 +329,7 @@ object MathematicsCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. The Golden Rule of Venn Diagrams: Fill From Inside Out!",
+                    heading = "The Golden Rule of Venn Diagrams: Fill From Inside Out!",
                     explanation =
                       "Suppose 30 students like Football and 20 like Music in a class of 40. Why does 30 + 20 = 50 (more than 40!)? Because people who like BOTH were counted TWICE! Think of two overlapping hula-hoops: always put the middle overlap x first, then subtract x from each hoop so nobody gets counted twice.",
                     keyFormula = "n(A \\cup B) = n(A) + n(B) - n(A \\cap B)   |   \\text{Subsets} = 2^n",
@@ -337,7 +337,7 @@ object MathematicsCurriculum {
                       "'Only A' means n(A) − n(A ∩ B). If '5 study neither', subtract 5 from n(U) BEFORE solving the hoops!",
                   ),
                   ConceptBlock(
-                    heading = "2. Functions f(x) & Inverse f⁻¹(x): The Forward & Undo Machines",
+                    heading = "Functions f(x) & Inverse f⁻¹(x): The Forward & Undo Machines",
                     explanation =
                       "A function f(x) = 2x + 3 is like a factory machine: drop x in, it doubles x then adds 3. Its inverse f⁻¹(x) is the UNDO machine: write y = 2x + 3, swap x and y (x = 2y + 3), and solve for y to get f⁻¹(x) = (x − 3)/2!",
                     keyFormula = "f(g(x)) = f\\big(g(x)\\big)   |   f\\big(f^{-1}(x)\\big) = x",
@@ -485,7 +485,7 @@ object MathematicsCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. The 4 Variation Recipes (Always Find Constant k First!)",
+                    heading = "The 4 Variation Recipes (Always Find Constant k First!)",
                     explanation =
                       "Think of Variation as a recipe ratio: Direct (y \\propto x) means when x doubles, y doubles (y = kx). Inverse (y \\propto \\frac{1}{x}) means more workers take LESS time (y = \\frac{k}{x}). Partial Variation has a fixed base fee PLUS a variable rate—just like a ride-hailing taxi: Base fare + Naira/km \\implies C = a + bx.",
                     keyFormula = "\\text{Direct: } y = kx   |   \\text{Inverse: } y = \\frac{k}{x}   |   \\text{Partial: } y = a + bx",
@@ -493,7 +493,7 @@ object MathematicsCurriculum {
                       "Read wording carefully: 'varies PARTLY as x and partly as x²' needs TWO constants: y = ax + bx², not one!",
                   ),
                   ConceptBlock(
-                    heading = "2. Inequalities: The Negative Flip Rule",
+                    heading = "Inequalities: The Negative Flip Rule",
                     explanation =
                       "Inequalities act just like equals (=), EXCEPT for one trap: 2 < 5 is true, multiply both sides by −1 and you MUST flip it to −2 > −5! For quadratic inequalities like x² − 5x + 6 < 0, factor to (x − 2)(x − 3) < 0: '< 0' traps x BETWEEN the roots (2 < x < 3), while '> 0' sends x OUTSIDE (x < 2 or x > 3).",
                     keyFormula = "(x - r_1)(x - r_2) < 0 \\implies r_1 < x < r_2\\quad (r_1 < r_2)",
@@ -631,7 +631,7 @@ object MathematicsCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Quadratics, Turning Point & Root Shortcuts (α + β, αβ)",
+                    heading = "Quadratics, Turning Point & Root Shortcuts (α + β, αβ)",
                     explanation =
                       "Every equation ax² + bx + c = 0 draws a U-shaped parabola. Its discriminant Δ = b² − 4ac acts like a weather forecast: Δ > 0 crosses the x-axis twice (2 real roots), Δ = 0 kisses it once (equal roots), Δ < 0 floats above/below (no real roots). Best shortcut in JAMB: Sum of roots α + β = −b/a and Product αβ = c/a!",
                     keyFormula = "\\alpha + \\beta = -\\frac{b}{a},\\quad \\alpha\\beta = \\frac{c}{a}   |   \\alpha^2 + \\beta^2 = (\\alpha + \\beta)^2 - 2\\alpha\\beta",
@@ -639,7 +639,7 @@ object MathematicsCurriculum {
                       "To make a brand new equation with roots m and n, simply write x² − (m + n)x + mn = 0!",
                   ),
                   ConceptBlock(
-                    heading = "2. Remainder & Factor Theorems (Zero Long Division!)",
+                    heading = "Remainder & Factor Theorems (Zero Long Division!)",
                     explanation =
                       "Want the remainder when a huge polynomial P(x) is divided by (x − a)? Don't do messy long division! Just plug x = a straight into P(x): the number P(a) IS your remainder! If P(a) = 0, then (x − a) divides cleanly and IS a factor.",
                     keyFormula = "\\text{Divisor } (px - q) \\implies \\text{Remainder} = P\\!\\left(\\frac{q}{p}\\right)",
@@ -776,7 +776,7 @@ object MathematicsCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. AP (Adding Step-by-Step) vs GP (Multiplying Step-by-Step)",
+                    heading = "AP (Adding Step-by-Step) vs GP (Multiplying Step-by-Step)",
                     explanation =
                       "Climb stairs 3 steps at a time (2, 5, 8, 11...): that steady ADDITION (+d) is an Arithmetic Progression (AP). Double your savings every day (₦2, ₦4, ₦8, ₦16...): steady MULTIPLICATION (×r) is a Geometric Progression (GP). If r is a proper fraction like 1/2, adding forever never explodes—it stops neatly at S∞ = a/(1 − r)!",
                     keyFormula = "\\text{AP: } T_n = a + (n-1)d,\\quad S_n = \\frac{n}{2}[2a + (n-1)d]   |   \\text{GP: } T_n = ar^{n-1},\\quad S_\\infty = \\frac{a}{1-r}",
@@ -784,7 +784,7 @@ object MathematicsCurriculum {
                       "Always divide consecutive GP terms (T₂/T₁) for r, and subtract (T₂ − T₁) for AP difference d!",
                   ),
                   ConceptBlock(
-                    heading = "2. Binary Operations (*): Secret Recipe Rules",
+                    heading = "Binary Operations (*): Secret Recipe Rules",
                     explanation =
                       "A binary operation like x * y = x + y + 2xy is just a custom cooking rule combining two numbers. Identity element e is the 'do-nothing' number that gives you back what you started with: solve x * e = x! Inverse element x⁻¹ is the partner that brings you back to e: solve x * x⁻¹ = e.",
                     keyFormula = "a * e = a \\text{ (Identity } e)   |   a * a^{-1} = e \\text{ (Inverse } a^{-1})",

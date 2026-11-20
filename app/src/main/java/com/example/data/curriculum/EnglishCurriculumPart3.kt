@@ -27,7 +27,7 @@ object EnglishCurriculumPart3 {
             concepts =
               listOf(
                 ConceptBlock(
-                  heading = "1. Put Two Fingers on Your Throat! (Voiced vs Voiceless & '-ed / -s' Rules)",
+                  heading = "Put Two Fingers on Your Throat! (Voiced vs Voiceless & '-ed / -s' Rules)",
                   explanation =
                       "Place two fingers lightly on your larynx and whisper 'SSSS' (no vibration = Voiceless) then hum 'ZZZZ' (vocal-cord vibration = Voiced). By phonetic assimilation, the past-tense suffix '-ed' matches the preceding sound: after voiceless consonants (/p, k, f, s, ʃ, tʃ/), '-ed' is pronounced /t/ ('kissed' = /kɪst/, 'laughed' = /lɑːft/); after voiced sounds, it is /d/ ('played'); after /t/ or /d/ itself, it inserts a vowel to become /ɪd/ ('wanted', 'landed').",
                   keyFormula = "-\\text{ed}:\\; /\\text{t}/\\text{ after voiceless}   |   /\\text{d}/\\text{ after voiced}   |   /\\text{ɪd}/\\text{ after } t,d",
@@ -35,7 +35,7 @@ object EnglishCurriculumPart3 {
                       "Watch the two 'TH' sounds: THin / θink / breath = Voiceless /θ/; THe / THis / breathe / brother = Voiced /ð/!",
                 ),
                 ConceptBlock(
-                  heading = "2. Infamous Silent Letters & Tricky Digraphs ('ch', 'gh', 's')",
+                  heading = "Infamous Silent Letters & Tricky Digraphs ('ch', 'gh', 's')",
                   explanation =
                       "Don't let eyes fool ears! Silent B: 'debt, doubt, subtle, bomb, plumber'. Silent P: 'psalm, receipt, pneumonia, corps (/kɔː/!)'. Silent S: 'island, aisle, debris, chassis'. Look out for 'CH': 'church' = /tʃ/, 'machine / chalet / chef / champagne' = /ʃ/ ('sh'!), 'chemist / chaos / chord / echo' = /k/!",
                   keyFormula = "/\\text{ʃ}/:\\; \\text{nation, sugar, chef, ocean}   |   /\\text{ʒ}/:\\; \\text{measure, vision, garage}   |   /\\text{dʒ}/:\\; \\text{judge, soldier, edge}",
@@ -170,7 +170,7 @@ object EnglishCurriculumPart3 {
             concepts =
               listOf(
                 ConceptBlock(
-                  heading = "1. The 3 Unbreakable Word-Stress Shortcuts!",
+                  heading = "The 3 Unbreakable Word-Stress Shortcuts!",
                   explanation =
                       "Rule A (2-Syllable Twin Rule): NOUN/ADJECTIVE = stress FIRST syllable ('CONduct, EXport, PREsent, REbel'); VERB action = stress SECOND syllable ('conDUCT, exPORT, preSENT, reBEL')! Rule B (-tion/-ic/-ian = Penultimate): Stress lands RIGHT BEFORE '-tion / -ic / -ian' ('inforMAtion, eLECtric, muSIcian')! Rule C (-gy/-phy/-ty/-cy/-ical = 3rd From Back): Count 3 back from the end ('biOlogy, phoTOgraphy, deMOcracy, uNIversity, poLItical')!",
                   keyFormula = "\\text{-tion/-ic/-ian} \\implies \\text{2nd-last}   |   \\text{-gy/-phy/-ty/-cy} \\implies \\text{3rd-last}   |   \\text{-ee/-eer/-esque} \\implies \\text{ON itself!}",
@@ -178,7 +178,7 @@ object EnglishCurriculumPart3 {
                       "Words ending in '-ee', '-eer', '-oo', '-ette', '-esque' pull stress straight onto the ENDING itself: 'employEE, enginEER, cigaRETTE, picturESQUE'!",
                 ),
                 ConceptBlock(
-                  heading = "2. Emphatic Stress & Rhymes (Easiest Full Marks in JAMB!)",
+                  heading = "Emphatic Stress & Rhymes (Easiest Full Marks in JAMB!)",
                   explanation =
                       "In Emphatic Stress, ONE word is typed in ALL CAPS (e.g., 'Ada bought a NEW dress yesterday.'). To pick the right question that matches this reply: keep EVERY non-caps word identical ('Ada, bought, dress, yesterday'), and CONTRADICT ONLY the CAPS word ('Did Ada buy an OLD dress yesterday?')! For Rhymes: stress + final vowel + ending consonant must match from the last stressed syllable onward (ignoring silent letters: 'comb / home', 'reign / vein', 'climb / thyme'!)!",
                   keyFormula = "\\text{Emphatic Rule: Match ALL non-CAPS words} + \\text{Contradict ONLY the ALL-CAPS word!}",
@@ -321,7 +321,7 @@ object EnglishCurriculumPart3 {
             concepts =
               listOf(
                 ConceptBlock(
-                  heading = "1. The 4 Golden WAEC Summary Rules (Stop Losing Half Marks!)",
+                  heading = "The 4 Golden WAEC Summary Rules (Stop Losing Half Marks!)",
                   explanation =
                       "Summary is the easiest A1 goldmine if you obey 4 simple rules: (1) Answer in CLEAN COMPLETE SENTENCES (starting with Subject + Verb—never broken phrases!); (2) PARAPHRASE in your own clear words (wholesale copy-pasting from the passage loses HALF marks automatically!); (3) Include ONE main point per numbered sentence if asked for 'three reasons'; (4) CUT OUT all statistics, brackets, analogies, and 'for example...' lists!",
                   keyFormula = "\\text{Summary Formula: Complete Sentence + Own Words + Zero Preamble/Examples}",
@@ -329,7 +329,7 @@ object EnglishCurriculumPart3 {
                       "Comprehension Vocab Substitution rule: when replacing an underlined passage word, test YOUR word straight back inside the original sentence—same tense, same singular/plural!",
                 ),
                 ConceptBlock(
-                  heading = "2. Essay & Letter Formats (Formal vs Informal Checklist)",
+                  heading = "Essay & Letter Formats (Formal vs Informal Checklist)",
                   explanation =
                       "Formal Letter (to Editor/Principal/Ministry): TWO addresses (yours top-right, recipient's left), Date, Salutation ('Dear Sir/Madam,'), Clear Centered/Underlined Heading/Title, zero slang/contractions ('cannot', not 'can't'), and Sign-off strictly 'Yours faithfully,' + Signature + Full Name! Informal Letter (friend/parent): ONLY ONE address (yours top-right), 'Dear Ada,' and 'Yours sincerely,' (or 'Your loving friend,') + First Name ONLY—NO signature!",
                   keyFormula = "\\text{Formal: 2 Addresses + Title + 'Yours faithfully,' + Signature}   |   \\text{Informal: 1 Address + 'Yours sincerely,' + First Name}",

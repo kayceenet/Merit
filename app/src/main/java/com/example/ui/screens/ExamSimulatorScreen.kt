@@ -270,7 +270,7 @@ fun ExamSimulatorScreen(
                   verticalArrangement = Arrangement.spacedBy(14.dp),
                 ) {
                   Text(
-                    text = "1. Compulsory Paper",
+                    text = "Compulsory Paper",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                   )
@@ -291,7 +291,7 @@ fun ExamSimulatorScreen(
                   }
 
                   Text(
-                    text = "2. Pick 3 Electives (${cbtState.selectedComboElectives.size}/3 selected)",
+                    text = "Elective Subjects (${cbtState.selectedComboElectives.size}/3 selected)",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                   )
@@ -321,7 +321,7 @@ fun ExamSimulatorScreen(
                   }
 
                   Text(
-                    text = "3. UTME Format & Question Count",
+                    text = "Format & Question Count",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                   )
@@ -393,7 +393,7 @@ fun ExamSimulatorScreen(
                   verticalArrangement = Arrangement.spacedBy(14.dp),
                 ) {
               Text(
-                text = "1. Select Exam Board Mode",
+                text = "Exam Board",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
               )
@@ -432,7 +432,7 @@ fun ExamSimulatorScreen(
               }
 
               Text(
-                text = "2. Select Subject Paper",
+                text = "Subject Paper",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
               )
@@ -464,7 +464,7 @@ fun ExamSimulatorScreen(
               }
 
               Text(
-                text = "3. Paper Length",
+                text = "Paper Length",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
               )

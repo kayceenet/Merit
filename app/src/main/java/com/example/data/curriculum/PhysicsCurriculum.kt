@@ -39,7 +39,7 @@ object PhysicsCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. The Seven Fundamental Quantities & Dimensional Equations",
+                    heading = "The Seven Fundamental Quantities & Dimensional Equations",
                     explanation =
                       "Just as all English words are formed from a fixed alphabet, every physical measurement in Physics reduces to seven independent base standards: Length l (metre, m), Mass m (kilogram, kg), Time t (second, s), Electric Current I (ampere, A), Thermodynamic Temperature T (kelvin, K), Amount of Substance n (mole, mol), and Luminous Intensity I_v (candela, cd). Derived quantities combine these base units—for example, velocity v = displacement / time (m/s), force F = mass × acceleration (kg·m/s² = N), work/energy E = force × distance (J), and power P = work / time (W). Dimensions represent Mass, Length, and Time generically as [M], [L], and [T].",
                     keyFormula = "[v] = L T^{-1}   |   [F] = M L T^{-2}   |   [E] = M L^{2} T^{-2}   |   [P] = M L^{2} T^{-3}",
@@ -47,7 +47,7 @@ object PhysicsCurriculum {
                       "Mass m (kg) measures quantity of matter and remains invariant anywhere; Weight W = mg (N) is gravitational pull and changes with local field strength g.",
                   ),
                   ConceptBlock(
-                    heading = "2. Choosing the Right Measuring Tool & Removing Zero Error",
+                    heading = "Choosing the Right Measuring Tool & Removing Zero Error",
                     explanation =
                       "A school ruler spots changes as small as 0.1 cm (1 mm). Need to measure a bottle cap's thickness? Use a Vernier Caliper (reads to 0.01 cm). Measuring a single hair or copper wire? Use a Micrometer Screw Gauge (reads to 0.001 cm = 0.01 mm). If the tool doesn't start at zero when shut, subtract a positive zero error or add back a negative one.",
                     keyFormula = "\\text{True Reading} = \\text{Main Scale} + (\\text{Coinciding Div} \\times \\text{Least Count}) - \\text{Zero Error}",
@@ -186,7 +186,7 @@ object PhysicsCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Scalar vs Vector Quantities & Resultant Addition",
+                    heading = "Scalar vs Vector Quantities & Resultant Addition",
                     explanation =
                       "Giving only a magnitude such as '5 km' describes Distance—a SCALAR completely defined by size and unit (e.g., mass m, speed v, time t, energy E, temperature T, pressure P). Specifying '5 km due North' gives Displacement—a VECTOR requiring both magnitude and direction (e.g., force F, velocity, acceleration a, momentum p). Two non-parallel forces F_1 and F_2 separated by angle θ combine via the parallelogram cosine law to produce resultant magnitude R.",
                     keyFormula = "R = \\sqrt{F_1^2 + F_2^2 + 2 F_1 F_2 \\cos(\\theta)}   \\quad (\\text{At } \\theta = 90^{\\circ}:\\; R = \\sqrt{F_1^2 + F_2^2})",
@@ -194,7 +194,7 @@ object PhysicsCurriculum {
                       "Two equal forces of magnitude F inclined at 120° produce a resultant of exact magnitude F.",
                   ),
                   ConceptBlock(
-                    heading = "2. Orthogonal Force Resolution (X and Y Components)",
+                    heading = "Orthogonal Force Resolution (X and Y Components)",
                     explanation =
                       "Consider a warehouse technician towing a cargo trolley via a handle tilted at angle θ above horizontal ground. Part of the applied pull F acts horizontally forward (F_x = F cos θ, adjacent to θ) while part lifts vertically upward (F_y = F sin θ, opposite θ). For three or more coplanar forces, sum all horizontal components (ΣF_x) and all vertical components (ΣF_y) separately, then compute the resultant angle α relative to the horizontal axis.",
                     keyFormula = "F_x = F\\cos(\\theta)   |   F_y = F\\sin(\\theta)   |   \\tan(\\alpha) = \\frac{\\Sigma F_y}{\\Sigma F_x}",
@@ -332,7 +332,7 @@ object PhysicsCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Velocity-Time Graphs: Slope = Acceleration, Area = Distance",
+                    heading = "Velocity-Time Graphs: Slope = Acceleration, Area = Distance",
                     explanation =
                       "Picture a car accelerating smoothly from traffic lights. On a velocity-vs-time graph, steepness (slope = Δv/Δt) tells you how quickly it speeds up (acceleration). The total area trapped under the line—usually a triangle plus a rectangle—equals the exact distance traveled!",
                     keyFormula = "v = u + at   |   s = ut + \\frac{1}{2}at^2   |   v^2 = u^2 + 2as",
@@ -340,7 +340,7 @@ object PhysicsCurriculum {
                       "If a stone is 'dropped from rest', immediately set u = 0! At maximum height when thrown straight up, final vertical velocity v = 0.",
                   ),
                   ConceptBlock(
-                    heading = "2. Projectiles: Two Independent Movies Playing at Once",
+                    heading = "Projectiles: Two Independent Movies Playing at Once",
                     explanation =
                       "Kick a football across a field! Sideways motion has ZERO gravity pulling it, so horizontal speed u_x = u·cos θ stays constant all flight. Up-and-down motion obeys gravity g pulling downward, pausing briefly at the top (v_y = 0) before falling back down. Launch at 45° gives the farthest horizontal range!",
                     keyFormula = "T = \\frac{2u\\sin\\theta}{g}   |   H = \\frac{u^2\\sin^2\\theta}{2g}   |   R = \\frac{u^2\\sin(2\\theta)}{g}",
@@ -479,7 +479,7 @@ object PhysicsCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Newton's Laws & Why Seatbelts Matter (Momentum)",
+                    heading = "Newton's Laws & Why Seatbelts Matter (Momentum)",
                     explanation =
                       "Objects are stubborn—a rolling ball keeps rolling unless friction stops it (1st Law: Inertia). Push a light shopping cart vs a heavy truck with the same push: the lighter one shoots forward faster (2nd Law: F = ma). When a cannon fires a cannonball forward, the cannon kicks backward equally hard (3rd Law & Momentum Conservation)!",
                     keyFormula = "F = ma = \\frac{m(v - u)}{t}   |   m_1 u_1 + m_2 u_2 = m_1 v_1 + m_2 v_2",
@@ -487,7 +487,7 @@ object PhysicsCurriculum {
                       "Momentum is ALWAYS conserved in explosions & collisions with no outside push, even when objects stick together!",
                   ),
                   ConceptBlock(
-                    heading = "2. Equilibrium: No Sliding AND No Tipping Over",
+                    heading = "Equilibrium: No Sliding AND No Tipping Over",
                     explanation =
                       "Try sitting on a see-saw with an older cousin: you sit farther from the pivot to balance their heavier weight! That turning effect is Moment = Force × perpendicular distance. For total equilibrium, total Up force = Down force AND Sum of Clockwise Moments = Sum of Anticlockwise Moments.",
                     keyFormula = "\\Sigma F = 0   \\quad\\text{AND}\\quad   \\Sigma(\\text{Clockwise Moments}) = \\Sigma(\\text{Anticlockwise Moments})",
@@ -636,7 +636,7 @@ object PhysicsCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Energy Never Disappears—It Changes Outfit",
+                    heading = "Energy Never Disappears—It Changes Outfit",
                     explanation =
                       "Lift a mango high up a tree and it stores height energy (Potential Energy = mgh). Let go and it speeds up as height energy trades seamlessly into motion energy (Kinetic Energy = ½mv²). Carrying a heavy bag horizontally without lifting? Physics says W = F·s·cos(90°) = 0 J of gravitational work!",
                     keyFormula = "W = F s \\cos\\theta   |   KE = \\frac{1}{2}mv^2   |   PE = mgh   |   P = \\frac{W}{t} = Fv",
@@ -644,7 +644,7 @@ object PhysicsCurriculum {
                       "Work requires movement IN the direction of force. No displacement = ZERO physics work!",
                   ),
                   ConceptBlock(
-                    heading = "2. Machines Make Lifting Easier (MA, VR & Efficiency)",
+                    heading = "Machines Make Lifting Easier (MA, VR & Efficiency)",
                     explanation =
                       "A ramp or pulley lets you lift a heavy motorcycle using less muscle force—at the cost of pulling a longer distance! Mechanical Advantage (MA = Load / Effort) measures force boost; Velocity Ratio (VR = Effort distance / Load distance) is set by geometry (number of pulley ropes supporting load, or 1/sin θ on a ramp).",
                     keyFormula = "MA = \\frac{L}{E}   |   VR = \\frac{d_E}{d_L}   |   \\text{Efficiency } \\eta = \\frac{MA}{VR} \\times 100\\%",
@@ -781,7 +781,7 @@ object PhysicsCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Circular Motion: Pulling Inward Keeps You Turning",
+                    heading = "Circular Motion: Pulling Inward Keeps You Turning",
                     explanation =
                       "Swing a stone tied to a string around your head. Your hand pulls INWARD along the string—that inward pull is Centripetal Force! Let go, and the stone flies straight along a tangent, NOT radially outward.",
                     keyFormula = "F_c = \\frac{mv^2}{r} = m\\omega^2 r   |   v = \\omega r   |   \\omega = 2\\pi f",
@@ -789,7 +789,7 @@ object PhysicsCurriculum {
                       "Banking curved highways tilts the road inward so normal reaction helps provide centripetal force even on wet tarmac!",
                   ),
                   ConceptBlock(
-                    heading = "2. Simple Harmonic Motion (SHM): Swing Back & Forth",
+                    heading = "Simple Harmonic Motion (SHM): Swing Back & Forth",
                     explanation =
                       "Watch a grandfather clock pendulum swing. At the extreme ends, velocity is ZERO and restoring force/acceleration is MAXIMUM. Passing straight through the middle, acceleration is ZERO and speed is MAXIMUM! Notice mass m does NOT change a pendulum's time period T—only length L and gravity g do!",
                     keyFormula = "a = -\\omega^2 x   |   T_{\\text{pendulum}} = 2\\pi\\sqrt{\\frac{L}{g}}   |   T_{\\text{spring}} = 2\\pi\\sqrt{\\frac{m}{k}}",
@@ -927,7 +927,7 @@ object PhysicsCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Why Broad Tires Don't Sink & Water Pushes Upward",
+                    heading = "Why Broad Tires Don't Sink & Water Pushes Upward",
                     explanation =
                       "Pressing with a sharp thumbtack hurts more than pressing with your flat thumb because Pressure = Force ÷ Area. Under water, fluid squeezes harder the deeper you dive (P = hρg). Push a beach ball underwater and the water fights back upward with a lift equal to the weight of water shoved aside—that's Archimedes' Upthrust!",
                     keyFormula = "P = \\frac{F}{A} = h\\rho g   |   U = V\\rho_{\\text{fluid}}g = W_{\\text{air}} - W_{\\text{fluid}}   |   RD = \\frac{W_{\\text{air}}}{W_{\\text{air}} - W_{\\text{water}}}",
@@ -935,7 +935,7 @@ object PhysicsCurriculum {
                       "A floating ship displaces its OWN ENTIRE WEIGHT of water (Law of Flotation). That's why steel ships with hollow air spaces float!",
                   ),
                   ConceptBlock(
-                    heading = "2. Hooke's Law, Surface Tension & Viscosity",
+                    heading = "Hooke's Law, Surface Tension & Viscosity",
                     explanation =
                       "Pull a steel spring gently and stretch e grows neatly in step with load F (Hooke's Law: F = ke). Meanwhile water drops bead into spheres because surface molecules pull inward (Surface Tension—soap drops lower it!), and thick honey drips slowly because fluid layers drag against each other (Viscosity—heat lowers liquid viscosity!).",
                     keyFormula = "F = k e   |   E_{\\text{elastic}} = \\frac{1}{2} F e = \\frac{1}{2} k e^2   |   \\text{Stress} = \\frac{F}{A}, \\; \\text{Strain} = \\frac{e}{L}",

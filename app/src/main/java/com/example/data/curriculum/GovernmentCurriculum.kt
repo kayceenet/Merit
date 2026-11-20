@@ -22,7 +22,7 @@ object GovernmentCurriculum {
     intel: String,
     recap: String,
   ) = ConceptBlock(
-    heading = heading,
+    heading = heading.replace(Regex("""^\d+\.\s+"""), "").trim(),
     explanation = explanation,
     keyFormula = keyFormula,
     examTip = examTip,

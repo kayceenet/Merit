@@ -230,7 +230,7 @@ fun SpacedRepetitionModal(
 
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
               Text(
-                text = "Verified Answer",
+                text = "Model Answer",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontWeight = FontWeight.SemiBold,
@@ -260,34 +260,51 @@ fun SpacedRepetitionModal(
         }
 
         if (answerRevealed) {
-          // Coral / Deep Indigo / Cornflower pill buttons matching Top-Center phone in mockup
-          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+          val ratingRows =
             listOf(
-              Triple(0, "Again\n1d", semantics.coralAccent.copy(alpha = 0.85f) to Color.White),
-              Triple(1, "Hard\n2d", semantics.coralAccent to Color.White),
-              Triple(2, "Good\n3d+", semantics.indigoAccent to Color.White),
-              Triple(3, "Excellent\n7d+", MaterialTheme.colorScheme.primary to Color.White),
-            ).forEach { (quality, label, colors) ->
-              Button(
-                onClick = {
-                  answerRevealed = false
-                  reviewedInSession++
-                  onRateCard(currentCard.id, quality)
-                },
-                modifier = Modifier.weight(1f).height(54.dp).testTag("spaced_rate_$quality"),
-                shape = RoundedCornerShape(14.dp),
-                colors =
-                  ButtonDefaults.buttonColors(
-                    containerColor = colors.first,
-                    contentColor = colors.second,
-                  ),
+              listOf(
+                Triple(0, "Again • 1d", semantics.coralAccent.copy(alpha = 0.88f) to Color.White),
+                Triple(1, "Hard • 2d", semantics.coralAccent to Color.White),
+              ),
+              listOf(
+                Triple(2, "Good • 3d+", semantics.indigoAccent to Color.White),
+                Triple(3, "Excellent • 7d+", MaterialTheme.colorScheme.primary to Color.White),
+              ),
+            )
+          Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+          ) {
+            ratingRows.forEach { rowItems ->
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
               ) {
-                Text(
-                  text = label,
-                  style = MaterialTheme.typography.labelSmall,
-                  fontWeight = FontWeight.Bold,
-                  textAlign = TextAlign.Center,
-                )
+                rowItems.forEach { (quality, label, colors) ->
+                  Button(
+                    onClick = {
+                      answerRevealed = false
+                      reviewedInSession++
+                      onRateCard(currentCard.id, quality)
+                    },
+                    modifier = Modifier.weight(1f).height(50.dp).testTag("spaced_rate_$quality"),
+                    shape = RoundedCornerShape(14.dp),
+                    colors =
+                      ButtonDefaults.buttonColors(
+                        containerColor = colors.first,
+                        contentColor = colors.second,
+                      ),
+                  ) {
+                    Text(
+                      text = label,
+                      style = MaterialTheme.typography.labelLarge,
+                      fontWeight = FontWeight.Bold,
+                      maxLines = 1,
+                      softWrap = false,
+                      textAlign = TextAlign.Center,
+                    )
+                  }
+                }
               }
             }
           }

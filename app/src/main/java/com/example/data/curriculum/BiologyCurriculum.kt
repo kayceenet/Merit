@@ -39,7 +39,7 @@ object BiologyCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. MR NIGER D + Why Viruses Confuse Scientists",
+                    heading = "MR NIGER D + Why Viruses Confuse Scientists",
                     explanation =
                       "How do we know a goat is alive while a stone isn't? Every living thing checks MR NIGER D: Movement, Respiration (making energy—NOT just breathing!), Nutrition, Irritability (sensing), Growth, Excretion (dumping metabolic waste—NOT pooping undigested food, which is Egestion!), Reproduction, and Death. Outside a host cell, a Virus acts like dead crystal dust; inside your lung cell, it hijacks machinery to copy itself!",
                     keyFormula = "\\text{Taxonomic Hierarchy: Kingdom} \\to \\text{Phylum} \\to \\text{Class} \\to \\text{Order} \\to \\text{Family} \\to \\text{Genus} \\to \\text{Species}",
@@ -47,7 +47,7 @@ object BiologyCurriculum {
                       "Binomial Naming rule: Genus starts CAPITALIZED, species all lowercase, BOTH italicized or underlined separately (e.g., Homo sapiens)!",
                   ),
                   ConceptBlock(
-                    heading = "2. The 5 Kingdoms & Microscope Math",
+                    heading = "The 5 Kingdoms & Microscope Math",
                     explanation =
                       "Only ONE kingdom lacks a true nucleus (Prokaryotes): Monera (Bacteria)! Single-celled Eukaryotes with a nucleus (Amoeba, Euglena, Plasmodium) go in Protista. Fungi (Mushrooms, Rhizopus, Yeast) look plant-like but have NO chlorophyll and have Chitin walls (not Cellulose!). On a light microscope, Eyepiece × Objective = Total Magnification!",
                     keyFormula = "\\text{Total Mag} = M_{\\text{eyepiece}} \\times M_{\\text{objective}}   |   M = \\frac{\\text{Drawing Size}}{\\text{Actual Size}}",
@@ -183,7 +183,7 @@ object BiologyCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Inside the Microscopic City (Organelle Jobs)",
+                    heading = "Inside the Microscopic City (Organelle Jobs)",
                     explanation =
                       "Every cell is a miniature factory city! Nucleus = City Hall storing DNA blueprints. Ribosomes = tiny 3D Printers building Proteins! Smooth/Rough ER = Conveyor Highways. Golgi Body = Post Office packaging proteins into vesicles. Mitochondrion = Power Plant burning glucose into ATP energy. Lysosome = Recycling Wrecking Crew!",
                     keyFormula = "\\text{Plant ONLY: Cell Wall + Chloroplasts + Large Vacuole}   |   \\text{Animal ONLY: Centrioles + Lysosomes}",
@@ -191,7 +191,7 @@ object BiologyCurriculum {
                       "Muscle cells and sperm tails are PACKED with Mitochondria because they burn massive ATP for movement!",
                   ),
                   ConceptBlock(
-                    heading = "2. Osmosis: Water Always Chases the Saltier / Sweeter Crowd!",
+                    heading = "Osmosis: Water Always Chases the Saltier / Sweeter Crowd!",
                     explanation =
                       "Diffusion moves ink or perfume from High → Low concentration. Osmosis is ONLY for WATER crossing a semi-permeable gate—from DILUTE (lots of water, weak salt = Hypotonic) into CONCENTRATED (less free water, high salt/sugar = Hypertonic)! Drop a Red Blood Cell into pure water: water rushes IN until it POPS (Haemolysis)! Put a potato strip in strong salt: water rushes OUT so cytoplasm shrinks away from the stiff wall (Plasmolysis)!",
                     keyFormula = "\\text{Hypotonic Bath} \\implies \\text{Plant Turgid / Animal Bursts}   |   \\text{Hypertonic Bath} \\implies \\text{Plant Plasmolyzed / Animal Crenated}",
@@ -328,7 +328,7 @@ object BiologyCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Enzymes: Fussy Biological Helper Keys",
+                    heading = "Enzymes: Fussy Biological Helper Keys",
                     explanation =
                       "Enzymes are protein speed-boosters shaped like tiny locks matching only ONE substrate key! Speed rises with warmth up to an Optimum (~37–40°C in humans)—push past 50°C and the protein LOCK MELTS out of shape permanently (DENATURED!). Notice pH tastes too: Stomach Pepsin loves strong acid (pH 2), Salivary Amylase likes neutral (pH 7), Intestinal Trypsin likes alkaline (pH 8.5)!",
                     keyFormula = "E + S \\rightleftharpoons ES \\to E + P   |   \\text{Temp } > 50^\\circ\\text{C} \\implies \\text{Active Site Denatured}",
@@ -336,7 +336,7 @@ object BiologyCurriculum {
                       "Careful: freezing cold (~0°C) only INACTIVATES enzymes (puts them to sleep—warm back up and they work!); boiling DENATURES them forever!",
                   ),
                   ConceptBlock(
-                    heading = "2. Photosynthesis & Aerobic vs Anaerobic Energy",
+                    heading = "Photosynthesis & Aerobic vs Anaerobic Energy",
                     explanation =
                       "Chloroplasts run solar power in 2 shifts: Day Shift (Light Reaction inside Grana) uses sunlight to split water (Photolysis) releasing O₂ bubbles + ATP/NADPH! Night-capable Shift (Calvin Cycle in Stroma) uses that ATP to stitch CO₂ into Glucose! Meanwhile, ALL living cells burn Glucose 24/7: With Oxygen → 38 ATP; Without Oxygen → only 2 ATP (Muscles make painful Lactic Acid → Oxygen Debt; Yeast makes Ethanol + CO₂ for bread rising!).",
                     keyFormula = "6\\text{CO}_2 + 6\\text{H}_2\\text{O} \\xrightarrow{\\text{Light/Chl}} \\text{C}_6\\text{H}_{12}\\text{O}_6 + 6\\text{O}_2   |   \\text{Yeast: } \\text{C}_6\\text{H}_{12}\\text{O}_6 \\to 2\\text{C}_2\\text{H}_5\\text{OH} + 2\\text{CO}_2 + 2\\text{ATP}",
@@ -482,7 +482,7 @@ object BiologyCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. The 5 Classic WAEC Food Tests",
+                    heading = "The 5 Classic WAEC Food Tests",
                     explanation =
                       "Spot nutrients by colour! Starch + Iodine = BLUE-BLACK! Reducing Sugar (Glucose/Maltose) + Benedict's + Heat = BRICK-RED ppt! (Sucrose stays blue until boiled with dil. HCl first—Non-reducing sugar!). Protein + Biuret (CuSO₄ + NaOH) = VIOLET / PURPLE! Fats + Sudan III = RED oil droplets (or translucent greasy spot on paper)!",
                     keyFormula = "\\text{Starch} \\xrightarrow{\\text{Amylase}} \\text{Maltose} \\xrightarrow{\\text{Maltase}} \\text{Glucose}   |   \\text{Protein} \\xrightarrow{\\text{Pepsin/Trypsin}} \\text{Peptides} \\xrightarrow{\\text{Erepsin}} \\text{Amino Acids}",
@@ -490,7 +490,7 @@ object BiologyCurriculum {
                       "Does Bile contain ANY digestive enzymes? NO! Bile contains ONLY bile salts that EMULSIFY fat blobs into tiny droplets + NaHCO₃ to neutralize stomach acid!",
                   ),
                   ConceptBlock(
-                    heading = "2. Teeth, Villi Absorption & Deficiencies",
+                    heading = "Teeth, Villi Absorption & Deficiencies",
                     explanation =
                       "Human adult Dental Formula (half jaw): I 2/2, C 1/1, PM 2/2, M 3/3 = 32 teeth (Herbivores leave a toothless Diastema gap instead of Canines!). Inside the Ileum, millions of finger-like Villi maximize absorption: Glucose & Amino acids enter Blood Capillaries → Hepatic Portal Vein to Liver, whereas Fatty Acids + Glycerol enter milky LACTEALS (lymph)!",
                     keyFormula = "\\text{Deficiencies: Vit A}\\to\\text{Night Blindness}   |   \\text{Vit C}\\to\\text{Scurvy}   |   \\text{Vit D}\\to\\text{Rickets}   |   \\text{Iodine}\\to\\text{Goitre}",
@@ -626,7 +626,7 @@ object BiologyCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Double Circulation: Why the Left Ventricle Has Triple Muscle!",
+                    heading = "Double Circulation: Why the Left Ventricle Has Triple Muscle!",
                     explanation =
                       "Deoxygenated blood returns from your body via the Vena Cava into the RIGHT ATRIUM (RA) → pushes through Tricuspid Valve into RIGHT VENTRICLE (RV) → pumps out Pulmonary ARTERY to the Lungs to grab O₂! Fresh red blood returns via Pulmonary VEIN into LEFT ATRIUM (LA) → passes Bicuspid (Mitral) Valve into super-muscular LEFT VENTRICLE (LV), which squeezes hard enough to blast blood all the way around your whole body through the Aorta!",
                     keyFormula = "\\text{Body} \\xrightarrow{\\text{Vena Cava}} \\text{RA} \\to \\text{RV} \\xrightarrow{\\text{Pulm. Artery}} \\text{Lungs} \\xrightarrow{\\text{Pulm. Vein}} \\text{LA} \\to \\text{LV} \\xrightarrow{\\text{Aorta}} \\text{Body}",
@@ -634,7 +634,7 @@ object BiologyCurriculum {
                       "GOLDEN EXCEPTION: Arteries carry blood AWAY from the heart (oxygenated EXCEPT Pulmonary Artery & Umbilical Artery!); Veins carry blood TOWARD the heart (deoxygenated EXCEPT Pulmonary Vein!)!",
                   ),
                   ConceptBlock(
-                    heading = "2. Plant Vascular Superhighways: Dead Xylem vs Living Phloem",
+                    heading = "Plant Vascular Superhighways: Dead Xylem vs Living Phloem",
                     explanation =
                       "Trees need no heart! Sunlight evaporates water off leaves through Stomata (Transpiration), sucking a continuous water chain UP hollow dead Lignified Xylem vessels (Cohesion-Tension + Root Pressure)! Meanwhile, living Phloem Sieve Tubes (helped by nucleated Companion Cells) pump sucrose sugars UP AND DOWN to fruits, growing buds, and underground roots (Translocation)!",
                     keyFormula = "\\text{High Wind + Low Humidity + Warmth} \\implies \\text{Transpiration Rate} \\uparrow   |   \\text{Phloem Ringing} \\implies \\text{Sugar Swells Above Ring}",
@@ -770,7 +770,7 @@ object BiologyCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Gas Exchange Surfaces & Breathing Like a Bellows",
+                    heading = "Gas Exchange Surfaces & Breathing Like a Bellows",
                     explanation =
                       "Whether a Fish's Gill Filaments, Frog's Moist Skin, Insect's Spiracles/Tracheae, or Human Alveoli—ALL great breathing organs share 4 rules: HUGE Surface Area, Ultra-Thin (1 cell thick!), Moist, and Rich Blood Supply (except insects, whose tracheal air pipes go straight to muscles!). During Inhalation, your External Intercostal muscles lift ribs UP & OUT while your Diaphragm flattens DOWN—chest volume EXPANDS, air pressure DROPS below outside air, and oxygen rushes in!",
                     keyFormula = "\\text{Fish Gill Counter-Current} > \\text{Concurrent (maintains } \\text{O}_2 \\text{ gradient along full lamella!)}",
@@ -778,7 +778,7 @@ object BiologyCurriculum {
                       "Exhaled air is NOT 0% O₂! It still has ~16% O₂ (down from 21%!) and ~4% CO₂ (up 100× from 0.04%)!",
                   ),
                   ConceptBlock(
-                    heading = "2. The Kidney Nephron Filter & Antidiuretic Hormone (ADH)",
+                    heading = "The Kidney Nephron Filter & Antidiuretic Hormone (ADH)",
                     explanation =
                       "Your Liver deaminates excess amino acids into toxic Ammonia → safe UREA (remember: humans don't store spare protein!). Each Kidney packs 1 million Nephron filters: High pressure inside the Glomerulus squeezes water, salts, glucose & urea into Bowman's Capsule (Ultrafiltration—big Red Blood Cells & Plasma Proteins STAY behind!). As fluid passes the Proximal Tubule, 100% of Glucose is pumped back! On a hot dry day, Pituitary gland releases ADH → Collecting Duct becomes permeable → extra water reabsorbed → small dark urine!",
                     keyFormula = "\\text{Bowman's Capsule (Ultrafiltration)} \\to \\text{PCT (100\\% Glucose Reabsorbed)} \\to \\text{Loop of Henle} \\to \\text{CD (+ADH } \\implies \\text{Water Saved)}",

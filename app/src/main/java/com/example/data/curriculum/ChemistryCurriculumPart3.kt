@@ -27,7 +27,7 @@ object ChemistryCurriculumPart3 {
             concepts =
               listOf(
                 ConceptBlock(
-                  heading = "1. Saturated vs Unsaturated Hydrocarbons (Holding Hands!)",
+                  heading = "Saturated vs Unsaturated Hydrocarbons (Holding Hands!)",
                   explanation =
                     "Carbon ALWAYS makes 4 bonds. In Alkanes (single bonds, saturated), every hand is full—so Chlorine can only swap places with a Hydrogen atom (SUBSTITUTION under sunlight!). Alkenes (double bond C=C) and Alkynes (triple bond C≡C) are unsaturated—they open up an extra bond to ADD Br₂ or H₂ cleanly! Drop brown Bromine water into an alkene and it turns COLOURLESS instantly!",
                   keyFormula = "\\text{Alkane: } C_nH_{2n+2}   |   \\text{Alkene: } C_nH_{2n}   |   \\text{Alkyne: } C_nH_{2n-2}   |   \\text{Homolog diff } = CH_2\\; (14\\text{ g})",
@@ -35,7 +35,7 @@ object ChemistryCurriculumPart3 {
                     "Wait: BOTH Alkenes and Alkynes decolorize Br₂ water! How to tell Ethyne (terminal H−C≡C−H) apart from Ethene? Ethyne gives a RED precipitate with ammoniacal Copper(I) chloride!",
                 ),
                 ConceptBlock(
-                  heading = "2. Isomers, Petroleum Cracking & Geometric Cis/Trans",
+                  heading = "Isomers, Petroleum Cracking & Geometric Cis/Trans",
                   explanation =
                     "Structural Isomers have the SAME molecular formula (e.g., C₄H₁₀) but different skeletons (straight butane vs branched 2-methylpropane). Petroleum Cracking snaps long heavy kerosene chains into high-demand Petrol + useful Ethene gas! Watch Octane Number: branched chains like 2,2,4-trimethylpentane (Iso-octane = 100) burn smoothly without engine knocking!",
                   keyFormula = "\\text{C}_{10}\\text{H}_{22} \\xrightarrow{\\text{Crack}} \\text{C}_8\\text{H}_{18}\\text{ (petrol)} + \\text{C}_2\\text{H}_4\\text{ (ethene)}",
@@ -172,7 +172,7 @@ object ChemistryCurriculumPart3 {
             concepts =
               listOf(
                 ConceptBlock(
-                  heading = "1. Alcohol Oxidation, Esters (Fruity Smells!) & Soaps",
+                  heading = "Alcohol Oxidation, Esters (Fruity Smells!) & Soaps",
                   explanation =
                     "Warm Primary Ethanol with orange acidified K₂Cr₂O₇ and it oxidizes first to Ethanal, then to Vinegar (Ethanoic Acid), turning the tube GREEN! Secondary alcohol stops at a Ketone; Tertiary has no α-H so orange stays unchanged! Mix Acid + Alcohol + a drop of Conc. H₂SO₄ and you cook up a sweet-smelling fruit ESTER! Boil vegetable fat/ester with caustic NaOH instead and you make SOAP + Glycerol (Saponification)!",
                   keyFormula = "\\text{RCOOH} + \\text{R}'\\text{OH} \\underset{\\text{H}_2\\text{SO}_4}{\\rightleftharpoons} \\text{RCOOR}' + \\text{H}_2\\text{O}   |   \\text{Fat} + 3\\text{NaOH} \\to \\text{Soap} + \\text{Glycerol}",
@@ -180,7 +180,7 @@ object ChemistryCurriculumPart3 {
                     "How to name an Ester RCOOR'? The '-OH alcohol' part goes FIRST as '-yl', and the '-COOH acid' part comes SECOND as '-anoate' (e.g., Ethanoic acid + Methanol = METHYL ETHANOATE)!",
                 ),
                 ConceptBlock(
-                  heading = "2. Addition vs Condensation Polymers & Biomolecules",
+                  heading = "Addition vs Condensation Polymers & Biomolecules",
                   explanation =
                     "Addition polymers (Polythene from Ethene, PVC from Chloroethene, Polystyrene) snap open C=C double bonds with ZERO side-product! Condensation polymers (Nylon-6,6, Terylene polyester, Starch, Proteins) link two different ends together while spitting out a tiny H₂O or HCl molecule at every join!",
                   keyFormula = "\\text{Starch} \\xrightarrow{\\text{amylase/H}^+} \\text{Glucose} \\xrightarrow{\\text{yeast zymase}} 2\\text{C}_2\\text{H}_5\\text{OH} + 2\\text{CO}_2",
@@ -318,7 +318,7 @@ object ChemistryCurriculumPart3 {
             concepts =
               listOf(
                 ConceptBlock(
-                  heading = "1. The WAEC Drop-and-Excess Cation Chart (Guaranteed 25+ Marks!)",
+                  heading = "The WAEC Drop-and-Excess Cation Chart (Guaranteed 25+ Marks!)",
                   explanation =
                     "Drop NaOH(aq) or NH₃(aq) into a mysterious metal salt! Colours spot Transition metals instantly: Cu²⁺ = BLUE gelatinous ppt; Fe²⁺ = DIRTY GREEN ppt; Fe³⁺ = REDDISH-BROWN ppt! What about WHITE precipitates (Ca²⁺, Al³⁺, Pb²⁺, Zn²⁺)? Add EXCESS NaOH: ZAP (Zn²⁺, Al³⁺, Pb²⁺) DISSOLVE into colourless solution, while Ca²⁺ STAYS insoluble! Then test with EXCESS NH₃: ONLY Zn²⁺ (and Cu²⁺ deep blue!) dissolves in excess NH₃—Al³⁺ & Pb²⁺ stay white!",
                   keyFormula = "\\text{Excess NaOH dissolves: } \\text{Zn}^{2+},\\text{ Al}^{3+},\\text{ Pb}^{2+}   |   \\text{Excess NH}_3\\text{ dissolves: } \\text{Zn}^{2+},\\; \\text{Cu}^{2+}\\text{ (deep blue)}",
@@ -326,7 +326,7 @@ object ChemistryCurriculumPart3 {
                     "Distinguish Al³⁺ vs Pb²⁺ cleanly: add dilute HCl or KI(aq)—Pb²⁺ makes bright YELLOW PbI₂ precipitate (or white PbCl₂ soluble on heating), Al³⁺ stays clear!",
                 ),
                 ConceptBlock(
-                  heading = "2. Essential Anion Tests & Nuclear vs Chemical Reactions",
+                  heading = "Essential Anion Tests & Nuclear vs Chemical Reactions",
                   explanation =
                     "SO₄²⁻ + BaCl₂ + dil. HCl = White ppt INSOLUBLE in acid (SO₃²⁻ dissolves!). Cl⁻ + AgNO₃ + dil. HNO₃ = White curdy ppt soluble in excess NH₃(aq)! NO₃⁻ + fresh FeSO₄ + Conc. H₂SO₄ down tube wall = BROWN RING! In Nuclear reactions, ONLY the nucleus changes (α loses ⁴He; β converts neutron → proton + ⁰₋₁e, raising Z by +1!).",
                   keyFormula = "\\text{CO}_3^{2-} \\xrightarrow{\\text{H}^+} \\text{CO}_2\\text{ (turns limewater milky)}   |   \\text{NO}_3^- \\xrightarrow{\\text{Fe}^{2+}/\\text{H}_2\\text{SO}_4} \\text{Brown Ring}",

@@ -28,7 +28,7 @@ object EnglishCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. The Question Tag Seesaw (+ flips to −; − flips to +)",
+                    heading = "The Question Tag Seesaw (+ flips to −; − flips to +)",
                     explanation =
                       "Imagine a seesaw: Positive sentence gets a NEGATIVE tag ('She passed, DIDN'T she?'); Negative sentence gets a POSITIVE tag ('She didn't pass, DID she?'). WATCH OUT for disguised negatives! Words like 'SELDOM', 'HARDLY', 'SCARCELY', 'RARELY', 'NEVER', 'FEW', and 'LITTLE' ALREADY make the sentence negative—so their tag MUST be POSITIVE ('He seldom visits, DOES he?')!",
                     keyFormula = "\\text{I am late, AREN'T I?}   |   \\text{Let's start, SHALL WE?}   |   \\text{Everyone knows, DON'T THEY?}",
@@ -36,7 +36,7 @@ object EnglishCurriculumPart2 {
                       "Spot hidden verbs: 'He'd left' = 'He HAD left' → 'hadn't he?'; 'He'd rather' = 'He WOULD rather' → 'wouldn't he?'!",
                   ),
                   ConceptBlock(
-                    heading = "2. Apostrophes & Semicolons (Zero Confusion)",
+                    heading = "Apostrophes & Semicolons (Zero Confusion)",
                     explanation =
                       "An Apostrophe shows two jobs ONLY: Contraction (missing letters: 'it's' = 'it is'; 'don't' = 'do not') OR Ownership ('Ada's bag', 'the boys' dormitory'—plural ending in -s puts apostrophe OUTSIDE the s!). Note: 'ITS' (no apostrophe!) means belonging to it ('The dog wagged ITS tail'), never 'it's'!",
                     keyFormula = "\\text{It's} = \\text{It is / It has}   |   \\text{Its} = \\text{Belonging to it}   |   \\text{Who's} = \\text{Who is}   |   \\text{Whose} = \\text{Possessive}",
@@ -171,7 +171,7 @@ object EnglishCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. The 3-Second Context Clues Method (Don't Translate Out of Context!)",
+                    heading = "The 3-Second Context Clues Method (Don't Translate Out of Context!)",
                     explanation =
                       "Words shift meaning depending on their neighbours! Example: 'We must COMBAT malaria' (fight) vs 'A SPARSE crowd attended' (thin/scattered) vs 'A CANDID remark' (frank/honest). Always cover options first, read the sentence's emotional clue ('despite', 'consequently', 'therefore'), guess YOUR OWN simple replacement word, and then pick the option matching that meaning + Part of Speech!",
                     keyFormula = "\\text{Check Instructions First: OPPOSITE (Antonym) vs NEAREST (Synonym) — NEVER confuse the two sections!}",
@@ -179,7 +179,7 @@ object EnglishCurriculumPart2 {
                       "High-frequency JAMB pairs: Frugal ↔ Extravagant; Ephemeral ↔ Permanent; Candid ↔ Evasive;Mitigate ↔ Aggravate; Ubiquitous ↔ Scarce; Loquacious ↔ Taciturn!",
                   ),
                   ConceptBlock(
-                    heading = "2. Morphology Roots: Unlock 500 Words From 10 Latin/Greek Keys",
+                    heading = "Morphology Roots: Unlock 500 Words From 10 Latin/Greek Keys",
                     explanation =
                       "'Bene-' = GOOD (benevolent, benefit); 'Mal-' = BAD (malicious, dismal); 'Omni-' = ALL (omnipotent); 'Equi-' = EQUAL; '-phobia' = FEAR; 'Chron-' = TIME (anachronism, chronic); 'Greg-' = FLOCK/CROWD (gregarious = sociable!). Knowing word DNA lets you crack brand-new SAT/JAMB vocabulary calmly!",
                     keyFormula = "\\text{A-/An- (without): apathy, anonymous}   |   \\text{Circum- (around): circumvent}   |   \\text{Epi-/Eu- (good): eulogy}",
@@ -316,7 +316,7 @@ object EnglishCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Golden Idiom Law: NEVER Pick the Literal Picture!",
+                    heading = "Golden Idiom Law: NEVER Pick the Literal Picture!",
                     explanation =
                       "If a question says 'Chidi let the cat out of the bag', crossing out any option mentioning 'animals' or 'pets' immediately boosts your score! Idioms have ONE holistic figurative meaning: 'let the cat out of the bag' = accidentally spill a secret; 'kick the bucket' = die; 'bite the bullet' = face a tough situation bravely; 'turn a deaf ear' = refuse to listen; 'burn the midnight oil' = study late at night!",
                     keyFormula = "\\text{White Elephant} = \\text{Costly useless project}   |   \\text{Red Herring} = \\text{Misleading clue}   |   \\text{Cold Shoulder} = \\text{Deliberately ignore}",
@@ -324,7 +324,7 @@ object EnglishCurriculumPart2 {
                       "Watch WAEC trap: 'break the ice' means ease awkward social tension—NOT smash frozen water!",
                   ),
                   ConceptBlock(
-                    heading = "2. Phrasal Verb Particle Magic (Same Verb, Wildly New Meaning!)",
+                    heading = "Phrasal Verb Particle Magic (Same Verb, Wildly New Meaning!)",
                     explanation =
                       "Compare 'PUT': 'Put OFF' = postpone; 'Put OUT' = extinguish a fire; 'Put UP WITH' = tolerate patiently; 'Put DOWN' = criticize/suppress! Compare 'CALL': 'Call OFF' = cancel; 'Call ON' = visit briefly / invite to speak; 'Call FOR' = demand/require! Compare 'MAKE': 'Make UP' = invent/reconcile; 'Make UP FOR' = compensate for; 'Make OUT' = discern barely!",
                     keyFormula = "\\text{Look up to} = \\text{Admire}   |   \\text{Look down on} = \\text{Despise}   |   \\text{Take after} = \\text{Resemble a parent}",
@@ -470,7 +470,7 @@ object EnglishCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Zero-Preposition Verbs & Exact Preposition Collocations",
+                    heading = "Zero-Preposition Verbs & Exact Preposition Collocations",
                     explanation =
                       "Certain common verbs already carry their direction INSIDE them—adding an extra preposition is WRONG! Say: 'DISCUSS the plan' (NEVER 'discuss about'), 'ENTER the hall' (NEVER 'enter into/inside'), 'DEMAND a refund' (NEVER 'demand for'), 'COMPRISE 5 sections' (OR 'consist OF'—NEVER 'comprise of'!), 'RETURN the book' (NEVER 'return back'). On the flip side: 'CONGRATULATE someone ON' (not 'for'), 'PREFER tea TO coffee' (NEVER 'than'!), 'ACCUSED OF theft', 'CHARGED WITH fraud'!",
                     keyFormula = "\\text{Accuse OF}   |   \\text{Charge WITH}   |   \\text{Congratulate ON}   |   \\text{Comply WITH}   |   \\text{Prefer A TO B}",
@@ -478,7 +478,7 @@ object EnglishCurriculumPart2 {
                       "Watch 'Arrive IN' vs 'Arrive AT': Arrive IN a huge city/country ('arrived in Abuja'); Arrive AT a building/spot ('arrived at the gate')!",
                   ),
                   ConceptBlock(
-                    heading = "2. Famous Confusable Twins (Spelling Tricks That Never Fail)",
+                    heading = "Famous Confusable Twins (Spelling Tricks That Never Fail)",
                     explanation =
                       "StationARy = pARked (standing still), StationERy = papER/pEns! PrincipAL = school pAL / main, PrincipLE = moral ruLE! Affect = Action verb, Effect = End result noun! ComplIment = praise ('I like'), ComplEment = makes complEte (e.g. complementary angles)! Prescribe (doctor writes medicine) vs Proscribe (government BANS a group)!",
                     keyFormula = "\\text{Die OF (disease: malaria)}   |   \\text{Die FROM (external cause: wound/hunger)}   |   \\text{Divide BETWEEN 2 / AMONG 3+}",
@@ -615,7 +615,7 @@ object EnglishCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. What Is a Register? (Speaking the Industry Language!)",
+                    heading = "What Is a Register? (Speaking the Industry Language!)",
                     explanation =
                       "A hospital patient pays a FEE, receives a DIAGNOSIS & PRESCRIPTION, and lies on a WARD—nobody calls a patient a 'customer' or hospital wards 'bedrooms'! Courtrooms speak of PLAINTIFF (sues), DEFENDANT (accused), VERDICT, BAIL, SENTENCE & ACQUITTAL. Airports speak of RUNWAY, TARMAC, BOARDING PASS, TURBULENCE & ALTITUDE. Cloze passages test BOTH domain word AND grammar around each blank!",
                     keyFormula = "\\text{Banking: Ledger, Overdraft, Collateral}   |   \\text{Publishing: Manuscript, Proofread, Royalty, Blurb}",
@@ -623,7 +623,7 @@ object EnglishCurriculumPart2 {
                       "Before picking a Cloze blank, read 2 words BEFORE and 2 words AFTER the gap to spot prepositions like 'to', 'a/an', or singular verbs!",
                   ),
                   ConceptBlock(
-                    heading = "2. Mastering Tone & Collocation Clues in Cloze Tests",
+                    heading = "Mastering Tone & Collocation Clues in Cloze Tests",
                     explanation =
                       "If a Cloze passage describes a courtroom trial, 'witness' beats 'spectator'; in a football match, 'spectators' beat 'audience'; in a concert/theatre, 'audience' wins; in a church sermon, 'congregation' wins! Watch every verb partner: you 'LAUNCH' an appeal/ship, 'SWORN IN' an official, 'CAST' a ballot, and 'PROROGUE/ADJOURN' parliament!",
                     keyFormula = "\\text{Crowd: Spectators (Sports) / Audience (Concert) / Congregation (Church) / Electorate (Voting)}",
@@ -759,7 +759,7 @@ object EnglishCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Spelling Lies — Listen With Your Mouth Shape! (Long vs Short Vowels)",
+                    heading = "Spelling Lies — Listen With Your Mouth Shape! (Long vs Short Vowels)",
                     explanation =
                       "English spelling plays wicked pranks: 'WOMEN' looks like 'o', yet sounds like /wɪmɪn/ (same short /ɪ/ as 'sit' and 'busy'!). 'HEART' looks like 'ea', yet says /ɑː/ (long 'car / clerk / pass')! Look out for TWO dots 'ː' in IPA symbols—they mean STRETCH the vowel long: /iː/ ('seat, key, quay, people') vs quick /ɪ/ ('sit, live, women, village')! And meet English's #1 superstar vowel: lazy /ə/ (Schwa), heard in the weak 'uh' of 'About', 'doctOr', 'teachEr'!",
                     keyFormula = "/\\text{iː}/\\; (\\text{key, quay, police}) \\neq /\\text{ɪ}/\\; (\\text{women, busy, build})   |   /\\text{ɜː}/\\; (\\text{bird, work, earn, colonel})",
@@ -767,7 +767,7 @@ object EnglishCurriculumPart2 {
                       "JAMB classics: 'bury' = /e/ (just like 'bed'!); 'quay' = /iː/ ('key'!); 'leopard / friend' = /e/; 'colonel' = /ɜː/ ('kernel'!)!",
                   ),
                   ConceptBlock(
-                    heading = "2. The 8 Diphthongs (Two-Vowel Smooth Glides)",
+                    heading = "The 8 Diphthongs (Two-Vowel Smooth Glides)",
                     explanation =
                       "A Diphthong slides smoothly from one vowel into another inside ONE syllable! Watch these sneaky spelling pairs: /eɪ/ ('cake, rain, GREAT, BREAK, GAUGE, STEAK'—NOT 'meat'!), /aɪ/ ('kite, height, buy, island, eye'), /əʊ/ ('go, boat, SEW, THOUGH, DOUGH'!), /aʊ/ ('house, cow, plough'), /eə/ ('care, BEAR, WEAR, HEIR, THERE'!), and /ɪə/ ('here, fear, BEER, WEIRD')!",
                     keyFormula = "/\\text{eɪ}/\\; (\\text{great, break})   |   /\\text{əʊ}/\\; (\\text{sew, though})   |   /\\text{eə}/\\; (\\text{air, heir})   |   /\\text{aɪ}/\\; (\\text{aisle, height})",

@@ -51,7 +51,7 @@ object AcademyCurriculumEnricher {
               ),
             correctIndex = 1,
             feedback =
-              "Correct: a 1.50 mm wire requires a micrometer screw gauge (0.01 mm least count) to resolve hundredths of a millimetre accurately.",
+              "A 1.50 mm wire requires a micrometer screw gauge (0.01 mm least count) to resolve hundredths of a millimetre accurately.",
           ),
           ProjectVerificationTask(
             id = "vp_phys_01_2",
@@ -77,7 +77,7 @@ object AcademyCurriculumEnricher {
               ),
             correctIndex = 1,
             feedback =
-              "dimensionless constants π and 4 drop out, leaving [d²·L] = [L³] for volume and [M L⁻³] for density.",
+              "Dimensionless constants π and 4 drop out, leaving [d²·L] = [L³] for volume and [M L⁻³] for density.",
           ),
         ),
       "phys_02_vectors" to
@@ -96,7 +96,7 @@ object AcademyCurriculumEnricher {
               ),
             correctIndex = 1,
             feedback =
-              "to cancel 3.0 m/s East, the Westward engine component 5.0 sin θ must equal 3.0 m/s, giving sin θ = 0.6 (36.9°).",
+              "To cancel 3.0 m/s East, the Westward engine component 5.0 sin θ must equal 3.0 m/s, giving sin θ = 0.6 (36.9°).",
           ),
           ProjectVerificationTask(
             id = "vp_phys_02_2",
@@ -112,7 +112,7 @@ object AcademyCurriculumEnricher {
               ),
             correctIndex = 2,
             feedback =
-              "resultant North speed v_N = √(5.0² − 3.0²) = 4.0 m/s (3-4-5 right triangle), so crossing time t = 400 / 4.0 = 100 s.",
+              "Resultant North speed v_N = √(5.0² − 3.0²) = 4.0 m/s (3-4-5 right triangle), so crossing time t = 400 / 4.0 = 100 s.",
           ),
           ProjectVerificationTask(
             id = "vp_phys_02_3",
@@ -128,7 +128,7 @@ object AcademyCurriculumEnricher {
               ),
             correctIndex = 1,
             feedback =
-              "the equilibrant always matches the resultant magnitude (60.8 N) while pointing exactly 180° opposite (34.7° South of West).",
+              "The equilibrant always matches the resultant magnitude (60.8 N) while pointing exactly 180° opposite (34.7° South of West).",
           ),
         ),
       "chem_01_separation_kinetic" to
@@ -147,7 +147,7 @@ object AcademyCurriculumEnricher {
               ),
             correctIndex = 1,
             feedback =
-              "insoluble solids come out first by filtration, immiscible liquids split cleanly in a separating funnel, and pure water is distilled from brine.",
+              "Insoluble solids come out first by filtration, immiscible liquids split cleanly in a separating funnel, and pure water is distilled from brine.",
           ),
           ProjectVerificationTask(
             id = "vp_chem_01_2",
@@ -179,7 +179,7 @@ object AcademyCurriculumEnricher {
               ),
             correctIndex = 1,
             feedback =
-              "Correct: during a phase transition, thermal energy goes into potential energy to overcome lattice forces while average kinetic energy (temperature) stays constant.",
+              "During a phase transition, thermal energy goes into potential energy to overcome lattice forces while average kinetic energy (temperature) stays constant.",
           ),
         ),
       "math_01_bases_modular" to
@@ -436,7 +436,7 @@ object AcademyCurriculumEnricher {
       ProjectVerificationTask(
         id = "vt_${lesson.id}_1",
         criterionTitle = "Checkpoint 1 • Protocol & Rule Setup",
-        prompt = "To execute Stage 1 (${stage1}) in \"${project.title}\", which specification satisfies the engineering/academic standard?",
+        prompt = "To implement Step 1 (${stage1}) in \"${project.title}\", which specification satisfies the engineering/academic standard?",
         options = opts1,
         correctIndex = idx1,
         feedback = "$crit1." + (ex1?.examinerTrap?.let { " Key safeguard: $it" } ?: ""),
@@ -523,6 +523,7 @@ object AcademyCurriculumEnricher {
               ?: "Checkpoint: summarize '${block.heading}' clearly in your own words before advancing."
           }
         block.copy(
+          heading = block.heading.replace(Regex("""^\d+\.\s+"""), "").trim(),
           mechanismWhyHow = mech,
           examIntelligence = intel,
           recap = recap,
@@ -533,7 +534,9 @@ object AcademyCurriculumEnricher {
       if (enrichedBaseConcepts.size >= 5 || spec == null) {
         enrichedBaseConcepts
       } else {
-        (enrichedBaseConcepts + spec.extraSections).take(6)
+        (enrichedBaseConcepts + spec.extraSections).take(6).map { blk ->
+          blk.copy(heading = blk.heading.replace(Regex("""^\d+\.\s+"""), "").trim())
+        }
       }
 
     val cleanedExamples = lesson.workedExamples.map(::sanitizeWorkedExample)
@@ -550,7 +553,14 @@ object AcademyCurriculumEnricher {
             project = baseProject,
             misconceptions = resolvedMisconceptions,
             examples = cleanedExamples,
-          )
+          ).map { task ->
+            val cleanFb =
+              task.feedback
+                .replace(Regex("""^(?:Verified|Confirmed|Passed|Correct)\s*:\s*""", RegexOption.IGNORE_CASE), "")
+                .trim()
+                .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+            task.copy(feedback = cleanFb)
+          }
       )
 
     if (spec == null) {

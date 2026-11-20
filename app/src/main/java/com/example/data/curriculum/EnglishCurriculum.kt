@@ -39,7 +39,7 @@ object EnglishCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. A Word's Job Decides Its Part of Speech!",
+                    heading = "A Word's Job Decides Its Part of Speech!",
                     explanation =
                       "Look at the word 'FAST': 'A fast car' (Adjective describing noun), 'She runs fast' (Adverb modifying verb), 'They fast during Ramadan' (Verb action), 'Break your fast' (Noun thing)! Same spelling, four jobs! Nouns name things, Pronouns replace nouns, Verbs show action/being, Adjectives decorate Nouns, and Adverbs spice up Verbs, Adjectives, or other Adverbs!",
                     keyFormula = "\\text{Countable Plurals: few / many / number}   |   \\text{Uncountable Mass: little / much / amount (information, furniture, luggage!)}",
@@ -47,7 +47,7 @@ object EnglishCurriculum {
                       "TRAP ALERT: 'Information', 'furniture', 'luggage', 'equipment', 'advice', and 'news' are NEVER pluralized with '-s'—always say 'a piece of advice', NEVER 'advices'!",
                   ),
                   ConceptBlock(
-                    heading = "2. Quantifiers & Pronoun Case Tricks",
+                    heading = "Quantifiers & Pronoun Case Tricks",
                     explanation =
                       "When sharing between TWO items: use 'between', 'each other', and comparative '-er' (taller). With THREE OR MORE: use 'among', 'one another', and superlative '-est' (tallest)! For pronouns: remove the friend's name to hear the right pronoun—'She gave [my brother and] ME a book', NOT 'I'!",
                     keyFormula = "\\text{Subject: I, he, she, they, who}   |   \\text{Object (after verb/prep): me, him, her, them, whom}",
@@ -182,7 +182,7 @@ object EnglishCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Phrase vs Clause: Check for the Heartbeat (Finite Verb!)",
+                    heading = "Phrase vs Clause: Check for the Heartbeat (Finite Verb!)",
                     explanation =
                       "A Phrase is a team of words WITHOUT a Subject + Tense-carrying Verb (e.g., 'in the pouring rain', 'to win the race'). A Clause HAS a Subject doing an active Verb with tense (e.g., 'WHEN the bell rang'). Every WAEC Comprehension paper asks two questions on an underlined part: (i) What is its grammatical NAME? (ii) What is its FUNCTION?",
                     keyFormula = "\\text{No Tense Verb} \\implies \\text{PHRASE}   |   \\text{Subject + Tense Verb} \\implies \\text{CLAUSE}",
@@ -190,7 +190,7 @@ object EnglishCurriculum {
                       "Never guess by starting word alone! Look at HOW IT ACTS: (1) Replace whole group with 'IT' → Noun Clause! (2) Sitting right behind a Noun saying 'which one?' → Adjectival Clause! (3) Telling HOW, WHEN, WHERE, or WHY the main verb happened → Adverbial Clause!",
                   ),
                   ConceptBlock(
-                    heading = "2. Exact WAEC Full-Mark Answers for Grammatical Function",
+                    heading = "Exact WAEC Full-Mark Answers for Grammatical Function",
                     explanation =
                       "Noun Clause functions as 'Subject of the verb ...' or 'Object of the verb ...'! Adjectival Clause ALWAYS 'modifies/qualifies the noun ...'! Adverbial Clause ALWAYS 'modifies the verb ...'! Pro tip: 'THAT he passed shocked everyone' → replace underlined with 'IT' ('IT shocked everyone') → Noun Clause, Subject of verb 'shocked'!",
                     keyFormula = "\\text{Noun Clause} \\to \\text{Subj/Obj of verb}   |   \\text{Adjectival} \\to \\text{Qualifies noun}   |   \\text{Adverbial} \\to \\text{Modifies verb}",
@@ -326,7 +326,7 @@ object EnglishCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Simple, Compound (FANBOYS) & Complex Building Blocks",
+                    heading = "Simple, Compound (FANBOYS) & Complex Building Blocks",
                     explanation =
                       "1 Independent Clause = SIMPLE ('Chidi laughed.'). 2 Independent equal clauses glued with a FANBOYS word (For, And, Nor, But, Or, Yet, So) = COMPOUND ('Chidi laughed, AND Ada cheered.'). 1 Boss Main Clause + 1+ dependent Subordinate Clauses ('because', 'although', 'if', 'which') = COMPLEX!",
                     keyFormula = "\\text{Compound: FANBOYS (For, And, Nor, But, Or, Yet, So)}   |   \\text{Complex: Because / Although / Which / If}",
@@ -334,7 +334,7 @@ object EnglishCurriculum {
                       "Joining two full sentences with ONLY a comma ('I woke up, I brushed') is a Comma Splice error—use a semicolon (;), full stop, or add ', and'!",
                   ),
                   ConceptBlock(
-                    heading = "2. Fixing Hilarious Dangling Modifiers!",
+                    heading = "Fixing Hilarious Dangling Modifiers!",
                     explanation =
                       "Read carefully: 'Running down the stairs, my bag fell off!' Wait—did your BACKPACK sprout legs and run down the stairs?! When a sentence starts with an '-ing' or '-ed' opening phrase, the VERY FIRST word right after the comma MUST be the person who did that action: 'Running down the stairs, I dropped my bag!'",
                     keyFormula = "\\text{Participle Opening, [Actual Doer!] ...}   |   \\text{Possessive Whose} \\neq \\text{Who's (Who is)}",
@@ -485,7 +485,7 @@ object EnglishCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Past Perfect ('Had + Done') vs Present Perfect ('Has/Have + Done')",
+                    heading = "Past Perfect ('Had + Done') vs Present Perfect ('Has/Have + Done')",
                     explanation =
                       "Whenever TWO things happened in the past, the ONE THAT HAPPENED FIRST wears 'HAD + Past Participle' (Past Perfect), and the second wears Simple Past! Example: 'When we reached the bus stop, the bus HAD already left' (Leaving happened BEFORE reaching!). Note: Present Perfect ('has eaten') NEVER pairs with a finished yesterday timestamp like 'yesterday' or 'in 2020'—use Simple Past ('ate') for finished past dates!",
                     keyFormula = "\\text{1st Past Event: had } + V_3   |   \\text{2nd Past Event: } V_2\\; |\\; \\text{Since/For (still continuing): has/have } + V_3",
@@ -493,7 +493,7 @@ object EnglishCurriculum {
                       "Watch out for irregular V₃ past participles: Go/Went/GONE; Sing/Sang/SUNG; Beat/Beat/BEATEN; Lie(down)/Lay/LAIN; Lay(put)/Laid/LAID; Hang(picture)/HUNG vs Hang(criminal)/HANGED!",
                   ),
                   ConceptBlock(
-                    heading = "2. The 3 Famous Conditional Equations (Lock the Matching Pairs!)",
+                    heading = "The 3 Famous Conditional Equations (Lock the Matching Pairs!)",
                     explanation =
                       "Treat English Conditionals like balancing algebra equations: Type 1 (Real Future): If + Present → WILL ('If it rains, I will stay'). Type 2 (Imaginary Now): If + Past ('WERE'!) → WOULD ('If I WERE the president, I would build labs'). Type 3 (Regret Over Past—cannot change!): If + HAD + V₃ → WOULD HAVE + V₃!",
                     keyFormula = "\\text{1: If } V_1 \\to \\text{will } V_1   |   \\text{2: If } V_2/\\text{were} \\to \\text{would } V_1   |   \\text{3: If had } V_3 \\to \\text{would have } V_3",
@@ -628,7 +628,7 @@ object EnglishCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. The Crazy Time-Warp Rule ('It is high time we LEFT!')",
+                    heading = "The Crazy Time-Warp Rule ('It is high time we LEFT!')",
                     explanation =
                       "Even though you mean NOW or SOON, four urgent phrases force the verb into SIMPLE PAST tense: 'It is high time...', 'It is about time...', 'I would rather you...', and 'I wish I...'! Why? Because you're imagining something overdue or unreal—so say 'It is high time we WENT home' (NEVER 'go' or 'should go')!",
                     keyFormula = "\\text{It is (high) time + Subj + } V_2\\; |\\; \\text{Would rather + Subj + } V_2\\; |\\; \\text{Insist/Suggest that + Subj + } V_{\\text{base}}",
@@ -636,7 +636,7 @@ object EnglishCurriculum {
                       "Notice the difference when there is NO second subject: 'I'd rather STAY' (bare verb!), vs 'I'd rather YOU STAYED' (past tense V₂)!",
                   ),
                   ConceptBlock(
-                    heading = "2. Passive Voice & Reported Speech Backshifting",
+                    heading = "Passive Voice & Reported Speech Backshifting",
                     explanation =
                       "Active focuses on DOER ('Ada broke the vase'); Passive promotes RECEIVER ('The vase WAS BROKEN by Ada'—always BE-verb + V₃!). Watch Reported Speech: when the reporting verb is past ('He SAID that...'), step every verb ONE notch backward: Present → Past; Will → Would; Can → Could; 'yesterday' → 'the previous day'! Exception: eternal facts ('The Earth orbits the Sun') stay Present!",
                     keyFormula = "\\text{Causative: Have / Get + Object + } V_3\\; (\\text{'have my hair CUT'})   |   \\text{Look forward to + } V\\text{-ing!}",
@@ -781,7 +781,7 @@ object EnglishCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Ignorable Sidekicks vs Neither/Nor Proximity",
+                    heading = "Ignorable Sidekicks vs Neither/Nor Proximity",
                     explanation =
                       "Spot the difference cleanly! When phrases like 'AS WELL AS', 'ALONG WITH', 'TOGETHER WITH', or 'IN ADDITION TO' appear, put invisible brackets around them and obey ONLY the FIRST noun ('The Governor, along with his commissioners, IS visiting'!). BUT with 'NEITHER...NOR' or 'EITHER...OR', the verb obeys whichever noun sits CLOSER to the blank ('Neither the captain nor the players ARE ready' vs 'Neither the players nor the captain IS ready')!",
                     keyFormula = "S_1\\text{ as well as } S_2 \\implies \\text{Obeys } S_1   |   \\text{Either } S_1 \\text{ or } S_2 \\implies \\text{Obeys } S_2\\text{ (Closer!)}",
@@ -789,7 +789,7 @@ object EnglishCurriculum {
                       "'Each', 'Every', 'Everyone', 'Nobody', 'One of the boys', and 'Many a student' are ALL strictly SINGULAR!",
                   ),
                   ConceptBlock(
-                    heading = "2. The 'A Number Of' vs 'The Number Of' & Twin Subjects Trick",
+                    heading = "The 'A Number Of' vs 'The Number Of' & Twin Subjects Trick",
                     explanation =
                       "'A number of students' just means 'Several students' → PLURAL verb ('A number of books ARE missing')! 'THE number of students' talks about ONE specific count → SINGULAR verb ('THE number IS 45')! Also look at 'Bread and butter' or 'Rice and stew': served together as ONE meal = SINGULAR ('Rice and beans IS my favourite')! And watch 'The Principal and Treasurer' (ONLY ONE 'the' = 1 person wearing two hats → SINGULAR) vs 'THE Principal and THE Treasurer' (TWO 'the's = 2 people → PLURAL)!",
                     keyFormula = "\\text{A number of} \\to \\text{Plural (ARE)}   |   \\text{The number of} \\to \\text{Singular (IS)}   |   \\text{One of + Plural Noun} \\to \\text{Singular Verb}",

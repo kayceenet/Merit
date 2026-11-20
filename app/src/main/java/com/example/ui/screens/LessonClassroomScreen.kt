@@ -1,6 +1,12 @@
 package com.example.ui.screens
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -31,6 +37,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.BookmarkAdd
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Calculate
@@ -44,6 +51,7 @@ import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Science
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material.icons.filled.WarningAmber
@@ -61,6 +69,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -90,11 +100,14 @@ import com.example.data.local.ThemePreferences
 import com.example.data.model.LessonProgress
 import com.example.ui.components.DisplaySettingsDialog
 import com.example.ui.components.EquationDisplayCard
+import com.example.ui.components.LessonSpeechFormatter
+import com.example.ui.components.LessonTtsController
 import com.example.ui.components.ScientificCalculatorSheet
 import com.example.ui.components.ScientificText
 import com.example.ui.components.StudioActionTile
 import com.example.ui.components.TopicDiagramCard
 import com.example.ui.components.TopRightMenuButton
+import com.example.ui.components.rememberLessonTtsController
 import com.example.ui.labs.PracticalLabWorkspace
 import com.example.ui.theme.semanticColors
 
@@ -140,6 +153,11 @@ fun LessonClassroomScreen(
 
   val semantics = MaterialTheme.semanticColors
   val classroomRatio = completedSteps.size / LessonPillar.entries.size.toFloat()
+  val ttsController = rememberLessonTtsController()
+
+  LaunchedEffect(lesson.id, selectedPillar) {
+    ttsController.stop()
+  }
 
   Column(
     modifier =
@@ -257,7 +275,7 @@ fun LessonClassroomScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp),
           ) {
             Text(
-              text = "LESSON ROADMAP",
+              text = "SECTIONS",
               style = MaterialTheme.typography.labelSmall,
               color = MaterialTheme.colorScheme.primary,
               fontWeight = FontWeight.Bold,
@@ -337,6 +355,8 @@ fun LessonClassroomScreen(
             selectedPillar = selectedPillar,
             projectVerificationAnswers = projectVerificationAnswers,
             isProjectVerified = isProjectVerified,
+            ttsController = ttsController,
+            scrollState = remember(lesson.id, selectedPillar) { ScrollState(0) },
             modifier = Modifier.weight(1f).fillMaxHeight(),
             onSaveNote = onSaveNote,
             onMarkExerciseComplete = { score -> onMarkPillarComplete(selectedPillar, score) },
@@ -345,8 +365,21 @@ fun LessonClassroomScreen(
         }
       } else {
         Column(modifier = Modifier.fillMaxSize()) {
-          // Handheld Studio 3x2 Tile Mode Switcher + Collapsible Toggle matching Unit 3 mockup
-          var showTileGrid by remember(lesson.id) { mutableStateOf(true) }
+          // Scroll-driven Studio 3x2 Mode Grid: collapses cleanly on slide-up, restores on slide-down
+          val bodyScrollState = remember(lesson.id, selectedPillar) { ScrollState(0) }
+          var manualGridOverride by remember(lesson.id, selectedPillar) { mutableStateOf<Boolean?>(null) }
+          val collapsedByScroll by remember(bodyScrollState) {
+            derivedStateOf { bodyScrollState.value > 56 }
+          }
+          LaunchedEffect(bodyScrollState.value) {
+            if (bodyScrollState.value <= 12) {
+              manualGridOverride = null
+            } else if (bodyScrollState.value > 84 && manualGridOverride == true) {
+              manualGridOverride = null
+            }
+          }
+          val showTileGrid = manualGridOverride ?: !collapsedByScroll
+
           Column(
             modifier =
               Modifier.fillMaxWidth()
@@ -360,7 +393,7 @@ fun LessonClassroomScreen(
               verticalAlignment = Alignment.CenterVertically,
             ) {
               Text(
-                text = "${selectedPillar.ordinal + 1}. ${selectedPillar.fullLabel}",
+                text = selectedPillar.fullLabel,
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.Bold,
@@ -370,13 +403,13 @@ fun LessonClassroomScreen(
                   Modifier.clip(RoundedCornerShape(99.dp))
                     .background(MaterialTheme.colorScheme.surface)
                     .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(99.dp))
-                    .clickable { showTileGrid = !showTileGrid }
+                    .clickable { manualGridOverride = !showTileGrid }
                     .padding(horizontal = 10.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
               ) {
                 Text(
-                  text = if (showTileGrid) "Compact" else "6 Modes",
+                  text = if (showTileGrid) "Compact" else "Modes",
                   style = MaterialTheme.typography.labelSmall,
                   color = MaterialTheme.colorScheme.primary,
                   fontWeight = FontWeight.Bold,
@@ -390,46 +423,58 @@ fun LessonClassroomScreen(
               }
             }
 
-            if (showTileGrid) {
-              LessonPillar.entries.chunked(3).forEach { rowPillars ->
-                Row(
-                  modifier = Modifier.fillMaxWidth(),
-                  horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                  rowPillars.forEach { pillar ->
-                    val active = pillar == selectedPillar
-                    val isDone = pillar.key in completedSteps
-                    val isUnlocked = CurriculumProgression.isPillarUnlocked(pillar, completedSteps)
-                    val icon =
-                      when (pillar) {
-                        LessonPillar.CONCEPT -> Icons.AutoMirrored.Filled.MenuBook
-                        LessonPillar.EXAMPLES -> Icons.Filled.Lightbulb
-                        LessonPillar.SCENARIO -> Icons.Filled.Public
-                        LessonPillar.LAB -> Icons.Filled.Science
-                        LessonPillar.PROJECT -> Icons.Filled.Build
-                        LessonPillar.EXERCISE -> Icons.AutoMirrored.Filled.Assignment
-                      }
-                    StudioActionTile(
-                      label = pillar.shortLabel,
-                      icon = icon,
-                      selected = active,
-                      completed = isDone,
-                      locked = !isUnlocked,
-                      modifier = Modifier.weight(1f).testTag("pillar_tab_${pillar.key}"),
-                      onClick = {
-                        if (isUnlocked) {
-                          lockNoticeMessage = null
-                          selectedPillar = pillar
-                        } else {
-                          lockNoticeMessage =
-                            "Finish ${LessonPillar.entries[(pillar.ordinal - 1).coerceAtLeast(0)].shortLabel} first to unlock ${pillar.shortLabel}."
+            AnimatedVisibility(
+              visible = showTileGrid,
+              enter = fadeIn() + expandVertically(),
+              exit = fadeOut() + shrinkVertically(),
+            ) {
+              Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                LessonPillar.entries.chunked(3).forEach { rowPillars ->
+                  Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                  ) {
+                    rowPillars.forEach { pillar ->
+                      val active = pillar == selectedPillar
+                      val isDone = pillar.key in completedSteps
+                      val isUnlocked = CurriculumProgression.isPillarUnlocked(pillar, completedSteps)
+                      val icon =
+                        when (pillar) {
+                          LessonPillar.CONCEPT -> Icons.AutoMirrored.Filled.MenuBook
+                          LessonPillar.EXAMPLES -> Icons.Filled.Lightbulb
+                          LessonPillar.SCENARIO -> Icons.Filled.Public
+                          LessonPillar.LAB -> Icons.Filled.Science
+                          LessonPillar.PROJECT -> Icons.Filled.Build
+                          LessonPillar.EXERCISE -> Icons.AutoMirrored.Filled.Assignment
                         }
-                      },
-                    )
+                      StudioActionTile(
+                        label = pillar.shortLabel,
+                        icon = icon,
+                        selected = active,
+                        completed = isDone,
+                        locked = !isUnlocked,
+                        modifier = Modifier.weight(1f).testTag("pillar_tab_${pillar.key}"),
+                        onClick = {
+                          if (isUnlocked) {
+                            lockNoticeMessage = null
+                            selectedPillar = pillar
+                          } else {
+                            lockNoticeMessage =
+                              "Finish ${LessonPillar.entries[(pillar.ordinal - 1).coerceAtLeast(0)].shortLabel} first to unlock ${pillar.shortLabel}."
+                          }
+                        },
+                      )
+                    }
                   }
                 }
               }
-            } else {
+            }
+
+            AnimatedVisibility(
+              visible = !showTileGrid,
+              enter = fadeIn() + expandVertically(),
+              exit = fadeOut() + shrinkVertically(),
+            ) {
               Row(
                 modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -494,6 +539,8 @@ fun LessonClassroomScreen(
                         text = pillar.shortLabel,
                         style = MaterialTheme.typography.labelMedium,
                         color = textColor,
+                        maxLines = 1,
+                        softWrap = false,
                         fontWeight = if (active || isDone) FontWeight.Bold else FontWeight.SemiBold,
                       )
                     }
@@ -511,6 +558,8 @@ fun LessonClassroomScreen(
             selectedPillar = selectedPillar,
             projectVerificationAnswers = projectVerificationAnswers,
             isProjectVerified = isProjectVerified,
+            ttsController = ttsController,
+            scrollState = bodyScrollState,
             modifier = Modifier.weight(1f).fillMaxWidth(),
             onSaveNote = onSaveNote,
             onMarkExerciseComplete = { score -> onMarkPillarComplete(selectedPillar, score) },
@@ -520,7 +569,7 @@ fun LessonClassroomScreen(
       }
     }
 
-    // Sticky Coursera Classroom Footer Controls
+    // Sticky Classroom Footer Controls
     val isCurrentDone = selectedPillar.key in completedSteps
     Row(
       modifier =
@@ -541,7 +590,7 @@ fun LessonClassroomScreen(
         modifier = Modifier.height(48.dp),
         shape = RoundedCornerShape(10.dp),
       ) {
-        Text("← Prev")
+        Text("← Prev", maxLines = 1, softWrap = false)
       }
 
       if (selectedPillar != LessonPillar.EXERCISE) {
@@ -551,7 +600,7 @@ fun LessonClassroomScreen(
           onClick = {
             if (projectGateActive) {
               lockNoticeMessage =
-                "Pass all Project Verification Checkpoints above before completing Stage 5."
+                "Pass all project verification checks above before marking complete."
             } else {
               lockNoticeMessage = null
               onMarkPillarComplete(selectedPillar, null)
@@ -564,10 +613,11 @@ fun LessonClassroomScreen(
             text =
               when {
                 isCurrentDone -> "Completed ✓"
-                projectGateActive -> "Verify Project"
-                else -> "Mark Complete"
+                projectGateActive -> "Verify Checks"
+                else -> "Complete"
               },
             maxLines = 1,
+            softWrap = false,
           )
         }
 
@@ -575,7 +625,7 @@ fun LessonClassroomScreen(
           onClick = {
             if (projectGateActive) {
               lockNoticeMessage =
-                "Complete and pass every Project Verification Checkpoint above to unlock Stage 6."
+                "Pass every project verification check above to unlock the Quiz."
             } else {
               lockNoticeMessage = null
               if (!isCurrentDone) onMarkPillarComplete(selectedPillar, null)
@@ -596,8 +646,10 @@ fun LessonClassroomScreen(
             ),
         ) {
           Text(
-            text = if (projectGateActive) "Pass Checks First" else "Next Section →",
+            text = if (projectGateActive) "Locked" else "Next →",
             fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            softWrap = false,
           )
         }
       } else {
@@ -677,25 +729,99 @@ private fun LessonPillarBody(
   selectedPillar: LessonPillar,
   projectVerificationAnswers: MutableMap<String, Int>,
   isProjectVerified: Boolean,
+  ttsController: LessonTtsController,
+  scrollState: ScrollState,
   onSaveNote: (title: String, content: String) -> Unit,
   onMarkExerciseComplete: (Long?) -> Unit,
   onOpenNextLesson: ((Lesson) -> Unit)?,
   modifier: Modifier = Modifier,
 ) {
   val semantics = MaterialTheme.semanticColors
+  val sectionTtsKey = "pillar_${lesson.id}_${selectedPillar.key}"
+  val isSectionSpeaking = ttsController.isSpeaking && ttsController.activeUtteranceKey == sectionTtsKey
 
   Column(
     modifier =
       modifier
-        .verticalScroll(rememberScrollState(initial = 0))
-        .padding(horizontal = 16.dp, vertical = 16.dp),
+        .verticalScroll(scrollState)
+        .padding(horizontal = 16.dp, vertical = 14.dp),
     verticalArrangement = Arrangement.spacedBy(14.dp),
   ) {
-    Text(
-      text = selectedPillar.fullLabel,
-      style = MaterialTheme.typography.headlineSmall,
-      color = MaterialTheme.colorScheme.onBackground,
-    )
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Text(
+        text = selectedPillar.fullLabel,
+        style = MaterialTheme.typography.headlineSmall,
+        color = MaterialTheme.colorScheme.onBackground,
+        modifier = Modifier.weight(1f),
+      )
+      Row(
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+      ) {
+        if (ttsController.isSpeaking) {
+          Surface(
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            shape = RoundedCornerShape(99.dp),
+            modifier =
+              Modifier.clip(RoundedCornerShape(99.dp))
+                .clickable { ttsController.cycleSpeed() }
+                .testTag("tts_speed_button"),
+          ) {
+            Text(
+              text = "${ttsController.speechRate}×",
+              style = MaterialTheme.typography.labelSmall,
+              color = MaterialTheme.colorScheme.onSurfaceVariant,
+              fontWeight = FontWeight.Bold,
+              modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+            )
+          }
+        }
+        Surface(
+          color =
+            if (isSectionSpeaking) MaterialTheme.colorScheme.primary
+            else MaterialTheme.colorScheme.primaryContainer,
+          shape = RoundedCornerShape(99.dp),
+          modifier =
+            Modifier.clip(RoundedCornerShape(99.dp))
+              .clickable {
+                ttsController.toggleSpeak(
+                  utteranceKey = sectionTtsKey,
+                  rawText = LessonSpeechFormatter.buildPillarSpeechText(lesson, selectedPillar),
+                )
+              }
+              .testTag("section_tts_button"),
+        ) {
+          Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
+          ) {
+            Icon(
+              imageVector = if (isSectionSpeaking) Icons.Filled.Stop else Icons.AutoMirrored.Filled.VolumeUp,
+              contentDescription = if (isSectionSpeaking) "Stop audio" else "Listen to section",
+              tint =
+                if (isSectionSpeaking) MaterialTheme.colorScheme.onPrimary
+                else MaterialTheme.colorScheme.onPrimaryContainer,
+              modifier = Modifier.size(16.dp),
+            )
+            Text(
+              text = if (isSectionSpeaking) "Stop" else "Listen",
+              style = MaterialTheme.typography.labelSmall,
+              color =
+                if (isSectionSpeaking) MaterialTheme.colorScheme.onPrimary
+                else MaterialTheme.colorScheme.onPrimaryContainer,
+              fontWeight = FontWeight.Bold,
+              maxLines = 1,
+              softWrap = false,
+            )
+          }
+        }
+      }
+    }
 
     when (selectedPillar) {
       LessonPillar.CONCEPT -> {
@@ -710,7 +836,7 @@ private fun LessonPillarBody(
             verticalArrangement = Arrangement.spacedBy(6.dp),
           ) {
             Text(
-              text = "PREREQUISITE & SYLLABUS ROADMAP",
+              text = "PREREQUISITES",
               style = MaterialTheme.typography.labelSmall,
               color = MaterialTheme.colorScheme.secondary,
               fontWeight = FontWeight.Bold,
@@ -743,7 +869,7 @@ private fun LessonPillarBody(
           verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
           Text(
-            text = "WHAT YOU WILL MASTER IN THIS LESSON",
+            text = "LEARNING OUTCOMES",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onPrimaryContainer,
             fontWeight = FontWeight.Bold,
@@ -771,7 +897,7 @@ private fun LessonPillarBody(
             verticalArrangement = Arrangement.spacedBy(10.dp),
           ) {
             Text(
-              text = "KEY TERMS & SYMBOL DEFINITIONS",
+              text = "KEY TERMS",
               style = MaterialTheme.typography.labelSmall,
               color = MaterialTheme.colorScheme.primary,
               fontWeight = FontWeight.Bold,
@@ -785,13 +911,13 @@ private fun LessonPillarBody(
                   fontWeight = FontWeight.Bold,
                 )
                 ScientificText(
-                  text = "Plain Meaning: ${entry.simpleMeaning}",
+                  text = "Core Meaning: ${entry.simpleMeaning}",
                   style = MaterialTheme.typography.bodySmall,
                   color = MaterialTheme.colorScheme.secondary,
                   fontWeight = FontWeight.SemiBold,
                 )
                 ScientificText(
-                  text = entry.definition,
+                  text = "Definition: ${entry.definition}",
                   style = MaterialTheme.typography.bodySmall,
                   color = MaterialTheme.colorScheme.onSurface,
                 )
@@ -814,6 +940,10 @@ private fun LessonPillarBody(
         TopicDiagramCard(lesson = lesson)
 
         lesson.concepts.forEachIndexed { idx, block ->
+          val cleanHeading = block.heading.replace(Regex("""^\d+\.\s+"""), "").trim()
+          val cardTtsKey = "concept_${lesson.id}_$idx"
+          val isCardSpeaking = ttsController.isSpeaking && ttsController.activeUtteranceKey == cardTtsKey
+
           Column(
             modifier =
               Modifier.fillMaxWidth()
@@ -823,20 +953,64 @@ private fun LessonPillarBody(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
           ) {
-            Surface(
-              color = MaterialTheme.colorScheme.surfaceVariant,
-              shape = RoundedCornerShape(6.dp),
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically,
             ) {
-              Text(
-                text = "SECTION ${idx + 1} OF ${lesson.concepts.size}",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
-              )
+              Surface(
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shape = RoundedCornerShape(6.dp),
+              ) {
+                Text(
+                  text = "TOPIC ${idx + 1}/${lesson.concepts.size}",
+                  style = MaterialTheme.typography.labelSmall,
+                  color = MaterialTheme.colorScheme.primary,
+                  fontWeight = FontWeight.Bold,
+                  modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                )
+              }
+              Surface(
+                color =
+                  if (isCardSpeaking) MaterialTheme.colorScheme.primary
+                  else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
+                shape = RoundedCornerShape(99.dp),
+                modifier =
+                  Modifier.clip(RoundedCornerShape(99.dp))
+                    .clickable {
+                      ttsController.toggleSpeak(
+                        utteranceKey = cardTtsKey,
+                        rawText = LessonSpeechFormatter.buildConceptSpeechText(block.copy(heading = cleanHeading)),
+                      )
+                    }
+                    .testTag("concept_tts_$idx"),
+              ) {
+                Row(
+                  modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp),
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                  Icon(
+                    imageVector = if (isCardSpeaking) Icons.Filled.Stop else Icons.AutoMirrored.Filled.VolumeUp,
+                    contentDescription = if (isCardSpeaking) "Stop audio" else "Listen to this section",
+                    tint =
+                      if (isCardSpeaking) MaterialTheme.colorScheme.onPrimary
+                      else MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(14.dp),
+                  )
+                  Text(
+                    text = if (isCardSpeaking) "Stop" else "Listen",
+                    style = MaterialTheme.typography.labelSmall,
+                    color =
+                      if (isCardSpeaking) MaterialTheme.colorScheme.onPrimary
+                      else MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold,
+                  )
+                }
+              }
             }
             Text(
-              text = block.heading,
+              text = cleanHeading,
               style = MaterialTheme.typography.titleMedium,
               color = MaterialTheme.colorScheme.onSurface,
             )
@@ -933,17 +1107,65 @@ private fun LessonPillarBody(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
           ) {
-            Surface(
-              color = MaterialTheme.colorScheme.secondaryContainer,
-              shape = RoundedCornerShape(99.dp),
+            val exampleTtsKey = "example_${lesson.id}_$exIdx"
+            val isExampleSpeaking =
+              ttsController.isSpeaking && ttsController.activeUtteranceKey == exampleTtsKey
+
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically,
             ) {
-              Text(
-                text = example.examSource,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-              )
+              Surface(
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                shape = RoundedCornerShape(99.dp),
+              ) {
+                Text(
+                  text = example.examSource,
+                  style = MaterialTheme.typography.labelSmall,
+                  color = MaterialTheme.colorScheme.onSecondaryContainer,
+                  fontWeight = FontWeight.Bold,
+                  modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                )
+              }
+              Surface(
+                color =
+                  if (isExampleSpeaking) MaterialTheme.colorScheme.primary
+                  else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
+                shape = RoundedCornerShape(99.dp),
+                modifier =
+                  Modifier.clip(RoundedCornerShape(99.dp))
+                    .clickable {
+                      ttsController.toggleSpeak(
+                        utteranceKey = exampleTtsKey,
+                        rawText = LessonSpeechFormatter.buildExampleSpeechText(example),
+                      )
+                    }
+                    .testTag("example_tts_$exIdx"),
+              ) {
+                Row(
+                  modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp),
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                  Icon(
+                    imageVector = if (isExampleSpeaking) Icons.Filled.Stop else Icons.AutoMirrored.Filled.VolumeUp,
+                    contentDescription = if (isExampleSpeaking) "Stop audio" else "Listen to example",
+                    tint =
+                      if (isExampleSpeaking) MaterialTheme.colorScheme.onPrimary
+                      else MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(14.dp),
+                  )
+                  Text(
+                    text = if (isExampleSpeaking) "Stop" else "Listen",
+                    style = MaterialTheme.typography.labelSmall,
+                    color =
+                      if (isExampleSpeaking) MaterialTheme.colorScheme.onPrimary
+                      else MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold,
+                  )
+                }
+              }
             }
             Text(
               text = example.title,
@@ -1002,7 +1224,7 @@ private fun LessonPillarBody(
                     modifier = Modifier.weight(1f).height(48.dp).testTag("reveal_step_$exIdx"),
                     shape = RoundedCornerShape(10.dp),
                   ) {
-                    Text("Reveal Step ${revealedCount + 1}/$totalSteps", maxLines = 1)
+                    Text("Step ${revealedCount + 1}/$totalSteps", maxLines = 1, softWrap = false)
                   }
                 }
                 Button(
@@ -1010,7 +1232,12 @@ private fun LessonPillarBody(
                   modifier = Modifier.weight(1f).height(48.dp).testTag("reveal_all_steps_$exIdx"),
                   shape = RoundedCornerShape(10.dp),
                 ) {
-                  Text(if (allRevealed) "Hide Solution" else "Reveal All", fontWeight = FontWeight.Bold)
+                  Text(
+                    text = if (allRevealed) "Hide Solution" else "Reveal All",
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    softWrap = false,
+                  )
                 }
               }
             }
@@ -1138,7 +1365,7 @@ private fun LessonPillarBody(
                 tint = MaterialTheme.colorScheme.error,
               )
               Text(
-                text = "MISCONCEPTIONS & ERROR ANALYSIS",
+                text = "COMMON MISCONCEPTIONS",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.error,
                 fontWeight = FontWeight.Bold,
@@ -1198,7 +1425,7 @@ private fun LessonPillarBody(
               verticalAlignment = Alignment.CenterVertically,
             ) {
               Text(
-                text = "TOPIC SUMMARY & REVISION PLAN",
+                text = "SUMMARY & NOTES",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
@@ -1216,14 +1443,14 @@ private fun LessonPillarBody(
                       append("Memory Aid: ${cheat.memoryAid}")
                     }
                   }
-                  onSaveNote("${lesson.title.take(26)} — Revision Summary", digest)
+                  onSaveNote("${lesson.title.take(26)} — Summary", digest)
                 },
                 shape = RoundedCornerShape(99.dp),
                 modifier = Modifier.height(36.dp).testTag("save_cheat_sheet_button"),
               ) {
                 Icon(Icons.Filled.BookmarkAdd, contentDescription = null, modifier = Modifier.size(15.dp))
                 Spacer(Modifier.width(4.dp))
-                Text("Save Summary", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                Text("Save", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, maxLines = 1)
               }
             }
 
@@ -1246,7 +1473,7 @@ private fun LessonPillarBody(
             if (cheat.symbolLegend.isNotEmpty()) {
               Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
-                  text = "SYMBOLS & CONSTANTS KEY",
+                  text = "SYMBOLS & CONSTANTS",
                   style = MaterialTheme.typography.labelSmall,
                   color = MaterialTheme.colorScheme.secondary,
                   fontWeight = FontWeight.Bold,
@@ -1281,7 +1508,7 @@ private fun LessonPillarBody(
             if (cheat.commonTraps.isNotEmpty()) {
               Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
-                  text = "HIGH-FREQUENCY EXAM TRAPS",
+                  text = "EXAM TRAPS",
                   style = MaterialTheme.typography.labelSmall,
                   color = MaterialTheme.colorScheme.error,
                   fontWeight = FontWeight.Bold,
@@ -1341,7 +1568,7 @@ private fun LessonPillarBody(
 
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
               Text(
-                text = "RECOMMENDED SPACED REVIEW SCHEDULE",
+                text = "SPACED REVIEW DAYS",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.secondary,
                 fontWeight = FontWeight.Bold,
@@ -1447,7 +1674,7 @@ private fun GuidedPracticeCard(lessonId: String, task: GuidedPracticeTask) {
     ) {
       Surface(color = MaterialTheme.colorScheme.primaryContainer, shape = RoundedCornerShape(99.dp)) {
         Text(
-          text = "3-HINT GUIDED PRACTICE • ${task.difficulty.uppercase()}",
+          text = "GUIDED PRACTICE • ${task.difficulty.uppercase()}",
           style = MaterialTheme.typography.labelSmall,
           color = MaterialTheme.colorScheme.onPrimaryContainer,
           fontWeight = FontWeight.Bold,
@@ -1490,7 +1717,7 @@ private fun GuidedPracticeCard(lessonId: String, task: GuidedPracticeTask) {
           modifier = Modifier.weight(1f).height(48.dp),
           shape = RoundedCornerShape(10.dp),
         ) {
-          Text("Reveal Hint ${revealedHints + 1}/${task.hints.size}")
+          Text("Hint ${revealedHints + 1}/${task.hints.size}", maxLines = 1, softWrap = false)
         }
       }
       Button(
@@ -1498,7 +1725,11 @@ private fun GuidedPracticeCard(lessonId: String, task: GuidedPracticeTask) {
         modifier = Modifier.weight(1f).height(48.dp),
         shape = RoundedCornerShape(10.dp),
       ) {
-        Text(if (showSolution) "Hide Solution" else "Check Full Solution")
+        Text(
+          text = if (showSolution) "Hide Solution" else "Full Solution",
+          maxLines = 1,
+          softWrap = false,
+        )
       }
     }
 
@@ -1561,7 +1792,7 @@ private fun TopicMasteryProjectCard(
           modifier = Modifier.size(18.dp),
         )
         Text(
-          text = "APPLIED MASTERY PROJECT • ${project.format.uppercase()}",
+          text = "APPLIED PROJECT • ${project.format.uppercase()}",
           style = MaterialTheme.typography.labelSmall,
           color = MaterialTheme.colorScheme.primary,
           fontWeight = FontWeight.Bold,
@@ -1578,7 +1809,7 @@ private fun TopicMasteryProjectCard(
         color = MaterialTheme.colorScheme.onSurface,
       )
       Text(
-        text = "DELIVERABLE WORKFLOW STAGES",
+        text = "WORKFLOW",
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.secondary,
         fontWeight = FontWeight.Bold,
@@ -1608,7 +1839,7 @@ private fun TopicMasteryProjectCard(
       }
     }
 
-    // Udacity-style Interactive App-Graded Project Verification
+    // Interactive App-Graded Project Verification
     Column(
       modifier =
         Modifier.fillMaxWidth()
@@ -1639,7 +1870,7 @@ private fun TopicMasteryProjectCard(
             modifier = Modifier.size(18.dp),
           )
           Text(
-            text = "INTERACTIVE PROJECT VERIFICATION",
+            text = "PROJECT CHECKS",
             style = MaterialTheme.typography.labelSmall,
             color = if (isProjectVerified) semantics.success else MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Bold,
@@ -1666,9 +1897,9 @@ private fun TopicMasteryProjectCard(
       Text(
         text =
           if (isProjectVerified) {
-            "All project verification checks passed! Inspect the reviewer model solution below or advance to Stage 6."
+            "All checks passed. Review the model solution below or advance to the Mastery Quiz."
           } else {
-            "Demonstrate hands-on mastery by passing every interactive checkpoint below. You can revise wrong answers immediately."
+            "Complete each checkpoint below to validate your project reasoning."
           },
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -1765,10 +1996,12 @@ private fun TopicMasteryProjectCard(
                   if (isCorrect) {
                     val cleaned =
                       task.feedback
-                        .removePrefix("Verified: ")
-                        .removePrefix("Confirmed: ")
-                        .removePrefix("Passed: ")
+                        .replace(
+                          Regex("""^(?:(?:Verified|Confirmed|Passed|Correct)\s*:\s*)+""", RegexOption.IGNORE_CASE),
+                          "",
+                        )
                         .trim()
+                        .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
                     "Verified: $cleaned"
                   } else {
                     "Needs Revision: Re-check the project principles and select the scientifically accurate choice."
@@ -1787,7 +2020,7 @@ private fun TopicMasteryProjectCard(
       if (project.rubricCriteria.isNotEmpty()) {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
           Text(
-            text = "RUBRIC STANDARDS VERIFIED BY CHECKS ABOVE",
+            text = "RUBRIC STANDARDS",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = FontWeight.Bold,
@@ -1822,9 +2055,9 @@ private fun TopicMasteryProjectCard(
         Text(
           text =
             when {
-              !isProjectVerified -> "Pass All ${tasks.size} Checks Above to Unlock Model Solution"
-              showModel -> "Hide Reviewer Model Solution"
-              else -> "Compare With Reviewer Model Solution"
+              !isProjectVerified -> "Pass ${tasks.size} Checks to Unlock Solution"
+              showModel -> "Hide Model Solution"
+              else -> "Show Model Solution"
             },
           maxLines = 1,
           overflow = TextOverflow.Ellipsis,

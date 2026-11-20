@@ -27,7 +27,7 @@ object MathematicsCurriculumPart3 {
             concepts =
               listOf(
                 ConceptBlock(
-                  heading = "1. Differentiation (dy/dx): Speedometer of Slope!",
+                  heading = "Differentiation (dy/dx): Speedometer of Slope!",
                   explanation =
                     "A straight line has one constant slope, whereas a curve's slope bends at every step. Differentiation gives you the EXACT slope at any point x! Power rule in 2 words: 'BRING DOWN, SUBTRACT 1'—multiply the front number by the power n, then drop the power to n − 1. Any lonely constant vanishes to 0 because a flat number doesn't tilt!",
                   keyFormula = "\\frac{d}{dx}(ax^n) = anx^{n-1}   |   \\text{Turning Point: } \\frac{dy}{dx} = 0   |   \\frac{d^2y}{dx^2} < 0 \\implies \\text{Max}",
@@ -35,7 +35,7 @@ object MathematicsCurriculumPart3 {
                     "In Kinematics: differentiate Distance s → Velocity v (ds/dt); differentiate Velocity v → Acceleration a (dv/dt)!",
                 ),
                 ConceptBlock(
-                  heading = "2. Integration (∫): Running the Machine Backwards for Area!",
+                  heading = "Integration (∫): Running the Machine Backwards for Area!",
                   explanation =
                     "Integration reverses differentiation: 'ADD 1 TO POWER, DIVIDE BY NEW POWER!' And never forget + C on indefinite integrals because constants vanish during differentiation. Want the shaded Area under curve y = f(x) between x = a and x = b? Integrate f(x), plug top b, plug bottom a, and subtract F(b) − F(a)!",
                   keyFormula = "\\int ax^n\\,dx = \\frac{ax^{n+1}}{n+1} + C\\; (n \\neq -1)   |   \\text{Area} = \\int_a^b y\\,dx",
@@ -171,7 +171,7 @@ object MathematicsCurriculumPart3 {
             concepts =
               listOf(
                 ConceptBlock(
-                  heading = "1. Permutations (Order Matters) vs Combinations (Order Doesn't!)",
+                  heading = "Permutations (Order Matters) vs Combinations (Order Doesn't!)",
                   explanation =
                     "Picking 3 medals (Gold, Silver, Bronze) from 10 runners? ORDER matters because Gold ≠ Bronze—use Permutation nPr! Picking a 3-person committee to sweep the hall? Chidi+Ada+Bola is the exact same committee as Bola+Chidi+Ada—order does NOT matter, use Combination nCr!",
                   keyFormula = "{}^{n}P_r = \\frac{n!}{(n-r)!}   |   {}^{n}C_r = \\frac{n!}{r!(n-r)!}   |   \\text{Circle: } (n-1)!",
@@ -179,7 +179,7 @@ object MathematicsCurriculumPart3 {
                     "Counting letter arrangements like 'SUCCESS' (7 letters, 3 S's, 2 C's)? Divide total factorial by repeat factorials: 7! / (3! × 2!)!",
                 ),
                 ConceptBlock(
-                  heading = "2. Probability: AND Multiplies, OR Adds, 'At Least One' = 1 − None!",
+                  heading = "Probability: AND Multiplies, OR Adds, 'At Least One' = 1 − None!",
                   explanation =
                     "Probability always stays between 0 (impossible) and 1 (certain). Independent events happening together (Head AND 6) MULTIPLY! Mutually exclusive choices (Red OR Blue) ADD! Hard problem asking 'probability of AT LEAST ONE success'? Flip it: calculate 1 − P(ALL FAIL)!",
                   keyFormula = "P(A \\cup B) = P(A) + P(B) - P(A \\cap B)   |   P(\\text{at least 1}) = 1 - P(\\text{none})",
@@ -318,7 +318,7 @@ object MathematicsCurriculumPart3 {
             concepts =
               listOf(
                 ConceptBlock(
-                  heading = "1. Mean, Median, Mode & Frequency Tables",
+                  heading = "Mean, Median, Mode & Frequency Tables",
                   explanation =
                     "Mean (x̄) adds everything up and shares fairly (∑fx / ∑f). Median lines numbers in order and grabs the dead-center middle. Mode is the most popular value. On a Pie Chart, convert score to angle using (value / Total) × 360°!",
                   keyFormula = "\\bar{x} = \\frac{\\sum f x}{\\sum f}   |   \\text{Pie Sector Angle} = \\frac{f}{N} \\times 360^\\circ",
@@ -326,7 +326,7 @@ object MathematicsCurriculumPart3 {
                     "On a grouped frequency table, use CLASS MIDPOINTS x_mid before multiplying by frequency f!",
                 ),
                 ConceptBlock(
-                  heading = "2. Range, Variance & Standard Deviation (How Spread Out Is Data?)",
+                  heading = "Range, Variance & Standard Deviation (How Spread Out Is Data?)",
                   explanation =
                     "Two classes can both have Mean = 60%, yet one class has everyone scoring 58–62% while the other has 20% and 100%! Standard Deviation (σ) measures how spread out scores are. Best shortcut: add +5 to every score? Mean increases by +5, but SPREAD (Range, Variance, σ) stays UNCHANGED! Multiply every score by 3? Both Mean AND σ multiply by 3!",
                   keyFormula = "\\sigma = \\sqrt{\\frac{\\sum f(x - \\bar{x})^2}{\\sum f}} = \\sqrt{\\frac{\\sum x^2}{N} - \\bar{x}^2}",

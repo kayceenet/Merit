@@ -99,7 +99,7 @@ fun DisplaySettingsDialog(
         modifier = Modifier.fillMaxWidth().heightIn(max = 460.dp).verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(14.dp),
       ) {
-        SettingsSectionHeader("1. Theme & Contrast")
+        SettingsSectionHeader("Theme & Contrast")
         FlowRow(
           horizontalArrangement = Arrangement.spacedBy(8.dp),
           verticalArrangement = Arrangement.spacedBy(6.dp),
@@ -214,7 +214,7 @@ fun DisplaySettingsDialog(
         )
 
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-        SettingsSectionHeader("2. Reading & Formula Clarity")
+        SettingsSectionHeader("Reading & Formula Clarity")
 
         Text(
           text = "Text Scale",
@@ -300,7 +300,7 @@ fun DisplaySettingsDialog(
         }
 
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-        SettingsSectionHeader("3. CBT Exam Simulator")
+        SettingsSectionHeader("CBT Exam Simulator")
 
         Text(
           text = "Seconds per Question",
@@ -349,7 +349,7 @@ fun DisplaySettingsDialog(
         )
 
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-        SettingsSectionHeader("4. Mastery & Spaced Revision")
+        SettingsSectionHeader("Mastery & Spaced Revision")
 
         Text(
           text = "Lesson Mastery Pass Threshold (${themePreferences.masteryPassPercent}%)",
@@ -417,7 +417,7 @@ fun DisplaySettingsDialog(
 
         if (onExportBackup != null || onImportBackup != null || onOpenCloudSync != null) {
           HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-          SettingsSectionHeader("5. Backup & Optional Cloud Sync")
+          SettingsSectionHeader("Backup & Optional Cloud Sync")
           Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),

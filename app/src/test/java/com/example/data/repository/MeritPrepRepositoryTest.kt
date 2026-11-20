@@ -303,7 +303,7 @@ class MeritPrepRepositoryTest {
       prefsRepo.setCurriculumVersion(1)
       repository.seedCurriculumIfNeeded()
 
-      assertEquals(8, prefsRepo.getCurriculumVersion())
+      assertEquals(MeritPrepRepository.CURRENT_CURRICULUM_VERSION, prefsRepo.getCurriculumVersion())
       assertEquals(96, repository.observeStructuredModules().first().flatMap { it.lessons }.size)
       val preserved =
         repository.observeLessonProgress(UserProfile.DEFAULT_PROFILE_ID).first()

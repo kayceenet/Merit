@@ -39,7 +39,7 @@ object ChemistryCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Elements, Compounds, and Mixtures",
+                    heading = "Elements, Compounds, and Mixtures",
                     explanation =
                       "An Element consists solely of atoms with the same atomic number (such as pure gold Au or oxygen O₂), whereas a Compound chemically bonds two or more elements in a fixed mass ratio (like H₂O, which cannot be separated by filtration). A Mixture physically blends two or more substances whose components retain their individual properties and can be separated via boiling point, density, solubility, or adsorption differences. In paper chromatography, the retention factor R_f equals the distance moved by the solute spot divided by the distance moved by the solvent front.",
                     keyFormula = "\\text{Air} = \\text{Mixture (N}_2 + \\text{O}_2 + \\text{Ar)}   |   \\text{Brass} = \\text{Cu} + \\text{Zn (Alloy)}   |   R_f = \\frac{\\text{Solute distance}}{\\text{Solvent front}}",
@@ -47,7 +47,7 @@ object ChemistryCurriculum {
                       "Match method to property: Immiscible liquids (oil + water) → Separating Funnel; Miscible liquids with close boiling points (ethanol 78°C + water 100°C) → Fractional Distillation; Sublimable solids (NH₄Cl, I₂, camphor) → Sublimation.",
                   ),
                   ConceptBlock(
-                    heading = "2. Kinetic Theory, Heating Plateaus & Purity Criteria",
+                    heading = "Kinetic Theory, Heating Plateaus & Purity Criteria",
                     explanation =
                       "In a solid, particles vibrate about fixed lattice positions. Heating ice raises temperature until 0°C, where the thermometer stalls horizontally because supplied energy breaks rigid intermolecular bonds (latent heat of fusion) rather than raising average kinetic energy. A pure substance melts at one sharp melting point (MP) and boils at one sharp boiling point (BP); dissolved impurities depress MP below 0°C and elevate BP above 100°C.",
                     keyFormula = "\\text{Impurity added} \\implies \\text{MP drops below } 0^\\circ\\text{C},\\quad \\text{BP rises above } 100^\\circ\\text{C}",
@@ -185,7 +185,7 @@ object ChemistryCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Inside the Atom & Isotopes (Same Protons, Different Weight)",
+                    heading = "Inside the Atom & Isotopes (Same Protons, Different Weight)",
                     explanation =
                       "Picture a stadium: a tiny heavy Nucleus sits at the center holding positively charged Protons (+1) and zero-charge Neutrons (0), while feather-light Electrons (−1) zoom around outside. Atomic Number Z = number of Protons (the atom's unchangeable ID card!). Mass Number A = Protons + Neutrons. Isotopes are twins with the SAME Z (same element!) but extra Neutrons—so they react identically chemically, only differing in mass!",
                     keyFormula = "\\text{Mass No. } A = p + n   |   A_r = \\frac{\\sum (\\%\\text{abundance} \\times \\text{isotope mass})}{100}",
@@ -193,7 +193,7 @@ object ChemistryCurriculum {
                       "Removing electrons makes a POSITIVE cation (+): ²⁷Al³⁺ has 13 protons, 14 neutrons, and 13 − 3 = 10 electrons!",
                   ),
                   ConceptBlock(
-                    heading = "2. Quantum Hotel Rooms (1s, 2s, 2p, 3s, 3p, 4s, 3d)",
+                    heading = "Quantum Hotel Rooms (1s, 2s, 2p, 3s, 3p, 4s, 3d)",
                     explanation =
                       "Electrons fill shells like guests checking into a hotel from the cheapest ground floor up (Aufbau Principle). Each room holds at most 2 electrons spinning opposite ways (Pauli Exclusion), and guests grab empty beds first before sharing a double room (Hund's Rule)! Secret: 4s fills BEFORE 3d because 4s sits slightly lower in energy.",
                     keyFormula = "1s^2\\; 2s^2\\; 2p^6\\; 3s^2\\; 3p^6\\; 4s^2\\; 3d^{10}",
@@ -330,7 +330,7 @@ object ChemistryCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Periodic Table Cheat-Map (Across vs Down)",
+                    heading = "Periodic Table Cheat-Map (Across vs Down)",
                     explanation =
                       "Rows (Periods) share the same number of shells; Columns (Groups) share outer electrons! Going LEFT → RIGHT across a period adds extra protons into the SAME shell, pulling electrons tighter—so Atom Size SHRINKS, while Ionization Energy & Electronegativity SHOOT UP (Fluorine is the tightest bully!). Going DOWN a group adds new fat shells—so Size GROWS and holding electrons gets weaker!",
                     keyFormula = "\\text{Across Period } (\\to):\\; r \\downarrow,\\; IE \\uparrow,\\; EN \\uparrow   |   \\text{Down Group } (\\downarrow):\\; r \\uparrow,\\; IE \\downarrow",
@@ -338,7 +338,7 @@ object ChemistryCurriculum {
                       "Transition metals (d-block) show: (1) Variable oxidation states (Fe²⁺/Fe³⁺), (2) Coloured ions, (3) Catalytic power, (4) Complex ion formation!",
                   ),
                   ConceptBlock(
-                    heading = "2. Chemical Bonds: Sharing vs Stealing vs H-Bonding",
+                    heading = "Chemical Bonds: Sharing vs Stealing vs H-Bonding",
                     explanation =
                       "Metal + Non-metal? The non-metal STEALS valence electrons → Ionic Bond (high melting point, conducts electricity ONLY when molten or dissolved!). Two Non-metals? They SHARE pairs → Covalent Bond (low melting point, poor conductor). One atom donates BOTH shared electrons (like NH₃ + H⁺ → NH₄⁺)? That's a Dative/Coordinate bond! Hydrogen stuck to F, O, or N creates sticky Hydrogen Bonds—that's why H₂O is a liquid while H₂S is a smelly gas!",
                     keyFormula = "\\text{CO}_2\\text{ Linear } (180^\\circ)   |   \\text{NH}_3\\text{ Pyramidal } (107^\\circ)   |   \\text{H}_2\\text{O Bent } (104.5^\\circ)   |   \\text{CH}_4\\text{ Tetra } (109.5^\\circ)",
@@ -486,7 +486,7 @@ object ChemistryCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. What Is 1 Mole? (The Chemist's Dozen!)",
+                    heading = "What Is 1 Mole? (The Chemist's Dozen!)",
                     explanation =
                       "A dozen eggs always means 12 eggs—whether tiny quail eggs or giant ostrich eggs. Similarly, 1 MOLE always means 6.02 × 10²³ particles (Avogadro's giant dozen!). Because hydrogen atoms weigh 1 u while carbon weighs 12 u, 1 mole simply weighs its Molecular Mass (Mᵣ) in grams—and ANY 1 mole of gas at STP fills 22.4 dm³!",
                     keyFormula = "n = \\frac{\\text{mass}}{M_r} = \\frac{V_{\\text{STP}}}{22.4\\text{ dm}^3} = C(\\text{mol/dm}^3)\\times V(\\text{dm}^3) = \\frac{N}{6.02\\times 10^{23}}",
@@ -494,7 +494,7 @@ object ChemistryCurriculum {
                       "Volumes in titration/stoichiometry are often given in cm³! ALWAYS divide cm³ by 1000 to get dm³ BEFORE multiplying C × V!",
                   ),
                   ConceptBlock(
-                    heading = "2. Empirical Formula in 3 Easy Steps",
+                    heading = "Empirical Formula in 3 Easy Steps",
                     explanation =
                       "Divide each element's % (or grams) by its Atomic Mass Aᵣ → Divide all results by the SMALLEST number → Double/triple only if you get .5 or .33 to reach clean whole numbers! Molecular Formula is simply (Empirical Formula)ₙ where n = Molar Mass / Empirical Mass.",
                     keyFormula = "\\text{Molecular Mass} = n \\times \\text{Empirical Mass}   |   \\text{Vapour Density } VD = \\frac{M_r}{2}",
@@ -633,7 +633,7 @@ object ChemistryCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. The Piston Trio: Squeeze (Boyle), Heat (Charles) & Dalton Mix",
+                    heading = "The Piston Trio: Squeeze (Boyle), Heat (Charles) & Dalton Mix",
                     explanation =
                       "Imagine gas molecules bouncing inside a syringe: push the plunger IN (higher Pressure P), and Volume V shrinks proportionally (Boyle: P₁V₁ = P₂V₂). Heat the gas (higher KELVIN temp T), molecules bounce harder pushing the piston OUT (Charles: V₁/T₁ = V₂/T₂). Put two different gases in one jar? Total Pressure = sum of individual pressures (Dalton)!",
                     keyFormula = "\\frac{P_1 V_1}{T_1} = \\frac{P_2 V_2}{T_2}   |   PV = nRT   |   T(\\text{K}) = t(^\\circ\\text{C}) + 273",
@@ -641,7 +641,7 @@ object ChemistryCurriculum {
                       "NEVER plug Celsius directly into Charles/Ideal Gas Law! Always add +273 first (27°C = 300 K)!",
                   ),
                   ConceptBlock(
-                    heading = "2. Graham's Law: Light Runners Sprint Faster!",
+                    heading = "Graham's Law: Light Runners Sprint Faster!",
                     explanation =
                       "At the same temperature, tiny light molecules like Hydrogen (Mᵣ = 2) sprint WAY faster than heavy clumsy Chlorine (Mᵣ = 71). Specifically, speed/rate scales inversely with the SQUARE ROOT of Molar Mass: if Gas B is 4× heavier than Gas A, Gas B diffuses √4 = 2× SLOWER (takes 2× longer time!).",
                     keyFormula = "\\frac{R_1}{R_2} = \\frac{t_2}{t_1} = \\sqrt{\\frac{M_2}{M_1}} = \\sqrt{\\frac{d_2}{d_1}}",
@@ -780,7 +780,7 @@ object ChemistryCurriculum {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. pH Scale, Strong vs Weak & Salt Hydrolysis",
+                    heading = "pH Scale, Strong vs Weak & Salt Hydrolysis",
                     explanation =
                       "pH runs from 0 (strong battery acid HCl) through 7 (pure water) to 14 (strong base NaOH). Every 1-unit drop in pH means 10× MORE H⁺ ions! Surprise WAEC trap: not every salt is pH 7! Strong Acid + Weak Base (like NH₄Cl) dissolves to give an ACIDIC solution (pH < 7); Weak Acid + Strong Base (like Na₂CO₃ or CH₃COONa) gives an ALKALINE solution (pH > 7)!",
                     keyFormula = "\\text{pH} = -\\log_{10}[\\text{H}^+],\\quad \\text{pH} + \\text{pOH} = 14   |   \\text{Weak Acid+Strong Base} \\implies \\text{pH} > 7",
@@ -788,7 +788,7 @@ object ChemistryCurriculum {
                       "Match the indicator: Methyl Orange (pH 3.1–4.4) for Strong Acid vs Weak Base (Na₂CO₃); Phenolphthalein (pH 8.3–10) for Weak Acid (CH₃COOH) vs Strong Base!",
                   ),
                   ConceptBlock(
-                    heading = "2. Titration Mastery Formula (Never Forget Mole Ratio!)",
+                    heading = "Titration Mastery Formula (Never Forget Mole Ratio!)",
                     explanation =
                       "H₂SO₄ carries TWO H⁺ protons per molecule, whereas NaOH carries ONE OH⁻—so 1 mole of H₂SO₄ neutralizes 2 moles of NaOH! Always write the balanced equation first to read n_A and n_B before plugging into C_A V_A / (C_B V_B) = n_A / n_B.",
                     keyFormula = "\\frac{C_A V_A}{C_B V_B} = \\frac{n_A}{n_B}   |   \\%\\text{ Purity} = \\frac{\\text{Pure Mass}}{\\text{Impure Mass}} \\times 100\\%",

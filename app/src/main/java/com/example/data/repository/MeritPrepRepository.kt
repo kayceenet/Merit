@@ -981,8 +981,8 @@ class MeritPrepRepository(
     }
   }
 
-  private companion object {
-    const val CURRENT_CURRICULUM_VERSION = 8
-    const val DAY_MILLIS = 86_400_000L
+  internal companion object {
+    const val CURRENT_CURRICULUM_VERSION = 9
+    private const val DAY_MILLIS = 86_400_000L
   }
 }

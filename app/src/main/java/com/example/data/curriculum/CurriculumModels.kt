@@ -218,12 +218,12 @@ enum class PracticalLabType(val title: String, val subtitle: String) {
 }
 
 enum class LessonPillar(val key: String, val shortLabel: String, val fullLabel: String) {
-  CONCEPT("concept", "1. Architecture & Study", "Stage 1: Topic Architecture, Prerequisites & 5-Section Study"),
-  EXAMPLES("examples", "2. Worked & Guided", "Stage 2: Step-by-Step Examples & 3-Hint Guided Practice"),
-  SCENARIO("scenario", "3. Context & Cheat Sheet", "Stage 3: Nigerian Real-World Context, Misconceptions & Cheat Sheet"),
-  LAB("lab", "4. Virtual Lab", "Stage 4: Academy Guided Virtual Lab Simulation"),
-  PROJECT("project", "5. Mastery Project", "Stage 5: Authentic Nigerian Capstone Project & Rubric"),
-  EXERCISE("exercise", "6. Final Assessment", "Stage 6: 100-Mark Mastery Gate (≥ 80% Unlocks Next)"),
+  CONCEPT("concept", "Concepts", "Concepts & Theory"),
+  EXAMPLES("examples", "Examples", "Worked Examples"),
+  SCENARIO("scenario", "Context", "Applications & Notes"),
+  LAB("lab", "Virtual Lab", "Virtual Lab"),
+  PROJECT("project", "Project", "Applied Project"),
+  EXERCISE("exercise", "Quiz", "Mastery Quiz"),
 }
 
 data class VocabularyEntry(

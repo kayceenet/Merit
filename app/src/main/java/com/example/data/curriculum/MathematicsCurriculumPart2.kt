@@ -28,7 +28,7 @@ object MathematicsCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Multiplying Matrices: Dive Across the Row, Down the Column!",
+                    heading = "Multiplying Matrices: Dive Across the Row, Down the Column!",
                     explanation =
                       "Think of a matrix as a neatly organized table of numbers. To multiply A × B, take Row 1 of A horizontally and dive down Column 1 of B vertically—multiply matching buddies and add them! Matrix multiplication is NOT commutative: A × B usually gives a totally different answer from B × A.",
                     keyFormula = "(m \\times n) \\times (n \\times p) \\to (m \\times p)   |   \\det\\begin{pmatrix}a & b\\\\ c & d\\end{pmatrix} = ad - bc",
@@ -36,7 +36,7 @@ object MathematicsCurriculumPart2 {
                       "If a matrix has NO inverse ('singular matrix'), immediately set its determinant ad − bc = 0 and solve!",
                   ),
                   ConceptBlock(
-                    heading = "2. The 2×2 Inverse Shortcut (Swap, Negate, Divide!)",
+                    heading = "The 2×2 Inverse Shortcut (Swap, Negate, Divide!)",
                     explanation =
                       "To invert A = [[a, b], [c, d]], remember three quick moves: (1) SWAP the main diagonal (d and a trade seats), (2) flip the SIGNS of the other diagonal (−b and −c), and (3) DIVIDE every entry by the determinant (ad − bc).",
                     keyFormula = "A^{-1} = \\frac{1}{ad - bc}\\begin{pmatrix}d & -b\\\\ -c & a\\end{pmatrix}",
@@ -173,7 +173,7 @@ object MathematicsCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. The 3 Parallel-Line Letters: Z, F, and C!",
+                    heading = "The 3 Parallel-Line Letters: Z, F, and C!",
                     explanation =
                       "Whenever a straight line cuts across two parallel tracks: look for a 'Z' shape—the inner corners are ALTERNATE and EQUAL! Look for an 'F' shape—the corners underneath the bars are CORRESPONDING and EQUAL! Look for a 'C' (or U) bracket—both inside corners add up to 180°!",
                     keyFormula = "\\text{Interior Sum} = (n - 2)\\times 180^\\circ   |   \\text{Each Exterior (Regular)} = \\frac{360^\\circ}{n}",
@@ -181,7 +181,7 @@ object MathematicsCurriculumPart2 {
                       "Need the number of sides n quickly? Always find ONE exterior angle (180° − interior), then divide n = 360° / exterior!",
                   ),
                   ConceptBlock(
-                    heading = "2. Similar Shapes: Lengths Scale by k, Areas Scale by k²!",
+                    heading = "Similar Shapes: Lengths Scale by k, Areas Scale by k²!",
                     explanation =
                       "If you zoom a photo of a triangle to 3× its height, every side multiplies by 3, AND its Area grows by 3 × 3 = 9 times (k²)! Likewise, volumes of similar 3D shapes scale by k³.",
                     keyFormula = "\\frac{L_1}{L_2} = k \\implies \\frac{A_1}{A_2} = k^2,\\quad \\frac{V_1}{V_2} = k^3",
@@ -318,7 +318,7 @@ object MathematicsCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. The Top 7 Circle Theorem Cheat-Sheet",
+                    heading = "The Top 7 Circle Theorem Cheat-Sheet",
                     explanation =
                       "Every circle puzzle uses at least one of these 7 simple rules: (1) Angle at Center = TWICE angle at circumference standing on the same arc! (2) Angle in a Semicircle = 90°! (3) Angles in the same segment = EQUAL (bow-tie rule)! (4) Opposite angles of a 4-corner Cyclic Quad add to 180°! (5) Radius meets Tangent at 90°! (6) Alternate Segment: tangent-chord angle equals the far interior triangle angle! (7) Perpendicular from center cuts a chord cleanly in half.",
                     keyFormula = "\\angle_{\\text{center}} = 2\\angle_{\\text{circ}}   |   \\angle_{\\text{semi}} = 90^\\circ   |   \\text{Cyclic Opp Sum} = 180^\\circ",
@@ -326,7 +326,7 @@ object MathematicsCurriculumPart2 {
                       "Always check if a chord passes through the CENTER O first—if it does, mark that 90° diameter angle right away!",
                   ),
                   ConceptBlock(
-                    heading = "2. The 4 Standard Loci (Path of a Moving Point)",
+                    heading = "The 4 Standard Loci (Path of a Moving Point)",
                     explanation =
                       "A Locus is the trail left by a point obeying a strict rule: Fixed distance r from 1 point = Circle! Equal distance from 2 points = Perpendicular Bisector line! Equal distance from 2 intersecting lines = Angle Bisector! Fixed distance from a straight track = Two Parallel Rails!",
                     keyFormula = "|PA| = |PB| \\implies \\perp\\text{ bisector of } AB",
@@ -464,7 +464,7 @@ object MathematicsCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Pizza Slices (Sectors) & Cone Magic",
+                    heading = "Pizza Slices (Sectors) & Cone Magic",
                     explanation =
                       "A sector of angle θ° is simply the fraction θ/360 of a full pizza! So its arc length is (θ/360)×2πr and its slice area is (θ/360)×πr². Take a paper sector and tape the two straight edges together—it folds into a 3D ICE-CREAM CONE! The sector radius R becomes the cone's slant height l, and the curved pizza crust becomes the cone base 2πr.",
                     keyFormula = "L_{\\text{arc}} = \\frac{\\theta}{360}\\cdot 2\\pi r   |   V_{\\text{cone}} = \\frac{1}{3}\\pi r^2 h,\\quad \\text{CSA}_{\\text{cone}} = \\pi r l",
@@ -472,7 +472,7 @@ object MathematicsCurriculumPart2 {
                       "When a sector of angle θ folds into a cone, base radius r = (θ / 360) × R_sector! Huge JAMB shortcut!",
                   ),
                   ConceptBlock(
-                    heading = "2. Spheres, Hemispheres & Frustums",
+                    heading = "Spheres, Hemispheres & Frustums",
                     explanation =
                       "A sphere has Surface Area 4πr² and Volume (4/3)πr³. Cut it in half to get a solid Hemisphere: its curved bowl is 2πr² PLUS the flat circular top πr² = 3πr² total! Cut the tip off a cone/pyramid to get a bucket-shaped Frustum: subtract small top volume from big full volume!",
                     keyFormula = "A_{\\text{sphere}} = 4\\pi r^2,\\quad V_{\\text{sphere}} = \\frac{4}{3}\\pi r^3   |   V_{\\text{frustum}} = \\frac{1}{3}\\pi H(R^2 + Rr + r^2)",
@@ -621,7 +621,7 @@ object MathematicsCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. SOHCAHTOA, Special Angles & The CAST Compass",
+                    heading = "SOHCAHTOA, Special Angles & The CAST Compass",
                     explanation =
                       "In right triangles: Sin = Opp/Hyp, Cos = Adj/Hyp, Tan = Opp/Adj. Memorize exact special triangles: sin 30° = cos 60° = 1/2, sin 45° = cos 45° = √2/2, sin 60° = cos 30° = √3/2! For angles above 90°, follow CAST starting Quadrant 1: All (+), Sine (+ in Q2), Tan (+ in Q3), Cos (+ in Q4).",
                     keyFormula = "\\sin^2\\theta + \\cos^2\\theta = 1   |   \\sin(30^\\circ)=\\frac{1}{2},\\; \\cos(60^\\circ)=\\frac{1}{2},\\; \\tan(45^\\circ)=1",
@@ -629,7 +629,7 @@ object MathematicsCurriculumPart2 {
                       "Angle of ELEVATION (looking up from horizontal) equals Angle of DEPRESSION (looking down from top) by Z-alternate angles!",
                   ),
                   ConceptBlock(
-                    heading = "2. Non-Right Triangles & Bearings Clockwise from North",
+                    heading = "Non-Right Triangles & Bearings Clockwise from North",
                     explanation =
                       "No 90° corner? If you know an angle and the side straight ACROSS from it, use the Sine Rule! If you have Side–Angle–Side (a corner trapped between two known sides) or all 3 sides, use Cosine Rule! For bearings: ALWAYS draw a little 'N↑' cross at the 'FROM' station and measure CLOCKWISE with 3 digits (e.g., 045°).",
                     keyFormula = "\\frac{a}{\\sin A} = \\frac{b}{\\sin B}   |   c^2 = a^2 + b^2 - 2ab\\cos C   |   \\text{Area} = \\frac{1}{2}ab\\sin C",
@@ -767,7 +767,7 @@ object MathematicsCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Distance, Midpoint & Slope (Rise over Run)",
+                    heading = "Distance, Midpoint & Slope (Rise over Run)",
                     explanation =
                       "Plot two points on graph paper: Midpoint simply averages their x's and y's! Distance makes a hidden right triangle and runs Pythagoras: √[(Δx)² + (Δy)²]! Slope (gradient m) measures steepness: Rise ÷ Run. Parallel lines keep identical slope (m₁ = m₂); Perpendicular lines turn 90°, flipping the fraction upside-down AND switching its sign (m₂ = −1/m₁)!",
                     keyFormula = "d = \\sqrt{(x_2-x_1)^2 + (y_2-y_1)^2},\\quad m = \\frac{y_2-y_1}{x_2-x_1}   |   m_1 m_2 = -1 \\text{ (Perp)}",
@@ -775,7 +775,7 @@ object MathematicsCurriculumPart2 {
                       "Before reading gradient from ax + by + c = 0, rewrite it into y = mx + c—do NOT blindly pick a!",
                   ),
                   ConceptBlock(
-                    heading = "2. Equation of a Circle from Center & Radius",
+                    heading = "Equation of a Circle from Center & Radius",
                     explanation =
                       "A circle is just all points (x, y) staying exact distance r from center (a, b): (x − a)² + (y − b)² = r². Given expanded form x² + y² + 2gx + 2fy + c = 0, divide the x and y numbers by −2 to get the center (−g, −f) instantly!",
                     keyFormula = "(x - a)^2 + (y - b)^2 = r^2   |   x^2+y^2+2gx+2fy+c=0 \\implies r = \\sqrt{g^2+f^2-c}",

@@ -28,7 +28,7 @@ object ChemistryCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Exothermic vs Endothermic & Bond Energy Math",
+                    heading = "Exothermic vs Endothermic & Bond Energy Math",
                     explanation =
                       "Breaking a bond ALWAYS costs energy (like snapping a stick—endothermic +); making a new bond RELEASES energy (exothermic −). So ΔH = Sum(Bonds Broken) − Sum(Bonds Formed)! In Exothermic reactions, products sit LOWER on the energy hill and give off heat (ΔH is NEGATIVE, e.g., burning petrol or acid + base neutralization).",
                     keyFormula = "\\Delta H = \\sum E_{\\text{broken}} - \\sum E_{\\text{formed}}   |   \\Delta G = \\Delta H - T\\Delta S",
@@ -36,7 +36,7 @@ object ChemistryCurriculumPart2 {
                       "Any Strong Acid + Strong Base neutralization ALWAYS releases −57.3 kJ per mole of H₂O formed!",
                   ),
                   ConceptBlock(
-                    heading = "2. Entropy (ΔS) & Gibbs Free Energy (ΔG)",
+                    heading = "Entropy (ΔS) & Gibbs Free Energy (ΔG)",
                     explanation =
                       "Entropy (S) measures messiness/disorder: Gases are super messy (highest S), Liquids medium, neat Crystals lowest S! A reaction happens ALL BY ITSELF (spontaneous) whenever Gibbs Free Energy ΔG = ΔH − TΔS is NEGATIVE (< 0). That explains why ice melts on a warm day even though melting is endothermic!",
                     keyFormula = "\\Delta G < 0 \\implies \\text{Spontaneous}   |   \\Delta G = 0 \\implies \\text{Equilibrium}",
@@ -173,7 +173,7 @@ object ChemistryCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Collision Theory & How Catalysts Work",
+                    heading = "Collision Theory & How Catalysts Work",
                     explanation =
                       "Molecules must smash together HARD enough (above Activation Energy Eₐ) to react! Grinding marble lumps into powder speeds fizzing because Surface Area explodes; warming by 10°C roughly DOUBLES successful collisions; and a Catalyst builds a lower mountain tunnel—slashing Eₐ so BOTH forward & reverse reactions speed up equally WITHOUT shifting final equilibrium yield!",
                     keyFormula = "\\text{Catalyst: } E_a \\downarrow,\\; \\text{Rate} \\uparrow,\\; \\Delta H \\text{ & } K_c \\text{ unchanged!}",
@@ -181,7 +181,7 @@ object ChemistryCurriculumPart2 {
                       "Catalyst NEVER increases the final equilibrium yield—it simply reaches equilibrium FASTER!",
                   ),
                   ConceptBlock(
-                    heading = "2. Le Chatelier's Principle: The Stubborn Seesaw!",
+                    heading = "Le Chatelier's Principle: The Stubborn Seesaw!",
                     explanation =
                       "A reversible reaction at equilibrium behaves like a stubborn toddler: whatever push you apply, it shifts the OPPOSITE way! Raise Pressure? Shifts toward FEWER GAS MOLES! Add Heat (raise T)? Shifts in the ENDOTHERMIC direction (forward if ΔH > 0, backward if ΔH < 0)! Note: ONLY Temperature can change the numerical value of K_c!",
                     keyFormula = "aA + bB \\rightleftharpoons cC + dD \\implies K_c = \\frac{[C]^c[D]^d}{[A]^a[B]^b}\\; (\\text{gases/aq only})",
@@ -318,7 +318,7 @@ object ChemistryCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. OIL RIG & Oxidation Number Rules",
+                    heading = "OIL RIG & Oxidation Number Rules",
                     explanation =
                       "Oxidation Is Loss of electrons (Oxidation Number climbs UP!); Reduction Is Gain of electrons (Oxidation Number drops DOWN!). Crucial twist: the species that GETS Oxidized is actually the REDUCING AGENT (it handed its electrons away to reduce the partner)! Quick rules: free elements = 0, Group 1 = +1, Hydrogen = +1, Oxygen = −2 (except peroxides −1).",
                     keyFormula = "\\text{MnO}_4^- \\to \\text{Mn}^{2+}\\; (+7 \\to +2:\\text{ Oxidizing Agent})   |   E^\\circ_{\\text{cell}} = E^\\circ_{\\text{red}} - E^\\circ_{\\text{ox}}",
@@ -326,7 +326,7 @@ object ChemistryCurriculumPart2 {
                       "Spot KMnO₄ (purple → colourless) and acidified K₂Cr₂O₇ (orange → green): both are superstar OXIDIZING agents!",
                   ),
                   ConceptBlock(
-                    heading = "2. Galvanic Cells vs Electrolytic Cells (AN OX / RED CAT)",
+                    heading = "Galvanic Cells vs Electrolytic Cells (AN OX / RED CAT)",
                     explanation =
                       "Across BOTH galvanic batteries and electrolysis tanks, Oxidation ALWAYS happens at the ANODE (AN OX) and Reduction ALWAYS happens at the CATHODE (RED CAT)! In a spontaneous battery (Daniell Zn/Cu cell), Zn is higher in reactivity so Zn becomes the negative Anode (−), shooting electrons across the wire to the positive Cu Cathode (+).",
                     keyFormula = "\\text{Zn}(s) | \\text{Zn}^{2+}(aq) || \\text{Cu}^{2+}(aq) | \\text{Cu}(s)   |   \\text{Salt Bridge completes circuit}",
@@ -462,7 +462,7 @@ object ChemistryCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Who Wins at the Electrodes? (3 Simple Rules)",
+                    heading = "Who Wins at the Electrodes? (3 Simple Rules)",
                     explanation =
                       "Drop salt into water and FOUR ions swim around (Na⁺, H⁺, Cl⁻, OH⁻). Who wins discharge? Rule 1 (Position): Easier-to-discharge ions WIN (Cu²⁺ beats H⁺; H⁺ beats Na⁺/K⁺! On the anion side, OH⁻ usually beats SO₄²⁻ & NO₃⁻). Rule 2 (High Concentration): Concentrating Brine floods the anode with Cl⁻ so Chlorine gas wins instead of OH⁻! Rule 3 (Active Electrode): Copper anode dissolves into Cu²⁺ instead of releasing O₂!",
                     keyFormula = "\\text{Cations discharged easily: } \\text{Ag}^+ > \\text{Cu}^{2+} > \\text{H}^+ > \\text{Zn}^{2+} > \\text{Na}^+ > \\text{K}^+",
@@ -470,7 +470,7 @@ object ChemistryCurriculumPart2 {
                       "During electrolysis of Dilute H₂SO₄ (acidified water): 2 volumes of H₂ form at Cathode while 1 volume of O₂ forms at Anode!",
                   ),
                   ConceptBlock(
-                    heading = "2. Faraday's Laws: Counting Electrons by Current & Time",
+                    heading = "Faraday's Laws: Counting Electrons by Current & Time",
                     explanation =
                       "1 Faraday (F = 96,500 C) equals the electric charge of 1 MOLE of electrons! To plate 1 mole of Ag⁺ takes 1 F; 1 mole of Cu²⁺ takes 2 F (two hands needed!); 1 mole of Al³⁺ takes 3 F! If the same current flows through two baths in series (Second Law), moles deposited scale inversely with ion charge n!",
                     keyFormula = "Q = I t\\; (t\\text{ in s!})   |   m = \\frac{M I t}{n F},\\quad F = 96{,}500\\text{ C/mol}",
@@ -619,7 +619,7 @@ object ChemistryCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Hard Water & Drying Agents (Never Mix Acid & Base Dryers!)",
+                    heading = "Hard Water & Drying Agents (Never Mix Acid & Base Dryers!)",
                     explanation =
                       "Hard water wastes soap into cloudy scum because Ca²⁺ and Mg²⁺ ions hijack soap! Temporary hardness comes from Ca(HCO₃)₂—simply BOIL it to break it into chalk (kettle fur!) or add slaked lime. Permanent hardness (CaSO₄/MgSO₄) survives boiling—beat it using Washing Soda (Na₂CO₃) or Ion-Exchange resin! Watch gas dryers: Ammonia NH₃ is ALKALINE, so NEVER dry it with acidic Conc. H₂SO₄ or CaCl₂ (it reacts!)—use Quicklime (CaO)!",
                     keyFormula = "\\text{Temp: } \\text{Ca(HCO}_3)_2 \\xrightarrow{\\Delta} \\text{CaCO}_3\\!\\downarrow + \\text{H}_2\\text{O} + \\text{CO}_2",
@@ -627,7 +627,7 @@ object ChemistryCurriculumPart2 {
                       "Conc. H₂SO₄ dehydrates H₂S too—dry H₂S using fused CaCl₂! Only NH₃ fails CaCl₂ (forms CaCl₂·8NH₃)!",
                   ),
                   ConceptBlock(
-                    heading = "2. Signature Halogens, NH₃ & SO₂ Bleaching Duel",
+                    heading = "Signature Halogens, NH₃ & SO₂ Bleaching Duel",
                     explanation =
                       "Chlorine (Cl₂) bleaches permanently by OXIDATION (kills dye using O from HOCl). Sulphur Dioxide (SO₂) bleaches ONLY temporarily by REDUCTION—air oxygen slowly turns straw hats & newsprint yellow again! Both NH₃ and HCl are ultra-soluble gases demonstrated by the classic Fountain Experiment.",
                     keyFormula = "\\text{Haber: } \\text{N}_2+3\\text{H}_2 \\xrightarrow{450^\\circ\\text{C, Fe}} 2\\text{NH}_3   |   \\text{Contact: } 2\\text{SO}_2+\\text{O}_2 \\xrightarrow{\\text{V}_2\\text{O}_5} 2\\text{SO}_3",
@@ -763,7 +763,7 @@ object ChemistryCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. The Metal Reactivity Ladder & Extraction Choice",
+                    heading = "The Metal Reactivity Ladder & Extraction Choice",
                     explanation =
                       "Please Stop Calling Me A Careless Zebra Instead Try Learning How Copper Saves Gold: K, Na, Ca, Mg, Al hold onto Oxygen SO fiercely that charcoal CANNOT tear it away—only raw ELECTROLYSIS frees them! Middle metals (Zn, Fe, Sn, Pb) give up Oxygen when roasted with Carbon / CO in a furnace!",
                     keyFormula = "\\text{Al (Bauxite Al}_2\\text{O}_3\\text{ in Cryolite)} \\to \\text{Electrolysis}   |   \\text{Fe (Haematite Fe}_2\\text{O}_3\\text{)} \\xrightarrow{\\text{CO}} \\text{Fe}",
@@ -771,7 +771,7 @@ object ChemistryCurriculumPart2 {
                       "Why add Cryolite (Na₃AlF₆) to Al₂O₃? It slashes the melting point from 2050°C down to ~950°C—saving huge electricity!",
                   ),
                   ConceptBlock(
-                    heading = "2. Inside the Blast Furnace & Essential Alloys",
+                    heading = "Inside the Blast Furnace & Essential Alloys",
                     explanation =
                       "Three solids pour into the top of the Blast Furnace: Haematite (Fe₂O₃), Coke (C), and Limestone (CaCO₃). Coke burns to CO₂ then reduces to CO—the true reducing agent that strips oxygen from Fe₂O₃! Meanwhile Limestone breaks into CaO and gobbles sandy SiO₂ impurity into floating liquid Slag (CaSiO₃)!",
                     keyFormula = "\\text{Fe}_2\\text{O}_3 + 3\\text{CO} \\to 2\\text{Fe} + 3\\text{CO}_2   |   \\text{CaO} + \\text{SiO}_2 \\to \\text{CaSiO}_3\\text{ (Slag)}",

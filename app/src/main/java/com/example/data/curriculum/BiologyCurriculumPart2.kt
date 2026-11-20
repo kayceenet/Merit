@@ -28,7 +28,7 @@ object BiologyCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Brain Zones & The Instant Reflex Shortcut",
+                    heading = "Brain Zones & The Instant Reflex Shortcut",
                     explanation =
                       "Touch a hot pot and your hand jerks away BEFORE you even feel 'Ouch!'—because the signal takes a Spinal Cord Reflex shortcut (Receptor → Sensory Neuron → Relay Neuron → Motor Neuron → Muscle Effector) instead of waiting for the Brain! Inside the Brain: Cerebrum handles thinking/memory; Cerebellum keeps balance & smooth walking; Medulla Oblongata keeps heartbeat & breathing running even while you sleep!",
                     keyFormula = "\\text{Stimulus} \\to \\text{Receptor} \\to \\text{Sensory} \\to \\text{Relay (Spinal)} \\to \\text{Motor} \\to \\text{Effector}",
@@ -36,7 +36,7 @@ object BiologyCurriculumPart2 {
                       "At a Synapse gap, electrical impulses switch to CHEMICAL neurotransmitters (e.g., Acetylcholine), guaranteeing signals travel ONE WAY ONLY!",
                   ),
                   ConceptBlock(
-                    heading = "2. Focusing the Eye & Fixing Blurry Vision + Hearing",
+                    heading = "Focusing the Eye & Fixing Blurry Vision + Hearing",
                     explanation =
                       "Look at a nearby book: Circular Ciliary muscles CONTRACT → Suspensory ligaments go SLACK → Elastic Lens bulges FATTER to bend rays sharply! Look far away: Ciliary relaxes → Ligaments pull tight → Lens flattens thin! Eye defects: Long eyeball or over-strong lens focuses light IN FRONT of Retina = MYOPIA (fix with diverging CONCAVE lens!). Too-short eyeball focuses BEHIND Retina = HYPERMETROPIA (fix with converging CONVEX lens!). Inside the Ear: Pinna → Eardrum → 3 Ossicles (Hammer-Anvil-Stirrup amplify 20×!) → Oval Window → Cochlea (Hearing!), while Semicircular Canals sense Balance!",
                     keyFormula = "\\text{Myopia (Near OK, Far Blurry)} \\to \\text{CONCAVE}   |   \\text{Hypermetropia (Far OK, Near Blurry)} \\to \\text{CONVEX}",
@@ -173,7 +173,7 @@ object BiologyCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Endocrine Hormones vs Nerve Signals + Blood Sugar Duel",
+                    heading = "Endocrine Hormones vs Nerve Signals + Blood Sugar Duel",
                     explanation =
                       "Nerves act like an instant fibre-optic phone call; Hormones act like letters mailed via the bloodstream—slower, longer-lasting, affecting distant organs! Classic pancreas seesaw: Eat a heavy carbohydrate lunch and Blood Glucose spikes → Islets of Langerhans release INSULIN telling the liver to pack sugar away as stored GLYCOGEN! Skip meals? Pancreas releases GLUCAGON breaking glycogen back into Glucose!",
                     keyFormula = "\\text{High Sugar} \\xrightarrow{\\text{Insulin}} \\text{Glycogen Stored}   |   \\text{Low Sugar} \\xrightarrow{\\text{Glucagon}} \\text{Glucose Released}",
@@ -181,7 +181,7 @@ object BiologyCurriculumPart2 {
                       "Auxin plant hormone trick: Light destroys/pushes Auxin onto the SHADED side of a stem! In SHOOTS, extra Auxin speeds cell elongation so the stem bends TOWARD light! Wait—in ROOTS, heavy Auxin INHIBITS growth so bottom root cells lag and roots bend DOWNWARD (positive geotropism)!",
                   ),
                   ConceptBlock(
-                    heading = "2. Plant Growth Hormones, Skeletons & Antagonistic Muscles",
+                    heading = "Plant Growth Hormones, Skeletons & Antagonistic Muscles",
                     explanation =
                       "Plants also use Gibberellins (bolt stems & break dormancy), Cytokinins (cell division), Ethene (ripen fruits!), and Abscisic Acid (dormancy/leaf drop!). In animals, Axial Skeleton (Skull, Backbone, Ribs) protects soft organs; Appendicular Skeleton (Limbs + Pelvic/Pectoral girdles) moves you around! Muscles only PULL (never push!), so they work in pairs like Biceps (flexor) & Triceps (extensor) across Cartilage-padded Synovial joints!",
                     keyFormula = "\\text{Ball \\& Socket (Shoulder/Hip: 360}^\\circ\\text{)}   |   \\text{Hinge (Elbow/Knee: 1 plane)}   |   \\text{Atlas (Yes nod) / Axis (No turn)}",
@@ -318,7 +318,7 @@ object BiologyCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Flower Structure, Double Fertilization & Seeds",
+                    heading = "Flower Structure, Double Fertilization & Seeds",
                     explanation =
                       "Stamen (Male) = Anther making Pollen + Filament. Pistil/Carpel (Female) = sticky Stigma + Style + Ovary holding Ovules! After pollination, the pollen tube shoots 2 sperm nuclei down into the ovule for Plant DOUBLE FERTILIZATION: Sperm #1 fuses with Egg → 2n Embryo; Sperm #2 fuses with 2 Polar Nuclei → 3n Endosperm food bank! Afterwards: Ovule becomes SEED, Ovary swells into FRUIT!",
                     keyFormula = "\\text{Epigeal (Bean: cotyledons lifted above soil)}   |   \\text{Hypogeal (Maize: cotyledon stays underground)}",
@@ -326,7 +326,7 @@ object BiologyCurriculumPart2 {
                       "Top 3 things EVERY seed strictly needs to germinate: (1) Water, (2) Oxygen, (3) Warmth! Notice LIGHT is NOT required by most germinating seeds underground!",
                   ),
                   ConceptBlock(
-                    heading = "2. Human 28-Day Menstrual Hormones & The Placenta",
+                    heading = "Human 28-Day Menstrual Hormones & The Placenta",
                     explanation =
                       "Days 1–5: Lining sheds (menstruation). Pituitary FSH ripens an ovarian follicle, which pumps out ESTROGEN to rebuild the thick uterus wall! On Day 14, a dramatic spike in LH triggers OVULATION! Empty follicle turns into yellow Corpus Luteum secreting PROGESTERONE to lock the lush lining steady—if pregnancy occurs, Progesterone stays high; if not, Corpus Luteum shrinks, Progesterone drops, and shedding restarts! Inside pregnancy, the Placenta lets O₂, Glucose & Antibodies pass mom→baby and Urea/CO₂ pass baby→mom WITHOUT mixing blood!",
                     keyFormula = "\\text{Day 14: LH Surge} \\implies \\text{Ovulation}   |   \\text{Progesterone} = \\text{Maintains Uterine Lining}",
@@ -472,7 +472,7 @@ object BiologyCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Dominant, Recessive, Co-Dominant & Test Crosses",
+                    heading = "Dominant, Recessive, Co-Dominant & Test Crosses",
                     explanation =
                       "Genes come in pairs called Alleles—one from Mom, one from Dad! A Dominant allele (T) masks a Recessive one (t) whenever paired together (Tt still looks Tall!). Crossing two hybrids Tt × Tt always produces 3 Tall : 1 Short phenotype (1 TT : 2 Tt : 1 tt)! How do you check whether a tall pea plant is pure TT or hybrid Tt? Do a TEST CROSS against a pure recessive short tt—if ANY short offspring appear, the tall parent MUST be hybrid Tt!",
                     keyFormula = "\\text{Monohybrid } F_2 = 3:1   |   \\text{Dihybrid } F_2 = 9:3:3:1   |   \\text{AS} \\times \\text{AS} \\implies 25\\%\\text{ AA}:50\\%\\text{ AS}:25\\%\\text{ SS}",
@@ -480,7 +480,7 @@ object BiologyCurriculumPart2 {
                       "ABO Blood Group trick: I^A and I^B are CO-DOMINANT (both show in AB!), while I^O is recessive! An A parent (I^A I^O) + B parent (I^B I^O) can have babies of ALL 4 types: A, B, AB, and O!",
                   ),
                   ConceptBlock(
-                    heading = "2. Sex-Linked Diseases & Sickle-Cell Trait",
+                    heading = "Sex-Linked Diseases & Sickle-Cell Trait",
                     explanation =
                       "Boys are XY while Girls are XX! Because the tiny Y chromosome lacks matching backup genes for traits on X, a boy who inherits just ONE broken X^h allele from his carrier mom (X^H X^h) immediately gets Haemophilia or Red-Green Colour Blindness—whereas a girl needs TWO broken copies (X^h X^h)! Sickle-cell (Hb^A Hb^S) heterozygote carriers resist severe malaria (Heterozygote Advantage)!",
                     keyFormula = "\\text{Carrier Mom } (X^H X^h) \\times \\text{Normal Dad } (X^H Y) \\implies 50\\%\\text{ of Sons Affected } (25\\%\\text{ all kids})",
@@ -618,7 +618,7 @@ object BiologyCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. DNA Base-Pairing Twins & Making Proteins",
+                    heading = "DNA Base-Pairing Twins & Making Proteins",
                     explanation =
                       "Think of DNA as a twisted double ladder whose rungs ONLY snap together in exact buddy pairs: Adenine (A) always locks with Thymine (T), and Guanine (G) always locks with Cytosine (C)! (When DNA copies a temporary mRNA messenger inside the nucleus, RNA uses Uracil U instead of T!). Three letters on mRNA (a Codon) call one specific amino acid onto the Ribosome to build proteins!",
                     keyFormula = "\\text{DNA: A} \\leftrightarrow \\text{T},\\; \\text{G} \\leftrightarrow \\text{C}   |   \\text{DNA} \\xrightarrow{\\text{Transcription}} \\text{mRNA} \\xrightarrow{\\text{Translation}} \\text{Protein}",
@@ -626,7 +626,7 @@ object BiologyCurriculumPart2 {
                       "Chargaff shortcut: if DNA has 20% Adenine, then Thymine is ALSO 20% (40% together), leaving 60% split equally → 30% Guanine and 30% Cytosine!",
                   ),
                   ConceptBlock(
-                    heading = "2. Variation & Darwin vs Lamarck Evolution",
+                    heading = "Variation & Darwin vs Lamarck Evolution",
                     explanation =
                       "Continuous variation (Height, Skin tone, Weight) spreads smoothly on a bell curve controlled by MANY genes + environment! Discontinuous variation (ABO Blood group, Tongue rolling, Fingerprint Whorl/Loop/Arch) puts everyone into neat separate buckets controlled by few genes! Darwin explained evolution cleanly: organisms overproduce → face scarce food/predators → beneficial mutant variations SURVIVE and pass helpful genes on (Natural Selection)! Lamarck wrongly claimed stretching a giraffe's neck stretched its babies' necks too!",
                     keyFormula = "\\text{Evidence of Evolution: Fossils + Homologous Pentadactyl Limbs + Vestigial Organs (Appendix/Coccyx) + Embryology}",

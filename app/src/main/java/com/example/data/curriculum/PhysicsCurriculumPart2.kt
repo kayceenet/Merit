@@ -27,7 +27,7 @@ object PhysicsCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Why Bridges Have Tiny Metal Gaps in Hot Sun",
+                    heading = "Why Bridges Have Tiny Metal Gaps in Hot Sun",
                     explanation =
                       "Heat makes atoms jiggle violently and push slightly farther apart—so steel rails and bridges grow longer in the afternoon sun! Engineers leave small expansion gaps so tracks don't buckle. Volume expansion coefficient γ is always THREE times linear expansivity α (γ = 3α), and area expansion β = 2α!",
                     keyFormula = "\\Delta L = \\alpha L_1 \\Delta\\theta   |   \\beta = 2\\alpha   |   \\gamma = 3\\alpha   |   \\theta(^{\\circ}C) = \\frac{X_\\theta - X_0}{X_{100} - X_0} \\times 100",
@@ -35,7 +35,7 @@ object PhysicsCurriculumPart2 {
                       "ALWAYS convert Celsius to Kelvin (T = °C + 273) before dividing in ANY Gas Law formula PV/T = constant!",
                   ),
                   ConceptBlock(
-                    heading = "2. Pressure, Volume & Kelvin Temperature of Trapped Gas",
+                    heading = "Pressure, Volume & Kelvin Temperature of Trapped Gas",
                     explanation =
                       "Squeeze a bicycle pump with your thumb blocking the nozzle: smaller volume packs air molecules closer so Pressure jumps up (Boyle's Law: P₁V₁ = P₂V₂). Heat a sealed balloon: faster molecules push walls outward so Volume expands with Kelvin T (Charles' Law: V₁/T₁ = V₂/T₂).",
                     keyFormula = "\\frac{P_1 V_1}{T_1} = \\frac{P_2 V_2}{T_2}   \\quad (T \\text{ strictly in Kelvin!})",
@@ -172,7 +172,7 @@ object PhysicsCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Climbing Temperature vs Flat Phase-Change Stops",
+                    heading = "Climbing Temperature vs Flat Phase-Change Stops",
                     explanation =
                       "Put an ice cube on a stove. While ice melts into water at 0°C—or water boils into steam at 100°C—the thermometer FREEZES flat! Heat added there doesn't raise temperature; instead, it breaks bonds holding molecules tight (Latent = 'Hidden' Heat, Q = mL).",
                     keyFormula = "Q_{\\text{temp rise}} = m c \\Delta\\theta   |   Q_{\\text{phase change}} = m L   |   \\text{Electrical Heat } = I V t",
@@ -180,7 +180,7 @@ object PhysicsCurriculumPart2 {
                       "Cooling by evaporation (sweating or alcohol on skin) works because escaping fast molecules steal latent heat of vaporization from your skin!",
                   ),
                   ConceptBlock(
-                    heading = "2. Conduction, Convection, Radiation & Vacuum Flasks",
+                    heading = "Conduction, Convection, Radiation & Vacuum Flasks",
                     explanation =
                       "Heat travels three ways: passed hand-to-hand along a metal spoon (Conduction—stopped by vacuum/plastic), carried upward by rising warm fluid loops (Convection—why AC sits high & kettle heaters sit at the bottom), and beaming across empty space from the Sun as infrared waves (Radiation—black dull surfaces absorb/emit best, shiny silver reflects!).",
                     keyFormula = "\\text{Relative Humidity} = \\frac{\\text{SVP at Dew Point}}{\\text{SVP at Room Temp}} \\times 100\\%",
@@ -319,7 +319,7 @@ object PhysicsCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Waves Move Energy Without Moving Water Forward",
+                    heading = "Waves Move Energy Without Moving Water Forward",
                     explanation =
                       "Drop a pebble in a pond: ripples spread outward carrying energy, while a floating cork just bobs up and down (Transverse wave—light, water, EM waves). Sound travels by squishing air back-and-forth along the travel arrow (Longitudinal wave—needs air/solids, ZERO sound in space vacuum!).",
                     keyFormula = "v = f\\lambda   |   v_{\\text{echo}} = \\frac{2d}{t}   |   \\text{Progressive: } y = A\\sin\\left(2\\pi ft - \\frac{2\\pi x}{\\lambda}\\right)",
@@ -327,7 +327,7 @@ object PhysicsCurriculumPart2 {
                       "Echo time t includes BOTH there and back, so distance to cliff d = (v × t) / 2! Sound travels FASTEST in steel solids, slower in water, slowest in air.",
                   ),
                   ConceptBlock(
-                    heading = "2. Musical Pipes, Beats & Overtones",
+                    heading = "Musical Pipes, Beats & Overtones",
                     explanation =
                       "Blow across a closed soda bottle vs an open flute pipe. A CLOSED pipe forces a still air node at the bottom so ¼ wavelength fits inside -> fundamental frequency f₀ = v / (4L) (only ODD harmonics: f₀, 3f₀, 5f₀). An OPEN pipe fits ½ wavelength inside -> f₀ = v / (2L) (ALL harmonics: f₀, 2f₀, 3f₀).",
                     keyFormula = "f_{\\text{closed}} = \\frac{v}{4L} \\; (1, 3, 5\\dots)   |   f_{\\text{open}} = \\frac{v}{2L} \\; (1, 2, 3\\dots)   |   f_{\\text{beat}} = |f_1 - f_2|",
@@ -465,7 +465,7 @@ object PhysicsCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Refraction & Total Internal Reflection (Why Diamonds Sparkle)",
+                    heading = "Refraction & Total Internal Reflection (Why Diamonds Sparkle)",
                     explanation =
                       "Light slows down when stepping from air into glass or water—so it bends TOWARD the normal line! Leaving glass back into air at a shallow steep angle larger than Critical Angle c bounces 100% of the light back inside (Total Internal Reflection)—powering fiber-optic internet cables and diamond sparkle!",
                     keyFormula = "n = \\frac{\\sin i}{\\sin r} = \\frac{c_{\\text{air}}}{v_{\\text{medium}}} = \\frac{\\text{Real Depth}}{\\text{Apparent Depth}}   |   \\sin c = \\frac{1}{n}",
@@ -473,7 +473,7 @@ object PhysicsCurriculumPart2 {
                       "Critical angle ONLY happens going from a DENSE medium (glass/water) toward a LESS dense medium (air)—never from air into glass!",
                   ),
                   ConceptBlock(
-                    heading = "2. Lenses, Mirrors & Fixing Blurry Vision",
+                    heading = "Lenses, Mirrors & Fixing Blurry Vision",
                     explanation =
                       "Magnifying glasses use Converging (Convex) lenses with f > 0. Under 'Real Is Positive', virtual images have negative v. Near-sighted (MYOPIA—can't see far) focuses too early in front of the retina -> fix with Diverging (Concave) lens. Far-sighted (HYPERMETROPIA—can't read close) focuses behind retina -> fix with Converging (Convex) lens!",
                     keyFormula = "\\frac{1}{u} + \\frac{1}{v} = \\frac{1}{f}   |   m = \\frac{v}{u}   |   P_{\\text{dioptres}} = \\frac{1}{f(\\text{m})}",
@@ -621,7 +621,7 @@ object PhysicsCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Static Sparks & Electric Push Fields",
+                    heading = "Static Sparks & Electric Push Fields",
                     explanation =
                       "Rub a plastic pen on dry hair and it picks up paper bits! Opposite charges attract; same charges push apart according to Coulomb's Law: move charges TWICE as far apart, and electric force drops FOUR times weaker (1/r²). Sharp lightning rods leak electric charge safely to earth via 'Action of Points'.",
                     keyFormula = "F = \\frac{k q_1 q_2}{r^2}   |   E = \\frac{F}{q} = \\frac{V}{d}   |   W = q V",
@@ -629,7 +629,7 @@ object PhysicsCurriculumPart2 {
                       "Careful! Adding resistors in SERIES adds directly (R₁+R₂), but Capacitors are OPPOSITE: PARALLEL adds directly (C = C₁ + C₂) and SERIES uses reciprocals!",
                   ),
                   ConceptBlock(
-                    heading = "2. Capacitors: Tiny Fast-Charge Buckets",
+                    heading = "Capacitors: Tiny Fast-Charge Buckets",
                     explanation =
                       "A capacitor stores electric charge between two parallel metal plates separated by an insulator (dielectric). Bigger plate area A or better dielectric boosts Capacitance C; wider plate gap d shrinks C.",
                     keyFormula = "C = \\frac{Q}{V} = \\frac{\\varepsilon_0 A}{d}   |   U = \\frac{1}{2} C V^2 = \\frac{1}{2} Q V   |   C_{\\text{parallel}} = C_1 + C_2",
@@ -766,7 +766,7 @@ object PhysicsCurriculumPart2 {
               concepts =
                 listOf(
                   ConceptBlock(
-                    heading = "1. Water-Pipe Analogy for Voltage, Current & Ohm's Law",
+                    heading = "Water-Pipe Analogy for Voltage, Current & Ohm's Law",
                     explanation =
                       "Think of electrons flowing around copper wire like water flowing through pipes. Voltage V is the water-pump push, Current I is how many litres flow per second, and Resistance R is a narrow pinch in the pipe! Even a real battery has tiny internal friction r inside its chemicals, stealing a small 'lost volt' (Ir) from EMF E.",
                     keyFormula = "V = I R   |   E = I(R + r) = V + I r   |   P = IV = I^2 R = \\frac{V^2}{R}",
@@ -774,7 +774,7 @@ object PhysicsCurriculumPart2 {
                       "To make a Galvanometer measure huge CURRENT (Ammeter), put a tiny SHUNT resistor in PARALLEL. To measure huge VOLTAGE (Voltmeter), put a huge MULTIPLIER resistor in SERIES!",
                   ),
                   ConceptBlock(
-                    heading = "2. Buying Electricity from Utility Meters (kWh)",
+                    heading = "Buying Electricity from Utility Meters (kWh)",
                     explanation =
                       "NEPA/DISCO meters charge by Kilowatt-Hours (kWh), NOT watts alone! Divide Watts by 1,000 to get Kilowatts, multiply by Hours run, then multiply by price per kWh.",
                     keyFormula = "R = \\frac{\\rho L}{A}   |   \\text{Energy (kWh)} = \\frac{\\text{Watts}}{1000} \\times \\text{Hours}",

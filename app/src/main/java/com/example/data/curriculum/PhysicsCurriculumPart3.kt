@@ -26,7 +26,7 @@ object PhysicsCurriculumPart3 {
             concepts =
               listOf(
                 ConceptBlock(
-                  heading = "1. Magnets + Moving Wires = Motors & Generators",
+                  heading = "Magnets + Moving Wires = Motors & Generators",
                   explanation =
                     "Run electric current through a wire inside a magnet and the wire KICKS sideways (Fleming's Left-Hand Motor Rule, F = BIL). Push a magnet into a coil of wire and electricity SPRINGS out (Faraday/Lenz Law—the coil always pushes back against the change!). Transformers use changing AC magnetic flux to boost voltage UP or DOWN cleanly.",
                   keyFormula = "F = B I L\\sin\\theta   |   \\frac{V_s}{V_p} = \\frac{N_s}{N_p}   |   \\text{Eff } \\eta = \\frac{I_s V_s}{I_p V_p}\\times 100\\%",
@@ -34,7 +34,7 @@ object PhysicsCurriculumPart3 {
                     "Transformers NEVER work on steady DC batteries—because DC creates steady magnetic flux with zero change!",
                 ),
                 ConceptBlock(
-                  heading = "2. Alternating Current (A.C.): Reactance & Radio Tuning Resonance",
+                  heading = "Alternating Current (A.C.): Reactance & Radio Tuning Resonance",
                   explanation =
                     "In AC, coils (Inductors L) block fast high frequencies (X_L = 2πfL) while Capacitors C pass high frequencies easily (X_C = 1/(2πfC)). When X_L equals X_C perfectly, they cancel out—Current shoots to MAXIMUM at Resonance Frequency f₀ (exactly how your FM radio locks onto one station!).",
                   keyFormula = "Z = \\sqrt{R^2 + (X_L - X_C)^2}   |   V_{\\text{rms}} = \\frac{V_0}{\\sqrt{2}}   |   f_0 = \\frac{1}{2\\pi\\sqrt{L C}}",
@@ -173,7 +173,7 @@ object PhysicsCurriculumPart3 {
             concepts =
               listOf(
                 ConceptBlock(
-                  heading = "1. Light Bullets (Photons) Knocking Out Metal Electrons",
+                  heading = "Light Bullets (Photons) Knocking Out Metal Electrons",
                   explanation =
                     "Think of light as tiny energy packets called PHOTONS (E = hf). Shining dim ultraviolet photons onto zinc pops electrons right out—even brighter red light can't budge a single one if its photon energy hf is smaller than the metal's Work Function Φ (unlock fee)! Once past f₀, leftover energy becomes electron speed KE_max.",
                   keyFormula = "E = hf = \\frac{hc}{\\lambda}   |   KE_{\\max} = hf - \\Phi = e V_s   |   \\Delta E = E_2 - E_1 = hf",
@@ -181,7 +181,7 @@ object PhysicsCurriculumPart3 {
                     "Changing light INTENSITY (brightness) changes NUMBER of electrons ejected (current)—only FREQUENCY f raises electron kinetic energy!",
                 ),
                 ConceptBlock(
-                  heading = "2. Semiconductors: Doping & Diode One-Way Valves",
+                  heading = "Semiconductors: Doping & Diode One-Way Valves",
                   explanation =
                     "Pure silicon conducts poorly. Sprinkle tiny Group 5 Phosphorus atoms (5 valence electrons) -> extra free NEGATIVE electrons -> N-TYPE. Sprinkle Group 3 Boron (3 valence electrons) -> missing positive HOLES -> P-TYPE. Join P to N to get a DIODE—it acts like a one-way valve turning AC wall power into phone-charger DC (Rectification)!",
                   keyFormula = "\\text{N-type: Donor Group V (electrons)}   |   \\text{P-type: Acceptor Group III (holes)}",
@@ -317,7 +317,7 @@ object PhysicsCurriculumPart3 {
             concepts =
               listOf(
                 ConceptBlock(
-                  heading = "1. Three Siblings Escaping Unstable Atomic Nuclei",
+                  heading = "Three Siblings Escaping Unstable Atomic Nuclei",
                   explanation =
                     "Heavy nuclei like Uranium-238 are overcrowded and eject particles to calm down: ALPHA (α = ⁴₂He nucleus—heavy +2 charge, stopped by paper); BETA (β = ⁰₋₁e fast electron—light −1 charge, stopped by aluminum foil); GAMMA (γ = pure neutral energy ray—Zero mass/charge, needs thick lead!).",
                   keyFormula = "\\alpha: (A-4, Z-2)   |   \\beta^-: (A, Z+1)   |   \\gamma: (A, Z \\text{ unchanged})   |   \\Delta E = \\Delta m\\,c^2",
@@ -325,7 +325,7 @@ object PhysicsCurriculumPart3 {
                     "In a magnetic field, α bends one way slightly (heavy), β bends sharply the OPPOSITE way (light & negative), and γ flies straight!",
                 ),
                 ConceptBlock(
-                  heading = "2. Half-Life: The Halving Clock That Never Speeds Up",
+                  heading = "Half-Life: The Halving Clock That Never Speeds Up",
                   explanation =
                     "Imagine 100 coins tossed once every hour: roughly half land tails and leave each round (100 → 50 → 25 → 12.5). Half-life T_½ is the time for HALF of any sample to decay. Boiling or freezing an isotope NEVER changes its half-life!",
                   keyFormula = "N = N_0 \\left(\\frac{1}{2}\\right)^n   \\quad \\text{where } n = \\frac{\\text{Total Time } t}{T_{1/2}}",
