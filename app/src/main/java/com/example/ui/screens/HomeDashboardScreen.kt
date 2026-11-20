@@ -1,17 +1,14 @@
 package com.example.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,50 +20,45 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.automirrored.filled.MenuBook
-import androidx.compose.material.icons.automirrored.filled.TrendingUp
-import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Bolt
-import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.LocalFireDepartment
-import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.School
-import androidx.compose.material.icons.filled.Science
-import androidx.compose.material.icons.filled.TrackChanges
-import androidx.compose.material.icons.outlined.Biotech
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.R
 import com.example.data.curriculum.CourseModule
 import com.example.data.curriculum.CurriculumCatalog
 import com.example.data.curriculum.CurriculumProgression
@@ -79,9 +71,24 @@ import com.example.data.local.ThemePreferences
 import com.example.data.model.ExamAttempt
 import com.example.data.model.LessonProgress
 import com.example.data.model.UserProfile
+import com.example.ui.components.StudioActionTile
+import com.example.ui.components.StudioGradientProgressBanner
+import com.example.ui.components.StudioSubjectGradientCard
 import com.example.ui.components.TopRightMenuButton
 import com.example.ui.theme.semanticColors
 import kotlin.math.roundToInt
+
+private enum class MaterialsSubTab(val label: String) {
+  TRACKS("Your tracks"),
+  STUDY_SETS("Study sets"),
+  EXAM_PREP("Exam prep"),
+}
+
+private enum class TrackFilterCategory(val label: String) {
+  ALL("All Subjects (7)"),
+  STEM("Sciences & Math"),
+  HUMANITIES("English & Social"),
+}
 
 @Composable
 fun HomeDashboardScreen(
@@ -101,6 +108,9 @@ fun HomeDashboardScreen(
   onOpenLesson: (Lesson) -> Unit,
   onOpenTrack: (SubjectTrack) -> Unit,
   onOpenExamLab: (String) -> Unit,
+  onOpenUtmeCombo: () -> Unit = {},
+  onOpenPaper2Lab: () -> Unit = {},
+  onOpenNotebook: () -> Unit = {},
   onOpenSpacedReview: () -> Unit = {},
   onOpenMenu: () -> Unit = {},
   modifier: Modifier = Modifier,
@@ -115,7 +125,6 @@ fun HomeDashboardScreen(
   val completedIds =
     remember(progressList) { progressList.filter { it.isCompleted }.map { it.lessonId }.toSet() }
 
-  // Find next unlocked, unmastered lesson in track-order so the user always resumes cleanly
   val nextLesson =
     remember(structuredModules, progressMap, allLessons, placementPassedSubjects, passThreshold) {
       val orderedByTracks =
@@ -137,7 +146,7 @@ fun HomeDashboardScreen(
     }
   val nextLessonProgress = progressMap[nextLesson.id]
   val nextLessonPillarsDone = nextLessonProgress?.completedSteps?.distinct()?.size ?: 0
-  val nextLessonRatio = nextLessonPillarsDone / LessonPillar.entries.size.toFloat()
+  val nextLessonPercent = ((nextLessonPillarsDone * 100f) / LessonPillar.entries.size.toFloat()).roundToInt()
 
   val anyConceptDone = progressList.any { LessonPillar.CONCEPT.key in it.completedSteps }
   val anyLabDone = progressList.any { LessonPillar.LAB.key in it.completedSteps }
@@ -148,59 +157,94 @@ fun HomeDashboardScreen(
   val projectedJamb =
     if (attempts.isEmpty()) 260 else (180 + (avgAccuracy * 2.2)).roundToInt().coerceIn(160, 400)
   val recentWeakTopic = attempts.firstOrNull()?.weakTopics?.firstOrNull()
-  val totalPastQuestions =
-    remember { CurriculumCatalog.tracks.sumOf { CurriculumCatalog.pastQuestionsFor(it.id, "ALL").size } }
   val semantics = MaterialTheme.semanticColors
 
-  Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+  var activeSubTab by remember { mutableStateOf(MaterialsSubTab.TRACKS) }
+  var searchQuery by remember { mutableStateOf("") }
+  var filterCategory by remember { mutableStateOf(TrackFilterCategory.ALL) }
+
+  val filteredTracks =
+    remember(searchQuery, filterCategory) {
+      CurriculumCatalog.tracks.filter { track ->
+        val matchesCategory =
+          when (filterCategory) {
+            TrackFilterCategory.ALL -> true
+            TrackFilterCategory.STEM -> track.id in setOf("physics", "chemistry", "mathematics", "biology")
+            TrackFilterCategory.HUMANITIES -> track.id in setOf("english", "economics", "government")
+          }
+        val matchesSearch =
+          searchQuery.isBlank() ||
+            track.title.contains(searchQuery, ignoreCase = true) ||
+            track.shortName.contains(searchQuery, ignoreCase = true) ||
+            track.tagline.contains(searchQuery, ignoreCase = true) ||
+            track.allLessons.any { it.title.contains(searchQuery, ignoreCase = true) }
+        matchesCategory && matchesSearch
+      }
+    }
+  val trackPairs = remember(filteredTracks) { filteredTracks.chunked(2) }
+
+  Box(
+    modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+    contentAlignment = Alignment.TopCenter,
+  ) {
     LazyColumn(
       modifier = Modifier.widthIn(max = 900.dp).fillMaxSize(),
-      contentPadding = PaddingValues(bottom = 24.dp),
+      contentPadding = PaddingValues(bottom = 28.dp),
       verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-      // Coursera-Style Clean Academic Top Bar + Theme Switch
+      // Studio Clean Header + Underline Sub-Tabs matching Bottom-Center Mockup
       item {
         Column(
           modifier =
             Modifier.fillMaxWidth()
-              .background(semantics.classroomBar)
-              .padding(horizontal = 16.dp, vertical = 16.dp),
-          verticalArrangement = Arrangement.spacedBy(10.dp),
+              .background(MaterialTheme.colorScheme.surface)
+              .padding(top = 12.dp),
         ) {
           Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
           ) {
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-              Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            Row(
+              horizontalArrangement = Arrangement.spacedBy(6.dp),
+              verticalAlignment = Alignment.CenterVertically,
+            ) {
+              Surface(
+                color = semantics.softTintSurface,
+                shape = RoundedCornerShape(99.dp),
               ) {
-                Icon(
-                  imageVector = Icons.Filled.School,
-                  contentDescription = null,
-                  tint = semantics.classroomAccent,
-                  modifier = Modifier.size(16.dp),
-                )
-                Text(
-                  text = "MERITPREP ACADEMY • ${profile?.targetExam ?: "JAMB • WAEC • NECO"}",
-                  style = MaterialTheme.typography.labelSmall,
-                  color = semantics.classroomAccent,
-                  fontWeight = FontWeight.Bold,
-                )
+                Row(
+                  modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                  Icon(
+                    imageVector = Icons.Filled.LocalFireDepartment,
+                    contentDescription = "Streak",
+                    tint = semantics.coralAccent,
+                    modifier = Modifier.size(16.dp),
+                  )
+                  Text(
+                    text = "${profile?.streakDays ?: 1}d",
+                    style = MaterialTheme.typography.labelMedium.copy(fontFeatureSettings = "tnum"),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold,
+                  )
+                }
               }
+            }
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
               Text(
-                text = "Welcome back, ${profile?.displayName?.substringBefore(" ") ?: "Scholar"}",
-                style = MaterialTheme.typography.headlineMedium,
-                color = semantics.onClassroomBar,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+                text = "Materials",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.Bold,
               )
               Text(
-                text = "UTME Target ${profile?.targetScore ?: 320}/400 • ${completedIds.size}/${allLessons.size} lessons mastered • $totalPastQuestions Qs",
-                style = MaterialTheme.typography.bodySmall,
-                color = semantics.classroomSubtext,
+                text = "${profile?.displayName?.substringBefore(" ") ?: "Scholar"} • ${profile?.totalXp ?: 0} XP",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
               )
             }
 
@@ -208,396 +252,519 @@ fun HomeDashboardScreen(
               horizontalArrangement = Arrangement.spacedBy(6.dp),
               verticalAlignment = Alignment.CenterVertically,
             ) {
-              StatBadge(
-                icon = Icons.Filled.LocalFireDepartment,
-                text = "${profile?.streakDays ?: 1}d",
-                containerColor = Color(0xFF422006),
-                contentColor = Color(0xFFFDE68A),
-                borderColor = Color(0xFFF59E0B),
-              )
-              StatBadge(
-                icon = Icons.Filled.Bolt,
-                text = "${profile?.totalXp ?: 0} XP",
-                containerColor = Color.White.copy(alpha = 0.14f),
-                contentColor = semantics.onClassroomBar,
-                borderColor = semantics.classroomAccent,
-              )
               IconButton(
                 onClick = onToggleDarkTheme,
                 modifier =
                   Modifier.minimumInteractiveComponentSize()
                     .size(48.dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.14f))
-                    .border(1.dp, Color.White.copy(alpha = 0.28f), CircleShape)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(semantics.softTintSurface)
                     .testTag("home_dark_theme_toggle"),
               ) {
                 Icon(
                   imageVector = if (isDarkTheme) Icons.Filled.LightMode else Icons.Filled.DarkMode,
                   contentDescription = if (isDarkTheme) "Switch to Light Theme" else "Switch to Dark Theme",
-                  tint = if (isDarkTheme) Color(0xFFFDE68A) else semantics.classroomAccent,
+                  tint = MaterialTheme.colorScheme.primary,
                   modifier = Modifier.size(20.dp),
                 )
               }
               TopRightMenuButton(
                 badgeCount = dueReviewsCount,
                 onClick = onOpenMenu,
-                useOnBarColors = true,
               )
+            }
+          }
+
+          Spacer(modifier = Modifier.height(14.dp))
+
+          // Underline Tab Strip: "Your tracks" | "Study sets" | "Exam prep"
+          Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(24.dp),
+          ) {
+            MaterialsSubTab.entries.forEach { tab ->
+              val selected = activeSubTab == tab
+              Column(
+                modifier =
+                  Modifier.clickable { activeSubTab = tab }
+                    .padding(bottom = 2.dp),
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+              ) {
+                Text(
+                  text = tab.label,
+                  style = MaterialTheme.typography.titleSmall,
+                  color =
+                    if (selected) MaterialTheme.colorScheme.onSurface
+                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                  fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                )
+                Box(
+                  modifier =
+                    Modifier.width(if (selected) 30.dp else 0.dp)
+                      .height(3.dp)
+                      .clip(CircleShape)
+                      .background(
+                        if (selected) MaterialTheme.colorScheme.primary
+                        else Color.Transparent
+                      )
+                )
+              }
             }
           }
         }
       }
 
-      // Coursera "My Learning" Active Course Hero Card
+      // Rounded Search Bar + Filter Button matching Mockup
       item {
-        Box(
-          modifier =
-            Modifier.padding(horizontal = 16.dp)
-              .fillMaxWidth()
-              .clip(RoundedCornerShape(18.dp))
-              .background(semantics.classroomBar)
-              .border(1.5.dp, semantics.classroomAccent.copy(alpha = 0.45f), RoundedCornerShape(18.dp)),
+        Row(
+          modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+          horizontalArrangement = Arrangement.spacedBy(10.dp),
+          verticalAlignment = Alignment.CenterVertically,
         ) {
-          Image(
-            painter = painterResource(id = R.drawable.img_hero_academy_1794740698817),
-            contentDescription = "Academy learning hero artwork",
-            modifier = Modifier.matchParentSize(),
-            contentScale = ContentScale.Crop,
-          )
-          Box(
+          Row(
             modifier =
-              Modifier.matchParentSize()
-                .background(
-                  Brush.horizontalGradient(
-                    colors = listOf(
-                      semantics.classroomBar.copy(alpha = 0.96f),
-                      semantics.classroomBar.copy(alpha = 0.90f),
-                      semantics.classroomBar.copy(alpha = 0.78f),
-                    )
-                  )
-                )
-          )
-          Column(
-            modifier = Modifier.fillMaxWidth().padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+              Modifier.weight(1f)
+                .height(48.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(semantics.softTintSurface)
+                .padding(horizontal = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
           ) {
+            Icon(
+              imageVector = Icons.Filled.Search,
+              contentDescription = null,
+              tint = MaterialTheme.colorScheme.onSurfaceVariant,
+              modifier = Modifier.size(20.dp),
+            )
+            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
+              if (searchQuery.isEmpty()) {
+                Text(
+                  text = "Search subjects, topics...",
+                  style = MaterialTheme.typography.bodyMedium,
+                  color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+              }
+              BasicTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                singleLine = true,
+                textStyle = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                modifier = Modifier.fillMaxWidth(),
+              )
+            }
+            if (searchQuery.isNotEmpty()) {
+              IconButton(
+                onClick = { searchQuery = "" },
+                modifier = Modifier.size(32.dp),
+              ) {
+                Icon(
+                  imageVector = Icons.Filled.Close,
+                  contentDescription = "Clear search",
+                  tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                  modifier = Modifier.size(16.dp),
+                )
+              }
+            }
+          }
+
+          IconButton(
+            onClick = {
+              val values = TrackFilterCategory.entries
+              filterCategory = values[(filterCategory.ordinal + 1) % values.size]
+            },
+            modifier =
+              Modifier.minimumInteractiveComponentSize()
+                .size(48.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(
+                  if (filterCategory != TrackFilterCategory.ALL) MaterialTheme.colorScheme.primaryContainer
+                  else semantics.softTintSurface
+                ),
+          ) {
+            Icon(
+              imageVector = Icons.Filled.Tune,
+              contentDescription = "Filter category (${filterCategory.label})",
+              tint =
+                if (filterCategory != TrackFilterCategory.ALL) MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.onSurface,
+              modifier = Modifier.size(20.dp),
+            )
+          }
+        }
+      }
+
+      when (activeSubTab) {
+        MaterialsSubTab.TRACKS -> {
+          // Resume Current Lesson Gradient Banner
+          item {
+            Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+              StudioGradientProgressBanner(
+                badgeText = "CONTINUE • ${nextLesson.syllabusTag}",
+                title = nextLesson.title,
+                subtitle = "$nextLessonPillarsDone/${LessonPillar.entries.size} study stages done • Tap to resume",
+                progressPercent = nextLessonPercent.coerceAtLeast(10),
+                modifier = Modifier.testTag("resume_lesson_button"),
+                onClick = { onOpenLesson(nextLesson) },
+              )
+            }
+          }
+
+          if (filterCategory != TrackFilterCategory.ALL) {
+            item {
+              Row(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+              ) {
+                Surface(
+                  color = MaterialTheme.colorScheme.primaryContainer,
+                  shape = RoundedCornerShape(99.dp),
+                ) {
+                  Text(
+                    text = "Showing: ${filterCategory.label}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                  )
+                }
+              }
+            }
+          }
+
+          // 2-Column Vibrant Gradient Subject Cards Grid matching Mockup Bottom-Center
+          items(trackPairs, key = { pair -> pair.joinToString("_") { it.id } }) { pair ->
             Row(
-              modifier = Modifier.fillMaxWidth(),
+              modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+              horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+              pair.forEach { track ->
+                val dbTrackLessons =
+                  structuredModules.filter { it.subjectId == track.id }.flatMap { it.lessons }
+                val trackLessons = if (dbTrackLessons.isNotEmpty()) dbTrackLessons else track.allLessons
+                val doneCount = trackLessons.count { it.id in completedIds }
+                val bankSize = CurriculumCatalog.pastQuestionsFor(track.id, "ALL").size
+                val (codeBadge, subtitle, gradient) = subjectGradientStyle(track.id)
+
+                StudioSubjectGradientCard(
+                  codeBadge = codeBadge,
+                  subtitle = subtitle,
+                  title = track.shortName,
+                  lessonsCount = trackLessons.size,
+                  questionsCount = bankSize,
+                  completedLessons = doneCount,
+                  gradientColors = gradient,
+                  modifier = Modifier.weight(1f).testTag("track_card_${track.id}"),
+                  onClick = { onOpenTrack(track) },
+                )
+              }
+              if (pair.size == 1) {
+                Spacer(modifier = Modifier.weight(1f))
+              }
+            }
+          }
+
+          // Active Recall Banner (when cards exist)
+          if (dueReviewsCount > 0 || totalReviewCardsCount > 0) {
+            item {
+              Row(
+                modifier =
+                  Modifier.padding(horizontal = 16.dp)
+                    .fillMaxWidth()
+                    .shadow(3.dp, RoundedCornerShape(20.dp))
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colorScheme.surface)
+                    .border(
+                      1.dp,
+                      if (dueReviewsCount > 0) semantics.coralAccent.copy(alpha = 0.65f)
+                      else MaterialTheme.colorScheme.outlineVariant,
+                      RoundedCornerShape(20.dp),
+                    )
+                    .clickable(onClick = onOpenSpacedReview)
+                    .padding(16.dp)
+                    .testTag("home_spaced_review_banner"),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+              ) {
+                Box(
+                  modifier =
+                    Modifier.size(44.dp)
+                      .clip(RoundedCornerShape(14.dp))
+                      .background(
+                        if (dueReviewsCount > 0) semantics.coralAccent.copy(alpha = 0.14f)
+                        else MaterialTheme.colorScheme.primaryContainer
+                      ),
+                  contentAlignment = Alignment.Center,
+                ) {
+                  Icon(
+                    imageVector = Icons.Filled.Psychology,
+                    contentDescription = null,
+                    tint = if (dueReviewsCount > 0) semantics.coralAccent else MaterialTheme.colorScheme.primary,
+                  )
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                  Text(
+                    text =
+                      if (dueReviewsCount > 0) "Daily Active Recall: $dueReviewsCount Card(s) Due"
+                      else "Recall Deck Caught Up ($totalReviewCardsCount cards)",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold,
+                  )
+                  Text(
+                    text = "SM-2 Day 1/3/7/14/30 flashcards for long-term retention",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                  )
+                }
+                Icon(
+                  imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                  contentDescription = "Open Recall Deck",
+                  tint = MaterialTheme.colorScheme.primary,
+                )
+              }
+            }
+          }
+
+          // Clean White Daily Learning Plan Card
+          item {
+            Column(
+              modifier =
+                Modifier.padding(horizontal = 16.dp)
+                  .fillMaxWidth()
+                  .shadow(3.dp, RoundedCornerShape(20.dp))
+                  .clip(RoundedCornerShape(20.dp))
+                  .background(MaterialTheme.colorScheme.surface)
+                  .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp))
+                  .padding(16.dp),
+              verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+              ) {
+                Text(
+                  text = "Daily Learning Plan",
+                  style = MaterialTheme.typography.titleMedium,
+                  color = MaterialTheme.colorScheme.onSurface,
+                  fontWeight = FontWeight.Bold,
+                )
+                val doneTasks = listOf(anyConceptDone, anyLabDone, anyExamPassed).count { it }
+                Surface(
+                  color = MaterialTheme.colorScheme.primaryContainer,
+                  shape = RoundedCornerShape(99.dp),
+                ) {
+                  Text(
+                    text = "$doneTasks / 3 GOALS",
+                    style = MaterialTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                  )
+                }
+              }
+
+              StudyChecklistItem(
+                title = "Build Zero-to-One Foundations",
+                subtitle = "Score ${passThreshold}%+ in ${nextLesson.title}",
+                isDone = anyConceptDone,
+                onClick = { onOpenLesson(nextLesson) },
+              )
+              StudyChecklistItem(
+                title = "Explore 1 Interactive Virtual Lab",
+                subtitle = nextLesson.labType.title,
+                isDone = anyLabDone,
+                onClick = { onOpenLesson(nextLesson) },
+              )
+              StudyChecklistItem(
+                title = "Pass 1 Timed Exam Drill (70%+)",
+                subtitle = "JAMB UTME, WAEC WASSCE & NECO SSCE",
+                isDone = anyExamPassed,
+                onClick = { onOpenExamLab("physics") },
+              )
+            }
+          }
+        }
+
+        MaterialsSubTab.STUDY_SETS -> {
+          item {
+            Column(
+              modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+              verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+              Text(
+                text = "Active Study Sets & Tools",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.Bold,
+              )
+              Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                StudioActionTile(
+                  label = if (dueReviewsCount > 0) "Recall ($dueReviewsCount)" else "Flashcards",
+                  icon = Icons.Filled.Psychology,
+                  iconTint = semantics.coralAccent,
+                  modifier = Modifier.weight(1f),
+                  onClick = onOpenSpacedReview,
+                )
+                StudioActionTile(
+                  label = "Notebook",
+                  icon = Icons.AutoMirrored.Filled.MenuBook,
+                  iconTint = MaterialTheme.colorScheme.primary,
+                  modifier = Modifier.weight(1f),
+                  onClick = onOpenNotebook,
+                )
+                StudioActionTile(
+                  label = "Next Lesson",
+                  icon = Icons.Filled.PlayArrow,
+                  iconTint = semantics.indigoAccent,
+                  modifier = Modifier.weight(1f),
+                  onClick = { onOpenLesson(nextLesson) },
+                )
+              }
+            }
+          }
+
+          items(filteredTracks, key = { "set_${it.id}" }) { track ->
+            val lessons = track.allLessons
+            val doneCount = lessons.count { it.id in completedIds }
+            Row(
+              modifier =
+                Modifier.padding(horizontal = 16.dp)
+                  .fillMaxWidth()
+                  .clip(RoundedCornerShape(18.dp))
+                  .background(MaterialTheme.colorScheme.surface)
+                  .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(18.dp))
+                  .clickable { onOpenTrack(track) }
+                  .padding(16.dp),
               horizontalArrangement = Arrangement.SpaceBetween,
               verticalAlignment = Alignment.CenterVertically,
             ) {
-              Surface(
-                color = semantics.classroomAccent,
-                shape = RoundedCornerShape(6.dp),
-              ) {
+              Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                 Text(
-                  text = "MY LEARNING • NEXT LESSON",
-                  style = MaterialTheme.typography.labelSmall,
-                  color = Color(0xFF0A1628),
+                  text = "${track.shortName} • ${track.modules.size} Modules",
+                  style = MaterialTheme.typography.titleSmall,
+                  color = MaterialTheme.colorScheme.onSurface,
                   fontWeight = FontWeight.Bold,
-                  modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                )
+                Text(
+                  text = track.tagline,
+                  style = MaterialTheme.typography.bodySmall,
+                  color = MaterialTheme.colorScheme.onSurfaceVariant,
+                  maxLines = 1,
+                  overflow = TextOverflow.Ellipsis,
                 )
               }
-              Text(
-                text = "$nextLessonPillarsDone/${LessonPillar.entries.size} parts",
-                style = MaterialTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
-                color = semantics.onClassroomBar,
-                fontWeight = FontWeight.SemiBold,
-              )
-            }
-
-            Text(
-              text = nextLesson.title,
-              style = MaterialTheme.typography.headlineSmall,
-              color = semantics.onClassroomBar,
-            )
-            Text(
-              text = "${nextLesson.syllabusTag} • ${nextLesson.durationMinutes} min • Lab: ${nextLesson.labType.title}",
-              style = MaterialTheme.typography.bodySmall,
-              color = semantics.classroomSubtext,
-            )
-
-            LinearProgressIndicator(
-              progress = { nextLessonRatio.coerceAtLeast(0.06f) },
-              modifier = Modifier.fillMaxWidth().height(6.dp).clip(CircleShape),
-              color = semantics.classroomAccent,
-              trackColor = Color.White.copy(alpha = 0.22f),
-            )
-
-            Button(
-              onClick = { onOpenLesson(nextLesson) },
-              modifier = Modifier.fillMaxWidth().height(48.dp).testTag("resume_lesson_button"),
-              shape = RoundedCornerShape(10.dp),
-              colors =
-                ButtonDefaults.buttonColors(
-                  containerColor = semantics.classroomAccent,
-                  contentColor = Color(0xFF0A1628),
-                ),
-            ) {
-              Icon(Icons.Filled.PlayArrow, contentDescription = null, modifier = Modifier.size(20.dp))
-              Spacer(modifier = Modifier.width(6.dp))
-              Text(
-                text = if (nextLessonPillarsDone > 0) "Resume Lesson" else "Start Lesson",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold,
-              )
-            }
-          }
-        }
-      }
-
-      if (dueReviewsCount > 0 || totalReviewCardsCount > 0) {
-        item {
-          Row(
-            modifier =
-              Modifier.padding(horizontal = 16.dp)
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .background(
-                  if (dueReviewsCount > 0) MaterialTheme.colorScheme.secondaryContainer
-                  else MaterialTheme.colorScheme.surface
+              Surface(
+                color = MaterialTheme.colorScheme.primaryContainer,
+                shape = RoundedCornerShape(99.dp),
+              ) {
+                Text(
+                  text = "$doneCount/${lessons.size}",
+                  style = MaterialTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
+                  color = MaterialTheme.colorScheme.onPrimaryContainer,
+                  fontWeight = FontWeight.Bold,
+                  modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                 )
-                .border(
-                  1.5.dp,
-                  if (dueReviewsCount > 0) MaterialTheme.colorScheme.secondary
-                  else MaterialTheme.colorScheme.outlineVariant,
-                  RoundedCornerShape(16.dp),
+              }
+            }
+          }
+        }
+
+        MaterialsSubTab.EXAM_PREP -> {
+          item {
+            Column(
+              modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+              verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+              StudioGradientProgressBanner(
+                badgeText = "UTME READINESS PROJECTION",
+                title = "$projectedJamb / 400 Score",
+                subtitle =
+                  if (attempts.isEmpty()) "Take your 1st mock to calibrate projected UTME aggregate"
+                  else "$avgAccuracy% accuracy across ${attempts.size} logged mocks",
+                progressPercent = ((projectedJamb * 100f) / 400f).roundToInt(),
+                onClick = onOpenUtmeCombo,
+              )
+
+              Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                StudioActionTile(
+                  label = "180-Q UTME",
+                  icon = Icons.Filled.School,
+                  iconTint = semantics.indigoAccent,
+                  modifier = Modifier.weight(1f),
+                  onClick = onOpenUtmeCombo,
                 )
-                .clickable(onClick = onOpenSpacedReview)
-                .padding(14.dp)
-                .testTag("home_spaced_review_banner"),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-          ) {
-            Icon(
-              imageVector = Icons.Filled.Psychology,
-              contentDescription = null,
-              tint =
-                if (dueReviewsCount > 0) MaterialTheme.colorScheme.onSecondaryContainer
-                else MaterialTheme.colorScheme.primary,
-            )
-            Column(modifier = Modifier.weight(1f)) {
-              Text(
-                text =
-                  if (dueReviewsCount > 0) "Daily Active Recall: $dueReviewsCount Card(s) Due"
-                  else "Recall Deck Caught Up ($totalReviewCardsCount cards)",
-                style = MaterialTheme.typography.titleSmall,
-                color =
-                  if (dueReviewsCount > 0) MaterialTheme.colorScheme.onSecondaryContainer
-                  else MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Bold,
-              )
-              Text(
-                text = "Tap to drill formulas & missed exam concepts on Day 1/3/7/14/30 schedule",
-                style = MaterialTheme.typography.bodySmall,
-                color =
-                  if (dueReviewsCount > 0) MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.85f)
-                  else MaterialTheme.colorScheme.onSurfaceVariant,
-              )
-            }
-            Icon(
-              imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-              contentDescription = "Open Recall Deck",
-              tint =
-                if (dueReviewsCount > 0) MaterialTheme.colorScheme.onSecondaryContainer
-                else MaterialTheme.colorScheme.primary,
-            )
-          }
-        }
-      }
+                StudioActionTile(
+                  label = "Subject CBT",
+                  icon = Icons.Filled.Quiz,
+                  iconTint = MaterialTheme.colorScheme.primary,
+                  modifier = Modifier.weight(1f),
+                  onClick = { onOpenExamLab("physics") },
+                )
+                StudioActionTile(
+                  label = "Paper 2 Lab",
+                  icon = Icons.AutoMirrored.Filled.Assignment,
+                  iconTint = semantics.coralAccent,
+                  modifier = Modifier.weight(1f),
+                  onClick = onOpenPaper2Lab,
+                )
+              }
 
-      // Coursera Guided Daily Study Goals
-      item {
-        Column(
-          modifier =
-            Modifier.padding(horizontal = 16.dp)
-              .fillMaxWidth()
-              .clip(RoundedCornerShape(16.dp))
-              .background(MaterialTheme.colorScheme.surface)
-              .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
-              .padding(16.dp),
-          verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-          Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-          ) {
-            Text(
-              text = "Daily Learning Plan",
-              style = MaterialTheme.typography.titleMedium,
-              color = MaterialTheme.colorScheme.onSurface,
-            )
-            val doneTasks = listOf(anyConceptDone, anyLabDone, anyExamPassed).count { it }
-            Surface(
-              color = MaterialTheme.colorScheme.primaryContainer,
-              shape = RoundedCornerShape(99.dp),
-            ) {
-              Text(
-                text = "$doneTasks/3 GOALS",
-                style = MaterialTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-              )
+              if (!recentWeakTopic.isNullOrBlank()) {
+                Row(
+                  modifier =
+                    Modifier.fillMaxWidth()
+                      .clip(RoundedCornerShape(18.dp))
+                      .background(MaterialTheme.colorScheme.surface)
+                      .border(1.dp, semantics.coralAccent.copy(alpha = 0.5f), RoundedCornerShape(18.dp))
+                      .clickable { onOpenExamLab("physics") }
+                      .padding(14.dp),
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                  Icon(Icons.Filled.Bolt, contentDescription = null, tint = semantics.coralAccent)
+                  Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                      text = "Recommended Weak-Topic Drill",
+                      style = MaterialTheme.typography.titleSmall,
+                      color = MaterialTheme.colorScheme.onSurface,
+                      fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                      text = "Target recent weak topic: $recentWeakTopic",
+                      style = MaterialTheme.typography.bodySmall,
+                      color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                  }
+                  Icon(
+                    Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                  )
+                }
+              }
             }
           }
-
-          StudyChecklistItem(
-            title = "Build Zero-to-One Foundations",
-            subtitle = "Complete study stages & score ${passThreshold}%+ in ${nextLesson.title}",
-            isDone = anyConceptDone,
-            onClick = { onOpenLesson(nextLesson) },
-          )
-          StudyChecklistItem(
-            title = "Complete 1 Interactive Virtual Lab",
-            subtitle = nextLesson.labType.title,
-            isDone = anyLabDone,
-            onClick = { onOpenLesson(nextLesson) },
-          )
-          StudyChecklistItem(
-            title = "Pass 1 Timed Exam Drill (70%+)",
-            subtitle = "JAMB UTME, WAEC WASSCE & NECO SSCE Bank",
-            isDone = anyExamPassed,
-            onClick = { onOpenExamLab("physics") },
-          )
-        }
-      }
-
-      // Exam Projection & Timed CBT Practice Strip
-      item {
-        Row(
-          modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
-          horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-          Column(
-            modifier =
-              Modifier.weight(1f)
-                .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.surface)
-                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
-                .padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-          ) {
-            Row(
-              verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-              Icon(
-                Icons.Filled.TrackChanges,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(18.dp),
-              )
-              Text(
-                "UTME Readiness",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.SemiBold,
-              )
-            }
-            Text(
-              text = "$projectedJamb / 400",
-              style = MaterialTheme.typography.headlineSmall.copy(fontFeatureSettings = "tnum"),
-              color = MaterialTheme.colorScheme.primary,
-              fontWeight = FontWeight.Bold,
-            )
-            Text(
-              text = if (attempts.isEmpty()) "Take 1st CBT mock to calibrate" else "$avgAccuracy% avg across ${attempts.size} mocks",
-              style = MaterialTheme.typography.bodySmall,
-              color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-          }
-
-          Column(
-            modifier =
-              Modifier.weight(1f)
-                .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
-                .clickable { onOpenExamLab("physics") }
-                .padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-          ) {
-            Row(
-              verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-              Icon(
-                Icons.Filled.Quiz,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.size(18.dp),
-              )
-              Text(
-                "Timed Exam Practice",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                fontWeight = FontWeight.SemiBold,
-              )
-            }
-            Text(
-              text = "JAMB, WAEC & NECO",
-              style = MaterialTheme.typography.titleLarge,
-              color = MaterialTheme.colorScheme.onPrimaryContainer,
-            )
-            Text(
-              text = recentWeakTopic?.let { "Drill weak topic: $it →" } ?: "Start syllabus mock paper →",
-              style = MaterialTheme.typography.bodySmall,
-              color = MaterialTheme.colorScheme.primary,
-              fontWeight = FontWeight.Bold,
-            )
-          }
-        }
-      }
-
-      // Section Header: Coursera Specializations
-      item {
-        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-          Text(
-            text = "JAMB, WAEC & NECO Specializations",
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onBackground,
-          )
-          Text(
-            text = "Sequential zero-to-mastery courses — score ≥${passThreshold}% on each assessment to unlock the next lesson",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-          )
-        }
-      }
-
-      items(CurriculumCatalog.tracks, key = { it.id }) { track ->
-        val dbTrackLessons =
-          structuredModules.filter { it.subjectId == track.id }.flatMap { it.lessons }
-        val trackLessons = if (dbTrackLessons.isNotEmpty()) dbTrackLessons else track.allLessons
-        val doneCount = trackLessons.count { it.id in completedIds }
-        val ratio = if (trackLessons.isEmpty()) 0f else doneCount / trackLessons.size.toFloat()
-        val nextTrackLesson =
-          CurriculumProgression.nextUnlockedLesson(
-            orderedTrackLessons = trackLessons,
-            progressMap = progressMap,
-            placementPassedSubjects = placementPassedSubjects,
-            passThresholdPercent = passThreshold,
-          )
-        val bankSize = CurriculumCatalog.pastQuestionsFor(track.id, "ALL").size
-
-        Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-          SubjectTrackCard(
-            track = track,
-            completedLessons = doneCount,
-            totalLessons = trackLessons.size,
-            pastQuestionCount = bankSize,
-            nextLessonTitle = nextTrackLesson?.title,
-            progressRatio = ratio,
-            onClick = { onOpenTrack(track) },
-          )
         }
       }
     }
   }
 }
+
+private fun subjectGradientStyle(subjectId: String): Triple<String, String, List<Color>> =
+  when (subjectId) {
+    "physics" -> Triple("PHY • SS1–SS3", "JAMB • WAEC", listOf(Color(0xFF6B9BFF), Color(0xFF4F7FF3)))
+    "chemistry" -> Triple("CHM • SS1–SS3", "JAMB • WAEC", listOf(Color(0xFF443EA0), Color(0xFF302B78)))
+    "mathematics" -> Triple("MTH • CORE", "UTME • WASSCE", listOf(Color(0xFF8382C7), Color(0xFF6967AE)))
+    "english" -> Triple("ENG • COMPULSORY", "60 UTME Qs", listOf(Color(0xFFFC8590), Color(0xFFF26C79)))
+    "biology" -> Triple("BIO • SS1–SS3", "Life Sciences", listOf(Color(0xFF39B2B0), Color(0xFF28898C)))
+    "economics" -> Triple("ECO • SS1–SS3", "Micro & Macro", listOf(Color(0xFF5D87F0), Color(0xFF4368CF)))
+    else -> Triple("GOV • SS1–SS3", "Civic & Polity", listOf(Color(0xFF5B4BB7), Color(0xFF3E338A)))
+  }
 
 @Composable
 private fun StudyChecklistItem(
@@ -610,15 +777,10 @@ private fun StudyChecklistItem(
   Row(
     modifier =
       Modifier.fillMaxWidth()
-        .clip(RoundedCornerShape(12.dp))
+        .clip(RoundedCornerShape(14.dp))
         .background(
           if (isDone) semantics.successContainer
-          else MaterialTheme.colorScheme.background
-        )
-        .border(
-          1.dp,
-          if (isDone) semantics.success else MaterialTheme.colorScheme.outlineVariant,
-          RoundedCornerShape(12.dp),
+          else semantics.softTintSurface
         )
         .clickable(onClick = onClick)
         .padding(horizontal = 12.dp, vertical = 10.dp),
@@ -651,193 +813,5 @@ private fun StudyChecklistItem(
       tint = if (isDone) semantics.onSuccessContainer else MaterialTheme.colorScheme.primary,
       modifier = Modifier.size(16.dp),
     )
-  }
-}
-
-@Composable
-private fun StatBadge(
-  icon: ImageVector,
-  text: String,
-  containerColor: Color,
-  contentColor: Color,
-  borderColor: Color,
-) {
-  Surface(
-    color = containerColor,
-    shape = RoundedCornerShape(99.dp),
-    modifier = Modifier.border(1.dp, borderColor, RoundedCornerShape(99.dp)),
-  ) {
-    Row(
-      modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-      Icon(icon, contentDescription = null, tint = contentColor, modifier = Modifier.size(16.dp))
-      Text(
-        text = text,
-        style = MaterialTheme.typography.labelMedium.copy(fontFeatureSettings = "tnum"),
-        color = contentColor,
-        fontWeight = FontWeight.Bold,
-      )
-    }
-  }
-}
-
-@Composable
-fun SubjectTrackCard(
-  track: SubjectTrack,
-  completedLessons: Int,
-  totalLessons: Int,
-  pastQuestionCount: Int,
-  nextLessonTitle: String?,
-  progressRatio: Float,
-  onClick: () -> Unit,
-) {
-  val semantics = MaterialTheme.semanticColors
-  val accentColor =
-    when (track.id) {
-      "physics" -> MaterialTheme.colorScheme.primary
-      "mathematics" -> semantics.classroomAccent
-      "chemistry" -> semantics.success
-      "biology" -> MaterialTheme.colorScheme.secondary
-      "economics" -> Color(0xFFD97706)
-      "government" -> Color(0xFF7C3AED)
-      else -> MaterialTheme.colorScheme.tertiary
-    }
-  val trackIcon =
-    when (track.id) {
-      "physics" -> Icons.Filled.Science
-      "mathematics" -> Icons.Filled.Calculate
-      "chemistry" -> Icons.Filled.Science
-      "biology" -> Icons.Outlined.Biotech
-      "economics" -> Icons.AutoMirrored.Filled.TrendingUp
-      "government" -> Icons.Filled.AccountBalance
-      else -> Icons.AutoMirrored.Filled.MenuBook
-    }
-
-  Row(
-    modifier =
-      Modifier.fillMaxWidth()
-        .height(IntrinsicSize.Min)
-        .clip(RoundedCornerShape(16.dp))
-        .background(MaterialTheme.colorScheme.surface)
-        .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
-        .clickable(onClick = onClick)
-        .testTag("track_card_${track.id}"),
-  ) {
-    Box(modifier = Modifier.width(5.dp).fillMaxHeight().background(accentColor))
-
-    Column(
-      modifier = Modifier.weight(1f).padding(16.dp),
-      verticalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-      Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-      ) {
-        Row(
-          modifier = Modifier.weight(1f),
-          verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-          Box(
-            modifier =
-              Modifier.size(44.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(12.dp)),
-            contentAlignment = Alignment.Center,
-          ) {
-            Icon(
-              imageVector = trackIcon,
-              contentDescription = track.title,
-              tint = MaterialTheme.colorScheme.onPrimaryContainer,
-            )
-          }
-          Column {
-            Text(
-              text = track.title,
-              style = MaterialTheme.typography.titleMedium,
-              color = MaterialTheme.colorScheme.onSurface,
-            )
-            Text(
-              text = "${track.modules.size} modules • $totalLessons lessons • $pastQuestionCount Practice Qs",
-              style = MaterialTheme.typography.labelSmall,
-              color = MaterialTheme.colorScheme.primary,
-              fontWeight = FontWeight.SemiBold,
-            )
-          }
-        }
-        Icon(
-          imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-          contentDescription = "Open ${track.title}",
-          tint = MaterialTheme.colorScheme.primary,
-        )
-      }
-
-      Text(
-        text = track.tagline,
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-      )
-
-      if (!nextLessonTitle.isNullOrBlank()) {
-        Row(
-          verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.spacedBy(5.dp),
-        ) {
-          Icon(
-            imageVector = Icons.Filled.LockOpen,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.size(14.dp),
-          )
-          Text(
-            text = "Unlocked next: $nextLessonTitle",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.secondary,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-          )
-        }
-      }
-
-      Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.SpaceBetween,
-          verticalAlignment = Alignment.CenterVertically,
-        ) {
-          Text(
-            text = "$completedLessons / $totalLessons lessons mastered",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-          )
-          Surface(
-            color =
-              if (progressRatio >= 1f) semantics.successContainer
-              else MaterialTheme.colorScheme.primaryContainer,
-            shape = RoundedCornerShape(99.dp),
-          ) {
-            Text(
-              text = "${(progressRatio * 100).roundToInt()}%",
-              style = MaterialTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
-              color =
-                if (progressRatio >= 1f) semantics.onSuccessContainer
-                else MaterialTheme.colorScheme.onPrimaryContainer,
-              fontWeight = FontWeight.Bold,
-              modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-            )
-          }
-        }
-        LinearProgressIndicator(
-          progress = { progressRatio },
-          modifier = Modifier.fillMaxWidth().height(7.dp).clip(CircleShape),
-          color = if (progressRatio >= 1f) semantics.success else MaterialTheme.colorScheme.primary,
-          trackColor = MaterialTheme.colorScheme.surfaceVariant,
-        )
-      }
-    }
   }
 }

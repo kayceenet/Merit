@@ -1,7 +1,6 @@
 package com.example.ui.screens
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -57,13 +56,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.R
 import com.example.data.curriculum.CurriculumCatalog
 import com.example.ui.components.Paper2DrillView
 import com.example.ui.components.ScientificCalculatorSheet
@@ -200,44 +196,31 @@ fun ExamSimulatorScreen(
             Box(
               modifier =
                 Modifier.fillMaxWidth()
-                  .height(168.dp)
-                  .clip(RoundedCornerShape(20.dp))
-                  .background(semantics.classroomBar)
-                  .border(1.5.dp, semantics.classroomAccent.copy(alpha = 0.45f), RoundedCornerShape(20.dp)),
-            ) {
-              Image(
-                painter = painterResource(id = R.drawable.img_cbt_banner_1794740699279),
-                contentDescription = "CBT Exam Simulator Laboratory",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop,
-              )
-              Box(
-                modifier =
-                  Modifier.fillMaxSize()
-                    .background(
-                      Brush.horizontalGradient(
-                        listOf(
-                          semantics.classroomBar.copy(alpha = 0.96f),
-                          semantics.classroomBar.copy(alpha = 0.88f),
-                          semantics.classroomBar.copy(alpha = 0.65f),
-                        )
+                  .clip(RoundedCornerShape(22.dp))
+                  .background(
+                    Brush.horizontalGradient(
+                      listOf(
+                        semantics.heroGradientStart,
+                        semantics.heroGradientMid,
+                        semantics.heroGradientEnd,
                       )
                     )
-              )
+                  ),
+            ) {
               Column(
-                modifier = Modifier.fillMaxSize().padding(18.dp),
-                verticalArrangement = Arrangement.Bottom,
+                modifier = Modifier.fillMaxWidth().padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
               ) {
-                Surface(color = semantics.classroomAccent, shape = RoundedCornerShape(6.dp)) {
+                Surface(color = Color.White.copy(alpha = 0.24f), shape = RoundedCornerShape(99.dp)) {
                   Text(
                     text = "TIMED CBT • 4-SUBJECT /400 • PAPER 2",
                     style = MaterialTheme.typography.labelSmall,
-                    color = Color(0xFF0A1628),
+                    color = Color.White,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                   )
                 }
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                   text =
                     when (activeLabMode) {
@@ -246,7 +229,8 @@ fun ExamSimulatorScreen(
                       ExamLabMode.PAPER_2 -> "WAEC & NECO Paper 2 Theory & Practicals"
                     },
                   style = MaterialTheme.typography.headlineSmall,
-                  color = semantics.onClassroomBar,
+                  color = Color.White,
+                  fontWeight = FontWeight.Bold,
                 )
                 Text(
                   text =
@@ -259,7 +243,7 @@ fun ExamSimulatorScreen(
                         "Structured essay & Alternative-to-Practical prompts with interactive M1/A1 rubrics."
                     },
                   style = MaterialTheme.typography.bodySmall,
-                  color = semantics.classroomSubtext,
+                  color = Color.White.copy(alpha = 0.90f),
                 )
               }
             }

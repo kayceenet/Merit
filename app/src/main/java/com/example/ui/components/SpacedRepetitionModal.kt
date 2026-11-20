@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -21,10 +22,11 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -37,8 +39,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.data.model.SpacedReviewCardEntity
 import com.example.ui.theme.semanticColors
@@ -59,20 +64,24 @@ fun SpacedRepetitionModal(
 
   val currentCard =
     if (reviewedInSession < batchSize) dueCards.firstOrNull() else null
+  val totalBatch = (reviewedInSession + dueCards.size).coerceAtLeast(1).coerceAtMost(batchSize)
+  val progressRatio =
+    if (currentCard == null) 1f
+    else ((reviewedInSession + 1).toFloat() / totalBatch.toFloat()).coerceIn(0.08f, 1f)
 
   ModalBottomSheet(
     onDismissRequest = onDismiss,
     sheetState = sheetState,
-    containerColor = MaterialTheme.colorScheme.surface,
-    contentColor = MaterialTheme.colorScheme.onSurface,
+    containerColor = MaterialTheme.colorScheme.background,
+    contentColor = MaterialTheme.colorScheme.onBackground,
   ) {
     Column(
       modifier =
         Modifier.fillMaxWidth()
           .verticalScroll(rememberScrollState())
           .navigationBarsPadding()
-          .padding(horizontal = 16.dp, vertical = 10.dp),
-      verticalArrangement = Arrangement.spacedBy(12.dp),
+          .padding(horizontal = 18.dp, vertical = 10.dp),
+      verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
       Row(
         modifier = Modifier.fillMaxWidth(),
@@ -89,81 +98,91 @@ fun SpacedRepetitionModal(
             tint = MaterialTheme.colorScheme.primary,
           )
           Text(
-            text = "SM-2 Active Recall Deck",
+            text = "Active Recall Deck",
             style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.Bold,
           )
         }
-        Surface(
-          color = MaterialTheme.colorScheme.primaryContainer,
-          shape = RoundedCornerShape(99.dp),
-        ) {
-          Text(
-            text =
-              if (currentCard != null) "${dueCards.size} due • Done: $reviewedInSession"
-              else "$allCardsCount saved",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-          )
-        }
+        Text(
+          text =
+            if (currentCard != null) "${reviewedInSession + 1} / $totalBatch"
+            else "$allCardsCount saved",
+          style = MaterialTheme.typography.labelLarge.copy(fontFeatureSettings = "tnum"),
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+          fontWeight = FontWeight.SemiBold,
+        )
       }
+
+      LinearProgressIndicator(
+        progress = { progressRatio },
+        modifier = Modifier.fillMaxWidth().height(5.dp).clip(CircleShape),
+        color = MaterialTheme.colorScheme.primary,
+        trackColor = MaterialTheme.colorScheme.outlineVariant,
+      )
 
       if (currentCard == null) {
         Column(
           modifier =
             Modifier.fillMaxWidth()
-              .clip(RoundedCornerShape(16.dp))
-              .background(semantics.successContainer)
-              .border(1.5.dp, semantics.success, RoundedCornerShape(16.dp))
-              .padding(20.dp),
+              .shadow(4.dp, RoundedCornerShape(24.dp))
+              .clip(RoundedCornerShape(24.dp))
+              .background(MaterialTheme.colorScheme.surface)
+              .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(24.dp))
+              .padding(24.dp),
           horizontalAlignment = Alignment.CenterHorizontally,
-          verticalArrangement = Arrangement.spacedBy(8.dp),
+          verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
           Icon(
             imageVector = Icons.Filled.CheckCircle,
             contentDescription = null,
             tint = semantics.success,
-            modifier = Modifier.size(36.dp),
+            modifier = Modifier.size(44.dp),
           )
           Text(
             text =
-              if (reviewedInSession > 0) "Recall Session Complete! (+${reviewedInSession * 5} XP)"
+              if (reviewedInSession > 0) "Recall Round Complete! (+${reviewedInSession * 5} XP)"
               else if (allCardsCount > 0) "You are completely caught up for today!"
               else "No Recall Cards Yet",
             style = MaterialTheme.typography.titleMedium,
-            color = semantics.onSuccessContainer,
+            color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
           )
           Text(
             text =
               if (allCardsCount > 0) {
-                "Your SM-2 memory intervals (Days 1, 3, 7, 14, 30) will bring cards back right before forgetting occurs."
+                "Your SM-2 schedule (Days 1, 3, 7, 14, 30) will resurface cards right before forgetting occurs."
               } else {
-                "Master any lesson quiz or miss a CBT mock question to automatically enqueue targeted active recall flashcards."
+                "Master any lesson quiz or miss a CBT mock question to automatically enqueue flashcards here."
               },
             style = MaterialTheme.typography.bodySmall,
-            color = semantics.onSuccessContainer,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
           )
           Button(
             onClick = onDismiss,
-            modifier = Modifier.fillMaxWidth().padding(top = 6.dp).height(48.dp),
-            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp).height(50.dp),
+            shape = RoundedCornerShape(16.dp),
           ) {
             Text("Back to Study", fontWeight = FontWeight.Bold)
           }
         }
       } else {
+        // Elevated pure white flashcard matching Top-Center mockup
         Column(
           modifier =
             Modifier.fillMaxWidth()
-              .clip(RoundedCornerShape(16.dp))
-              .background(MaterialTheme.colorScheme.background)
-              .border(1.5.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
-              .padding(16.dp),
-          verticalArrangement = Arrangement.spacedBy(12.dp),
+              .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(24.dp),
+                ambientColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.14f),
+              )
+              .clip(RoundedCornerShape(24.dp))
+              .background(MaterialTheme.colorScheme.surface)
+              .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(24.dp))
+              .padding(20.dp),
+          verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
           Row(
             modifier = Modifier.fillMaxWidth(),
@@ -171,19 +190,19 @@ fun SpacedRepetitionModal(
             verticalAlignment = Alignment.CenterVertically,
           ) {
             Surface(
-              color = MaterialTheme.colorScheme.secondaryContainer,
+              color = MaterialTheme.colorScheme.primaryContainer,
               shape = RoundedCornerShape(99.dp),
             ) {
               Text(
                 text = currentCard.subjectId.uppercase(),
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
               )
             }
             Text(
-              text = "Interval: ${currentCard.intervalDays}d • Reps: ${currentCard.repetitions}",
+              text = "Interval ${currentCard.intervalDays}d • Reps ${currentCard.repetitions}",
               style = MaterialTheme.typography.labelSmall,
               color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -191,83 +210,84 @@ fun SpacedRepetitionModal(
 
           ScientificText(
             text = currentCard.prompt,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurface,
           )
 
           if (!answerRevealed) {
+            Spacer(modifier = Modifier.height(6.dp))
             Button(
               onClick = { answerRevealed = true },
-              modifier = Modifier.fillMaxWidth().height(48.dp).testTag("spaced_reveal_button"),
-              shape = RoundedCornerShape(12.dp),
+              modifier = Modifier.fillMaxWidth().height(50.dp).testTag("spaced_reveal_button"),
+              shape = RoundedCornerShape(16.dp),
             ) {
               Icon(Icons.Filled.Visibility, contentDescription = null, modifier = Modifier.size(18.dp))
               Spacer(Modifier.padding(horizontal = 4.dp))
-              Text("Reveal Answer & Explanation", fontWeight = FontWeight.Bold)
+              Text("Reveal Answer & Application", fontWeight = FontWeight.Bold)
             }
           } else {
-            Surface(
-              color = semantics.successContainer,
-              shape = RoundedCornerShape(12.dp),
-              modifier =
-                Modifier.fillMaxWidth()
-                  .border(1.dp, semantics.success, RoundedCornerShape(12.dp)),
-            ) {
-              Column(
-                modifier = Modifier.padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-              ) {
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+              Text(
+                text = "Verified Answer",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.SemiBold,
+              )
+              ScientificText(
+                text = currentCard.answer,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+              )
+              if (currentCard.explanation.isNotBlank()) {
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                  text = "ANSWER",
+                  text = "Example / Exam Application",
                   style = MaterialTheme.typography.labelSmall,
-                  color = semantics.onSuccessContainer,
-                  fontWeight = FontWeight.Bold,
+                  color = MaterialTheme.colorScheme.onSurfaceVariant,
+                  fontWeight = FontWeight.SemiBold,
                 )
                 ScientificText(
-                  text = currentCard.answer,
-                  style = MaterialTheme.typography.titleSmall,
-                  color = semantics.onSuccessContainer,
-                  fontWeight = FontWeight.Bold,
+                  text = currentCard.explanation,
+                  style = MaterialTheme.typography.bodyMedium,
+                  color = MaterialTheme.colorScheme.onSurface,
                 )
-                if (currentCard.explanation.isNotBlank()) {
-                  ScientificText(
-                    text = currentCard.explanation,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = semantics.onSuccessContainer,
-                  )
-                }
               }
             }
+          }
+        }
 
-            Text(
-              text = "Rate how easily you recalled this:",
-              style = MaterialTheme.typography.labelMedium,
-              color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-              listOf(
-                Triple(0, "Forgot\n(1d)", MaterialTheme.colorScheme.errorContainer to MaterialTheme.colorScheme.onErrorContainer),
-                Triple(1, "Hard\n(2d)", MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer),
-                Triple(2, "Good\n(3d+)", MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer),
-                Triple(3, "Easy\n(7d+)", semantics.successContainer to semantics.onSuccessContainer),
-              ).forEach { (quality, label, colors) ->
-                OutlinedButton(
-                  onClick = {
-                    answerRevealed = false
-                    reviewedInSession++
-                    onRateCard(currentCard.id, quality)
-                  },
-                  modifier = Modifier.weight(1f).height(56.dp).testTag("spaced_rate_$quality"),
-                  shape = RoundedCornerShape(12.dp),
-                  colors = ButtonDefaults.outlinedButtonColors(containerColor = colors.first, contentColor = colors.second),
-                ) {
-                  Text(
-                    text = label,
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold,
-                  )
-                }
+        if (answerRevealed) {
+          // Coral / Deep Indigo / Cornflower pill buttons matching Top-Center phone in mockup
+          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf(
+              Triple(0, "Again\n1d", semantics.coralAccent.copy(alpha = 0.85f) to Color.White),
+              Triple(1, "Hard\n2d", semantics.coralAccent to Color.White),
+              Triple(2, "Good\n3d+", semantics.indigoAccent to Color.White),
+              Triple(3, "Excellent\n7d+", MaterialTheme.colorScheme.primary to Color.White),
+            ).forEach { (quality, label, colors) ->
+              Button(
+                onClick = {
+                  answerRevealed = false
+                  reviewedInSession++
+                  onRateCard(currentCard.id, quality)
+                },
+                modifier = Modifier.weight(1f).height(54.dp).testTag("spaced_rate_$quality"),
+                shape = RoundedCornerShape(14.dp),
+                colors =
+                  ButtonDefaults.buttonColors(
+                    containerColor = colors.first,
+                    contentColor = colors.second,
+                  ),
+              ) {
+                Text(
+                  text = label,
+                  style = MaterialTheme.typography.labelSmall,
+                  fontWeight = FontWeight.Bold,
+                  textAlign = TextAlign.Center,
+                )
               }
             }
           }

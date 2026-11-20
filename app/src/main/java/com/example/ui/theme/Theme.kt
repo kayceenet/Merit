@@ -36,6 +36,13 @@ data class MeritSemanticColors(
   val classroomSubtext: Color,
   val classroomAccent: Color,
   val onClassroomAccent: Color,
+  val heroGradientStart: Color,
+  val heroGradientMid: Color,
+  val heroGradientEnd: Color,
+  val coralAccent: Color,
+  val indigoAccent: Color,
+  val periwinkleAccent: Color,
+  val softTintSurface: Color,
 )
 
 private val LightSemanticColors =
@@ -43,12 +50,19 @@ private val LightSemanticColors =
     success = MasteryEmerald,
     onSuccess = Color.White,
     successContainer = MasteryEmeraldLight,
-    onSuccessContainer = Color(0xFF022C22),
-    classroomBar = CourseraDeepNavy,
+    onSuccessContainer = Color(0xFF043832),
+    classroomBar = StudioDeepNavy,
     onClassroomBar = Color.White,
-    classroomSubtext = Color(0xFFD6E6FF),
-    classroomAccent = CourseraAzureAccent,
-    onClassroomAccent = CourseraAzureInk,
+    classroomSubtext = Color(0xFFDCE7FF),
+    classroomAccent = Color(0xFF7CA7FF),
+    onClassroomAccent = Color(0xFF091A42),
+    heroGradientStart = StudioBlue,
+    heroGradientMid = StudioLavenderMid,
+    heroGradientEnd = StudioCoral,
+    coralAccent = StudioCoral,
+    indigoAccent = StudioIndigo,
+    periwinkleAccent = StudioPeriwinkle,
+    softTintSurface = StudioSoftTintVariant,
   )
 
 private val DarkSemanticColors =
@@ -57,11 +71,18 @@ private val DarkSemanticColors =
     onSuccess = Color(0xFF022C22),
     successContainer = MasteryEmeraldDarkContainer,
     onSuccessContainer = Color(0xFFD1FAE5),
-    classroomBar = Color(0xFF091B3A),
-    onClassroomBar = Color.White,
-    classroomSubtext = Color(0xFFD6E6FF),
-    classroomAccent = CourseraAzureAccent,
-    onClassroomAccent = CourseraAzureInk,
+    classroomBar = Color(0xFF141B38),
+    onClassroomBar = Color(0xFFF8FAFC),
+    classroomSubtext = Color(0xFFD0DCFF),
+    classroomAccent = Color(0xFF89B4FF),
+    onClassroomAccent = Color(0xFF071636),
+    heroGradientStart = Color(0xFF4772D6),
+    heroGradientMid = Color(0xFF6B5BC4),
+    heroGradientEnd = Color(0xFFD45B6B),
+    coralAccent = DarkStudioCoral,
+    indigoAccent = DarkStudioIndigo,
+    periwinkleAccent = Color(0xFF9F9EE8),
+    softTintSurface = NightSurfaceVariant,
   )
 
 val LocalMeritSemanticColors = staticCompositionLocalOf { LightSemanticColors }
@@ -77,18 +98,18 @@ val MaterialTheme.semanticColors: MeritSemanticColors
 
 private val RoyalIndigoDarkScheme =
   darkColorScheme(
-    primary = DarkCourseraBlue,
-    onPrimary = DarkCourseraOnBlue,
-    primaryContainer = DarkCourseraBlueContainer,
-    onPrimaryContainer = DarkCourseraOnBlueContainer,
-    secondary = DarkCourseraTeal,
-    onSecondary = DarkCourseraOnTeal,
-    secondaryContainer = DarkCourseraTealContainer,
-    onSecondaryContainer = DarkCourseraOnTealContainer,
-    tertiary = DarkScholarAmber,
-    onTertiary = DarkScholarOnAmber,
-    tertiaryContainer = DarkScholarAmberContainer,
-    onTertiaryContainer = DarkScholarOnAmberContainer,
+    primary = DarkStudioBlue,
+    onPrimary = DarkStudioOnBlue,
+    primaryContainer = DarkStudioBlueContainer,
+    onPrimaryContainer = DarkStudioOnBlueContainer,
+    secondary = DarkStudioIndigo,
+    onSecondary = DarkStudioOnIndigo,
+    secondaryContainer = DarkStudioIndigoContainer,
+    onSecondaryContainer = DarkStudioOnIndigoContainer,
+    tertiary = DarkStudioCoral,
+    onTertiary = DarkStudioOnCoral,
+    tertiaryContainer = DarkStudioCoralContainer,
+    onTertiaryContainer = DarkStudioOnCoralContainer,
     error = DarkError,
     onError = DarkOnError,
     errorContainer = DarkErrorContainer,
@@ -105,30 +126,30 @@ private val RoyalIndigoDarkScheme =
 
 private val RoyalIndigoLightScheme =
   lightColorScheme(
-    primary = CourseraBlue,
-    onPrimary = CourseraOnBlue,
-    primaryContainer = CourseraBlueContainer,
-    onPrimaryContainer = CourseraOnBlueContainer,
-    secondary = CourseraTeal,
-    onSecondary = CourseraOnTeal,
-    secondaryContainer = CourseraTealContainer,
-    onSecondaryContainer = CourseraOnTealContainer,
-    tertiary = ScholarAmber,
-    onTertiary = ScholarOnAmber,
-    tertiaryContainer = ScholarAmberContainer,
-    onTertiaryContainer = ScholarOnAmberContainer,
+    primary = StudioBlue,
+    onPrimary = StudioOnBlue,
+    primaryContainer = StudioBlueContainer,
+    onPrimaryContainer = StudioOnBlueContainer,
+    secondary = StudioIndigo,
+    onSecondary = StudioOnIndigo,
+    secondaryContainer = StudioIndigoContainer,
+    onSecondaryContainer = StudioOnIndigoContainer,
+    tertiary = StudioCoral,
+    onTertiary = StudioOnCoral,
+    tertiaryContainer = StudioCoralContainer,
+    onTertiaryContainer = StudioOnCoralContainer,
     error = LightError,
     onError = LightOnError,
     errorContainer = LightErrorContainer,
     onErrorContainer = LightOnErrorContainer,
-    background = PorcelainBackground,
-    onBackground = InkOnBackground,
+    background = StudioIceBackground,
+    onBackground = StudioInkOnBackground,
     surface = PureCardSurface,
-    onSurface = InkOnBackground,
-    surfaceVariant = CourseraSurfaceVariant,
-    onSurfaceVariant = MutedInkOnSurfaceVariant,
-    outline = HairlineOutline,
-    outlineVariant = SubtleOutlineVariant,
+    onSurface = StudioInkOnBackground,
+    surfaceVariant = StudioSoftTintVariant,
+    onSurfaceVariant = StudioMutedSlateInk,
+    outline = StudioOutline,
+    outlineVariant = StudioHairlineVariant,
   )
 
 private val EmeraldDarkScheme =
@@ -137,10 +158,10 @@ private val EmeraldDarkScheme =
     onPrimary = DarkEmeraldOnPrimary,
     primaryContainer = DarkEmeraldContainer,
     onPrimaryContainer = DarkEmeraldOnContainer,
-    secondary = DarkCourseraBlue,
-    onSecondary = DarkCourseraOnBlue,
-    secondaryContainer = DarkCourseraBlueContainer,
-    onSecondaryContainer = DarkCourseraOnBlueContainer,
+    secondary = DarkStudioBlue,
+    onSecondary = DarkStudioOnBlue,
+    secondaryContainer = DarkStudioBlueContainer,
+    onSecondaryContainer = DarkStudioOnBlueContainer,
   )
 
 private val EmeraldLightScheme =
@@ -149,21 +170,21 @@ private val EmeraldLightScheme =
     onPrimary = Color.White,
     primaryContainer = EmeraldContainer,
     onPrimaryContainer = EmeraldOnContainer,
-    secondary = CourseraBlue,
+    secondary = StudioBlue,
     onSecondary = Color.White,
-    secondaryContainer = CourseraBlueContainer,
-    onSecondaryContainer = CourseraOnBlueContainer,
+    secondaryContainer = StudioBlueContainer,
+    onSecondaryContainer = StudioOnBlueContainer,
   )
 
 private val WarmAmberDarkScheme =
   RoyalIndigoDarkScheme.copy(
-    primary = DarkScholarAmber,
-    onPrimary = DarkScholarOnAmber,
-    primaryContainer = DarkScholarAmberContainer,
-    onPrimaryContainer = DarkScholarOnAmberContainer,
-    secondary = DarkCourseraTeal,
-    onSecondary = DarkCourseraOnTeal,
-    tertiary = DarkCourseraBlue,
+    primary = Color(0xFFFBBF24),
+    onPrimary = Color(0xFF2D1600),
+    primaryContainer = Color(0xFF543207),
+    onPrimaryContainer = Color(0xFFFEF3C7),
+    secondary = DarkEmeraldPrimary,
+    onSecondary = DarkEmeraldOnPrimary,
+    tertiary = DarkStudioBlue,
     background = DarkWarmBg,
     surface = DarkWarmSurface,
     surfaceVariant = DarkWarmVariant,
@@ -175,8 +196,8 @@ private val WarmAmberLightScheme =
     onPrimary = Color.White,
     primaryContainer = WarmAmberContainer,
     onPrimaryContainer = WarmAmberOnContainer,
-    secondary = CourseraTeal,
-    tertiary = CourseraBlue,
+    secondary = EmeraldPrimary,
+    tertiary = StudioBlue,
     background = WarmPaperBg,
     surface = PureCardSurface,
     surfaceVariant = WarmPaperVariant,
@@ -222,10 +243,10 @@ private val CrimsonDarkScheme =
     onPrimary = DarkCrimsonOnPrimary,
     primaryContainer = DarkCrimsonContainer,
     onPrimaryContainer = DarkCrimsonOnContainer,
-    secondary = DarkCourseraBlue,
-    onSecondary = DarkCourseraOnBlue,
-    secondaryContainer = DarkCourseraBlueContainer,
-    onSecondaryContainer = DarkCourseraOnBlueContainer,
+    secondary = DarkStudioBlue,
+    onSecondary = DarkStudioOnBlue,
+    secondaryContainer = DarkStudioBlueContainer,
+    onSecondaryContainer = DarkStudioOnBlueContainer,
   )
 
 private val CrimsonLightScheme =
@@ -234,10 +255,10 @@ private val CrimsonLightScheme =
     onPrimary = Color.White,
     primaryContainer = CrimsonContainer,
     onPrimaryContainer = CrimsonOnContainer,
-    secondary = CourseraBlue,
+    secondary = StudioBlue,
     onSecondary = Color.White,
-    secondaryContainer = CourseraBlueContainer,
-    onSecondaryContainer = CourseraOnBlueContainer,
+    secondaryContainer = StudioBlueContainer,
+    onSecondaryContainer = StudioOnBlueContainer,
   )
 
 private fun semanticColorsFor(palette: ThemePalette, darkTheme: Boolean): MeritSemanticColors =
@@ -245,38 +266,47 @@ private fun semanticColorsFor(palette: ThemePalette, darkTheme: Boolean): MeritS
     ThemePalette.ROYAL_INDIGO -> if (darkTheme) DarkSemanticColors else LightSemanticColors
     ThemePalette.EMERALD_SCHOLAR ->
       (if (darkTheme) DarkSemanticColors else LightSemanticColors).copy(
-        classroomBar = if (darkTheme) Color(0xFF052E24) else Color(0xFF064E3B),
+        classroomBar = if (darkTheme) Color(0xFF062E26) else Color(0xFF0F766E),
         classroomSubtext = Color(0xFFD1FAE5),
         classroomAccent = Color(0xFF34D399),
+        heroGradientStart = if (darkTheme) Color(0xFF0D9488) else Color(0xFF14B8A6),
+        heroGradientMid = if (darkTheme) Color(0xFF3B6FD4) else Color(0xFF5A8DEE),
+        heroGradientEnd = if (darkTheme) Color(0xFF5256B8) else Color(0xFF7D7CC2),
       )
     ThemePalette.WARM_AMBER ->
       (if (darkTheme) DarkSemanticColors else LightSemanticColors).copy(
-        classroomBar = if (darkTheme) Color(0xFF2B1C06) else Color(0xFF78350F),
+        classroomBar = if (darkTheme) Color(0xFF2B1C06) else Color(0xFF92400E),
         classroomSubtext = Color(0xFFFEF3C7),
         classroomAccent = Color(0xFFFBBF24),
         onClassroomAccent = Color(0xFF2D1600),
+        heroGradientStart = Color(0xFFD97706),
+        heroGradientMid = Color(0xFFE07A68),
+        heroGradientEnd = Color(0xFFF67E87),
       )
     ThemePalette.OLED_HIGH_CONTRAST ->
       (if (darkTheme) DarkSemanticColors else LightSemanticColors).copy(
-        classroomBar = if (darkTheme) Color(0xFF070B12) else Color(0xFF001C4D),
+        classroomBar = if (darkTheme) Color(0xFF070B12) else Color(0xFF0F296B),
         classroomSubtext = Color.White,
-        classroomAccent = Color(0xFF38BDF8),
+        classroomAccent = Color(0xFF60A5FA),
       )
     ThemePalette.CRIMSON_DISTINCTION ->
       (if (darkTheme) DarkSemanticColors else LightSemanticColors).copy(
-        classroomBar = if (darkTheme) Color(0xFF310817) else Color(0xFF6B0F2B),
-        classroomSubtext = Color(0xFFFFE4E6),
+        classroomBar = if (darkTheme) Color(0xFF330A1B) else Color(0xFF9D174D),
+        classroomSubtext = Color(0xFFFFE4EC),
         classroomAccent = Color(0xFFFDA4AF),
         onClassroomAccent = Color(0xFF4C0519),
+        heroGradientStart = Color(0xFFBE185D),
+        heroGradientMid = Color(0xFF7D5CC9),
+        heroGradientEnd = Color(0xFF5A8DEE),
       )
   }
 
 val MeritPrepShapes =
   Shapes(
-    small = RoundedCornerShape(8.dp),
-    medium = RoundedCornerShape(12.dp),
-    large = RoundedCornerShape(16.dp),
-    extraLarge = RoundedCornerShape(24.dp),
+    small = RoundedCornerShape(10.dp),
+    medium = RoundedCornerShape(16.dp),
+    large = RoundedCornerShape(20.dp),
+    extraLarge = RoundedCornerShape(26.dp),
   )
 
 private fun ColorScheme.withContrastBoost(
@@ -296,6 +326,11 @@ private fun ColorScheme.withContrastBoost(
         isDynamic -> NightCardSurface
         else -> surface
       },
+      surfaceVariant = when {
+        boosted -> OledElevatedVariant
+        isDynamic -> NightSurfaceVariant
+        else -> surfaceVariant
+      },
       onBackground = if (boosted) Color.White else NightOnBackground,
       onSurface = if (boosted) Color.White else NightOnBackground,
       onSurfaceVariant = if (boosted) Color(0xFFE2E8F0) else NightOnSurfaceVariant,
@@ -306,7 +341,7 @@ private fun ColorScheme.withContrastBoost(
     copy(
       background = when {
         boosted -> Color.White
-        isDynamic -> PorcelainBackground
+        isDynamic -> StudioIceBackground
         else -> background
       },
       surface = when {
@@ -314,11 +349,16 @@ private fun ColorScheme.withContrastBoost(
         isDynamic -> PureCardSurface
         else -> surface
       },
-      onBackground = if (boosted) Color.Black else InkOnBackground,
-      onSurface = if (boosted) Color.Black else InkOnBackground,
-      onSurfaceVariant = if (boosted) Color(0xFF1E293B) else MutedInkOnSurfaceVariant,
-      outline = if (boosted) Color(0xFF334155) else HairlineOutline,
-      outlineVariant = if (boosted) Color(0xFF94A3B8) else SubtleOutlineVariant,
+      surfaceVariant = when {
+        boosted -> Color(0xFFEDF2FA)
+        isDynamic -> StudioSoftTintVariant
+        else -> surfaceVariant
+      },
+      onBackground = if (boosted) Color.Black else StudioInkOnBackground,
+      onSurface = if (boosted) Color.Black else StudioInkOnBackground,
+      onSurfaceVariant = if (boosted) Color(0xFF1E293B) else StudioMutedSlateInk,
+      outline = if (boosted) Color(0xFF334155) else StudioOutline,
+      outlineVariant = if (boosted) Color(0xFF94A3B8) else StudioHairlineVariant,
     )
   }
 

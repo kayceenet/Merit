@@ -24,24 +24,28 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Assignment
+import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Psychology
+import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Science
+import androidx.compose.material.icons.filled.UnfoldLess
+import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -54,7 +58,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -65,6 +69,8 @@ import com.example.data.curriculum.CurriculumProgression
 import com.example.data.curriculum.Lesson
 import com.example.data.curriculum.LessonPillar
 import com.example.data.model.LessonProgress
+import com.example.ui.components.StudioActionTile
+import com.example.ui.components.StudioGradientProgressBanner
 import com.example.ui.components.TopRightMenuButton
 import com.example.ui.theme.semanticColors
 import kotlin.math.roundToInt
@@ -78,6 +84,9 @@ fun CatalogScreen(
   passThresholdPercent: Long = CurriculumProgression.PASS_THRESHOLD_PERCENT,
   dueReviewsCount: Int = 0,
   onOpenPlacementCheck: (String) -> Unit = {},
+  onOpenSpacedReview: () -> Unit = {},
+  onOpenExamLab: (String) -> Unit = {},
+  onOpenPaper2Lab: () -> Unit = {},
   onOpenMenu: () -> Unit = {},
   onOpenLesson: (Lesson) -> Unit,
   modifier: Modifier = Modifier,
@@ -110,7 +119,6 @@ fun CatalogScreen(
   val bankQuestionCount =
     remember(activeTrack.id) { CurriculumCatalog.pastQuestionsFor(activeTrack.id, "ALL").size }
 
-  // Collapsible module accordions; auto-expand the module containing the next unlocked lesson
   var expandedModuleIds by remember(activeTrack.id) {
     val activeModuleId = continueLesson?.moduleId ?: modulesForTrack.firstOrNull()?.id
     mutableStateOf(setOfNotNull(activeModuleId))
@@ -123,31 +131,42 @@ fun CatalogScreen(
   }
 
   var lockedAlertTarget by remember { mutableStateOf<Pair<Lesson, String?>?>(null) }
+  val allModulesExpanded = expandedModuleIds.size >= modulesForTrack.size && modulesForTrack.isNotEmpty()
 
-  Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+  Box(
+    modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+    contentAlignment = Alignment.TopCenter,
+  ) {
     Column(modifier = Modifier.widthIn(max = 920.dp).fillMaxSize()) {
-      // Top Coursera Subject Switcher Bar
+      // Studio Clean Header + Subject Pill Bar
       Column(
         modifier =
           Modifier.fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface)
-            .border(1.dp, MaterialTheme.colorScheme.outlineVariant)
             .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
       ) {
         Row(
           modifier = Modifier.fillMaxWidth(),
           horizontalArrangement = Arrangement.SpaceBetween,
           verticalAlignment = Alignment.CenterVertically,
         ) {
-          Text(
-            text = "Course Syllabus & Mastery",
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.weight(1f),
-          )
+          Column(modifier = Modifier.weight(1f)) {
+            Text(
+              text = activeTrack.shortName,
+              style = MaterialTheme.typography.headlineSmall,
+              color = MaterialTheme.colorScheme.onSurface,
+              fontWeight = FontWeight.Bold,
+            )
+            Text(
+              text = "Syllabus & Mastery Roadmap",
+              style = MaterialTheme.typography.labelSmall,
+              color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+          }
           TopRightMenuButton(badgeCount = dueReviewsCount, onClick = onOpenMenu)
         }
+
         Row(
           modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
           horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -167,9 +186,10 @@ fun CatalogScreen(
                 FilterChipDefaults.filterChipColors(
                   selectedContainerColor = MaterialTheme.colorScheme.primary,
                   selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
-                  containerColor = MaterialTheme.colorScheme.background,
+                  containerColor = semantics.softTintSurface,
                   labelColor = MaterialTheme.colorScheme.onSurface,
                 ),
+              border = null,
               modifier = Modifier.testTag("catalog_filter_${track.id}"),
             )
           }
@@ -179,106 +199,168 @@ fun CatalogScreen(
       LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
       ) {
-        // Coursera Specialization Overview Banner
+        // Meta info row matching Right Phone mockup ("Job interview  📄 48 cards  🔖 Career")
         item {
-          Column(
-            modifier =
-              Modifier.fillMaxWidth()
-                .clip(RoundedCornerShape(18.dp))
-                .background(semantics.classroomBar)
-                .border(1.5.dp, semantics.classroomAccent.copy(alpha = 0.45f), RoundedCornerShape(18.dp))
-                .padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
           ) {
+            Text(
+              text = continueLesson?.title ?: activeTrack.title,
+              style = MaterialTheme.typography.titleSmall,
+              color = MaterialTheme.colorScheme.onBackground,
+              fontWeight = FontWeight.Bold,
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis,
+              modifier = Modifier.weight(1f).padding(end = 10.dp),
+            )
             Row(
-              modifier = Modifier.fillMaxWidth(),
-              horizontalArrangement = Arrangement.SpaceBetween,
+              horizontalArrangement = Arrangement.spacedBy(12.dp),
               verticalAlignment = Alignment.CenterVertically,
             ) {
-              Surface(color = semantics.classroomAccent, shape = RoundedCornerShape(6.dp)) {
+              Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+              ) {
+                Icon(
+                  imageVector = Icons.Filled.Description,
+                  contentDescription = null,
+                  tint = MaterialTheme.colorScheme.primary,
+                  modifier = Modifier.size(15.dp),
+                )
                 Text(
-                  text = "${modulesForTrack.size} MODULES • ${trackLessons.size} LESSONS",
+                  text = "${trackLessons.size} lessons",
                   style = MaterialTheme.typography.labelSmall,
-                  color = Color(0xFF0A1628),
-                  fontWeight = FontWeight.Bold,
-                  modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                  color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
               }
-              Text(
-                text = "${(trackRatio * 100).roundToInt()}% Mastered",
-                style = MaterialTheme.typography.labelMedium.copy(fontFeatureSettings = "tnum"),
-                color = semantics.classroomAccent,
-                fontWeight = FontWeight.Bold,
-              )
-            }
-
-            Text(
-              text = activeTrack.title,
-              style = MaterialTheme.typography.headlineSmall,
-              color = semantics.onClassroomBar,
-            )
-            Text(
-              text = activeTrack.tagline,
-              style = MaterialTheme.typography.bodySmall,
-              color = semantics.classroomSubtext,
-            )
-            Text(
-              text = "${totalMinutes / 60}h ${totalMinutes % 60}m curriculum • $bankQuestionCount JAMB/WAEC/NECO questions • ${passThresholdPercent}% mastery lock",
-              style = MaterialTheme.typography.labelSmall,
-              color = semantics.classroomSubtext,
-            )
-
-            LinearProgressIndicator(
-              progress = { trackRatio.coerceAtLeast(0.03f) },
-              modifier = Modifier.fillMaxWidth().height(7.dp).clip(CircleShape),
-              color = semantics.classroomAccent,
-              trackColor = Color.White.copy(alpha = 0.22f),
-            )
-
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-              if (continueLesson != null) {
-                Button(
-                  onClick = { onOpenLesson(continueLesson) },
-                  modifier = Modifier.weight(1f).height(48.dp),
-                  shape = RoundedCornerShape(10.dp),
-                  colors =
-                    ButtonDefaults.buttonColors(
-                      containerColor = semantics.classroomAccent,
-                      contentColor = Color(0xFF0A1628),
-                    ),
-                ) {
-                  Icon(Icons.Filled.PlayArrow, contentDescription = null, modifier = Modifier.size(18.dp))
-                  Spacer(modifier = Modifier.width(6.dp))
-                  Text(
-                    text = "Continue: ${continueLesson.title}",
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Bold,
-                  )
-                }
-              }
-              OutlinedButton(
-                onClick = { onOpenPlacementCheck(activeTrack.id) },
-                modifier = Modifier.height(48.dp).testTag("catalog_placement_button"),
-                shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = semantics.onClassroomBar),
+              Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
               ) {
-                Icon(Icons.Filled.School, contentDescription = null, modifier = Modifier.size(16.dp))
-                Spacer(modifier = Modifier.width(4.dp))
+                Icon(
+                  imageVector = Icons.Filled.BookmarkBorder,
+                  contentDescription = null,
+                  tint = MaterialTheme.colorScheme.primary,
+                  modifier = Modifier.size(15.dp),
+                )
                 Text(
-                  text = if (activeTrack.id in placementPassedSubjects) "Placed ✓" else "SS3 Check",
-                  style = MaterialTheme.typography.labelMedium,
-                  fontWeight = FontWeight.Bold,
+                  text = "$bankQuestionCount Qs",
+                  style = MaterialTheme.typography.labelSmall,
+                  color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
               }
             }
           }
         }
 
-        // Coursera Collapsible Module / Week Accordions
+        // 3x2 Crisp White Action Tiles Grid matching Right Phone mockup
+        item {
+          Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+              StudioActionTile(
+                label = "Resume",
+                icon = Icons.Filled.PlayArrow,
+                selected = continueLesson != null,
+                modifier = Modifier.weight(1f),
+                onClick = { continueLesson?.let(onOpenLesson) },
+              )
+              StudioActionTile(
+                label = "Flashcards",
+                icon = Icons.Filled.Psychology,
+                iconTint = semantics.coralAccent,
+                modifier = Modifier.weight(1f),
+                onClick = onOpenSpacedReview,
+              )
+              StudioActionTile(
+                label = "Mock CBT",
+                icon = Icons.Filled.Quiz,
+                iconTint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.weight(1f),
+                onClick = { onOpenExamLab(activeTrack.id) },
+              )
+            }
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+              StudioActionTile(
+                label = "Paper 2",
+                icon = Icons.AutoMirrored.Filled.Assignment,
+                iconTint = semantics.indigoAccent,
+                modifier = Modifier.weight(1f),
+                onClick = onOpenPaper2Lab,
+              )
+              StudioActionTile(
+                label = if (activeTrack.id in placementPassedSubjects) "Placed ✓" else "SS3 Check",
+                icon = Icons.Filled.School,
+                completed = activeTrack.id in placementPassedSubjects,
+                iconTint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.weight(1f).testTag("catalog_placement_button"),
+                onClick = { onOpenPlacementCheck(activeTrack.id) },
+              )
+              StudioActionTile(
+                label = if (allModulesExpanded) "Collapse" else "Expand All",
+                icon = if (allModulesExpanded) Icons.Filled.UnfoldLess else Icons.Filled.UnfoldMore,
+                iconTint = semantics.periwinkleAccent,
+                modifier = Modifier.weight(1f),
+                onClick = {
+                  expandedModuleIds =
+                    if (allModulesExpanded) emptySet()
+                    else modulesForTrack.map { it.id }.toSet()
+                },
+              )
+            }
+          }
+        }
+
+        // Gradient Progress Hero Banner matching Right Phone ("Keep improving! / Your current score" + circular ring)
+        item {
+          val pct = (trackRatio * 100).roundToInt()
+          StudioGradientProgressBanner(
+            title =
+              when {
+                pct >= 80 -> "Mastery Pace!"
+                pct >= 30 -> "Good momentum!"
+                else -> "Keep improving!"
+              },
+            subtitle = "Track progress • $masteredCount/${trackLessons.size} lessons mastered",
+            progressPercent = pct,
+            onClick = { continueLesson?.let(onOpenLesson) },
+          )
+        }
+
+        // Overview Soft Summary Card matching bottom of Right Phone mockup
+        item {
+          Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(
+              text = "Overview",
+              style = MaterialTheme.typography.titleMedium,
+              color = MaterialTheme.colorScheme.onBackground,
+              fontWeight = FontWeight.Bold,
+            )
+            Column(
+              modifier =
+                Modifier.fillMaxWidth()
+                  .clip(RoundedCornerShape(18.dp))
+                  .background(semantics.softTintSurface)
+                  .padding(horizontal = 16.dp, vertical = 14.dp),
+              verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+              OverviewMetricRow("Mastered lessons", "$masteredCount")
+              OverviewMetricRow("Lessons remaining", "${(trackLessons.size - masteredCount).coerceAtLeast(0)}")
+              OverviewMetricRow("Estimated syllabus time", "${totalMinutes / 60}h ${totalMinutes % 60}m")
+            }
+          }
+        }
+
+        // Collapsible Module Accordions
         itemsIndexed(modulesForTrack, key = { _, m -> m.id }) { partIndex, courseModule ->
           val partMastered = courseModule.lessons.count { progressMap[it.id]?.isCompleted == true }
           val isExpanded = courseModule.id in expandedModuleIds
@@ -286,9 +368,10 @@ fun CatalogScreen(
           Column(
             modifier =
               Modifier.fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
+                .shadow(3.dp, RoundedCornerShape(20.dp))
+                .clip(RoundedCornerShape(20.dp))
                 .background(MaterialTheme.colorScheme.surface)
-                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp)),
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp)),
           ) {
             Row(
               modifier =
@@ -313,6 +396,7 @@ fun CatalogScreen(
                   text = courseModule.title,
                   style = MaterialTheme.typography.titleMedium,
                   color = MaterialTheme.colorScheme.onSurface,
+                  fontWeight = FontWeight.Bold,
                 )
                 Text(
                   text = courseModule.summary,
@@ -328,7 +412,7 @@ fun CatalogScreen(
                   color =
                     if (partMastered == courseModule.lessons.size && courseModule.lessons.isNotEmpty())
                       semantics.successContainer
-                    else MaterialTheme.colorScheme.surfaceVariant,
+                    else semantics.softTintSurface,
                   shape = RoundedCornerShape(99.dp),
                 ) {
                   Text(
@@ -373,10 +457,10 @@ fun CatalogScreen(
                   Row(
                     modifier =
                       Modifier.fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
+                        .clip(RoundedCornerShape(16.dp))
                         .background(
-                          if (isLocked) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f)
-                          else MaterialTheme.colorScheme.background
+                          if (isLocked) semantics.softTintSurface.copy(alpha = 0.6f)
+                          else semantics.softTintSurface
                         )
                         .border(
                           width = if (isDone) 1.5.dp else 1.dp,
@@ -384,9 +468,9 @@ fun CatalogScreen(
                             when {
                               isDone -> semantics.success
                               isLocked -> MaterialTheme.colorScheme.outlineVariant
-                              else -> MaterialTheme.colorScheme.outline
+                              else -> MaterialTheme.colorScheme.outlineVariant
                             },
-                          shape = RoundedCornerShape(12.dp),
+                          shape = RoundedCornerShape(16.dp),
                         )
                         .clickable {
                           if (isLocked) {
@@ -402,23 +486,14 @@ fun CatalogScreen(
                   ) {
                     Box(
                       modifier =
-                        Modifier.size(34.dp)
+                        Modifier.size(36.dp)
                           .clip(CircleShape)
                           .background(
                             when {
                               isDone -> semantics.successContainer
-                              isLocked -> MaterialTheme.colorScheme.surfaceVariant
+                              isLocked -> MaterialTheme.colorScheme.surface
                               else -> MaterialTheme.colorScheme.primaryContainer
                             }
-                          )
-                          .border(
-                            1.5.dp,
-                            when {
-                              isDone -> semantics.success
-                              isLocked -> MaterialTheme.colorScheme.outline
-                              else -> MaterialTheme.colorScheme.primary
-                            },
-                            CircleShape,
                           ),
                       contentAlignment = Alignment.Center,
                     ) {
@@ -449,7 +524,7 @@ fun CatalogScreen(
 
                     Column(
                       modifier = Modifier.weight(1f),
-                      verticalArrangement = Arrangement.spacedBy(4.dp),
+                      verticalArrangement = Arrangement.spacedBy(3.dp),
                     ) {
                       Text(
                         text = lesson.title,
@@ -457,28 +532,29 @@ fun CatalogScreen(
                         color =
                           if (isLocked) MaterialTheme.colorScheme.onSurfaceVariant
                           else MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.Bold,
                       )
                       Row(
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                         verticalAlignment = Alignment.CenterVertically,
                       ) {
                         Icon(
-                          imageVector = Icons.Filled.MenuBook,
+                          imageVector = Icons.AutoMirrored.Filled.MenuBook,
                           contentDescription = null,
                           tint = MaterialTheme.colorScheme.onSurfaceVariant,
                           modifier = Modifier.size(13.dp),
                         )
                         Text(
-                          text = "Reading • ${lesson.durationMinutes}m • ${lesson.exercises.size} Qs Quiz",
+                          text = "${lesson.durationMinutes}m • ${lesson.exercises.size} Qs Quiz",
                           style = MaterialTheme.typography.bodySmall,
                           color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                       }
                       if (isLocked && !unlockState.prerequisiteLessonTitle.isNullOrBlank()) {
                         Text(
-                          text = "Complete \"${unlockState.prerequisiteLessonTitle}\" (≥${passThresholdPercent}% mastery) to unlock",
+                          text = "Complete \"${unlockState.prerequisiteLessonTitle}\" (${passThresholdPercent}%+) to unlock",
                           style = MaterialTheme.typography.labelSmall,
-                          color = MaterialTheme.colorScheme.tertiary,
+                          color = semantics.coralAccent,
                           maxLines = 2,
                         )
                       } else {
@@ -489,13 +565,13 @@ fun CatalogScreen(
                           Icon(
                             imageVector = Icons.Filled.Science,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.secondary,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(13.dp),
                           )
                           Text(
                             text = "Lab: ${lesson.labType.title}",
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.secondary,
+                            color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -508,7 +584,7 @@ fun CatalogScreen(
                       color =
                         when {
                           isDone -> semantics.successContainer
-                          isLocked -> MaterialTheme.colorScheme.surfaceVariant
+                          isLocked -> MaterialTheme.colorScheme.surface
                           else -> MaterialTheme.colorScheme.primaryContainer
                         },
                       shape = RoundedCornerShape(99.dp),
@@ -563,7 +639,7 @@ fun CatalogScreen(
             if (!prereqTitle.isNullOrBlank()) {
               "\"${lockedLesson.title}\" builds directly on \"$prereqTitle\". Complete all study, lab & project stages and score at least ${passThresholdPercent}% on the Mastery Quiz to unlock this lesson."
             } else {
-              "Complete the prerequisite lesson (≥${passThresholdPercent}% quiz score) to unlock \"${lockedLesson.title}\"."
+              "Complete the prerequisite lesson (${passThresholdPercent}%+ quiz score) to unlock \"${lockedLesson.title}\"."
             },
           style = MaterialTheme.typography.bodyMedium,
         )
@@ -583,6 +659,27 @@ fun CatalogScreen(
       dismissButton = {
         TextButton(onClick = { lockedAlertTarget = null }) { Text("Close") }
       },
+    )
+  }
+}
+
+@Composable
+private fun OverviewMetricRow(label: String, value: String) {
+  Row(
+    modifier = Modifier.fillMaxWidth(),
+    horizontalArrangement = Arrangement.SpaceBetween,
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Text(
+      text = label,
+      style = MaterialTheme.typography.bodyMedium,
+      color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    Text(
+      text = value,
+      style = MaterialTheme.typography.titleSmall.copy(fontFeatureSettings = "tnum"),
+      color = MaterialTheme.colorScheme.onSurface,
+      fontWeight = FontWeight.Bold,
     )
   }
 }

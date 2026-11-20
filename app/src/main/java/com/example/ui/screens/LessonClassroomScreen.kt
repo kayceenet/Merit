@@ -29,16 +29,21 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.Assignment
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.BookmarkAdd
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material.icons.filled.WarningAmber
@@ -87,6 +92,7 @@ import com.example.ui.components.DisplaySettingsDialog
 import com.example.ui.components.EquationDisplayCard
 import com.example.ui.components.ScientificCalculatorSheet
 import com.example.ui.components.ScientificText
+import com.example.ui.components.StudioActionTile
 import com.example.ui.components.TopicDiagramCard
 import com.example.ui.components.TopRightMenuButton
 import com.example.ui.labs.PracticalLabWorkspace
@@ -142,8 +148,8 @@ fun LessonClassroomScreen(
         .statusBarsPadding()
         .navigationBarsPadding(),
   ) {
-    // Coursera Distraction-Free Classroom Header + Progress Rail
-    Column(modifier = Modifier.fillMaxWidth().background(semantics.classroomBar)) {
+    // Studio Clean Classroom Top Header + Subtle Progress Rail
+    Column(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface)) {
       Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -153,21 +159,22 @@ fun LessonClassroomScreen(
           Icon(
             Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = "Back to syllabus",
-            tint = semantics.onClassroomBar,
+            tint = MaterialTheme.colorScheme.onSurface,
           )
         }
         Column(modifier = Modifier.weight(1f)) {
           Text(
             text = lesson.title,
             style = MaterialTheme.typography.titleMedium,
-            color = semantics.onClassroomBar,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.Bold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
           )
           Text(
-            text = "${lesson.syllabusTag} • ${completedSteps.size}/${LessonPillar.entries.size} sections completed",
+            text = "${lesson.syllabusTag} • ${completedSteps.size}/${LessonPillar.entries.size} sections mastered",
             style = MaterialTheme.typography.labelSmall,
-            color = semantics.classroomSubtext,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
         }
         if (themePreferences.cbtShowCalculator) {
@@ -178,7 +185,7 @@ fun LessonClassroomScreen(
             Icon(
               Icons.Filled.Calculate,
               contentDescription = "Scientific calculator",
-              tint = semantics.onClassroomBar,
+              tint = MaterialTheme.colorScheme.primary,
             )
           }
         }
@@ -189,14 +196,14 @@ fun LessonClassroomScreen(
           Icon(
             Icons.Filled.BookmarkAdd,
             contentDescription = "Save formula note",
-            tint = semantics.classroomAccent,
+            tint = MaterialTheme.colorScheme.primary,
           )
         }
         if (onOpenMenu != null) {
           TopRightMenuButton(
             badgeCount = dueReviewsCount,
             onClick = onOpenMenu,
-            useOnBarColors = true,
+            useOnBarColors = false,
           )
         } else {
           IconButton(
@@ -206,7 +213,7 @@ fun LessonClassroomScreen(
             Icon(
               Icons.Filled.TextFields,
               contentDescription = "Text size and display settings",
-              tint = semantics.onClassroomBar,
+              tint = MaterialTheme.colorScheme.primary,
             )
           }
         }
@@ -214,8 +221,8 @@ fun LessonClassroomScreen(
       LinearProgressIndicator(
         progress = { classroomRatio.coerceAtLeast(0.05f) },
         modifier = Modifier.fillMaxWidth().height(4.dp),
-        color = semantics.classroomAccent,
-        trackColor = Color.White.copy(alpha = 0.22f),
+        color = MaterialTheme.colorScheme.primary,
+        trackColor = MaterialTheme.colorScheme.outlineVariant,
       )
     }
 
@@ -338,86 +345,159 @@ fun LessonClassroomScreen(
         }
       } else {
         Column(modifier = Modifier.fillMaxSize()) {
-          // Handheld Coursera Sequential Section Stepper
-          Row(
+          // Handheld Studio 3x2 Tile Mode Switcher + Collapsible Toggle matching Unit 3 mockup
+          var showTileGrid by remember(lesson.id) { mutableStateOf(true) }
+          Column(
             modifier =
               Modifier.fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface)
-                .border(1.dp, MaterialTheme.colorScheme.outlineVariant)
-                .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 12.dp, vertical = 10.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
           ) {
-            LessonPillar.entries.forEach { pillar ->
-              val active = pillar == selectedPillar
-              val isDone = pillar.key in completedSteps
-              val isUnlocked = CurriculumProgression.isPillarUnlocked(pillar, completedSteps)
-              val bgColor =
-                when {
-                  active -> MaterialTheme.colorScheme.primary
-                  isDone -> semantics.successContainer
-                  !isUnlocked -> MaterialTheme.colorScheme.surfaceVariant
-                  else -> MaterialTheme.colorScheme.background
-                }
-              val borderColor =
-                when {
-                  active -> MaterialTheme.colorScheme.primary
-                  isDone -> semantics.success
-                  !isUnlocked -> MaterialTheme.colorScheme.outlineVariant
-                  else -> MaterialTheme.colorScheme.outline
-                }
-              val textColor =
-                when {
-                  active -> MaterialTheme.colorScheme.onPrimary
-                  isDone -> semantics.onSuccessContainer
-                  !isUnlocked -> MaterialTheme.colorScheme.onSurfaceVariant
-                  else -> MaterialTheme.colorScheme.onSurface
-                }
-
-              Surface(
-                color = bgColor,
-                shape = RoundedCornerShape(99.dp),
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically,
+            ) {
+              Text(
+                text = "${selectedPillar.ordinal + 1}. ${selectedPillar.fullLabel}",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                fontWeight = FontWeight.Bold,
+              )
+              Row(
                 modifier =
                   Modifier.clip(RoundedCornerShape(99.dp))
-                    .border(1.2.dp, borderColor, RoundedCornerShape(99.dp))
-                    .clickable {
-                      if (isUnlocked) {
-                        lockNoticeMessage = null
-                        selectedPillar = pillar
-                      } else {
-                        lockNoticeMessage =
-                          "Finish ${LessonPillar.entries[(pillar.ordinal - 1).coerceAtLeast(0)].shortLabel} first to unlock ${pillar.shortLabel}."
-                      }
-                    }
-                    .testTag("pillar_tab_${pillar.key}"),
+                    .background(MaterialTheme.colorScheme.surface)
+                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(99.dp))
+                    .clickable { showTileGrid = !showTileGrid }
+                    .padding(horizontal = 10.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
               ) {
+                Text(
+                  text = if (showTileGrid) "Compact" else "6 Modes",
+                  style = MaterialTheme.typography.labelSmall,
+                  color = MaterialTheme.colorScheme.primary,
+                  fontWeight = FontWeight.Bold,
+                )
+                Icon(
+                  imageVector = if (showTileGrid) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                  contentDescription = "Toggle mode grid",
+                  tint = MaterialTheme.colorScheme.primary,
+                  modifier = Modifier.size(16.dp),
+                )
+              }
+            }
+
+            if (showTileGrid) {
+              LessonPillar.entries.chunked(3).forEach { rowPillars ->
                 Row(
-                  modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                  verticalAlignment = Alignment.CenterVertically,
-                  horizontalArrangement = Arrangement.spacedBy(6.dp),
+                  modifier = Modifier.fillMaxWidth(),
+                  horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                  when {
-                    isDone ->
-                      Icon(
-                        imageVector = Icons.Filled.CheckCircle,
-                        contentDescription = "Completed",
-                        tint = if (active) MaterialTheme.colorScheme.onPrimary else semantics.success,
-                        modifier = Modifier.size(15.dp),
-                      )
-                    !isUnlocked ->
-                      Icon(
-                        imageVector = Icons.Filled.Lock,
-                        contentDescription = "Locked",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(14.dp),
-                      )
+                  rowPillars.forEach { pillar ->
+                    val active = pillar == selectedPillar
+                    val isDone = pillar.key in completedSteps
+                    val isUnlocked = CurriculumProgression.isPillarUnlocked(pillar, completedSteps)
+                    val icon =
+                      when (pillar) {
+                        LessonPillar.CONCEPT -> Icons.AutoMirrored.Filled.MenuBook
+                        LessonPillar.EXAMPLES -> Icons.Filled.Lightbulb
+                        LessonPillar.SCENARIO -> Icons.Filled.Public
+                        LessonPillar.LAB -> Icons.Filled.Science
+                        LessonPillar.PROJECT -> Icons.Filled.Build
+                        LessonPillar.EXERCISE -> Icons.AutoMirrored.Filled.Assignment
+                      }
+                    StudioActionTile(
+                      label = pillar.shortLabel,
+                      icon = icon,
+                      selected = active,
+                      completed = isDone,
+                      locked = !isUnlocked,
+                      modifier = Modifier.weight(1f).testTag("pillar_tab_${pillar.key}"),
+                      onClick = {
+                        if (isUnlocked) {
+                          lockNoticeMessage = null
+                          selectedPillar = pillar
+                        } else {
+                          lockNoticeMessage =
+                            "Finish ${LessonPillar.entries[(pillar.ordinal - 1).coerceAtLeast(0)].shortLabel} first to unlock ${pillar.shortLabel}."
+                        }
+                      },
+                    )
                   }
-                  Text(
-                    text = pillar.shortLabel,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = textColor,
-                    fontWeight = if (active || isDone) FontWeight.Bold else FontWeight.SemiBold,
-                  )
+                }
+              }
+            } else {
+              Row(
+                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+              ) {
+                LessonPillar.entries.forEach { pillar ->
+                  val active = pillar == selectedPillar
+                  val isDone = pillar.key in completedSteps
+                  val isUnlocked = CurriculumProgression.isPillarUnlocked(pillar, completedSteps)
+                  val bgColor =
+                    when {
+                      active -> MaterialTheme.colorScheme.primary
+                      isDone -> semantics.successContainer
+                      !isUnlocked -> MaterialTheme.colorScheme.surfaceVariant
+                      else -> MaterialTheme.colorScheme.surface
+                    }
+                  val textColor =
+                    when {
+                      active -> MaterialTheme.colorScheme.onPrimary
+                      isDone -> semantics.onSuccessContainer
+                      !isUnlocked -> MaterialTheme.colorScheme.onSurfaceVariant
+                      else -> MaterialTheme.colorScheme.onSurface
+                    }
+
+                  Surface(
+                    color = bgColor,
+                    shape = RoundedCornerShape(99.dp),
+                    modifier =
+                      Modifier.clip(RoundedCornerShape(99.dp))
+                        .clickable {
+                          if (isUnlocked) {
+                            lockNoticeMessage = null
+                            selectedPillar = pillar
+                          } else {
+                            lockNoticeMessage =
+                              "Finish ${LessonPillar.entries[(pillar.ordinal - 1).coerceAtLeast(0)].shortLabel} first to unlock ${pillar.shortLabel}."
+                          }
+                        }
+                        .testTag("pillar_tab_${pillar.key}"),
+                  ) {
+                    Row(
+                      modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                      verticalAlignment = Alignment.CenterVertically,
+                      horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                      when {
+                        isDone ->
+                          Icon(
+                            imageVector = Icons.Filled.CheckCircle,
+                            contentDescription = "Completed",
+                            tint = if (active) MaterialTheme.colorScheme.onPrimary else semantics.success,
+                            modifier = Modifier.size(15.dp),
+                          )
+                        !isUnlocked ->
+                          Icon(
+                            imageVector = Icons.Filled.Lock,
+                            contentDescription = "Locked",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(14.dp),
+                          )
+                      }
+                      Text(
+                        text = pillar.shortLabel,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = textColor,
+                        fontWeight = if (active || isDone) FontWeight.Bold else FontWeight.SemiBold,
+                      )
+                    }
+                  }
                 }
               }
             }

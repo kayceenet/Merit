@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DarkMode
@@ -71,6 +72,7 @@ import com.example.data.local.ThemePreferences
 import com.example.data.model.ExamAttempt
 import com.example.data.model.LessonProgress
 import com.example.data.model.UserProfile
+import com.example.ui.components.StudioActionTile
 import com.example.ui.components.TopRightMenuButton
 import com.example.ui.theme.semanticColors
 import kotlin.math.roundToInt
@@ -108,6 +110,7 @@ fun AnalyticsProfileScreen(
   onSetUseDynamicColor: (Boolean) -> Unit,
   onSetFontSizeScale: (FontSizeScale) -> Unit = {},
   onOpenSettingsPortal: () -> Unit = {},
+  onOpenNotebook: () -> Unit = {},
   onOpenMenu: () -> Unit = {},
   onPracticeWeakSubject: (String) -> Unit,
   onUpdateGoal: (displayName: String, targetExam: String, targetScore: Long) -> Unit,
@@ -199,13 +202,31 @@ fun AnalyticsProfileScreen(
         }
       }
 
-      // 4-Metric Coursera Telemetry Summary Strip
+      // Studio Metric Tiles + Quick Notebook / Settings Portal Shortcuts
       item {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-          TelemetryTile("MASTERED", "$masteredLessons", Modifier.weight(1f))
-          TelemetryTile("AVG MOCK", if (attempts.isEmpty()) "—" else "$avgScore%", Modifier.weight(1f))
-          TelemetryTile("XP", "${profile?.totalXp ?: offlineSnapshot.offlineXp}", Modifier.weight(1f))
-          TelemetryTile("STREAK", "${profile?.streakDays ?: offlineSnapshot.offlineStreakDays}d", Modifier.weight(1f))
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            TelemetryTile("MASTERED", "$masteredLessons", Modifier.weight(1f))
+            TelemetryTile("AVG MOCK", if (attempts.isEmpty()) "—" else "$avgScore%", Modifier.weight(1f))
+            TelemetryTile("XP", "${profile?.totalXp ?: offlineSnapshot.offlineXp}", Modifier.weight(1f))
+            TelemetryTile("STREAK", "${profile?.streakDays ?: offlineSnapshot.offlineStreakDays}d", Modifier.weight(1f))
+          }
+          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            StudioActionTile(
+              label = "Formula Notebook",
+              icon = Icons.AutoMirrored.Filled.MenuBook,
+              iconTint = MaterialTheme.colorScheme.primary,
+              modifier = Modifier.weight(1f),
+              onClick = onOpenNotebook,
+            )
+            StudioActionTile(
+              label = "Settings Portal",
+              icon = Icons.Filled.Settings,
+              iconTint = semantics.indigoAccent,
+              modifier = Modifier.weight(1f),
+              onClick = onOpenSettingsPortal,
+            )
+          }
         }
       }
 

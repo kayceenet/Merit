@@ -75,14 +75,14 @@ fun TopRightMenuButton(
 ) {
   val semantics = MaterialTheme.semanticColors
   val containerBg =
-    if (useOnBarColors) Color.White.copy(alpha = 0.14f)
-    else MaterialTheme.colorScheme.surfaceVariant
+    if (useOnBarColors) Color.White.copy(alpha = 0.16f)
+    else MaterialTheme.colorScheme.surface
   val borderColor =
     if (useOnBarColors) Color.White.copy(alpha = 0.28f)
     else MaterialTheme.colorScheme.outlineVariant
   val iconTint =
     if (useOnBarColors) semantics.onClassroomBar
-    else MaterialTheme.colorScheme.onSurface
+    else MaterialTheme.colorScheme.primary
 
   Box(modifier = modifier) {
     IconButton(
@@ -90,9 +90,9 @@ fun TopRightMenuButton(
       modifier =
         Modifier.minimumInteractiveComponentSize()
           .size(48.dp)
-          .clip(CircleShape)
+          .clip(RoundedCornerShape(14.dp))
           .background(containerBg)
-          .border(1.dp, borderColor, CircleShape)
+          .border(1.dp, borderColor, RoundedCornerShape(14.dp))
           .testTag("top_right_menu_button"),
     ) {
       Icon(
@@ -104,14 +104,14 @@ fun TopRightMenuButton(
     }
     if (badgeCount > 0) {
       Surface(
-        color = MaterialTheme.colorScheme.error,
+        color = semantics.coralAccent,
         shape = CircleShape,
         modifier = Modifier.align(Alignment.TopEnd).padding(2.dp),
       ) {
         Text(
           text = if (badgeCount > 9) "9+" else "$badgeCount",
           style = MaterialTheme.typography.labelSmall,
-          color = MaterialTheme.colorScheme.onError,
+          color = Color.White,
           fontWeight = FontWeight.Bold,
           modifier = Modifier.padding(horizontal = 5.dp, vertical = 1.dp),
         )
@@ -165,13 +165,17 @@ fun AcademyMenuSheet(
           .padding(horizontal = 16.dp, vertical = 8.dp),
       verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-      // Academy Scholar Summary Header + Quick Theme Flip
+      // Studio Multi-Stop Gradient Scholar Summary Card + Quick Theme Flip
       Row(
         modifier =
           Modifier.fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(semantics.classroomBar)
-            .padding(14.dp),
+            .clip(RoundedCornerShape(20.dp))
+            .background(
+              androidx.compose.ui.graphics.Brush.horizontalGradient(
+                listOf(semantics.heroGradientStart, semantics.heroGradientMid, semantics.heroGradientEnd)
+              )
+            )
+            .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
       ) {
@@ -179,7 +183,7 @@ fun AcademyMenuSheet(
           Text(
             text = profile?.displayName ?: "MeritPrep Scholar",
             style = MaterialTheme.typography.titleMedium,
-            color = semantics.onClassroomBar,
+            color = Color.White,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
