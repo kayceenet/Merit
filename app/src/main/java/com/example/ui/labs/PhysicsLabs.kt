@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.example.data.curriculum.PracticalLabType
 import com.example.ui.components.ScientificText
 import com.example.ui.theme.semanticColors
+import java.util.Locale
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.asin
@@ -81,28 +82,28 @@ private fun VernierMicrometerLab() {
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     LabMetricBanner(
       listOf(
-        "Observed" to String.format("%.2f mm", observed),
-        "Zero Error" to String.format("%+.2f mm", zeroErrorMm),
-        "True Diameter" to String.format("%.2f mm", trueReading),
+        "Observed" to String.format(Locale.US, "%.2f mm", observed),
+        "Zero Error" to String.format(Locale.US, "%+.2f mm", zeroErrorMm),
+        "True Diameter" to String.format(Locale.US, "%.2f mm", trueReading),
       )
     )
     LabeledLabSlider(
       label = "Main Sleeve Reading",
-      valueText = String.format("%.1f mm", sleeveMm),
+      valueText = String.format(Locale.US, "%.1f mm", sleeveMm),
       value = sleeveMm,
       onValueChange = { sleeveMm = (it * 2f).roundToInt() / 2f },
       valueRange = 0f..10f,
     )
     LabeledLabSlider(
       label = "Thimble Circular Scale Division (×0.01 mm)",
-      valueText = "$thimbleDiv div (${String.format("%.2f mm", thimbleDiv * 0.01f)})",
+      valueText = "$thimbleDiv div (${String.format(Locale.US, "%.2f mm", thimbleDiv * 0.01f)})",
       value = thimbleDiv.toFloat(),
       onValueChange = { thimbleDiv = it.roundToInt() },
       valueRange = 0f..49f,
     )
     LabeledLabSlider(
       label = "Instrument Zero Error",
-      valueText = String.format("%+.2f mm", zeroErrorMm),
+      valueText = String.format(Locale.US, "%+.2f mm", zeroErrorMm),
       value = zeroErrorMm,
       onValueChange = { zeroErrorMm = (it * 100f).roundToInt() / 100f },
       valueRange = -0.10f..0.10f,
@@ -137,9 +138,9 @@ private fun VectorParallelogramLab() {
     }
     LabMetricBanner(
       listOf(
-        "Resultant R" to String.format("%.1f N", r),
-        "Angle to F₁" to String.format("%.1f°", dirDeg),
-        "Equilibrant" to String.format("%.1f N opp", r),
+        "Resultant R" to String.format(Locale.US, "%.1f N", r),
+        "Angle to F₁" to String.format(Locale.US, "%.1f°", dirDeg),
+        "Equilibrant" to String.format(Locale.US, "%.1f N opp", r),
       )
     )
     LabeledLabSlider(
@@ -200,9 +201,9 @@ private fun ProjectileKinematicsLab() {
     }
     LabMetricBanner(
       listOf(
-        "Max Height" to String.format("%.1f m", maxHeight),
-        "Range R" to String.format("%.1f m", range),
-        "Time T" to String.format("%.2f s", flightTime),
+        "Max Height" to String.format(Locale.US, "%.1f m", maxHeight),
+        "Range R" to String.format(Locale.US, "%.1f m", range),
+        "Time T" to String.format(Locale.US, "%.2f s", flightTime),
       )
     )
     LabeledLabSlider(
@@ -221,7 +222,7 @@ private fun ProjectileKinematicsLab() {
     )
     LabeledLabSlider(
       label = "Gravitational Acceleration g",
-      valueText = String.format("%.1f m/s²", gravity),
+      valueText = String.format(Locale.US, "%.1f m/s²", gravity),
       value = gravity,
       onValueChange = { gravity = (it * 10f).roundToInt() / 10f },
       valueRange = 1.6f..12.0f,
@@ -241,9 +242,9 @@ private fun MomentBalanceLab() {
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     LabMetricBanner(
       listOf(
-        "ACW Moment" to String.format("%.1f N·m", acwTorque),
-        "Balancing CW F₂" to String.format("%.1f N", balancingFright),
-        "Pivot Reaction" to String.format("%.1f N", fLeft + balancingFright),
+        "ACW Moment" to String.format(Locale.US, "%.1f N·m", acwTorque),
+        "Balancing CW F₂" to String.format(Locale.US, "%.1f N", balancingFright),
+        "Pivot Reaction" to String.format(Locale.US, "%.1f N", fLeft + balancingFright),
       )
     )
     LabeledLabSlider(
@@ -255,14 +256,14 @@ private fun MomentBalanceLab() {
     )
     LabeledLabSlider(
       label = "Left Lever Arm d_1",
-      valueText = String.format("%.1f m", dLeft),
+      valueText = String.format(Locale.US, "%.1f m", dLeft),
       value = dLeft,
       onValueChange = { dLeft = it },
       valueRange = 0.5f..5.0f,
     )
     LabeledLabSlider(
       label = "Right Lever Arm d_2",
-      valueText = String.format("%.1f m", dRight),
+      valueText = String.format(Locale.US, "%.1f m", dRight),
       value = dRight,
       onValueChange = { dRight = it },
       valueRange = 0.5f..5.0f,
@@ -283,9 +284,9 @@ private fun SimpleMachineEfficiencyLab() {
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     LabMetricBanner(
       listOf(
-        "Mech Adv (L/E)" to String.format("%.2f", ma),
+        "Mech Adv (L/E)" to String.format(Locale.US, "%.2f", ma),
         "Vel Ratio (VR)" to "$vr",
-        "Efficiency" to String.format("%.1f%%", eff.coerceAtMost(100f)),
+        "Efficiency" to String.format(Locale.US, "%.1f%%", eff.coerceAtMost(100f)),
       )
     )
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -321,14 +322,14 @@ private fun PendulumShmLab() {
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     LabMetricBanner(
       listOf(
-        "Period T" to String.format("%.2f s", period),
-        "Frequency f" to String.format("%.2f Hz", freq),
-        "T² / L" to String.format("%.2f s²/m", (period * period) / lengthM),
+        "Period T" to String.format(Locale.US, "%.2f s", period),
+        "Frequency f" to String.format(Locale.US, "%.2f Hz", freq),
+        "T² / L" to String.format(Locale.US, "%.2f s²/m", (period * period) / lengthM),
       )
     )
     LabeledLabSlider(
       label = "Pendulum String Length L",
-      valueText = String.format("%.2f m", lengthM),
+      valueText = String.format(Locale.US, "%.2f m", lengthM),
       value = lengthM,
       onValueChange = { lengthM = it },
       valueRange = 0.25f..2.50f,
@@ -355,9 +356,9 @@ private fun ArchimedesBuoyancyLab() {
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     LabMetricBanner(
       listOf(
-        "Weight in Air" to String.format("%.2f N", weightAirN),
-        "Upthrust" to String.format("%.2f N", upthrustN),
-        "Status" to if (floats) "FLOATS" else String.format("Apparent %.2f N", apparentN),
+        "Weight in Air" to String.format(Locale.US, "%.2f N", weightAirN),
+        "Upthrust" to String.format(Locale.US, "%.2f N", upthrustN),
+        "Status" to if (floats) "FLOATS" else String.format(Locale.US, "Apparent %.2f N", apparentN),
       )
     )
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -386,9 +387,9 @@ private fun LinearExpansionLab() {
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     LabMetricBanner(
       listOf(
-        "Original L₀" to String.format("%.1f m", l0),
+        "Original L₀" to String.format(Locale.US, "%.1f m", l0),
         "Expansivity α" to "${alphas[materialIdx]} /K",
-        "ΔL Gain" to String.format("%.2f mm", deltaLmm),
+        "ΔL Gain" to String.format(Locale.US, "%.2f mm", deltaLmm),
       )
     )
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -405,7 +406,7 @@ private fun LinearExpansionLab() {
     )
     LabeledLabSlider(
       label = "Original Bar Length L_0",
-      valueText = String.format("%.1f m", l0),
+      valueText = String.format(Locale.US, "%.1f m", l0),
       value = l0,
       onValueChange = { l0 = it },
       valueRange = 1f..10f,
@@ -433,7 +434,7 @@ private fun CalorimetryPhaseLab() {
     LabMetricBanner(
       listOf(
         "Heat Supplied Q" to "${heatKj.roundToInt()} kJ",
-        "Temperature" to String.format("%.1f °C", tempC),
+        "Temperature" to String.format(Locale.US, "%.1f °C", tempC),
         "Phase State" to phase.substringBefore(" ("),
       )
     )
@@ -460,8 +461,8 @@ private fun SoundHarmonicsPipeLab() {
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     LabMetricBanner(
       listOf(
-        "Fundamental f₀" to String.format("%.1f Hz", f1),
-        "Wavelength λ₁" to String.format("%.2f m", vSound / f1),
+        "Fundamental f₀" to String.format(Locale.US, "%.1f Hz", f1),
+        "Wavelength λ₁" to String.format(Locale.US, "%.2f m", vSound / f1),
         "Harmonics" to if (isClosed) "Odd (1,3,5)" else "All (1,2,3)",
       )
     )
@@ -471,7 +472,7 @@ private fun SoundHarmonicsPipeLab() {
     }
     LabeledLabSlider(
       label = "Air Column Length L",
-      valueText = String.format("%.2f m", pipeLen),
+      valueText = String.format(Locale.US, "%.2f m", pipeLen),
       value = pipeLen,
       onValueChange = { pipeLen = it },
       valueRange = 0.25f..1.50f,
@@ -494,10 +495,10 @@ private fun WaveOpticsBenchLab() {
       listOf(
         "Focal f" to "${focal.roundToInt()} cm",
         "Object u" to "${uDist.roundToInt()} cm",
-        "Image v" to String.format("%.1f cm", vDist),
+        "Image v" to String.format(Locale.US, "%.1f cm", vDist),
       )
     )
-    ScientificText("Magnification M = ${String.format("%.2f", mag)}×  •  Nature: $imageNature", style = MaterialTheme.typography.labelLarge)
+    ScientificText("Magnification M = ${String.format(Locale.US, "%.2f", mag)}×  •  Nature: $imageNature", style = MaterialTheme.typography.labelLarge)
     LabeledLabSlider(
       label = "Convex Lens Focal Length f",
       valueText = "${focal.roundToInt()} cm",
@@ -528,9 +529,9 @@ private fun CapacitorNetworkLab() {
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     LabMetricBanner(
       listOf(
-        "Total C_eq" to String.format("%.2f μF", cTotal),
-        "Charge Q" to String.format("%.1f μC", cTotal * voltage),
-        "Energy U" to String.format("%.0f μJ", energyUj),
+        "Total C_eq" to String.format(Locale.US, "%.2f μF", cTotal),
+        "Charge Q" to String.format(Locale.US, "%.1f μC", cTotal * voltage),
+        "Energy U" to String.format(Locale.US, "%.0f μJ", energyUj),
       )
     )
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -576,9 +577,9 @@ private fun OhmsCircuitLab() {
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     LabMetricBanner(
       listOf(
-        "R_ext" to String.format("%.2f Ω", rExt),
-        "Current I" to String.format("%.2f A", current),
-        "Terminal V" to String.format("%.2f V", terminalV),
+        "R_ext" to String.format(Locale.US, "%.2f Ω", rExt),
+        "Current I" to String.format(Locale.US, "%.2f A", current),
+        "Terminal V" to String.format(Locale.US, "%.2f V", terminalV),
       )
     )
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -608,7 +609,7 @@ private fun OhmsCircuitLab() {
     )
     LabeledLabSlider(
       label = "Cell Internal Resistance r",
-      valueText = String.format("%.1f Ω", internalR),
+      valueText = String.format(Locale.US, "%.1f Ω", internalR),
       value = internalR,
       onValueChange = { internalR = (it * 10f).roundToInt() / 10f },
       valueRange = 0.0f..3.0f,
@@ -628,7 +629,7 @@ private fun TransformerAcResonanceLab() {
     LabMetricBanner(
       listOf(
         "Turns Np : Ns" to "$np : $ns",
-        "Output Vs" to String.format("%.1f V", vs),
+        "Output Vs" to String.format(Locale.US, "%.1f V", vs),
         "Type" to kind,
       )
     )
@@ -719,9 +720,9 @@ private fun PhotoelectricQuantumLab() {
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     LabMetricBanner(
       listOf(
-        "Photon E (hf)" to String.format("%.2f eV", photonEv),
-        "Work Fn W₀" to String.format("%.2f eV", workFunctionEv),
-        "Max KE" to if (emits) String.format("%.2f eV", ekMax) else "0 (Below f₀)",
+        "Photon E (hf)" to String.format(Locale.US, "%.2f eV", photonEv),
+        "Work Fn W₀" to String.format(Locale.US, "%.2f eV", workFunctionEv),
+        "Max KE" to if (emits) String.format(Locale.US, "%.2f eV", ekMax) else "0 (Below f₀)",
       )
     )
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -731,7 +732,7 @@ private fun PhotoelectricQuantumLab() {
     }
     LabeledLabSlider(
       label = "Incident Light Frequency f",
-      valueText = String.format("%.1f × 10¹⁴ Hz", freqFactor),
+      valueText = String.format(Locale.US, "%.1f × 10¹⁴ Hz", freqFactor),
       value = freqFactor,
       onValueChange = { freqFactor = it },
       valueRange = 4.0f..14.0f,
@@ -749,17 +750,17 @@ private fun HalfLifeDecayLab() {
     LabMetricBanner(
       listOf(
         "Initial N₀" to "${n0.roundToInt()}",
-        "Half-Lives n" to String.format("%.1f t½", halfLives),
+        "Half-Lives n" to String.format(Locale.US, "%.1f t½", halfLives),
         "Remaining N" to "${remaining.roundToInt()}",
       )
     )
     LabeledLabSlider(
       label = "Number of Half-Lives Elapsed (t / t_{1/2})",
-      valueText = String.format("%.1f half-lives", halfLives),
+      valueText = String.format(Locale.US, "%.1f half-lives", halfLives),
       value = halfLives,
       onValueChange = { halfLives = (it * 2f).roundToInt() / 2f },
       valueRange = 0f..5f,
     )
-    ScientificText("Formula: N = N_0 × (1/2)^n — Remaining fraction = ${String.format("%.1f%%", 100f * 0.5f.pow(halfLives))}.", style = MaterialTheme.typography.bodySmall)
+    ScientificText("Formula: N = N_0 × (1/2)^n — Remaining fraction = ${String.format(Locale.US, "%.1f%%", 100f * 0.5f.pow(halfLives))}.", style = MaterialTheme.typography.bodySmall)
   }
 }

@@ -13,10 +13,12 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.data.model.ActiveCbtSessionEntity
 import com.example.data.model.ExamAttempt
 import com.example.data.model.LearningChapterEntity
 import com.example.data.model.LearningModuleEntity
 import com.example.data.model.LessonProgress
+import com.example.data.model.Paper2AttemptEntity
 import com.example.data.model.PastQuestionEntity
 import com.example.data.model.SpacedReviewCardEntity
 import com.example.data.model.StudyNote
@@ -176,6 +178,32 @@ interface MeritPrepDao {
 
   @Query("SELECT * FROM past_questions WHERE subjectId = :subjectId ORDER BY orderIndex ASC")
   suspend fun getPastQuestionsBySubject(subjectId: String): List<PastQuestionEntity>
+
+  // Paper 2 Theory & Alternative-to-Practical Attempts
+  @Query("SELECT * FROM paper2_attempts WHERE userId = :userId ORDER BY updatedAtMillis DESC")
+  fun observePaper2Attempts(userId: String): Flow<List<Paper2AttemptEntity>>
+
+  @Query("SELECT * FROM paper2_attempts WHERE userId = :userId")
+  suspend fun getAllPaper2AttemptsOnce(userId: String): List<Paper2AttemptEntity>
+
+  @Query("SELECT * FROM paper2_attempts WHERE id = :id LIMIT 1")
+  suspend fun getPaper2AttemptOnce(id: String): Paper2AttemptEntity?
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun upsertPaper2Attempt(attempt: Paper2AttemptEntity)
+
+  // Resumable CBT Exam Session Recovery
+  @Query("SELECT * FROM active_cbt_sessions WHERE userId = :userId LIMIT 1")
+  fun observeActiveCbtSession(userId: String): Flow<ActiveCbtSessionEntity?>
+
+  @Query("SELECT * FROM active_cbt_sessions WHERE userId = :userId LIMIT 1")
+  suspend fun getActiveCbtSessionOnce(userId: String): ActiveCbtSessionEntity?
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun upsertActiveCbtSession(session: ActiveCbtSessionEntity)
+
+  @Query("DELETE FROM active_cbt_sessions WHERE userId = :userId")
+  suspend fun clearActiveCbtSession(userId: String)
 }
 
 @Database(
@@ -189,8 +217,10 @@ interface MeritPrepDao {
       LearningChapterEntity::class,
       PastQuestionEntity::class,
       SpacedReviewCardEntity::class,
+      Paper2AttemptEntity::class,
+      ActiveCbtSessionEntity::class,
     ],
-  version = 3,
+  version = 4,
   exportSchema = false,
 )
 @TypeConverters(StringListConverters::class)
@@ -227,6 +257,52 @@ abstract class MeritPrepDatabase : RoomDatabase() {
         }
       }
 
+    val MIGRATION_3_4 =
+      object : Migration(3, 4) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+          db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS paper2_attempts (
+              id TEXT NOT NULL PRIMARY KEY,
+              userId TEXT NOT NULL,
+              promptId TEXT NOT NULL,
+              subjectId TEXT NOT NULL,
+              topic TEXT NOT NULL,
+              studentWorking TEXT NOT NULL,
+              checkedStepIndicesJson TEXT NOT NULL,
+              earnedMarks INTEGER NOT NULL,
+              totalMarks INTEGER NOT NULL,
+              updatedAtMillis INTEGER NOT NULL
+            )
+            """.trimIndent()
+          )
+          db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS active_cbt_sessions (
+              userId TEXT NOT NULL PRIMARY KEY,
+              selectedSubjectId TEXT NOT NULL,
+              selectedExamBoard TEXT NOT NULL,
+              selectedQuestionLimit INTEGER NOT NULL,
+              isUtmeComboMode INTEGER NOT NULL,
+              selectedComboElectivesJson TEXT NOT NULL,
+              comboQuestionSubjectsJson TEXT NOT NULL,
+              comboSubjectTabsJson TEXT NOT NULL,
+              activeComboSubjectTab TEXT,
+              questionIdsJson TEXT NOT NULL,
+              currentIndex INTEGER NOT NULL,
+              selectedAnswersJson TEXT NOT NULL,
+              flaggedQuestionsJson TEXT NOT NULL,
+              perQuestionSecondsJson TEXT NOT NULL,
+              remainingSeconds INTEGER NOT NULL,
+              elapsedSeconds INTEGER NOT NULL,
+              totalAllowedSeconds INTEGER NOT NULL,
+              updatedAtMillis INTEGER NOT NULL
+            )
+            """.trimIndent()
+          )
+        }
+      }
+
     fun getInstance(context: Context): MeritPrepDatabase {
       return instance
         ?: synchronized(this) {
@@ -236,7 +312,7 @@ abstract class MeritPrepDatabase : RoomDatabase() {
               MeritPrepDatabase::class.java,
               "meritprep.db",
             )
-              .addMigrations(MIGRATION_2_3)
+              .addMigrations(MIGRATION_2_3, MIGRATION_3_4)
               .fallbackToDestructiveMigration(dropAllTables = true)
               .build()
               .also { instance = it }

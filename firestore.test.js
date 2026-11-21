@@ -216,3 +216,36 @@ test("StudyNotes CRUD enforces ownership and size bounds", async () => {
 
   await assertSucceeds(noteRef.delete());
 });
+
+test("NECO and ALL examType values succeed and invalid list items at index > 0 fail", async () => {
+  const aliceDb = testEnv.authenticatedContext(ALICE_UID).firestore();
+  await assertSucceeds(
+    aliceDb.collection("users").doc(ALICE_UID).collection("examAttempts").doc("attempt_neco").set({
+      userId: ALICE_UID,
+      examType: "NECO",
+      subjectId: "biology",
+      subjectTitle: "Biology",
+      correctCount: 9,
+      totalQuestions: 10,
+      percentage: 90,
+      durationSeconds: 240,
+      weakTopics: ["Genetics"],
+      createdAt: pastTimestamp(),
+    })
+  );
+
+  await assertFails(
+    aliceDb.collection("users").doc(ALICE_UID).collection("examAttempts").doc("attempt_bad_list").set({
+      userId: ALICE_UID,
+      examType: "ALL",
+      subjectId: "physics",
+      subjectTitle: "Physics",
+      correctCount: 7,
+      totalQuestions: 10,
+      percentage: 70,
+      durationSeconds: 300,
+      weakTopics: ["Waves", 123],
+      createdAt: pastTimestamp(),
+    })
+  );
+});

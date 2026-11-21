@@ -16,7 +16,8 @@ object CurriculumCatalog {
   private val passageLookupByEntityId: Map<String, String> by lazy {
     buildMap {
       tracks.forEach { track ->
-        val allQs = track.pastQuestions + track.allLessons.flatMap { it.exercises }
+        val extra = ExpandedPastQuestionBank.extraBySubject[track.id].orEmpty()
+        val allQs = track.pastQuestions + extra + track.allLessons.flatMap { it.exercises }
         allQs.forEach { q ->
           if (!q.passageText.isNullOrBlank()) {
             put("${track.id}_${q.id}", q.passageText)
@@ -29,6 +30,9 @@ object CurriculumCatalog {
 
   fun passageForEntityId(entityId: String): String? = passageLookupByEntityId[entityId]
 
+  fun diagramSpecForEntityId(entityId: String): QuestionDiagramSpec? =
+    ExpandedPastQuestionBank.diagramSpecForEntityId(entityId)
+
   fun trackById(subjectId: String): SubjectTrack? = tracks.find { it.id == subjectId }
 
   fun lessonById(lessonId: String): Lesson? =
@@ -38,7 +42,8 @@ object CurriculumCatalog {
 
   fun pastQuestionsFor(subjectId: String, examFilter: String): List<PracticeQuestion> {
     val track = trackById(subjectId) ?: return emptyList()
-    val pool = track.pastQuestions + track.allLessons.flatMap { it.exercises }
+    val extra = ExpandedPastQuestionBank.extraBySubject[subjectId].orEmpty()
+    val pool = (track.pastQuestions + extra + track.allLessons.flatMap { it.exercises }).distinctBy { it.id }
     return if (examFilter == "ALL") {
       pool
     } else {

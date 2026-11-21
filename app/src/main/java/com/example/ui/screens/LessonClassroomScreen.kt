@@ -109,6 +109,7 @@ import com.example.ui.components.DisplaySettingsDialog
 import com.example.ui.components.EquationDisplayCard
 import com.example.ui.components.LessonSpeechFormatter
 import com.example.ui.components.LessonTtsController
+import com.example.ui.components.QuestionDiagramCard
 import com.example.ui.components.ScientificCalculatorSheet
 import com.example.ui.components.ScientificText
 import com.example.ui.components.StudioActionTile
@@ -135,6 +136,7 @@ fun LessonClassroomScreen(
   onBack: () -> Unit,
   onMarkPillarComplete: (LessonPillar, Long?) -> Unit,
   onSaveNote: (title: String, content: String) -> Unit,
+  onEarnLabXp: (xpDelta: Int, missionCompleted: Boolean) -> Unit = { _, _ -> },
   onOpenNextLesson: ((Lesson) -> Unit)? = null,
 ) {
   BackHandler(onBack = onBack)
@@ -366,6 +368,7 @@ fun LessonClassroomScreen(
             modifier = Modifier.weight(1f).fillMaxHeight(),
             onSaveNote = onSaveNote,
             onMarkExerciseComplete = { score -> onMarkPillarComplete(selectedPillar, score) },
+            onEarnLabXp = onEarnLabXp,
             onOpenNextLesson = onOpenNextLesson,
           )
         }
@@ -569,6 +572,7 @@ fun LessonClassroomScreen(
             modifier = Modifier.weight(1f).fillMaxWidth(),
             onSaveNote = onSaveNote,
             onMarkExerciseComplete = { score -> onMarkPillarComplete(selectedPillar, score) },
+            onEarnLabXp = onEarnLabXp,
             onOpenNextLesson = onOpenNextLesson,
           )
         }
@@ -739,6 +743,7 @@ private fun LessonPillarBody(
   scrollState: ScrollState,
   onSaveNote: (title: String, content: String) -> Unit,
   onMarkExerciseComplete: (Long?) -> Unit,
+  onEarnLabXp: (xpDelta: Int, missionCompleted: Boolean) -> Unit = { _, _ -> },
   onOpenNextLesson: ((Lesson) -> Unit)?,
   modifier: Modifier = Modifier,
 ) {
@@ -1055,12 +1060,35 @@ private fun LessonPillarBody(
               )
             }
             if (block.microDrills.isNotEmpty()) {
+              val checkedDrills = remember(lesson.id, idx) { mutableStateMapOf<Int, Boolean>() }
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+              ) {
+                Surface(
+                  color =
+                    if (checkedDrills.size >= block.microDrills.size) semantics.successContainer
+                    else MaterialTheme.colorScheme.surfaceVariant,
+                  shape = RoundedCornerShape(99.dp),
+                ) {
+                  Text(
+                    text = "Quick Checks: ${checkedDrills.size}/${block.microDrills.size}",
+                    style = MaterialTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
+                    color =
+                      if (checkedDrills.size >= block.microDrills.size) semantics.onSuccessContainer
+                      else MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 9.dp, vertical = 3.dp),
+                  )
+                }
+              }
               block.microDrills.forEachIndexed { drillIdx, drill ->
                 ConceptMicroDrillCard(
                   lessonId = lesson.id,
                   sectionIndex = idx,
                   drillIndex = drillIdx,
                   drill = drill,
+                  onAnswered = { checkedDrills[drillIdx] = true },
                 )
               }
             }
@@ -1695,6 +1723,7 @@ private fun LessonPillarBody(
           labType = lesson.labType,
           labBrief = lesson.labBrief,
           externalResources = lesson.externalResources,
+          onGamifiedRewardEarned = onEarnLabXp,
         )
       }
 
@@ -2262,6 +2291,9 @@ private fun InlineExerciseSection(
           style = MaterialTheme.typography.titleMedium,
           color = MaterialTheme.colorScheme.onSurface,
         )
+        q.diagramSpec?.let { spec ->
+          QuestionDiagramCard(spec = spec)
+        }
 
         q.options.forEachIndexed { optIdx, optText ->
           val isSelected = chosen == optIdx
@@ -2535,6 +2567,7 @@ private fun ConceptMicroDrillCard(
   sectionIndex: Int,
   drillIndex: Int,
   drill: MicroDrill,
+  onAnswered: () -> Unit = {},
 ) {
   var selectedOption by remember(lessonId, sectionIndex, drillIndex) { mutableIntStateOf(-1) }
   var showHint by remember(lessonId, sectionIndex, drillIndex) { mutableStateOf(false) }
@@ -2643,7 +2676,10 @@ private fun ConceptMicroDrillCard(
             .background(bg)
             .border(1.dp, border, RoundedCornerShape(9.dp))
             .minimumInteractiveComponentSize()
-            .clickable { selectedOption = optIdx }
+            .clickable {
+              selectedOption = optIdx
+              onAnswered()
+            }
             .padding(horizontal = 10.dp, vertical = 9.dp)
             .testTag("micro_drill_${sectionIndex}_${drillIndex}_opt_$optIdx"),
         horizontalArrangement = Arrangement.spacedBy(8.dp),

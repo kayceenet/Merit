@@ -33,7 +33,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import java.util.Locale
 import kotlin.math.PI
+import kotlin.math.acos
+import kotlin.math.asin
+import kotlin.math.atan
 import kotlin.math.cos
 import kotlin.math.ln
 import kotlin.math.log10
@@ -45,10 +49,18 @@ import kotlin.math.tan
 
 object ScientificExpressionEvaluator {
 
-  fun evaluate(rawExpression: String, ansValue: Double = 0.0): Result<Double> {
+  fun evaluate(
+    rawExpression: String,
+    ansValue: Double = 0.0,
+    isDegreeMode: Boolean = true,
+  ): Result<Double> {
     if (rawExpression.isBlank()) return Result.failure(IllegalArgumentException("Empty expression"))
     val normalized =
       rawExpression
+        .replace("sin⁻¹", "asin")
+        .replace("cos⁻¹", "acos")
+        .replace("tan⁻¹", "atan")
+        .replace("×10^", "*10^")
         .replace("×", "*")
         .replace("÷", "/")
         .replace("−", "-")
@@ -57,7 +69,7 @@ object ScientificExpressionEvaluator {
         .replace("Ans", "($ansValue)")
         .replace(" ", "")
     return runCatching {
-      val parser = Parser(normalized)
+      val parser = Parser(normalized, isDegreeMode)
       val value = parser.parseExpression()
       if (!parser.isAtEnd()) throw IllegalArgumentException("Unexpected symbol")
       if (value.isNaN() || value.isInfinite()) throw ArithmeticException("Math Error")
@@ -69,13 +81,16 @@ object ScientificExpressionEvaluator {
     if (value.isNaN() || value.isInfinite()) return "Math Error"
     if (kotlin.math.abs(value) < 1e-12) return "0"
     val roundedLong = value.roundToLong()
-    if (kotlin.math.abs(value - roundedLong.toDouble()) < 1e-10) {
+    if (kotlin.math.abs(value - roundedLong.toDouble()) < 1e-10 && kotlin.math.abs(value) < 1e14) {
       return roundedLong.toString()
     }
-    return String.format("%.8g", value).trimEnd('0').trimEnd('.')
+    return String.format(Locale.US, "%.8g", value).trimEnd('0').trimEnd('.')
   }
 
-  private class Parser(private val src: String) {
+  private class Parser(
+    private val src: String,
+    private val isDegreeMode: Boolean,
+  ) {
     private var pos = 0
 
     fun isAtEnd(): Boolean = pos >= src.length
@@ -122,7 +137,6 @@ object ScientificExpressionEvaluator {
             x /= 100.0
           }
           c == '(' || c.isLetter() -> {
-            // Implicit multiplication e.g. 2(3+4), 2sin(30), 2pi
             x *= parsePower()
           }
           else -> return x
@@ -132,14 +146,28 @@ object ScientificExpressionEvaluator {
     }
 
     private fun parsePower(): Double {
-      val base = parseUnary()
-      return if (peek() == '^') {
+      var base = parsePostfix()
+      if (peek() == '^') {
         advance()
         val exp = parsePower()
-        base.pow(exp)
-      } else {
-        base
+        base = base.pow(exp)
       }
+      return base
+    }
+
+    private fun parsePostfix(): Double {
+      var x = parseUnary()
+      while (peek() == '!') {
+        advance()
+        val n = x.roundToLong()
+        if (x < 0.0 || kotlin.math.abs(x - n.toDouble()) > 1e-9 || n > 20L) {
+          throw ArithmeticException("Factorial domain 0..20")
+        }
+        var acc = 1.0
+        for (i in 2L..n) acc *= i.toDouble()
+        x = acc
+      }
+      return x
     }
 
     private fun parseUnary(): Double {
@@ -175,7 +203,7 @@ object ScientificExpressionEvaluator {
         return when (ident) {
           "pi" -> PI
           "e" -> kotlin.math.E
-          "sin", "cos", "tan", "log", "ln", "sqrt" -> {
+          "sin", "cos", "tan", "asin", "acos", "atan", "log", "ln", "sqrt" -> {
             val arg =
               if (peek() == '(') {
                 advance()
@@ -186,9 +214,23 @@ object ScientificExpressionEvaluator {
                 parseUnary()
               }
             when (ident) {
-              "sin" -> sin(Math.toRadians(arg))
-              "cos" -> cos(Math.toRadians(arg))
-              "tan" -> tan(Math.toRadians(arg))
+              "sin" -> sin(if (isDegreeMode) Math.toRadians(arg) else arg)
+              "cos" -> cos(if (isDegreeMode) Math.toRadians(arg) else arg)
+              "tan" -> tan(if (isDegreeMode) Math.toRadians(arg) else arg)
+              "asin" -> {
+                if (arg < -1.0 || arg > 1.0) throw ArithmeticException("Domain [-1,1]")
+                val rad = asin(arg)
+                if (isDegreeMode) Math.toDegrees(rad) else rad
+              }
+              "acos" -> {
+                if (arg < -1.0 || arg > 1.0) throw ArithmeticException("Domain [-1,1]")
+                val rad = acos(arg)
+                if (isDegreeMode) Math.toDegrees(rad) else rad
+              }
+              "atan" -> {
+                val rad = atan(arg)
+                if (isDegreeMode) Math.toDegrees(rad) else rad
+              }
               "log" -> {
                 if (arg <= 0.0) throw ArithmeticException("Domain error")
                 log10(arg)
@@ -227,9 +269,17 @@ fun ScientificCalculatorSheet(onDismiss: () -> Unit) {
   var expression by remember { mutableStateOf("") }
   var displayResult by remember { mutableStateOf("0") }
   var lastAns by remember { mutableDoubleStateOf(0.0) }
+  var isDegreeMode by remember { mutableStateOf(true) }
 
   val rows = remember {
     listOf(
+      listOf(
+        CalcKey("sin⁻¹", "sin⁻¹(", CalcKeyKind.FUNCTION),
+        CalcKey("cos⁻¹", "cos⁻¹(", CalcKeyKind.FUNCTION),
+        CalcKey("tan⁻¹", "tan⁻¹(", CalcKeyKind.FUNCTION),
+        CalcKey("n!", "!", CalcKeyKind.FUNCTION),
+        CalcKey("×10^", "×10^", CalcKeyKind.FUNCTION),
+      ),
       listOf(
         CalcKey("sin", "sin(", CalcKeyKind.FUNCTION),
         CalcKey("cos", "cos(", CalcKeyKind.FUNCTION),
@@ -286,7 +336,7 @@ fun ScientificCalculatorSheet(onDismiss: () -> Unit) {
         Modifier.fillMaxWidth()
           .navigationBarsPadding()
           .padding(horizontal = 16.dp, vertical = 8.dp),
-      verticalArrangement = Arrangement.spacedBy(10.dp),
+      verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
       Row(
         modifier = Modifier.fillMaxWidth(),
@@ -294,16 +344,43 @@ fun ScientificCalculatorSheet(onDismiss: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
       ) {
         Text(
-          text = "JAMB & WAEC Scientific Calculator (DEG)",
+          text = "JAMB & WAEC Scientific Calculator",
           style = MaterialTheme.typography.titleSmall,
           color = MaterialTheme.colorScheme.primary,
           fontWeight = FontWeight.Bold,
         )
-        Text(
-          text = "Ans = ${ScientificExpressionEvaluator.formatResult(lastAns)}",
-          style = MaterialTheme.typography.labelSmall,
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+        Row(
+          horizontalArrangement = Arrangement.spacedBy(8.dp),
+          verticalAlignment = Alignment.CenterVertically,
+        ) {
+          Box(
+            modifier =
+              Modifier.clip(RoundedCornerShape(99.dp))
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(99.dp))
+                .clickable {
+                  isDegreeMode = !isDegreeMode
+                  val live = ScientificExpressionEvaluator.evaluate(expression, lastAns, isDegreeMode)
+                  if (live.isSuccess) {
+                    displayResult = ScientificExpressionEvaluator.formatResult(live.getOrThrow())
+                  }
+                }
+                .padding(horizontal = 10.dp, vertical = 4.dp)
+                .testTag("calc_deg_rad_toggle"),
+          ) {
+            Text(
+              text = if (isDegreeMode) "DEG" else "RAD",
+              style = MaterialTheme.typography.labelSmall,
+              color = MaterialTheme.colorScheme.onPrimaryContainer,
+              fontWeight = FontWeight.ExtraBold,
+            )
+          }
+          Text(
+            text = "Ans=${ScientificExpressionEvaluator.formatResult(lastAns)}",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+          )
+        }
       }
 
       Column(
@@ -378,14 +455,14 @@ fun ScientificCalculatorSheet(onDismiss: () -> Unit) {
                       "DEL" -> {
                         if (expression.isNotEmpty()) {
                           expression = expression.dropLast(1)
-                          val live = ScientificExpressionEvaluator.evaluate(expression, lastAns)
+                          val live = ScientificExpressionEvaluator.evaluate(expression, lastAns, isDegreeMode)
                           if (live.isSuccess) {
                             displayResult = ScientificExpressionEvaluator.formatResult(live.getOrThrow())
                           }
                         }
                       }
                       "=" -> {
-                        val res = ScientificExpressionEvaluator.evaluate(expression, lastAns)
+                        val res = ScientificExpressionEvaluator.evaluate(expression, lastAns, isDegreeMode)
                         if (res.isSuccess) {
                           val value = res.getOrThrow()
                           lastAns = value
@@ -396,7 +473,7 @@ fun ScientificCalculatorSheet(onDismiss: () -> Unit) {
                       }
                       else -> {
                         expression += key.token
-                        val live = ScientificExpressionEvaluator.evaluate(expression, lastAns)
+                        val live = ScientificExpressionEvaluator.evaluate(expression, lastAns, isDegreeMode)
                         if (live.isSuccess) {
                           displayResult = ScientificExpressionEvaluator.formatResult(live.getOrThrow())
                         }
@@ -408,9 +485,10 @@ fun ScientificCalculatorSheet(onDismiss: () -> Unit) {
             ) {
               Text(
                 text = key.label,
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.labelLarge,
                 color = fg,
                 fontWeight = FontWeight.Bold,
+                maxLines = 1,
               )
             }
           }

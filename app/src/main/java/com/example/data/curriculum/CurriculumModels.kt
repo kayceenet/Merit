@@ -320,6 +320,19 @@ data class RealLifeScenario(
   val examConnection: String,
 )
 
+enum class QuestionDiagramSpec(val label: String) {
+  OHMIC_SERIES_PARALLEL_CIRCUIT("Circuit Schematic"),
+  PROJECTILE_TRAJECTORY("Projectile Vector Schematic"),
+  CONVEX_LENS_RAYS("Ray Optics Schematic"),
+  CIRCLE_THEOREM_CHORD("Circle Theorem Schematic"),
+  BEARING_COMPASS_TRIANGLE("Compass Bearing Schematic"),
+  SUPPLY_DEMAND_TAX_SHIFT("Market Equilibrium Graph"),
+  TITRATION_PH_CURVE("Titration pH Curve"),
+  ENZYME_TEMP_CURVE("Enzyme Activity Curve"),
+  PUNNETT_GENETICS_GRID("Mendelian Inheritance Grid"),
+  VERNIER_MICROMETER_SCALE("Vernier / Micrometer Scale"),
+}
+
 data class PracticeQuestion(
   val id: String,
   val topic: String,
@@ -335,6 +348,7 @@ data class PracticeQuestion(
   val marks: Int = 20,
   val remediationTip: String = "",
   val passageText: String? = null,
+  val diagramSpec: QuestionDiagramSpec? = null,
 ) {
   val boardStyleLabel: String
     get() =

@@ -15,7 +15,7 @@
         },
         "targetExam": {
           "type": "string",
-          "enum": ["BOTH", "JAMB", "WAEC"],
+          "enum": ["ALL", "BOTH", "JAMB", "WAEC", "NECO"],
           "description": "Primary exam focus."
         },
         "targetScore": {
@@ -100,7 +100,7 @@
         },
         "examType": {
           "type": "string",
-          "enum": ["JAMB", "WAEC"],
+          "enum": ["JAMB", "WAEC", "NECO", "ALL"],
           "description": "Exam board format."
         },
         "subjectId": {

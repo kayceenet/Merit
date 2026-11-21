@@ -71,6 +71,7 @@ import com.example.data.local.ThemePalette
 import com.example.data.local.ThemePreferences
 import com.example.data.model.ExamAttempt
 import com.example.data.model.LessonProgress
+import com.example.data.model.Paper2AttemptEntity
 import com.example.data.model.UserProfile
 import com.example.ui.components.StudioActionTile
 import com.example.ui.components.TopRightMenuButton
@@ -103,6 +104,7 @@ fun AnalyticsProfileScreen(
   progressList: List<LessonProgress>,
   offlineSnapshot: OfflineProgressSnapshot,
   themePreferences: ThemePreferences,
+  paper2Attempts: List<Paper2AttemptEntity> = emptyList(),
   dueReviewsCount: Int = 0,
   onSetThemeMode: (ThemeMode) -> Unit,
   onSetThemePalette: (ThemePalette) -> Unit = {},
@@ -282,7 +284,7 @@ fun AnalyticsProfileScreen(
             LegendDot("Chapter Mastery", masteryColor)
           }
 
-          // Native Compose Canvas Grouped Bar Chart across all 5 Subjects
+          // Native Compose Canvas Grouped Bar Chart across all 7 Subjects
           Canvas(
             modifier =
               Modifier.fillMaxWidth()
@@ -570,6 +572,164 @@ fun AnalyticsProfileScreen(
                 shape = RoundedCornerShape(12.dp),
               ) {
                 Text("Drill Weakest Subject: ${priorityWeak.shortName} →", fontWeight = FontWeight.Bold)
+              }
+            }
+          }
+        }
+      }
+
+      // UTME University Course Cutoff Readiness Card
+      item {
+        val projectedUtme =
+          if (attempts.isEmpty()) 260
+          else (180 + (avgScore * 2.2)).roundToInt().coerceIn(160, 400)
+        val benchmarks =
+          listOf(
+            "Medicine & Surgery" to 300,
+            "Law / Accounting" to 280,
+            "Engineering" to 270,
+            "Computer Science" to 260,
+            "Social Sciences" to 240,
+          )
+        Column(
+          modifier =
+            Modifier.fillMaxWidth()
+              .clip(RoundedCornerShape(20.dp))
+              .background(MaterialTheme.colorScheme.surface)
+              .border(1.5.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp))
+              .padding(16.dp),
+          verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+          ) {
+            Column(modifier = Modifier.weight(1f)) {
+              Text(
+                text = "UTME Course Cutoff Readiness",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+              )
+              Text(
+                text =
+                  if (attempts.isEmpty()) "Baseline projection — take mocks to calibrate"
+                  else "Projected from $avgScore% CBT mock accuracy",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+              )
+            }
+            Surface(
+              color = MaterialTheme.colorScheme.primaryContainer,
+              shape = RoundedCornerShape(99.dp),
+            ) {
+              Text(
+                text = "$projectedUtme / 400",
+                style = MaterialTheme.typography.labelMedium.copy(fontFeatureSettings = "tnum"),
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+              )
+            }
+          }
+          benchmarks.forEach { (course, cutoff) ->
+            val meetsCutoff = projectedUtme >= cutoff
+            Row(
+              modifier =
+                Modifier.fillMaxWidth()
+                  .clip(RoundedCornerShape(10.dp))
+                  .background(
+                    if (meetsCutoff) semantics.successContainer.copy(alpha = 0.7f)
+                    else MaterialTheme.colorScheme.background
+                  )
+                  .border(
+                    1.dp,
+                    if (meetsCutoff) semantics.success.copy(alpha = 0.5f)
+                    else MaterialTheme.colorScheme.outlineVariant,
+                    RoundedCornerShape(10.dp),
+                  )
+                  .padding(horizontal = 12.dp, vertical = 8.dp),
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically,
+            ) {
+              Text(
+                text = course,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.SemiBold,
+              )
+              Text(
+                text = if (meetsCutoff) "$cutoff+ Ready" else "Target $cutoff (+${cutoff - projectedUtme})",
+                style = MaterialTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
+                color = if (meetsCutoff) semantics.success else MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.Bold,
+              )
+            }
+          }
+        }
+      }
+
+      if (paper2Attempts.isNotEmpty()) {
+        item {
+          val avgPaper2 =
+            paper2Attempts
+              .filter { it.totalMarks > 0 }
+              .map { (it.earnedMarks * 100f) / it.totalMarks.toFloat() }
+              .let { scores -> if (scores.isEmpty()) 0 else scores.average().roundToInt() }
+          Column(
+            modifier =
+              Modifier.fillMaxWidth()
+                .clip(RoundedCornerShape(20.dp))
+                .background(MaterialTheme.colorScheme.surface)
+                .border(1.5.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(20.dp))
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+          ) {
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically,
+            ) {
+              Text(
+                text = "Paper 2 Theory Mastery",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+              )
+              Surface(
+                color = semantics.successContainer,
+                shape = RoundedCornerShape(99.dp),
+              ) {
+                Text(
+                  text = "$avgPaper2% AVG (${paper2Attempts.size} essays)",
+                  style = MaterialTheme.typography.labelSmall.copy(fontFeatureSettings = "tnum"),
+                  color = semantics.onSuccessContainer,
+                  fontWeight = FontWeight.Bold,
+                  modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                )
+              }
+            }
+            paper2Attempts.take(3).forEach { entry ->
+              Row(
+                modifier =
+                  Modifier.fillMaxWidth()
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(horizontal = 10.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+              ) {
+                Text(
+                  text = "${entry.topic} • ${entry.subjectId.replaceFirstChar { it.uppercase() }}",
+                  style = MaterialTheme.typography.bodySmall,
+                  color = MaterialTheme.colorScheme.onSurface,
+                  fontWeight = FontWeight.Medium,
+                )
+                Text(
+                  text = "${entry.earnedMarks}/${entry.totalMarks} marks",
+                  style = MaterialTheme.typography.labelMedium.copy(fontFeatureSettings = "tnum"),
+                  color = MaterialTheme.colorScheme.primary,
+                  fontWeight = FontWeight.Bold,
+                )
               }
             }
           }

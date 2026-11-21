@@ -2,6 +2,7 @@ package com.example
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -193,6 +194,8 @@ private fun MeritPrepAppShell(
   val offlineSnapshot by viewModel.offlineSnapshot.collectAsStateWithLifecycle()
   val themePreferences by viewModel.themePreferences.collectAsStateWithLifecycle()
   val cbtState by viewModel.cbtState.collectAsStateWithLifecycle()
+  val resumableCbtSession by viewModel.resumableCbtSession.collectAsStateWithLifecycle()
+  val paper2Attempts by viewModel.paper2Attempts.collectAsStateWithLifecycle()
   val dueReviewCards by viewModel.dueReviewCards.collectAsStateWithLifecycle()
   val allReviewCards by viewModel.allReviewCards.collectAsStateWithLifecycle()
   val signedInGoogleUser by viewModel.signedInGoogleUser.collectAsStateWithLifecycle()
@@ -277,6 +280,19 @@ private fun MeritPrepAppShell(
     }
   }
 
+  BackHandler(
+    enabled =
+      activeLesson == null &&
+        activeTab != TopTab.HOME &&
+        !showQuickActionSheet &&
+        !showMenuSheet &&
+        !showSettingsPortal &&
+        !showSpacedReviewModal &&
+        !showPlacementDialog
+  ) {
+    activeTab = TopTab.HOME
+  }
+
   Box(modifier = Modifier.fillMaxSize()) {
     val openLesson = activeLesson
     if (openLesson != null) {
@@ -312,6 +328,9 @@ private fun MeritPrepAppShell(
         },
         onSaveNote = { title, content ->
           viewModel.createStudyNote(openLesson.id, openLesson.subjectId, title, content, true)
+        },
+        onEarnLabXp = { xpDelta, _ ->
+          viewModel.awardGamifiedLabXp(openLesson.id, xpDelta)
         },
         onOpenNextLesson = { upcoming -> activeLesson = upcoming },
       )
@@ -372,9 +391,11 @@ private fun MeritPrepAppShell(
                   structuredModules = structuredModules,
                   progressList = progressList,
                   attempts = attempts,
+                  notes = notes,
                   isDarkTheme = isDarkTheme,
                   themePreferences = themePreferences,
                   placementPassedSubjects = offlineSnapshot.placementPassedSubjects,
+                  todayXp = offlineSnapshot.todayXp,
                   dueReviewsCount = dueReviewCards.size,
                   totalReviewCardsCount = allReviewCards.size,
                   onToggleDarkTheme = { viewModel.toggleDarkTheme(isDarkTheme) },
@@ -443,6 +464,8 @@ private fun MeritPrepAppShell(
                   cbtState = cbtState,
                   cbtShowCalculator = themePreferences.cbtShowCalculator,
                   dueReviewsCount = dueReviewCards.size,
+                  resumableSession = resumableCbtSession,
+                  paper2Attempts = paper2Attempts,
                   onSelectSubject = viewModel::selectExamSubject,
                   onSelectBoard = viewModel::selectExamBoard,
                   onSelectQuestionLimit = viewModel::selectQuestionLimit,
@@ -460,6 +483,9 @@ private fun MeritPrepAppShell(
                   onTogglePauseTimer = viewModel::togglePauseCbtTimer,
                   onSubmitExam = viewModel::submitCbtExam,
                   onRetakeExam = viewModel::retakeLastMock,
+                  onResumeSavedCbt = viewModel::resumeSavedCbtExam,
+                  onDiscardSavedCbt = viewModel::discardSavedCbtExam,
+                  onSavePaper2Attempt = viewModel::savePaper2Attempt,
                   onDrillMissedQuestions = viewModel::startMissedQuestionsDrill,
                   onSaveToNotebook = { subjectId, title, content ->
                     viewModel.createStudyNote("cbt_review", subjectId, title, content, true)
@@ -490,6 +516,7 @@ private fun MeritPrepAppShell(
                   progressList = progressList,
                   offlineSnapshot = offlineSnapshot,
                   themePreferences = themePreferences,
+                  paper2Attempts = paper2Attempts,
                   dueReviewsCount = dueReviewCards.size,
                   onSetThemeMode = viewModel::setThemeMode,
                   onSetThemePalette = viewModel::setThemePalette,
@@ -556,6 +583,7 @@ private fun MeritPrepAppShell(
         profile = profile,
         themePreferences = themePreferences,
         isDarkTheme = isDarkTheme,
+        todayXp = offlineSnapshot.todayXp,
         dueReviewsCount = dueReviewCards.size,
         totalReviewCardsCount = allReviewCards.size,
         placementPassedCount = offlineSnapshot.placementPassedSubjects.size,
@@ -713,7 +741,7 @@ private fun StudioDockedBottomBar(
           )
           StudioNavIconItem(
             tab = navTabs[3],
-            selected = activeTab == navTabs[3] || activeTab == TopTab.NOTEBOOK,
+            selected = activeTab == navTabs[3],
             showDot = dueReviewsCount > 0,
             onClick = { onSelectTab(navTabs[3]) },
             modifier = Modifier.weight(1f).testTag("nav_analytics"),

@@ -65,6 +65,7 @@ import com.example.ui.components.StudioMetricTile
 import com.example.ui.theme.semanticColors
 import com.example.ui.viewmodel.ExamResultSummary
 import com.example.ui.viewmodel.QuestionReviewItem
+import java.util.Locale
 
 private enum class ReviewFilter(val label: String) {
   ALL("All"),
@@ -100,7 +101,7 @@ fun PostExamSummaryScreen(
 
   val minutesTaken = summary.timeTakenSeconds / 60
   val secondsTaken = summary.timeTakenSeconds % 60
-  val formattedTime = String.format("%02d:%02d", minutesTaken, secondsTaken)
+  val formattedTime = String.format(Locale.US, "%02d:%02d", minutesTaken, secondsTaken)
   val avgSecondsPerQuestion =
     if (summary.totalQuestions > 0) summary.timeTakenSeconds / summary.totalQuestions else 0
 
@@ -440,6 +441,7 @@ fun PostExamSummaryScreen(
       items(filteredItems, key = { it.questionIndex }) { item ->
         QuestionReviewCard(
           item = item,
+          fallbackSubjectId = summary.subjectId,
           onSaveToNotebook = onSaveToNotebook,
         )
       }
@@ -452,6 +454,7 @@ fun PostExamSummaryScreen(
 @Composable
 private fun QuestionReviewCard(
   item: QuestionReviewItem,
+  fallbackSubjectId: String = "general",
   onSaveToNotebook: ((subjectId: String, title: String, content: String) -> Unit)? = null,
 ) {
   val semantics = MaterialTheme.semanticColors
@@ -660,7 +663,7 @@ private fun QuestionReviewCard(
         OutlinedButton(
           onClick = {
             onSaveToNotebook(
-              item.subjectId.ifBlank { "physics" },
+              item.subjectId.ifBlank { fallbackSubjectId.ifBlank { "general" } },
               "${q.topic} — Solution",
               "${q.question}\n\n${q.stepByStepSolution}",
             )

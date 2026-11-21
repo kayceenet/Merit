@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import com.example.data.curriculum.PracticalLabType
 import com.example.ui.components.ScientificText
+import java.util.Locale
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
@@ -145,21 +146,21 @@ private fun StoichiometryLimitingLab() {
     LabMetricBanner(
       listOf(
         "Limiting Reactant" to limiting.substringBefore(" "),
-        "H₂O Yield" to String.format("%.1f mol (%.0f g)", waterMoles, waterMoles * 18f),
-        "STP Vol" to String.format("%.1f dm³", waterMoles * 22.4f),
+        "H₂O Yield" to String.format(Locale.US, "%.1f mol (%.0f g)", waterMoles, waterMoles * 18f),
+        "STP Vol" to String.format(Locale.US, "%.1f dm³", waterMoles * 22.4f),
       )
     )
     ScientificText("Reaction Equation: 2H_2 + O_2 → 2H_2O", style = MaterialTheme.typography.labelLarge)
     LabeledLabSlider(
       label = "Moles of Hydrogen H_2 Supplied",
-      valueText = String.format("%.1f mol", h2Moles),
+      valueText = String.format(Locale.US, "%.1f mol", h2Moles),
       value = h2Moles,
       onValueChange = { h2Moles = (it * 2).roundToInt() / 2f },
       valueRange = 1f..8f,
     )
     LabeledLabSlider(
       label = "Moles of Oxygen O_2 Supplied",
-      valueText = String.format("%.1f mol", o2Moles),
+      valueText = String.format(Locale.US, "%.1f mol", o2Moles),
       value = o2Moles,
       onValueChange = { o2Moles = (it * 2).roundToInt() / 2f },
       valueRange = 0.5f..5f,
@@ -179,9 +180,9 @@ private fun GasLawPistonLab() {
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     LabMetricBanner(
       listOf(
-        "Volume (1 mol)" to String.format("%.2f dm³", volL),
+        "Volume (1 mol)" to String.format(Locale.US, "%.2f dm³", volL),
         "Kelvin Temp" to "${tempK.roundToInt()} K (${tempK.roundToInt() - 273}°C)",
-        "Effusion vs O₂" to String.format("%.2f×", grahamSpeedRatio),
+        "Effusion vs O₂" to String.format(Locale.US, "%.2f×", grahamSpeedRatio),
       )
     )
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -199,7 +200,7 @@ private fun GasLawPistonLab() {
     )
     LabeledLabSlider(
       label = "Gas Pressure P",
-      valueText = String.format("%.2f atm", pressAtm),
+      valueText = String.format(Locale.US, "%.2f atm", pressAtm),
       value = pressAtm,
       onValueChange = { pressAtm = it },
       valueRange = 0.5f..4.0f,
@@ -223,8 +224,8 @@ private fun AcidBaseTitrationLab() {
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     LabMetricBanner(
       listOf(
-        "NaOH Added" to String.format("%.1f cm³", naohMl),
-        "Flask pH" to String.format("%.2f", pH.coerceIn(0f, 14f)),
+        "NaOH Added" to String.format(Locale.US, "%.1f cm³", naohMl),
+        "Flask pH" to String.format(Locale.US, "%.2f", pH.coerceIn(0f, 14f)),
         "Indicator" to indicatorColor.substringBefore(" ("),
       )
     )
@@ -234,7 +235,7 @@ private fun AcidBaseTitrationLab() {
     }
     LabeledLabSlider(
       label = "Volume of 0.1 M NaOH Delivered from Burette",
-      valueText = String.format("%.1f cm³", naohMl),
+      valueText = String.format(Locale.US, "%.1f cm³", naohMl),
       value = naohMl,
       onValueChange = { naohMl = it },
       valueRange = 0f..40f,
@@ -279,7 +280,7 @@ private fun LeChatelierHaberLab() {
       listOf(
         "Pressure" to "${pressureAtm.roundToInt()} atm",
         "Temperature" to "${tempC.roundToInt()} °C",
-        "NH₃ Yield" to String.format("%.1f%%", yieldPct),
+        "NH₃ Yield" to String.format(Locale.US, "%.1f%%", yieldPct),
       )
     )
     LabeledLabSlider(
@@ -335,8 +336,8 @@ private fun FaradayElectrolysisLab() {
     LabMetricBanner(
       listOf(
         "Charge Q = It" to "${q.roundToInt()} C",
-        "Faradays" to String.format("%.3f F", q / 96500f),
-        "Cathode Mass" to String.format("%.3f g", massPlated),
+        "Faradays" to String.format(Locale.US, "%.3f F", q / 96500f),
+        "Cathode Mass" to String.format(Locale.US, "%.3f g", massPlated),
       )
     )
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -346,7 +347,7 @@ private fun FaradayElectrolysisLab() {
     }
     LabeledLabSlider(
       label = "Steady Electrolysis Current I",
-      valueText = String.format("%.1f A", currentA),
+      valueText = String.format(Locale.US, "%.1f A", currentA),
       value = currentA,
       onValueChange = { currentA = it },
       valueRange = 0.5f..10f,

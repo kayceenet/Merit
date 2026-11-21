@@ -4,17 +4,31 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.data.curriculum.PracticalLabType
 import com.example.ui.components.ScientificText
+import com.example.ui.components.rememberLessonTtsController
 
 @Composable
 internal fun EnglishLabDispatcher(lessonId: String, labType: PracticalLabType) {
@@ -148,29 +162,53 @@ private fun IdiomsRegistersLab(lessonId: String) {
 @Composable
 private fun IpaVowelsConsonantsLab(lessonId: String) {
   var idx by remember { mutableIntStateOf(0) }
+  val ttsController = rememberLessonTtsController()
   val items = if (lessonId == "eng_13_consonants_silent") {
     listOf(
-      "-ed = /t/ (Voiceless)" to "washed /t/, laughed /t/, missed /t/, packed /t/ (after p, k, f, s, ʃ)",
-      "-ed = /ɪd/ (Added Syl)" to "wanted /ɪd/, landed /ɪd/, hated /ɪd/ (after /t/ or /d/)",
-      "/θ/ vs /ð/ Minimal Pair" to "Voiceless /θ/: think, bath, breath  |  Voiced /ð/: they, bathe, breathe",
-      "Silent Letters Classics" to "psalm (p), receipt (p), subtle (b), corps /kɔː/ (p,s), sword (w)",
+      Triple("-ed = /t/ (Voiceless)", "washed /t/, laughed /t/, missed /t/, packed /t/ (after p, k, f, s, ʃ)", "washed. laughed. missed. packed."),
+      Triple("-ed = /ɪd/ (Added Syl)", "wanted /ɪd/, landed /ɪd/, hated /ɪd/ (after /t/ or /d/)", "wanted. landed. hated."),
+      Triple("/θ/ vs /ð/ Minimal Pair", "Voiceless /θ/: think, bath, breath  |  Voiced /ð/: they, bathe, breathe", "think, bath, breath. Versus: they, bathe, breathe."),
+      Triple("Silent Letters Classics", "psalm (p), receipt (p), subtle (b), corps /kɔː/ (p,s), sword (w)", "psalm. receipt. subtle. corps. sword."),
     )
   } else {
     listOf(
-      "/iː/ Long vs /ɪ/ Short" to "/iː/: seat, key, quay, police  |  /ɪ/: sit, women, busy, village",
-      "/ɜː/ Central Vowel" to "/ɜː/: bird, word, work, colonel, earn (beware 'w+or'!)",
-      "/eɪ/ vs /eə/ Diphthongs" to "/eɪ/: great, break, steak, gauge  |  /eə/: air, heir, bear, wear",
-      "/ʌ/ & /əʊ/ Tricky Spellings" to "/ʌ/: cup, blood, flood, love  |  /əʊ/: go, sew, though, dough",
+      Triple("/iː/ Long vs /ɪ/ Short", "/iː/: seat, key, quay, police  |  /ɪ/: sit, women, busy, village", "Long vowel: seat, key, quay, police. Short vowel: sit, women, busy, village."),
+      Triple("/ɜː/ Central Vowel", "/ɜː/: bird, word, work, colonel, earn (beware 'w+or'!)", "bird, word, work, colonel, earn."),
+      Triple("/eɪ/ vs /eə/ Diphthongs", "/eɪ/: great, break, steak, gauge  |  /eə/: air, heir, bear, wear", "great, break, steak, gauge. Versus: air, heir, bear, wear."),
+      Triple("/ʌ/ & /əʊ/ Tricky Spellings", "/ʌ/: cup, blood, flood, love  |  /əʊ/: go, sew, though, dough", "cup, blood, flood, love. Versus: go, sew, though, dough."),
     )
   }
+  val ttsKey = "ipa_lab_${lessonId}_$idx"
+  val isSpeaking = ttsController.isSpeaking && ttsController.activeUtteranceKey == ttsKey
+
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-      items.forEachIndexed { i, (label, _) ->
-        FilterChip(selected = idx == i, onClick = { idx = i }, label = { Text(label.substringBefore(" Tricky").substringBefore(" Minimal")) })
+      items.forEachIndexed { i, item ->
+        FilterChip(selected = idx == i, onClick = { idx = i }, label = { Text(item.first.substringBefore(" Tricky").substringBefore(" Minimal")) })
       }
     }
     LabMetricBanner(listOf("IPA Pattern" to items[idx].first))
     ScientificText(items[idx].second, style = MaterialTheme.typography.bodySmall)
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+      OutlinedButton(
+        onClick = { ttsController.toggleSpeak(ttsKey, items[idx].third) },
+        modifier = Modifier.weight(1f).minimumInteractiveComponentSize(),
+      ) {
+        Icon(
+          imageVector = if (isSpeaking) Icons.Filled.Stop else Icons.AutoMirrored.Filled.VolumeUp,
+          contentDescription = "Pronounce minimal pair",
+          modifier = Modifier.size(18.dp),
+        )
+        Spacer(Modifier.width(6.dp))
+        Text(if (isSpeaking) "Stop Audio" else "Pronounce Words (${ttsController.speechRate}×)")
+      }
+      OutlinedButton(
+        onClick = { ttsController.cycleSpeed() },
+        modifier = Modifier.minimumInteractiveComponentSize(),
+      ) {
+        Text("${ttsController.speechRate}×")
+      }
+    }
   }
 }
 
@@ -178,20 +216,44 @@ private fun IpaVowelsConsonantsLab(lessonId: String) {
 @Composable
 private fun StressEmphaticLab() {
   var idx by remember { mutableIntStateOf(0) }
+  val ttsController = rememberLessonTtsController()
   val patterns = listOf(
-    "Noun vs Verb Twin" to "CON-duct / EX-port / OB-ject (Noun: 1st)  vs  con-DUCT / ex-PORT / ob-JECT (Verb: 2nd)",
-    "-tion / -ic / -ian Rule" to "2nd syllable from end: in-for-MA-tion, pho-to-GRA-phic, mu-SI-cian",
-    "-gy / -phy / -ty / -cy" to "3rd syllable from end: bi-O-lo-gy, pho-TO-gra-phy, u-ni-VER-si-ty, de-MO-cra-cy",
-    "Emphatic Contrast" to "'Ada bought a NEW bag.' → Q: 'Did Ada buy an OLD bag?' (Contradict ONLY the CAPS word!)",
+    Triple("Noun vs Verb Twin", "CON-duct / EX-port / OB-ject (Noun: 1st)  vs  con-DUCT / ex-PORT / ob-JECT (Verb: 2nd)", "Noun: CONduct, EXport, OBject. Verb: conDUCT, exPORT, obJECT."),
+    Triple("-tion / -ic / -ian Rule", "2nd syllable from end: in-for-MA-tion, pho-to-GRA-phic, mu-SI-cian", "information. photographic. musician."),
+    Triple("-gy / -phy / -ty / -cy", "3rd syllable from end: bi-O-lo-gy, pho-TO-gra-phy, u-ni-VER-si-ty, de-MO-cra-cy", "biology. photography. university. democracy."),
+    Triple("Emphatic Contrast", "'Ada bought a NEW bag.' → Q: 'Did Ada buy an OLD bag?' (Contradict ONLY the CAPS word!)", "Ada bought a NEW bag. Question: Did Ada buy an OLD bag?"),
   )
+  val ttsKey = "stress_lab_$idx"
+  val isSpeaking = ttsController.isSpeaking && ttsController.activeUtteranceKey == ttsKey
+
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-      patterns.forEachIndexed { i, (title, _) ->
-        FilterChip(selected = idx == i, onClick = { idx = i }, label = { Text(title) })
+      patterns.forEachIndexed { i, item ->
+        FilterChip(selected = idx == i, onClick = { idx = i }, label = { Text(item.first) })
       }
     }
     LabMetricBanner(listOf("Stress Rule" to patterns[idx].first))
     ScientificText(patterns[idx].second, style = MaterialTheme.typography.bodySmall)
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+      OutlinedButton(
+        onClick = { ttsController.toggleSpeak(ttsKey, patterns[idx].third) },
+        modifier = Modifier.weight(1f).minimumInteractiveComponentSize(),
+      ) {
+        Icon(
+          imageVector = if (isSpeaking) Icons.Filled.Stop else Icons.AutoMirrored.Filled.VolumeUp,
+          contentDescription = "Listen to stress pattern",
+          modifier = Modifier.size(18.dp),
+        )
+        Spacer(Modifier.width(6.dp))
+        Text(if (isSpeaking) "Stop Audio" else "Hear Stress Contrast (${ttsController.speechRate}×)")
+      }
+      OutlinedButton(
+        onClick = { ttsController.cycleSpeed() },
+        modifier = Modifier.minimumInteractiveComponentSize(),
+      ) {
+        Text("${ttsController.speechRate}×")
+      }
+    }
   }
 }
 

@@ -35,16 +35,29 @@ service cloud.firestore {
       return val is timestamp && val <= request.time;
     }
 
+    function isValidListItem(listVal, idx) {
+      return listVal.size() <= idx || (listVal[idx] is string && listVal[idx].size() >= 1 && listVal[idx].size() <= 64);
+    }
+
     function isValidStringList(listVal, maxItems) {
       return listVal is list &&
         listVal.size() <= maxItems &&
-        (listVal.size() == 0 || (listVal[0] is string && listVal[0].size() <= 64));
+        isValidListItem(listVal, 0) &&
+        isValidListItem(listVal, 1) &&
+        isValidListItem(listVal, 2) &&
+        isValidListItem(listVal, 3) &&
+        isValidListItem(listVal, 4) &&
+        isValidListItem(listVal, 5) &&
+        isValidListItem(listVal, 6) &&
+        isValidListItem(listVal, 7) &&
+        isValidListItem(listVal, 8) &&
+        isValidListItem(listVal, 9);
     }
 
     function isValidUserProfile(data, userId) {
       return data.userId == userId &&
         isValidString(data.displayName, 1, 80) &&
-        data.targetExam in ['BOTH', 'JAMB', 'WAEC'] &&
+        data.targetExam in ['ALL', 'BOTH', 'JAMB', 'WAEC', 'NECO'] &&
         data.targetScore is int && data.targetScore >= 160 && data.targetScore <= 400 &&
         data.streakDays is int && data.streakDays >= 0 && data.streakDays <= 3650 &&
         data.totalXp is int && data.totalXp >= 0 && data.totalXp <= 1000000 &&
@@ -66,7 +79,7 @@ service cloud.firestore {
 
     function isValidExamAttempt(data, userId) {
       return data.userId == userId &&
-        data.examType in ['JAMB', 'WAEC'] &&
+        data.examType in ['JAMB', 'WAEC', 'NECO', 'ALL'] &&
         isValidString(data.subjectId, 1, 64) &&
         isValidString(data.subjectTitle, 1, 100) &&
         data.correctCount is int && data.correctCount >= 0 && data.correctCount <= 200 &&

@@ -125,3 +125,40 @@ data class SpacedReviewCardEntity(
   val updatedAtMillis: Long = System.currentTimeMillis(),
 )
 
+@Entity(tableName = "paper2_attempts")
+data class Paper2AttemptEntity(
+  @PrimaryKey val id: String,
+  val userId: String = UserProfile.DEFAULT_PROFILE_ID,
+  val promptId: String,
+  val subjectId: String,
+  val topic: String,
+  val studentWorking: String,
+  val checkedStepIndicesJson: String,
+  val earnedMarks: Int,
+  val totalMarks: Int,
+  val updatedAtMillis: Long = System.currentTimeMillis(),
+)
+
+@Entity(tableName = "active_cbt_sessions")
+data class ActiveCbtSessionEntity(
+  @PrimaryKey val userId: String = UserProfile.DEFAULT_PROFILE_ID,
+  val selectedSubjectId: String,
+  val selectedExamBoard: String,
+  val selectedQuestionLimit: Int,
+  val isUtmeComboMode: Boolean,
+  val selectedComboElectivesJson: String,
+  val comboQuestionSubjectsJson: String,
+  val comboSubjectTabsJson: String,
+  val activeComboSubjectTab: String?,
+  val questionIdsJson: String,
+  val currentIndex: Int,
+  val selectedAnswersJson: String,
+  val flaggedQuestionsJson: String,
+  val perQuestionSecondsJson: String,
+  val remainingSeconds: Int,
+  val elapsedSeconds: Int,
+  val totalAllowedSeconds: Int,
+  val updatedAtMillis: Long = System.currentTimeMillis(),
+)
+
+

@@ -572,4 +572,96 @@ class MeritPrepRepositoryTest {
       assertEquals(40, running.comboQuestionSubjects.count { it == "economics" })
       viewModel.returnToCbtSetup()
     }
+
+  @Test
+  fun `expanded past question bank provides 60 plus english jamb items and persists diagram specs`() =
+    runTest(testDispatcher) {
+      repository.seedCurriculumIfNeeded()
+      val englishJamb = repository.fetchPastQuestionsForCbt("english", "JAMB")
+      assertTrue("Expected >= 60 English JAMB pool items, got ${englishJamb.size}", englishJamb.size >= 60)
+
+      val allPool =
+        CurriculumCatalog.tracks.flatMap { repository.fetchPastQuestionsForCbt(it.id, "ALL") }
+      assertTrue(
+        "Expected diagramSpec questions to survive Room persistence",
+        allPool.any { it.diagramSpec != null },
+      )
+    }
+
+  @Test
+  fun `calendar day xp tracks daily total and increments or resets streak accurately`() =
+    runTest(testDispatcher) {
+      val day10 = 20_000L
+      val (s1, today1) = prefsRepo.recordDailyActivityXp(xpDelta = 40L, epochDay = day10)
+      assertEquals(1L, s1)
+      assertEquals(40L, today1)
+
+      // Same day accumulates XP without double-incrementing streak
+      val (sSame, todaySame) = prefsRepo.recordDailyActivityXp(xpDelta = 25L, epochDay = day10)
+      assertEquals(1L, sSame)
+      assertEquals(65L, todaySame)
+
+      // Consecutive next day increments streak and starts a fresh daily counter
+      val (sNext, todayNext) = prefsRepo.recordDailyActivityXp(xpDelta = 30L, epochDay = day10 + 1L)
+      assertEquals(2L, sNext)
+      assertEquals(30L, todayNext)
+
+      // Skipping a calendar day resets streak back to 1
+      val (sSkipped, todaySkipped) = prefsRepo.recordDailyActivityXp(xpDelta = 20L, epochDay = day10 + 3L)
+      assertEquals(1L, sSkipped)
+      assertEquals(20L, todaySkipped)
+    }
+
+  @Test
+  fun `paper 2 attempt and interrupted cbt session persist and resume via viewmodel`() =
+    runTest(testDispatcher) {
+      repository.seedCurriculumIfNeeded()
+      val uid = UserProfile.DEFAULT_PROFILE_ID
+      repository.ensureProfile(uid, "Ngozi").getOrThrow()
+
+      val viewModel = MeritPrepViewModel(repository)
+      runCurrent()
+
+      // 1. Paper 2 theory attempt persists
+      viewModel.savePaper2Attempt(
+        promptId = "p2_phy_proj",
+        subjectId = "physics",
+        examBoard = "WAEC",
+        studentWorking = "u = 40 m/s, angle 30 deg, T = 2u sin(30)/g",
+        checkedIndices = listOf(0, 1),
+        earnedMarks = 7,
+        maxMarks = 10,
+      )
+      advanceUntilIdle()
+      val paper2List = repository.observePaper2Attempts(uid).first()
+      assertEquals(1, paper2List.size)
+      assertEquals(7, paper2List.first().earnedMarks)
+      assertTrue(paper2List.first().studentWorking.contains("T = 2u sin(30)/g"))
+
+      // 2. Start CBT, answer Q0, then verify ActiveCbtSession saves and restores cleanly
+      viewModel.startMockExam("physics", "JAMB", questionLimit = 10)
+      awaitStage(viewModel, CbtExamStage.RUNNING)
+      val q0 = viewModel.cbtState.value.questions.first()
+      viewModel.selectCbtAnswer(0, q0.correctIndex)
+      advanceTimeBy(500L)
+      runCurrent()
+
+      val savedSession = repository.getActiveCbtSessionOnce(uid)
+      assertNotNull(savedSession)
+      assertTrue(savedSession!!.questionIdsJson.contains(q0.id))
+
+      // Simulate fresh ViewModel instance resuming interrupted session
+      val freshViewModel = MeritPrepViewModel(repository)
+      runCurrent()
+      freshViewModel.resumeSavedCbtExam()
+      awaitStage(freshViewModel, CbtExamStage.RUNNING)
+      assertEquals(q0.correctIndex, freshViewModel.cbtState.value.selectedAnswers[0])
+
+      // Cleanly cancel both active exam timers before draining coroutine queue
+      viewModel.returnToCbtSetup()
+      freshViewModel.submitCbtExam()
+      awaitStage(freshViewModel, CbtExamStage.SUMMARY)
+      advanceUntilIdle()
+      assertEquals(null, repository.getActiveCbtSessionOnce(uid))
+    }
 }

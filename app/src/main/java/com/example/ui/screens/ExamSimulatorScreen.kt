@@ -27,23 +27,29 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.OutlinedFlag
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.minimumInteractiveComponentSize
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -61,7 +67,10 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.data.curriculum.CurriculumCatalog
+import com.example.data.model.ActiveCbtSessionEntity
+import com.example.data.model.Paper2AttemptEntity
 import com.example.ui.components.Paper2DrillView
+import com.example.ui.components.QuestionDiagramCard
 import com.example.ui.components.ScientificCalculatorSheet
 import com.example.ui.components.ScientificText
 import com.example.ui.components.TopRightMenuButton
@@ -69,6 +78,7 @@ import com.example.ui.theme.semanticColors
 import com.example.ui.viewmodel.CbtExamStage
 import com.example.ui.viewmodel.CbtExamState
 import com.example.ui.viewmodel.QuestionReviewItem
+import java.util.Locale
 
 enum class ExamLabMode(val label: String) {
   SINGLE_CBT("Single Subject"),
@@ -76,7 +86,7 @@ enum class ExamLabMode(val label: String) {
   PAPER_2("Paper 2 Theory"),
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ExamSimulatorScreen(
   initialSubjectId: String?,
@@ -85,6 +95,8 @@ fun ExamSimulatorScreen(
   cbtState: CbtExamState,
   cbtShowCalculator: Boolean = true,
   dueReviewsCount: Int = 0,
+  resumableSession: ActiveCbtSessionEntity? = null,
+  paper2Attempts: List<Paper2AttemptEntity> = emptyList(),
   onSelectSubject: (String) -> Unit,
   onSelectBoard: (String) -> Unit,
   onSelectQuestionLimit: (Int) -> Unit,
@@ -100,6 +112,17 @@ fun ExamSimulatorScreen(
   onTogglePauseTimer: () -> Unit,
   onSubmitExam: () -> Unit,
   onRetakeExam: () -> Unit,
+  onResumeSavedCbt: () -> Unit = {},
+  onDiscardSavedCbt: () -> Unit = {},
+  onSavePaper2Attempt: (
+    promptId: String,
+    subjectId: String,
+    title: String,
+    studentWorking: String,
+    checkedStepIndices: List<Int>,
+    selfScoreMarks: Int,
+    totalMarks: Int,
+  ) -> Unit = { _, _, _, _, _, _, _ -> },
   onDrillMissedQuestions: (List<QuestionReviewItem>) -> Unit = {},
   onSaveToNotebook: (subjectId: String, title: String, content: String) -> Unit = { _, _, _ -> },
   onOpenMenu: () -> Unit = {},
@@ -110,6 +133,9 @@ fun ExamSimulatorScreen(
   var comboQuestionsPerSubject by remember { mutableIntStateOf(10) }
   var isFullUtme180 by remember { mutableStateOf(false) }
   var showCalculator by remember { mutableStateOf(false) }
+  var showQuestionGrid by remember { mutableStateOf(false) }
+  var showSubmitConfirm by remember { mutableStateOf(false) }
+  var gridFilter by remember { mutableIntStateOf(0) }
 
   LaunchedEffect(initialSubjectId) {
     if (!initialSubjectId.isNullOrBlank() && cbtState.stage == CbtExamStage.SETUP) {
@@ -137,6 +163,14 @@ fun ExamSimulatorScreen(
         val effectiveCount =
           if (selectedQuestionLimit <= 0) availableCount
           else minOf(selectedQuestionLimit, availableCount)
+        val savedQuestionCount =
+          remember(resumableSession?.questionIdsJson) {
+            runCatching { org.json.JSONArray(resumableSession?.questionIdsJson ?: "[]").length() }.getOrDefault(0)
+          }
+        val savedAnsweredCount =
+          remember(resumableSession?.selectedAnswersJson) {
+            runCatching { org.json.JSONObject(resumableSession?.selectedAnswersJson ?: "{}").length() }.getOrDefault(0)
+          }
 
         LazyColumn(
           modifier = Modifier.widthIn(max = 880.dp).fillMaxSize(),
@@ -162,6 +196,56 @@ fun ExamSimulatorScreen(
                 )
               }
               TopRightMenuButton(badgeCount = dueReviewsCount, onClick = onOpenMenu)
+            }
+          }
+
+          if (resumableSession != null && savedQuestionCount > 0) {
+            item {
+              val savedMins = resumableSession.remainingSeconds / 60
+              val savedSecs = resumableSession.remainingSeconds % 60
+              val savedTime = String.format(Locale.US, "%02d:%02d", savedMins, savedSecs)
+              val savedSubjectTitle =
+                if (resumableSession.isUtmeComboMode) "4-Subject UTME Combo"
+                else CurriculumCatalog.trackById(resumableSession.selectedSubjectId)?.shortName ?: resumableSession.selectedSubjectId
+              Column(
+                modifier =
+                  Modifier.fillMaxWidth()
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(MaterialTheme.colorScheme.tertiaryContainer)
+                    .border(1.5.dp, MaterialTheme.colorScheme.tertiary, RoundedCornerShape(18.dp))
+                    .padding(14.dp)
+                    .testTag("resume_cbt_banner"),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+              ) {
+                Text(
+                  text = "RESUME INTERRUPTED MOCK PAPER",
+                  style = MaterialTheme.typography.labelSmall,
+                  color = MaterialTheme.colorScheme.onTertiaryContainer,
+                  fontWeight = FontWeight.Bold,
+                )
+                Text(
+                  text = "$savedSubjectTitle (${resumableSession.selectedExamBoard}) • $savedAnsweredCount/$savedQuestionCount answered • $savedTime left",
+                  style = MaterialTheme.typography.bodySmall,
+                  color = MaterialTheme.colorScheme.onTertiaryContainer,
+                  fontWeight = FontWeight.SemiBold,
+                )
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                  Button(
+                    onClick = onResumeSavedCbt,
+                    modifier = Modifier.weight(1f).minimumInteractiveComponentSize().testTag("resume_cbt_button"),
+                    shape = RoundedCornerShape(12.dp),
+                  ) {
+                    Text("Resume Paper", fontWeight = FontWeight.Bold)
+                  }
+                  OutlinedButton(
+                    onClick = onDiscardSavedCbt,
+                    modifier = Modifier.minimumInteractiveComponentSize().testTag("discard_cbt_button"),
+                    shape = RoundedCornerShape(12.dp),
+                  ) {
+                    Text("Discard")
+                  }
+                }
+              }
             }
           }
 
@@ -254,7 +338,19 @@ fun ExamSimulatorScreen(
               ExamLabMode.PAPER_2 -> {
                 Paper2DrillView(
                   selectedSubjectId = selectedSubjectId,
+                  paper2Attempts = paper2Attempts,
                   onSelectSubject = onSelectSubject,
+                  onSavePaper2Attempt = { prompt, working, checkedIndices, earnedMarks ->
+                    onSavePaper2Attempt(
+                      prompt.id,
+                      prompt.subjectId,
+                      "${prompt.examBoard} • ${prompt.topic}",
+                      working,
+                      checkedIndices,
+                      earnedMarks,
+                      prompt.totalMarks,
+                    )
+                  },
                   onSaveToNotebook = onSaveToNotebook,
                 )
               }
@@ -596,27 +692,31 @@ fun ExamSimulatorScreen(
             ) {
               Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
               ) {
                 Icon(
                   Icons.Filled.Timer,
                   contentDescription = "Remaining time",
-                  tint = if (cbtState.remainingSeconds < 60) Color(0xFFFCA5A5) else semantics.classroomAccent,
+                  tint =
+                    if (cbtState.remainingSeconds < 60) MaterialTheme.colorScheme.error
+                    else semantics.classroomAccent,
                 )
                 Text(
-                  text = String.format("%02d:%02d", minutes, seconds),
+                  text = String.format(Locale.US, "%02d:%02d", minutes, seconds),
                   style =
                     MaterialTheme.typography.titleMedium.copy(
                       fontFamily = FontFamily.Default,
                       fontFeatureSettings = "tnum",
                     ),
-                  color = if (cbtState.remainingSeconds < 60) Color(0xFFFCA5A5) else semantics.onClassroomBar,
+                  color =
+                    if (cbtState.remainingSeconds < 60) MaterialTheme.colorScheme.error
+                    else semantics.onClassroomBar,
                   fontWeight = FontWeight.Bold,
                   modifier = Modifier.testTag("cbt_timer_text"),
                 )
                 IconButton(
                   onClick = onTogglePauseTimer,
-                  modifier = Modifier.minimumInteractiveComponentSize().size(40.dp).testTag("cbt_pause_timer_button"),
+                  modifier = Modifier.minimumInteractiveComponentSize().testTag("cbt_pause_timer_button"),
                 ) {
                   Icon(
                     imageVector = if (cbtState.isTimerPaused) Icons.Filled.PlayArrow else Icons.Filled.Pause,
@@ -625,10 +725,21 @@ fun ExamSimulatorScreen(
                     modifier = Modifier.size(18.dp),
                   )
                 }
+                IconButton(
+                  onClick = { showQuestionGrid = true },
+                  modifier = Modifier.minimumInteractiveComponentSize().testTag("cbt_question_grid_button"),
+                ) {
+                  Icon(
+                    imageVector = Icons.Filled.GridView,
+                    contentDescription = "Open Question Map Grid",
+                    tint = semantics.onClassroomBar,
+                    modifier = Modifier.size(19.dp),
+                  )
+                }
                 if (cbtShowCalculator) {
                   IconButton(
                     onClick = { showCalculator = true },
-                    modifier = Modifier.minimumInteractiveComponentSize().size(40.dp).testTag("cbt_calculator_button"),
+                    modifier = Modifier.minimumInteractiveComponentSize().testTag("cbt_calculator_button"),
                   ) {
                     Icon(
                       imageVector = Icons.Filled.Calculate,
@@ -645,19 +756,19 @@ fun ExamSimulatorScreen(
                   if (cbtState.isTimerPaused) "PAUSED"
                   else "${cbtState.selectedAnswers.size}/${questions.size}",
                 style = MaterialTheme.typography.labelMedium.copy(fontFeatureSettings = "tnum"),
-                color = if (cbtState.isTimerPaused) Color(0xFFFDE68A) else semantics.classroomSubtext,
+                color = if (cbtState.isTimerPaused) semantics.classroomAccent else semantics.classroomSubtext,
                 fontWeight = FontWeight.Bold,
               )
 
               Button(
-                onClick = onSubmitExam,
+                onClick = { showSubmitConfirm = true },
                 shape = RoundedCornerShape(10.dp),
                 colors =
                   ButtonDefaults.buttonColors(
                     containerColor = semantics.classroomAccent,
-                    contentColor = Color(0xFF0A1628),
+                    contentColor = semantics.onClassroomAccent,
                   ),
-                modifier = Modifier.testTag("submit_cbt_button"),
+                modifier = Modifier.minimumInteractiveComponentSize().testTag("submit_cbt_button"),
               ) {
                 Text("Submit", fontWeight = FontWeight.Bold)
               }
@@ -665,7 +776,9 @@ fun ExamSimulatorScreen(
             LinearProgressIndicator(
               progress = { timerProgress.coerceIn(0f, 1f) },
               modifier = Modifier.fillMaxWidth().height(4.dp),
-              color = if (cbtState.remainingSeconds < 60) Color(0xFFFCA5A5) else semantics.classroomAccent,
+              color =
+                if (cbtState.remainingSeconds < 60) MaterialTheme.colorScheme.error
+                else semantics.classroomAccent,
               trackColor = Color.White.copy(alpha = 0.22f),
             )
           }
@@ -836,6 +949,13 @@ fun ExamSimulatorScreen(
                   color = MaterialTheme.colorScheme.onSurface,
                 )
 
+                question.diagramSpec?.let { spec ->
+                  QuestionDiagramCard(
+                    spec = spec,
+                    modifier = Modifier.padding(vertical = 4.dp).testTag("cbt_question_diagram"),
+                  )
+                }
+
                 question.options.forEachIndexed { optIdx, optText ->
                   val chosen = cbtState.selectedAnswers[currentIndex] == optIdx
                   Row(
@@ -903,7 +1023,7 @@ fun ExamSimulatorScreen(
             }
             Button(
               onClick = {
-                if (currentIndex < questions.lastIndex) onNextQuestion() else onSubmitExam()
+                if (currentIndex < questions.lastIndex) onNextQuestion() else showSubmitConfirm = true
               },
               modifier = Modifier.weight(1f).height(50.dp).testTag("cbt_next_button"),
               shape = RoundedCornerShape(14.dp),
@@ -931,6 +1051,172 @@ fun ExamSimulatorScreen(
         }
       }
     }
+  }
+
+  if (showQuestionGrid && cbtState.stage == CbtExamStage.RUNNING) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val allIndices = cbtState.questions.indices.toList()
+    val filteredIndices =
+      when (gridFilter) {
+        1 -> allIndices.filter { !cbtState.selectedAnswers.containsKey(it) }
+        2 -> allIndices.filter { it in cbtState.flaggedQuestions }
+        else -> allIndices
+      }
+    ModalBottomSheet(
+      onDismissRequest = { showQuestionGrid = false },
+      sheetState = sheetState,
+      containerColor = MaterialTheme.colorScheme.surface,
+    ) {
+      Column(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+      ) {
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically,
+        ) {
+          Text(
+            text = "Question Navigator (${cbtState.selectedAnswers.size}/${cbtState.questions.size})",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+          )
+          TextButton(onClick = { showQuestionGrid = false }) { Text("Close") }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+          val unansCount = cbtState.questions.size - cbtState.selectedAnswers.size
+          val flagCount = cbtState.flaggedQuestions.size
+          listOf(0 to "All (${cbtState.questions.size})", 1 to "Unanswered ($unansCount)", 2 to "Flagged ($flagCount)")
+            .forEach { (fIdx, fLabel) ->
+              FilterChip(
+                selected = gridFilter == fIdx,
+                onClick = { gridFilter = fIdx },
+                label = { Text(fLabel, style = MaterialTheme.typography.labelSmall) },
+              )
+            }
+        }
+        if (filteredIndices.isEmpty()) {
+          Text(
+            text = "No questions match this filter.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(vertical = 12.dp),
+          )
+        } else {
+          LazyColumn(
+            modifier = Modifier.fillMaxWidth().height(300.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+          ) {
+            items(filteredIndices.chunked(6).size) { rowIdx ->
+              val chunk = filteredIndices.chunked(6)[rowIdx]
+              Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+              ) {
+                chunk.forEach { qIdx ->
+                  val answered = cbtState.selectedAnswers.containsKey(qIdx)
+                  val flagged = qIdx in cbtState.flaggedQuestions
+                  val active = qIdx == cbtState.currentIndex
+                  val bg =
+                    when {
+                      active -> MaterialTheme.colorScheme.primary
+                      flagged -> MaterialTheme.colorScheme.tertiaryContainer
+                      answered -> semantics.successContainer
+                      else -> MaterialTheme.colorScheme.background
+                    }
+                  val fg =
+                    when {
+                      active -> MaterialTheme.colorScheme.onPrimary
+                      flagged -> MaterialTheme.colorScheme.onTertiaryContainer
+                      answered -> semantics.onSuccessContainer
+                      else -> MaterialTheme.colorScheme.onSurface
+                    }
+                  Box(
+                    modifier =
+                      Modifier.weight(1f)
+                        .height(48.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(bg)
+                        .border(
+                          1.dp,
+                          if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
+                          RoundedCornerShape(10.dp),
+                        )
+                        .clickable {
+                          onGoToQuestion(qIdx)
+                          showQuestionGrid = false
+                        },
+                    contentAlignment = Alignment.Center,
+                  ) {
+                    Text(
+                      text = "${qIdx + 1}",
+                      style = MaterialTheme.typography.labelLarge.copy(fontFeatureSettings = "tnum"),
+                      color = fg,
+                      fontWeight = FontWeight.Bold,
+                    )
+                  }
+                }
+                repeat(6 - chunk.size) {
+                  Spacer(modifier = Modifier.weight(1f))
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (showSubmitConfirm && cbtState.stage == CbtExamStage.RUNNING) {
+    val total = cbtState.questions.size
+    val answered = cbtState.selectedAnswers.size
+    val unanswered = (total - answered).coerceAtLeast(0)
+    val flagged = cbtState.flaggedQuestions.size
+    val firstUnanswered = cbtState.questions.indices.firstOrNull { !cbtState.selectedAnswers.containsKey(it) }
+    AlertDialog(
+      onDismissRequest = { showSubmitConfirm = false },
+      title = { Text("Submit Mock Paper?", fontWeight = FontWeight.Bold) },
+      text = {
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+          Text("Answered: $answered / $total")
+          Text("Unanswered: $unanswered")
+          Text("Flagged for review: $flagged")
+          if (unanswered > 0) {
+            Text(
+              text = "You still have $unanswered unanswered question(s). Submitting now will mark them as skipped.",
+              style = MaterialTheme.typography.bodySmall,
+              color = MaterialTheme.colorScheme.error,
+            )
+          }
+        }
+      },
+      confirmButton = {
+        Button(
+          onClick = {
+            showSubmitConfirm = false
+            onSubmitExam()
+          },
+          modifier = Modifier.testTag("confirm_submit_cbt_button"),
+        ) {
+          Text("Submit Now")
+        }
+      },
+      dismissButton = {
+        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+          if (firstUnanswered != null) {
+            TextButton(
+              onClick = {
+                showSubmitConfirm = false
+                onGoToQuestion(firstUnanswered)
+              }
+            ) {
+              Text("Jump Unanswered")
+            }
+          }
+          TextButton(onClick = { showSubmitConfirm = false }) { Text("Cancel") }
+        }
+      },
+    )
   }
 
   if (showCalculator) {

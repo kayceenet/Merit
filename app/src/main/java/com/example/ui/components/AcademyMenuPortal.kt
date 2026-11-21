@@ -126,6 +126,7 @@ fun AcademyMenuSheet(
   profile: UserProfile?,
   themePreferences: ThemePreferences,
   isDarkTheme: Boolean,
+  todayXp: Long = 0L,
   dueReviewsCount: Int,
   totalReviewCardsCount: Int,
   placementPassedCount: Int,
@@ -149,7 +150,9 @@ fun AcademyMenuSheet(
   val semantics = MaterialTheme.semanticColors
   val dailyTarget = themePreferences.dailyXpTarget.coerceAtLeast(50)
   val totalXp = (profile?.totalXp ?: 0L).toInt()
-  val dailyProgressRatio = ((totalXp % dailyTarget).toFloat() / dailyTarget.toFloat()).coerceIn(0.08f, 1f)
+  val dailyProgressRatio =
+    if (todayXp <= 0L) 0f
+    else (todayXp.toFloat() / dailyTarget.toFloat()).coerceIn(0.06f, 1f)
 
   ModalBottomSheet(
     onDismissRequest = onDismiss,
@@ -196,7 +199,7 @@ fun AcademyMenuSheet(
               Icon(
                 Icons.Filled.LocalFireDepartment,
                 contentDescription = null,
-                tint = Color(0xFFFBBF24),
+                tint = semantics.classroomAccent,
                 modifier = Modifier.size(15.dp),
               )
               Text(
@@ -214,7 +217,7 @@ fun AcademyMenuSheet(
                 modifier = Modifier.size(15.dp),
               )
               Text(
-                text = "$totalXp XP • Daily goal ${dailyTarget} XP",
+                text = "$todayXp/$dailyTarget XP today • $totalXp Total",
                 style = MaterialTheme.typography.labelSmall,
                 color = semantics.classroomSubtext,
                 fontWeight = FontWeight.SemiBold,

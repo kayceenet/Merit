@@ -17,14 +17,18 @@ import com.example.data.local.OfflineProgressSnapshot
 import com.example.data.local.ThemeMode
 import com.example.data.local.ThemePalette
 import com.example.data.local.ThemePreferences
+import com.example.data.model.ActiveCbtSessionEntity
 import com.example.data.model.ExamAttempt
 import com.example.data.model.LessonProgress
+import com.example.data.model.Paper2AttemptEntity
 import com.example.data.model.SpacedReviewCardEntity
 import com.example.data.model.StudyNote
 import com.example.data.model.UserProfile
 import com.example.data.remote.GoogleUserSnapshot
 import com.example.data.remote.MeritPrepCloudSync
 import com.example.data.repository.MeritPrepRepository
+import org.json.JSONArray
+import org.json.JSONObject
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -113,6 +117,32 @@ class MeritPrepViewModel(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
         initialValue = emptyList(),
+      )
+
+  val paper2Attempts: StateFlow<List<Paper2AttemptEntity>> =
+    repository
+      .observePaper2Attempts(currentUserId)
+      .catch { error ->
+        if (error is CancellationException) throw error
+        emit(emptyList())
+      }
+      .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
+        initialValue = emptyList(),
+      )
+
+  val resumableCbtSession: StateFlow<ActiveCbtSessionEntity?> =
+    repository
+      .observeActiveCbtSession(currentUserId)
+      .catch { error ->
+        if (error is CancellationException) throw error
+        emit(null)
+      }
+      .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS),
+        initialValue = null,
       )
 
   val structuredModules: StateFlow<List<CourseModule>> =
@@ -264,9 +294,7 @@ class MeritPrepViewModel(
     viewModelScope.launch {
       val res = repository.rateSpacedReviewCard(cardId, quality)
       if (res.isSuccess) {
-        val currentStreak =
-          (profileState.value as? UiState.Success)?.data?.streakDays?.coerceAtLeast(1L) ?: 1L
-        repository.awardXp(currentUserId, 5L, currentStreak)
+        repository.recordXpWithAutoStreak(currentUserId, 5L)
         val days = res.getOrNull()?.intervalDays ?: 1
         _statusMessage.value = "Scheduled next recall in $days day(s) (+5 XP)"
       }
@@ -278,15 +306,49 @@ class MeritPrepViewModel(
       val trackName = CurriculumCatalog.trackById(subjectId)?.shortName ?: subjectId
       if (scorePercent >= 75) {
         repository.recordPlacementPassed(subjectId)
-        val currentStreak =
-          (profileState.value as? UiState.Success)?.data?.streakDays?.coerceAtLeast(1L) ?: 1L
-        repository.awardXp(currentUserId, 60L, currentStreak)
+        repository.recordXpWithAutoStreak(currentUserId, 60L)
         _statusMessage.value =
           "SS3 Placement Passed ($scorePercent%) — foundational $trackName chapters unlocked (+60 XP)"
       } else {
         _statusMessage.value =
           "Placement scored $scorePercent%. Reach 75%+ or build step-by-step from Lesson 1."
       }
+    }
+  }
+
+  fun awardGamifiedLabXp(lessonId: String, xpDelta: Int) {
+    val safeXp = xpDelta.toLong().coerceIn(0L, 120L)
+    if (safeXp <= 0L) return
+    viewModelScope.launch {
+      repository.recordCompletedLab(currentUserId, lessonId, safeXp)
+      _statusMessage.value = "Lab challenge completed (+${safeXp} XP)"
+    }
+  }
+
+  fun savePaper2Attempt(
+    promptId: String,
+    subjectId: String,
+    examBoard: String,
+    studentWorking: String,
+    checkedIndices: List<Int>,
+    earnedMarks: Int,
+    maxMarks: Int,
+  ) {
+    viewModelScope.launch {
+      val res =
+        repository.savePaper2Attempt(
+          userId = currentUserId,
+          promptId = promptId,
+          subjectId = subjectId,
+          examBoard = examBoard,
+          studentWorking = studentWorking,
+          checkedRubricIndices = checkedIndices,
+          earnedMarks = earnedMarks,
+          maxMarks = maxMarks,
+        )
+      _statusMessage.value =
+        if (res.isSuccess) "Paper 2 working & score saved ($earnedMarks/$maxMarks)"
+        else "Could not save Paper 2 attempt"
     }
   }
 
@@ -400,6 +462,7 @@ class MeritPrepViewModel(
           resultSummary = null,
         )
       launchExamTimer()
+      persistActiveCbtSession()
     }
   }
 
@@ -499,6 +562,7 @@ class MeritPrepViewModel(
           resultSummary = null,
         )
       launchExamTimer()
+      persistActiveCbtSession()
     }
   }
 
@@ -589,6 +653,7 @@ class MeritPrepViewModel(
       if (state.stage == CbtExamStage.RUNNING) state.copy(isTimerPaused = !state.isTimerPaused)
       else state
     }
+    persistActiveCbtSession()
   }
 
   fun goToCbtQuestion(index: Int) {
@@ -603,6 +668,7 @@ class MeritPrepViewModel(
         state
       }
     }
+    persistActiveCbtSession()
   }
 
   fun nextCbtQuestion() {
@@ -617,6 +683,7 @@ class MeritPrepViewModel(
         state
       }
     }
+    persistActiveCbtSession()
   }
 
   fun previousCbtQuestion() {
@@ -631,6 +698,7 @@ class MeritPrepViewModel(
         state
       }
     }
+    persistActiveCbtSession()
   }
 
   fun selectCbtAnswer(questionIndex: Int, optionIndex: Int) {
@@ -643,6 +711,7 @@ class MeritPrepViewModel(
         state.copy(selectedAnswers = nextAnswers)
       }
     }
+    persistActiveCbtSession()
     if (themePreferences.value.cbtAutoAdvance) {
       viewModelScope.launch {
         delay(220L)
@@ -664,7 +733,119 @@ class MeritPrepViewModel(
       if (questionIndex in updated) updated.remove(questionIndex) else updated.add(questionIndex)
       state.copy(flaggedQuestions = updated)
     }
+    persistActiveCbtSession()
   }
+
+  fun resumeSavedCbtExam() {
+    viewModelScope.launch {
+      val saved = repository.getActiveCbtSessionOnce(currentUserId) ?: return@launch
+      val questionIds = decodeStringListJson(saved.questionIdsJson)
+      if (questionIds.isEmpty()) {
+        repository.clearActiveCbtSession(currentUserId)
+        return@launch
+      }
+      val allById =
+        CurriculumCatalog.tracks
+          .flatMap { track -> repository.fetchPastQuestionsForCbt(track.id, "ALL") }
+          .associateBy { it.id }
+      val restoredQuestions = questionIds.mapNotNull { id -> allById[id] }
+      if (restoredQuestions.isEmpty()) {
+        repository.clearActiveCbtSession(currentUserId)
+        _statusMessage.value = "Saved CBT paper could not be restored."
+        return@launch
+      }
+      val selectedAnswers = decodeIntMapJson(saved.selectedAnswersJson)
+      val perQuestionSeconds = decodeIntMapJson(saved.perQuestionSecondsJson)
+      val flagged = decodeStringListJson(saved.flaggedQuestionsJson).mapNotNull { it.toIntOrNull() }.toSet()
+      val selectedElectives = decodeStringListJson(saved.selectedComboElectivesJson)
+      val comboTabs = decodeStringListJson(saved.comboSubjectTabsJson)
+      val comboSubjects = decodeStringListJson(saved.comboQuestionSubjectsJson)
+      val safeIdx = saved.currentIndex.coerceIn(0, restoredQuestions.lastIndex)
+
+      examTimerJob?.cancel()
+      _cbtState.value =
+        CbtExamState(
+          stage = CbtExamStage.RUNNING,
+          selectedSubjectId = saved.selectedSubjectId,
+          selectedExamBoard = saved.selectedExamBoard,
+          selectedQuestionLimit = saved.selectedQuestionLimit.coerceAtLeast(restoredQuestions.size),
+          isUtmeComboMode = saved.isUtmeComboMode,
+          selectedComboElectives = selectedElectives.ifEmpty { comboTabs.filter { it != "english" } }.ifEmpty { _cbtState.value.selectedComboElectives },
+          comboQuestionSubjects = comboSubjects,
+          comboSubjectTabs = comboTabs,
+          activeComboSubjectTab = saved.activeComboSubjectTab ?: comboSubjects.getOrNull(safeIdx) ?: comboTabs.firstOrNull(),
+          questions = restoredQuestions,
+          currentIndex = safeIdx,
+          selectedAnswers = selectedAnswers,
+          flaggedQuestions = flagged,
+          perQuestionSeconds = perQuestionSeconds,
+          remainingSeconds = saved.remainingSeconds.coerceAtLeast(30),
+          elapsedSeconds = saved.elapsedSeconds.coerceAtLeast(0),
+          totalAllowedSeconds = saved.totalAllowedSeconds.coerceAtLeast(120),
+          isTimerPaused = false,
+          isLoadingQuestions = false,
+          resultSummary = null,
+        )
+      launchExamTimer()
+      _statusMessage.value = "Resumed mock paper (${selectedAnswers.size}/${restoredQuestions.size} answered)"
+    }
+  }
+
+  fun discardSavedCbtExam() {
+    viewModelScope.launch { repository.clearActiveCbtSession(currentUserId) }
+  }
+
+  private fun persistActiveCbtSession() {
+    val state = _cbtState.value
+    if (state.stage != CbtExamStage.RUNNING || state.questions.isEmpty()) return
+    val entity =
+      ActiveCbtSessionEntity(
+        userId = currentUserId,
+        selectedSubjectId = state.selectedSubjectId,
+        selectedExamBoard = state.selectedExamBoard,
+        selectedQuestionLimit = state.selectedQuestionLimit,
+        isUtmeComboMode = state.isUtmeComboMode,
+        selectedComboElectivesJson = JSONArray(state.selectedComboElectives).toString(),
+        comboQuestionSubjectsJson = JSONArray(state.comboQuestionSubjects).toString(),
+        comboSubjectTabsJson = JSONArray(state.comboSubjectTabs).toString(),
+        activeComboSubjectTab = state.activeComboSubjectTab,
+        questionIdsJson = JSONArray(state.questions.map { it.id }).toString(),
+        currentIndex = state.currentIndex,
+        selectedAnswersJson =
+          JSONObject().apply {
+            state.selectedAnswers.forEach { (k, v) -> put(k.toString(), v) }
+          }.toString(),
+        flaggedQuestionsJson = JSONArray(state.flaggedQuestions.map { it.toString() }).toString(),
+        perQuestionSecondsJson =
+          JSONObject().apply {
+            state.perQuestionSeconds.forEach { (k, v) -> put(k.toString(), v) }
+          }.toString(),
+        remainingSeconds = state.remainingSeconds,
+        elapsedSeconds = state.elapsedSeconds,
+        totalAllowedSeconds = state.totalAllowedSeconds,
+        updatedAtMillis = System.currentTimeMillis(),
+      )
+    viewModelScope.launch { repository.saveActiveCbtSession(entity) }
+  }
+
+  private fun decodeStringListJson(raw: String): List<String> =
+    runCatching {
+      val arr = JSONArray(raw)
+      List(arr.length()) { i -> arr.optString(i, "") }.filter { it.isNotBlank() }
+    }.getOrDefault(emptyList())
+
+  private fun decodeIntMapJson(raw: String): Map<Int, Int> =
+    runCatching {
+      val obj = JSONObject(raw)
+      buildMap {
+        val keys = obj.keys()
+        while (keys.hasNext()) {
+          val k = keys.next()
+          val ki = k.toIntOrNull()
+          if (ki != null) put(ki, obj.getInt(k))
+        }
+      }
+    }.getOrDefault(emptyMap())
 
   fun submitCbtExam() {
     val state = _cbtState.value
@@ -752,8 +933,9 @@ class MeritPrepViewModel(
       )
     }
 
-    // Auto-enqueue missed CBT questions into SM-2 Spaced Repetition Deck
+    // Clear saved in-progress mock & auto-enqueue missed CBT questions into SM-2 Spaced Repetition Deck
     viewModelScope.launch {
+      repository.clearActiveCbtSession(currentUserId)
       reviewItems.filter { !it.isCorrect }.take(12).forEach { item ->
         repository.seedReviewCardFromQuestion(
           userId = currentUserId,
@@ -778,6 +960,7 @@ class MeritPrepViewModel(
 
   fun returnToCbtSetup() {
     examTimerJob?.cancel()
+    viewModelScope.launch { repository.clearActiveCbtSession(currentUserId) }
     _cbtState.update {
       it.copy(
         stage = CbtExamStage.SETUP,
@@ -844,15 +1027,13 @@ class MeritPrepViewModel(
         if (completedNow) {
           repository.seedReviewCardsFromLesson(currentUserId, lesson)
         }
-        val currentStreak =
-          (profileState.value as? UiState.Success)?.data?.streakDays?.coerceAtLeast(1L) ?: 1L
         val xpBonus =
           when {
             pillar == LessonPillar.EXERCISE && passedExercise -> 40L
             pillar == LessonPillar.EXERCISE -> 10L
             else -> 15L
           }
-        repository.awardXp(currentUserId, xpBonus, currentStreak)
+        repository.recordXpWithAutoStreak(currentUserId, xpBonus)
         _statusMessage.value =
           when {
             pillar == LessonPillar.EXERCISE && passedExercise ->
@@ -889,10 +1070,8 @@ class MeritPrepViewModel(
           weakTopics = weakTopics,
         )
       if (res.isSuccess) {
-        val currentStreak =
-          (profileState.value as? UiState.Success)?.data?.streakDays?.coerceAtLeast(1L) ?: 1L
         val xp = 30L + (correctCount * 10L)
-        repository.awardXp(currentUserId, xp, currentStreak)
+        repository.recordXpWithAutoStreak(currentUserId, xp)
         _statusMessage.value = "Exam attempt saved (+${xp} XP)"
       } else {
         _statusMessage.value = "Unable to save exam score."

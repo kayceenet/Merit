@@ -198,6 +198,8 @@ object MeritPrepCloudSync {
         when (profileToPush.targetExam.uppercase()) {
           "JAMB" -> "JAMB"
           "WAEC" -> "WAEC"
+          "NECO" -> "NECO"
+          "ALL" -> "ALL"
           else -> "BOTH"
         }
       val profilePayload =
@@ -235,7 +237,13 @@ object MeritPrepCloudSync {
 
       val remoteAttemptIds = remoteAttempts.map { it.id }.toSet()
       mergedBundle.attempts.filter { it.id !in remoteAttemptIds && it.id.matches(VALID_ID_REGEX) }.forEach { att ->
-        val safeBoard = if (att.examType.equals("WAEC", ignoreCase = true) || att.examType.equals("NECO", ignoreCase = true)) "WAEC" else "JAMB"
+        val safeBoard =
+          when (att.examType.uppercase()) {
+            "WAEC" -> "WAEC"
+            "NECO" -> "NECO"
+            "ALL" -> "ALL"
+            else -> "JAMB"
+          }
         val total = att.totalQuestions.coerceIn(1L, 200L)
         val correct = att.correctCount.coerceIn(0L, total)
         val payload =

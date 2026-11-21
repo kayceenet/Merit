@@ -82,10 +82,13 @@ data class CachedExamResultSnapshot(
 data class OfflineProgressSnapshot(
   val completedLessonIds: Set<String> = emptySet(),
   val placementPassedSubjects: Set<String> = emptySet(),
+  val completedLabIds: Set<String> = emptySet(),
   val lastLessonId: String? = null,
   val lastExamSubjectId: String? = null,
   val offlineXp: Long = 0L,
   val offlineStreakDays: Long = 1L,
+  val todayXp: Long = 0L,
+  val lastActiveEpochDay: Long = 0L,
   val totalExamsTaken: Int = 0,
   val recentResults: List<CachedExamResultSnapshot> = emptyList(),
 )
@@ -130,13 +133,18 @@ class OfflinePreferencesRepository(private val dataStore: DataStore<Preferences>
 
   val offlineSnapshot: Flow<OfflineProgressSnapshot> =
     dataStore.data.map { prefs ->
+      val currentDay = currentLocalEpochDay()
+      val xpDay = prefs[KEY_TODAY_XP_EPOCH_DAY] ?: 0L
       OfflineProgressSnapshot(
         completedLessonIds = prefs[KEY_COMPLETED_LESSON_IDS] ?: emptySet(),
         placementPassedSubjects = prefs[KEY_PLACEMENT_PASSED_SUBJECTS] ?: emptySet(),
+        completedLabIds = prefs[KEY_COMPLETED_LAB_IDS] ?: emptySet(),
         lastLessonId = prefs[KEY_LAST_LESSON_ID],
         lastExamSubjectId = prefs[KEY_LAST_EXAM_SUBJECT_ID],
         offlineXp = prefs[KEY_OFFLINE_XP] ?: 0L,
         offlineStreakDays = prefs[KEY_OFFLINE_STREAK_DAYS] ?: 1L,
+        todayXp = if (xpDay == currentDay) (prefs[KEY_TODAY_XP] ?: 0L) else 0L,
+        lastActiveEpochDay = prefs[KEY_LAST_ACTIVE_EPOCH_DAY] ?: 0L,
         totalExamsTaken = prefs[KEY_TOTAL_EXAMS_TAKEN] ?: 0,
         recentResults = parseCachedResults(prefs[KEY_RECENT_EXAM_RESULTS_JSON]),
       )
@@ -151,7 +159,11 @@ class OfflinePreferencesRepository(private val dataStore: DataStore<Preferences>
   }
 
   suspend fun setThemePalette(palette: ThemePalette) {
-    dataStore.edit { prefs -> prefs[KEY_THEME_PALETTE] = palette.name }
+    dataStore.edit { prefs ->
+      prefs[KEY_THEME_PALETTE] = palette.name
+      // Picking a curated palette activates it visibly on Android 12+ instead of wallpaper Material You overriding it
+      prefs[KEY_USE_DYNAMIC_COLOR] = false
+    }
   }
 
   suspend fun setHighContrastBoost(enabled: Boolean) {
@@ -222,6 +234,45 @@ class OfflinePreferencesRepository(private val dataStore: DataStore<Preferences>
     }
   }
 
+  suspend fun recordDailyActivityXp(
+    xpDelta: Long,
+    currentStreakFallback: Long = 1L,
+    epochDay: Long = currentLocalEpochDay(),
+  ): Pair<Long, Long> {
+    var computedStreak = currentStreakFallback.coerceAtLeast(1L)
+    var computedTodayXp = 0L
+    dataStore.edit { prefs ->
+      val prevStreak = (prefs[KEY_OFFLINE_STREAK_DAYS] ?: currentStreakFallback).coerceAtLeast(1L)
+      val lastDay = prefs[KEY_LAST_ACTIVE_EPOCH_DAY] ?: 0L
+      computedStreak =
+        when {
+          lastDay <= 0L -> prevStreak.coerceAtLeast(1L)
+          epochDay == lastDay -> prevStreak
+          epochDay == lastDay + 1L -> (prevStreak + 1L).coerceAtMost(3650L)
+          epochDay > lastDay + 1L -> 1L
+          else -> prevStreak
+        }
+      val prevTodayDay = prefs[KEY_TODAY_XP_EPOCH_DAY] ?: 0L
+      val baseTodayXp = if (prevTodayDay == epochDay) (prefs[KEY_TODAY_XP] ?: 0L) else 0L
+      computedTodayXp = (baseTodayXp + xpDelta.coerceAtLeast(0L)).coerceAtMost(100_000L)
+      prefs[KEY_OFFLINE_STREAK_DAYS] = computedStreak
+      prefs[KEY_LAST_ACTIVE_EPOCH_DAY] = maxOf(lastDay, epochDay)
+      prefs[KEY_TODAY_XP] = computedTodayXp
+      prefs[KEY_TODAY_XP_EPOCH_DAY] = epochDay
+    }
+    return computedStreak to computedTodayXp
+  }
+
+  suspend fun recordCompletedLab(labKey: String): Boolean {
+    var newlyAdded = false
+    dataStore.edit { prefs ->
+      val current = prefs[KEY_COMPLETED_LAB_IDS]?.toMutableSet() ?: mutableSetOf()
+      newlyAdded = current.add(labKey)
+      prefs[KEY_COMPLETED_LAB_IDS] = current
+    }
+    return newlyAdded
+  }
+
   suspend fun recordLessonSnapshot(
     lessonId: String,
     isCompleted: Boolean,
@@ -229,9 +280,9 @@ class OfflinePreferencesRepository(private val dataStore: DataStore<Preferences>
     streakDays: Long? = null,
   ) {
     dataStore.edit { prefs ->
-      prefs[KEY_LAST_LESSON_ID] = lessonId
+      if (lessonId.isNotBlank()) prefs[KEY_LAST_LESSON_ID] = lessonId
       val currentSet = prefs[KEY_COMPLETED_LESSON_IDS]?.toMutableSet() ?: mutableSetOf()
-      if (isCompleted) {
+      if (isCompleted && lessonId.isNotBlank()) {
         currentSet.add(lessonId)
       }
       prefs[KEY_COMPLETED_LESSON_IDS] = currentSet
@@ -302,6 +353,9 @@ class OfflinePreferencesRepository(private val dataStore: DataStore<Preferences>
     return array.toString()
   }
 
+  private fun currentLocalEpochDay(): Long =
+    (System.currentTimeMillis() + java.util.TimeZone.getDefault().getOffset(System.currentTimeMillis())) / 86_400_000L
+
   private companion object {
     val KEY_THEME_MODE = stringPreferencesKey("theme_mode")
     val KEY_THEME_PALETTE = stringPreferencesKey("theme_palette")
@@ -319,10 +373,14 @@ class OfflinePreferencesRepository(private val dataStore: DataStore<Preferences>
     val KEY_SPACED_REVIEW_BATCH_SIZE = intPreferencesKey("spaced_review_batch_size")
     val KEY_COMPLETED_LESSON_IDS = stringSetPreferencesKey("completed_lesson_ids")
     val KEY_PLACEMENT_PASSED_SUBJECTS = stringSetPreferencesKey("placement_passed_subjects")
+    val KEY_COMPLETED_LAB_IDS = stringSetPreferencesKey("completed_lab_ids")
     val KEY_LAST_LESSON_ID = stringPreferencesKey("last_lesson_id")
     val KEY_LAST_EXAM_SUBJECT_ID = stringPreferencesKey("last_exam_subject_id")
     val KEY_OFFLINE_XP = longPreferencesKey("offline_xp")
     val KEY_OFFLINE_STREAK_DAYS = longPreferencesKey("offline_streak_days")
+    val KEY_LAST_ACTIVE_EPOCH_DAY = longPreferencesKey("last_active_epoch_day")
+    val KEY_TODAY_XP = longPreferencesKey("today_xp")
+    val KEY_TODAY_XP_EPOCH_DAY = longPreferencesKey("today_xp_epoch_day")
     val KEY_TOTAL_EXAMS_TAKEN = intPreferencesKey("total_exams_taken")
     val KEY_RECENT_EXAM_RESULTS_JSON = stringPreferencesKey("recent_exam_results_json")
     val KEY_CURRICULUM_VERSION = intPreferencesKey("curriculum_version")

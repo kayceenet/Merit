@@ -60,6 +60,7 @@ fun GamifiedVirtualLab(
   lessonId: String,
   labType: PracticalLabType,
   modifier: Modifier = Modifier,
+  onRewardEarned: (xpDelta: Int, missionCompleted: Boolean) -> Unit = { _, _ -> },
 ) {
   val rounds = remember(lessonId, labType) { GamifiedLabChallenges.roundsFor(labType) }
   var roundIdx by remember(lessonId, labType) { mutableIntStateOf(0) }
@@ -379,6 +380,7 @@ fun GamifiedVirtualLab(
                 xp += earnedThisRound
                 completedRounds += 1
                 trialSubmitted = true
+                onRewardEarned(earnedThisRound, completedRounds >= rounds.size)
               },
               modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("gamified_lab_submit"),
             ) {
@@ -494,6 +496,7 @@ fun GamifiedVirtualLab(
                 xp += earnedThisRound
                 completedRounds += 1
                 trialSubmitted = true
+                onRewardEarned(earnedThisRound, completedRounds >= rounds.size)
               },
               modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).testTag("gamified_lab_submit"),
             ) {

@@ -49,7 +49,8 @@ object CurriculumEntityMapper {
 
   fun buildPastQuestionEntities(): List<PastQuestionEntity> =
     CurriculumCatalog.tracks.flatMap { track ->
-      val combined = (track.pastQuestions + track.allLessons.flatMap { it.exercises }).distinctBy { it.id }
+      val extra = ExpandedPastQuestionBank.extraBySubject[track.id].orEmpty()
+      val combined = (track.pastQuestions + extra + track.allLessons.flatMap { it.exercises }).distinctBy { it.id }
       combined.mapIndexed { idx, raw ->
         val q = AcademyCurriculumEnricher.sanitizeQuestion(raw, idx)
         PastQuestionEntity(
@@ -137,6 +138,7 @@ object CurriculumEntityMapper {
         stepByStepSolution = entity.stepByStepSolution,
         waecMarkingScheme = entity.waecMarkingScheme,
         passageText = CurriculumCatalog.passageForEntityId(entity.id),
+        diagramSpec = CurriculumCatalog.diagramSpecForEntityId(entity.id),
       )
     )
 
@@ -531,6 +533,7 @@ object CurriculumEntityMapper {
             put("marks", q.marks)
             put("remediationTip", q.remediationTip)
             put("passageText", q.passageText ?: JSONObject.NULL)
+            put("diagramSpec", q.diagramSpec?.name ?: JSONObject.NULL)
           }
         )
       }
@@ -544,7 +547,11 @@ object CurriculumEntityMapper {
         val optsArr = o.optJSONArray("options") ?: JSONArray()
         val scheme = o.opt("waecMarkingScheme")
         val passage = o.opt("passageText")
+        val specRaw = o.opt("diagramSpec")
         val qId = o.optString("id", "")
+        val parsedSpec =
+          if (specRaw == null || specRaw == JSONObject.NULL) CurriculumCatalog.diagramSpecForEntityId(qId)
+          else QuestionDiagramSpec.entries.find { it.name == specRaw.toString() }
         AcademyCurriculumEnricher.sanitizeQuestion(
           PracticeQuestion(
             id = qId,
@@ -563,6 +570,7 @@ object CurriculumEntityMapper {
             passageText =
               if (passage == null || passage == JSONObject.NULL) CurriculumCatalog.passageForEntityId(qId)
               else passage.toString(),
+            diagramSpec = parsedSpec,
           )
         )
       }

@@ -1,9 +1,18 @@
 package com.example.ui.labs
 
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -14,9 +23,20 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.data.curriculum.PracticalLabType
 import com.example.ui.components.ScientificText
+import com.example.ui.theme.semanticColors
+import java.util.Locale
 import kotlin.math.exp
 import kotlin.math.pow
 import kotlin.math.roundToInt
@@ -61,8 +81,8 @@ private fun MicroscopyMagnificationLab() {
     LabMetricBanner(
       listOf(
         "Total Mag" to "×$totalMag",
-        "Drawing Size" to "${String.format("%.1f", drawingCm)} cm",
-        "Actual Cell" to String.format("%.1f μm", actualUm),
+        "Drawing Size" to "${String.format(Locale.US, "%.1f", drawingCm)} cm",
+        "Actual Cell" to String.format(Locale.US, "%.1f μm", actualUm),
       )
     )
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -72,7 +92,7 @@ private fun MicroscopyMagnificationLab() {
     }
     LabeledLabSlider(
       label = "Measured Diagram Size on Paper",
-      valueText = String.format("%.1f cm", drawingCm),
+      valueText = String.format(Locale.US, "%.1f cm", drawingCm),
       value = drawingCm,
       onValueChange = { drawingCm = it },
       valueRange = 1f..10f,
@@ -88,10 +108,68 @@ private fun OsmosisCellBathLab() {
   val plantState = listOf("TURGID (Vacuole swollen; Wall prevents bursting)", "FLACCID (Zero net water flow)", "PLASMOLYZED (Membrane pulls away from wall)")
   val rbcState = listOf("HAEMOLYSIS (Swells and bursts cleanly!)", "NORMAL BICONCAVE SHAPE", "CRENATED (Shriveled & spiked)")
 
+  val primary = MaterialTheme.colorScheme.primary
+  val secondary = MaterialTheme.colorScheme.secondary
+  val errorColor = MaterialTheme.colorScheme.error
+  val successColor = MaterialTheme.semanticColors.success
+
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
       baths.forEachIndexed { idx, b ->
         FilterChip(selected = bathIdx == idx, onClick = { bathIdx = idx }, label = { Text(b.substringBefore(" (")) })
+      }
+    }
+    Canvas(modifier = Modifier.fillMaxWidth().height(120.dp)) {
+      val leftCx = size.width * 0.28f
+      val rightCx = size.width * 0.72f
+      val cy = size.height * 0.5f
+      // Left: Plant Cell (rigid cell wall + changing central vacuole)
+      drawRoundRect(
+        color = successColor,
+        topLeft = Offset(leftCx - 54f, cy - 42f),
+        size = Size(108f, 84f),
+        cornerRadius = CornerRadius(18f, 18f),
+        style = Stroke(width = 5f),
+      )
+      val vacScale = when (bathIdx) {
+        0 -> 1.0f
+        1 -> 0.76f
+        else -> 0.45f
+      }
+      drawRoundRect(
+        color = primary.copy(alpha = 0.28f),
+        topLeft = Offset(leftCx - 44f * vacScale, cy - 32f * vacScale),
+        size = Size(88f * vacScale, 64f * vacScale),
+        cornerRadius = CornerRadius(14f, 14f),
+      )
+      // Right: Animal Red Blood Cell (no cell wall!)
+      val rbcRadius = when (bathIdx) {
+        0 -> 44f
+        1 -> 34f
+        else -> 22f
+      }
+      drawCircle(
+        color = if (bathIdx == 0) errorColor.copy(alpha = 0.3f) else secondary.copy(alpha = 0.28f),
+        radius = rbcRadius,
+        center = Offset(rightCx, cy),
+      )
+      drawCircle(
+        color = if (bathIdx == 0) errorColor else secondary,
+        radius = rbcRadius,
+        center = Offset(rightCx, cy),
+        style = Stroke(width = 4f),
+      )
+      if (bathIdx == 2) {
+        // Crenation spikes
+        for (i in 0 until 8) {
+          val a = i * (Math.PI / 4.0)
+          drawLine(
+            color = secondary,
+            start = Offset(rightCx + (20f * kotlin.math.cos(a)).toFloat(), cy + (20f * kotlin.math.sin(a)).toFloat()),
+            end = Offset(rightCx + (31f * kotlin.math.cos(a)).toFloat(), cy + (31f * kotlin.math.sin(a)).toFloat()),
+            strokeWidth = 3f,
+          )
+        }
       }
     }
     LabMetricBanner(
@@ -140,7 +218,7 @@ private fun BioenergeticsAndEnzymeLab() {
       )
       LabeledLabSlider(
         label = "Dissolved CO_2 Concentration",
-        valueText = String.format("%.2f%%", co2Pct),
+        valueText = String.format(Locale.US, "%.2f%%", co2Pct),
         value = co2Pct,
         onValueChange = { co2Pct = it },
         valueRange = 0.01f..0.10f,
@@ -163,11 +241,40 @@ private fun EnzymeActivityLab() {
   }
   val state = if (tempC < 10f) "Inactivated (Cold Sleep)" else if (tempC > 50f) "DENATURED Permanently!" else "Active Lock-and-Key"
 
+  val primary = MaterialTheme.colorScheme.primary
+  val danger = MaterialTheme.colorScheme.error
+  val outline = MaterialTheme.colorScheme.outlineVariant
+
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
       enzymes.forEachIndexed { idx, e ->
         FilterChip(selected = enzymeIdx == idx, onClick = { enzymeIdx = idx }, label = { Text(e) })
       }
+    }
+    Canvas(modifier = Modifier.fillMaxWidth().height(115.dp)) {
+      val left = 20f
+      val right = size.width - 20f
+      val bottom = size.height - 16f
+      val top = 14f
+      drawLine(outline, Offset(left, bottom), Offset(right, bottom), strokeWidth = 3f)
+      drawLine(outline, Offset(left, top), Offset(left, bottom), strokeWidth = 3f)
+      val path = Path().apply {
+        for (i in 0..50) {
+          val t = (i / 50f) * 65f
+          val r = when {
+            t > 52f -> 0f
+            t > 40f -> (100f * (52f - t) / 12f).coerceIn(0f, 100f)
+            else -> (100f * exp(-((t - 37f) / 18f).pow(2))).coerceIn(8f, 100f)
+          }
+          val px = left + (t / 65f) * (right - left)
+          val py = bottom - (r / 100f) * (bottom - top)
+          if (i == 0) moveTo(px, py) else lineTo(px, py)
+        }
+      }
+      drawPath(path, primary, style = Stroke(width = 4.5f))
+      val curX = left + (tempC / 65f) * (right - left)
+      val curY = bottom - (ratePct / 100f) * (bottom - top)
+      drawCircle(if (tempC > 50f) danger else primary, radius = 8f, center = Offset(curX, curY))
     }
     LabMetricBanner(
       listOf(
@@ -193,12 +300,35 @@ private fun FoodTestsBenchLab() {
   val foods = listOf("Starch (Yam)", "Glucose (Reducing)", "Sucrose (Non-reducing)", "Egg Albumin (Protein)")
   val reagents = listOf("Iodine Solution", "Benedict's + Heat", "HCl + Neutralize + Benedict's", "Biuret (NaOH + CuSO₄)")
   val colours = listOf("Blue-Black Colour", "Brick-Red Precipitate", "Brick-Red ONLY after Acid Boil", "Violet / Purple Ring")
+  val semantics = MaterialTheme.semanticColors
+  val indicatorTint = when (foodIdx) {
+    0 -> semantics.indigoAccent
+    1, 2 -> semantics.coralAccent
+    else -> MaterialTheme.colorScheme.secondary
+  }
+  val outline = MaterialTheme.colorScheme.outline
 
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
       foods.forEachIndexed { idx, f ->
         FilterChip(selected = foodIdx == idx, onClick = { foodIdx = idx }, label = { Text(f.substringBefore(" (")) })
       }
+    }
+    Canvas(modifier = Modifier.fillMaxWidth().height(92.dp)) {
+      val cx = size.width * 0.5f
+      drawRoundRect(
+        color = indicatorTint.copy(alpha = 0.72f),
+        topLeft = Offset(cx - 24f, 34f),
+        size = Size(48f, 44f),
+        cornerRadius = CornerRadius(20f, 20f),
+      )
+      drawRoundRect(
+        color = outline,
+        topLeft = Offset(cx - 26f, 10f),
+        size = Size(52f, 72f),
+        cornerRadius = CornerRadius(22f, 22f),
+        style = Stroke(width = 4f),
+      )
     }
     LabMetricBanner(listOf("Reagent" to reagents[foodIdx], "Positive Result" to colours[foodIdx]))
   }
@@ -370,6 +500,15 @@ private fun PunnettGeneticsLab() {
   val asCount = grid.count { it == "AS" } * 25
   val ssCount = grid.count { it == "SS" } * 25
 
+  val cellBorder = MaterialTheme.colorScheme.outlineVariant
+  val surfaceBg = MaterialTheme.colorScheme.background
+  val normBg = MaterialTheme.semanticColors.successContainer
+  val normFg = MaterialTheme.semanticColors.onSuccessContainer
+  val carBg = MaterialTheme.colorScheme.tertiaryContainer
+  val carFg = MaterialTheme.colorScheme.onTertiaryContainer
+  val ssBg = MaterialTheme.colorScheme.errorContainer
+  val ssFg = MaterialTheme.colorScheme.onErrorContainer
+
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
       options.forEach { g ->
@@ -377,6 +516,54 @@ private fun PunnettGeneticsLab() {
       }
       options.forEach { g ->
         FilterChip(selected = p2 == g, onClick = { p2 = g }, label = { Text("Dad $g") })
+      }
+    }
+    // Live 2x2 Punnett Cross Matrix
+    Column(
+      modifier =
+        Modifier.fillMaxWidth()
+          .clip(RoundedCornerShape(12.dp))
+          .background(surfaceBg)
+          .border(1.dp, cellBorder, RoundedCornerShape(12.dp))
+          .padding(10.dp),
+      verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+          Text("M \\ D", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+        }
+        listOf(p2[0], p2[1]).forEach { dGamete ->
+          Box(
+            modifier = Modifier.weight(1f).clip(RoundedCornerShape(8.dp)).background(MaterialTheme.colorScheme.secondaryContainer).padding(vertical = 6.dp),
+            contentAlignment = Alignment.Center,
+          ) {
+            Text("$dGamete", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+          }
+        }
+      }
+      listOf(0, 1).forEach { r ->
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+          Box(
+            modifier = Modifier.weight(1f).clip(RoundedCornerShape(8.dp)).background(MaterialTheme.colorScheme.secondaryContainer).padding(vertical = 8.dp),
+            contentAlignment = Alignment.Center,
+          ) {
+            Text("${p1[r]}", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+          }
+          listOf(0, 1).forEach { c ->
+            val gType = grid[r * 2 + c]
+            val (bg, fg) = when (gType) {
+              "AA" -> normBg to normFg
+              "AS" -> carBg to carFg
+              else -> ssBg to ssFg
+            }
+            Box(
+              modifier = Modifier.weight(1f).clip(RoundedCornerShape(8.dp)).background(bg).border(1.dp, cellBorder, RoundedCornerShape(8.dp)).padding(vertical = 8.dp),
+              contentAlignment = Alignment.Center,
+            ) {
+              Text(gType, style = MaterialTheme.typography.titleSmall, color = fg, fontWeight = FontWeight.ExtraBold)
+            }
+          }
+        }
       }
     }
     LabMetricBanner(

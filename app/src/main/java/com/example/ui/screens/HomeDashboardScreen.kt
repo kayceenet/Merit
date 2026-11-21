@@ -70,6 +70,7 @@ import com.example.data.local.ThemeMode
 import com.example.data.local.ThemePreferences
 import com.example.data.model.ExamAttempt
 import com.example.data.model.LessonProgress
+import com.example.data.model.StudyNote
 import com.example.data.model.UserProfile
 import com.example.ui.components.StudioActionTile
 import com.example.ui.components.StudioGradientProgressBanner
@@ -96,9 +97,11 @@ fun HomeDashboardScreen(
   structuredModules: List<CourseModule>,
   progressList: List<LessonProgress>,
   attempts: List<ExamAttempt>,
+  notes: List<StudyNote> = emptyList(),
   isDarkTheme: Boolean,
   themePreferences: ThemePreferences = ThemePreferences(),
   placementPassedSubjects: Set<String> = emptySet(),
+  todayXp: Long = 0L,
   dueReviewsCount: Int = 0,
   totalReviewCardsCount: Int = 0,
   onToggleDarkTheme: () -> Unit,
@@ -157,14 +160,54 @@ fun HomeDashboardScreen(
   val projectedJamb =
     if (attempts.isEmpty()) 260 else (180 + (avgAccuracy * 2.2)).roundToInt().coerceIn(160, 400)
   val recentWeakTopic = attempts.firstOrNull()?.weakTopics?.firstOrNull()
+  val recentWeakSubjectId =
+    remember(attempts, recentWeakTopic, nextLesson.subjectId) {
+      val fromAttempt =
+        attempts.firstOrNull { !recentWeakTopic.isNullOrBlank() && recentWeakTopic in it.weakTopics }
+          ?.subjectId
+          ?.takeIf { it.isNotBlank() && it != "utme_combo" }
+      val fromCatalog =
+        if (!recentWeakTopic.isNullOrBlank()) {
+          CurriculumCatalog.tracks.firstOrNull { track ->
+            track.allLessons.any { it.title.contains(recentWeakTopic, ignoreCase = true) }
+          }?.id
+        } else null
+      fromAttempt ?: fromCatalog ?: nextLesson.subjectId
+    }
   val semantics = MaterialTheme.semanticColors
 
   var activeSubTab by remember { mutableStateOf(MaterialsSubTab.TRACKS) }
   var searchQuery by remember { mutableStateOf("") }
   var filterCategory by remember { mutableStateOf(TrackFilterCategory.ALL) }
 
+  val trimmedQuery = searchQuery.trim()
+  val matchingLessons =
+    remember(trimmedQuery, allLessons) {
+      if (trimmedQuery.length < 2) emptyList()
+      else {
+        allLessons.filter { lesson ->
+          lesson.title.contains(trimmedQuery, ignoreCase = true) ||
+            lesson.syllabusTag.contains(trimmedQuery, ignoreCase = true) ||
+            lesson.concepts.any {
+              it.heading.contains(trimmedQuery, ignoreCase = true) ||
+                (it.keyFormula?.contains(trimmedQuery, ignoreCase = true) == true)
+            }
+        }.take(6)
+      }
+    }
+  val matchingNotes =
+    remember(trimmedQuery, notes) {
+      if (trimmedQuery.length < 2) emptyList()
+      else {
+        notes.filter { note ->
+          note.title.contains(trimmedQuery, ignoreCase = true) ||
+            note.content.contains(trimmedQuery, ignoreCase = true)
+        }.take(4)
+      }
+    }
+
   val filteredTracks =
-    remember(searchQuery, filterCategory) {
+    remember(trimmedQuery, filterCategory) {
       CurriculumCatalog.tracks.filter { track ->
         val matchesCategory =
           when (filterCategory) {
@@ -173,11 +216,11 @@ fun HomeDashboardScreen(
             TrackFilterCategory.HUMANITIES -> track.id in setOf("english", "economics", "government")
           }
         val matchesSearch =
-          searchQuery.isBlank() ||
-            track.title.contains(searchQuery, ignoreCase = true) ||
-            track.shortName.contains(searchQuery, ignoreCase = true) ||
-            track.tagline.contains(searchQuery, ignoreCase = true) ||
-            track.allLessons.any { it.title.contains(searchQuery, ignoreCase = true) }
+          trimmedQuery.isBlank() ||
+            track.title.contains(trimmedQuery, ignoreCase = true) ||
+            track.shortName.contains(trimmedQuery, ignoreCase = true) ||
+            track.tagline.contains(trimmedQuery, ignoreCase = true) ||
+            track.allLessons.any { it.title.contains(trimmedQuery, ignoreCase = true) }
         matchesCategory && matchesSearch
       }
     }
@@ -242,7 +285,7 @@ fun HomeDashboardScreen(
                 fontWeight = FontWeight.Bold,
               )
               Text(
-                text = "${profile?.displayName?.substringBefore(" ") ?: "Scholar"} • ${profile?.totalXp ?: 0} XP",
+                text = "${profile?.displayName?.substringBefore(" ") ?: "Scholar"} • Today ${todayXp}/${themePreferences.dailyXpTarget} XP",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
               )
@@ -341,7 +384,7 @@ fun HomeDashboardScreen(
             Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
               if (searchQuery.isEmpty()) {
                 Text(
-                  text = "Search subjects, topics...",
+                  text = "Search subjects, topics, formulas, notes...",
                   style = MaterialTheme.typography.bodyMedium,
                   color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -392,6 +435,98 @@ fun HomeDashboardScreen(
                 else MaterialTheme.colorScheme.onSurface,
               modifier = Modifier.size(20.dp),
             )
+          }
+        }
+      }
+
+      if (trimmedQuery.length >= 2 && (matchingLessons.isNotEmpty() || matchingNotes.isNotEmpty())) {
+        item {
+          Column(
+            modifier =
+              Modifier.padding(horizontal = 16.dp)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(18.dp))
+                .background(MaterialTheme.colorScheme.surface)
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(18.dp))
+                .padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+          ) {
+            Text(
+              text = "DIRECT SEARCH MATCHES (${matchingLessons.size + matchingNotes.size})",
+              style = MaterialTheme.typography.labelSmall,
+              color = MaterialTheme.colorScheme.primary,
+              fontWeight = FontWeight.Bold,
+            )
+            matchingLessons.forEach { hit ->
+              Row(
+                modifier =
+                  Modifier.fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(semantics.softTintSurface)
+                    .clickable { onOpenLesson(hit) }
+                    .padding(horizontal = 12.dp, vertical = 9.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+              ) {
+                Column(modifier = Modifier.weight(1f)) {
+                  Text(
+                    text = hit.title,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                  )
+                  Text(
+                    text = "${hit.subjectId.replaceFirstChar { it.uppercase() }} • ${hit.syllabusTag}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                  )
+                }
+                Icon(
+                  imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                  contentDescription = "Open ${hit.title}",
+                  tint = MaterialTheme.colorScheme.primary,
+                  modifier = Modifier.size(16.dp),
+                )
+              }
+            }
+            matchingNotes.forEach { note ->
+              Row(
+                modifier =
+                  Modifier.fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.55f))
+                    .clickable(onClick = onOpenNotebook)
+                    .padding(horizontal = 12.dp, vertical = 9.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+              ) {
+                Column(modifier = Modifier.weight(1f)) {
+                  Text(
+                    text = "Note: ${note.title}",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                  )
+                  Text(
+                    text = note.content,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                  )
+                }
+                Icon(
+                  imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                  contentDescription = "Open Notebook",
+                  tint = MaterialTheme.colorScheme.secondary,
+                  modifier = Modifier.size(16.dp),
+                )
+              }
+            }
           }
         }
       }
@@ -584,7 +719,7 @@ fun HomeDashboardScreen(
                 title = "Pass 1 Timed Exam Drill (70%+)",
                 subtitle = "JAMB UTME, WAEC WASSCE & NECO SSCE",
                 isDone = anyExamPassed,
-                onClick = { onOpenExamLab("physics") },
+                onClick = { onOpenExamLab(nextLesson.subjectId) },
               )
             }
           }
@@ -703,7 +838,7 @@ fun HomeDashboardScreen(
                   icon = Icons.Filled.Quiz,
                   iconTint = MaterialTheme.colorScheme.primary,
                   modifier = Modifier.weight(1f),
-                  onClick = { onOpenExamLab("physics") },
+                  onClick = { onOpenExamLab(nextLesson.subjectId) },
                 )
                 StudioActionTile(
                   label = "Paper 2 Lab",
@@ -721,7 +856,7 @@ fun HomeDashboardScreen(
                       .clip(RoundedCornerShape(18.dp))
                       .background(MaterialTheme.colorScheme.surface)
                       .border(1.dp, semantics.coralAccent.copy(alpha = 0.5f), RoundedCornerShape(18.dp))
-                      .clickable { onOpenExamLab("physics") }
+                      .clickable { onOpenExamLab(recentWeakSubjectId) }
                       .padding(14.dp),
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -755,16 +890,22 @@ fun HomeDashboardScreen(
   }
 }
 
-private fun subjectGradientStyle(subjectId: String): Triple<String, String, List<Color>> =
-  when (subjectId) {
-    "physics" -> Triple("PHY • SS1–SS3", "JAMB • WAEC", listOf(Color(0xFF6B9BFF), Color(0xFF4F7FF3)))
-    "chemistry" -> Triple("CHM • SS1–SS3", "JAMB • WAEC", listOf(Color(0xFF443EA0), Color(0xFF302B78)))
-    "mathematics" -> Triple("MTH • CORE", "UTME • WASSCE", listOf(Color(0xFF8382C7), Color(0xFF6967AE)))
-    "english" -> Triple("ENG • COMPULSORY", "60 UTME Qs", listOf(Color(0xFFFC8590), Color(0xFFF26C79)))
-    "biology" -> Triple("BIO • SS1–SS3", "Life Sciences", listOf(Color(0xFF39B2B0), Color(0xFF28898C)))
-    "economics" -> Triple("ECO • SS1–SS3", "Micro & Macro", listOf(Color(0xFF5D87F0), Color(0xFF4368CF)))
-    else -> Triple("GOV • SS1–SS3", "Civic & Polity", listOf(Color(0xFF5B4BB7), Color(0xFF3E338A)))
+@Composable
+private fun subjectGradientStyle(subjectId: String): Triple<String, String, List<Color>> {
+  val semantics = MaterialTheme.semanticColors
+  val primary = MaterialTheme.colorScheme.primary
+  val secondary = MaterialTheme.colorScheme.secondary
+  val tertiary = MaterialTheme.colorScheme.tertiary
+  return when (subjectId) {
+    "physics" -> Triple("PHY • SS1–SS3", "JAMB • WAEC", listOf(semantics.heroGradientStart, primary))
+    "chemistry" -> Triple("CHM • SS1–SS3", "JAMB • WAEC", listOf(semantics.classroomBar, semantics.indigoAccent))
+    "mathematics" -> Triple("MTH • CORE", "UTME • WASSCE", listOf(semantics.periwinkleAccent, semantics.heroGradientMid))
+    "english" -> Triple("ENG • COMPULSORY", "60 UTME Qs", listOf(semantics.coralAccent, tertiary))
+    "biology" -> Triple("BIO • SS1–SS3", "Life Sciences", listOf(semantics.success, secondary))
+    "economics" -> Triple("ECO • SS1–SS3", "Micro & Macro", listOf(primary, semantics.indigoAccent))
+    else -> Triple("GOV • SS1–SS3", "Civic & Polity", listOf(semantics.heroGradientMid, semantics.classroomBar))
   }
+}
 
 @Composable
 private fun StudyChecklistItem(

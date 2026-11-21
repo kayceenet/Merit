@@ -16,11 +16,14 @@ import com.example.data.local.OfflineProgressSnapshot
 import com.example.data.local.ThemeMode
 import com.example.data.local.ThemePalette
 import com.example.data.local.ThemePreferences
+import com.example.data.model.ActiveCbtSessionEntity
 import com.example.data.model.ExamAttempt
 import com.example.data.model.LessonProgress
+import com.example.data.model.Paper2AttemptEntity
 import com.example.data.model.SpacedReviewCardEntity
 import com.example.data.model.StudyNote
 import com.example.data.model.UserProfile
+import java.time.LocalDate
 import java.util.UUID
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CancellationException
@@ -120,15 +123,21 @@ class MeritPrepRepository(
 
   suspend fun seedCurriculumIfNeeded() {
     try {
+      val storedVersion = preferencesRepository?.getCurriculumVersion() ?: CURRENT_CURRICULUM_VERSION
+      val moduleCount = dao.getModuleCount()
+      val chapterCount = dao.getChapterCount()
+      val pqCount = dao.getPastQuestionCount()
+      if (storedVersion == CURRENT_CURRICULUM_VERSION && moduleCount > 0 && chapterCount > 0 && pqCount > 0) {
+        return
+      }
       val expectedModules = CurriculumEntityMapper.buildModuleEntities()
       val expectedChapters = CurriculumEntityMapper.buildChapterEntities()
       val expectedQuestions = CurriculumEntityMapper.buildPastQuestionEntities()
-      val storedVersion = preferencesRepository?.getCurriculumVersion() ?: CURRENT_CURRICULUM_VERSION
       val needsRefresh =
         storedVersion != CURRENT_CURRICULUM_VERSION ||
-          dao.getModuleCount() != expectedModules.size ||
-          dao.getChapterCount() != expectedChapters.size ||
-          dao.getPastQuestionCount() != expectedQuestions.size
+          moduleCount != expectedModules.size ||
+          chapterCount != expectedChapters.size ||
+          pqCount != expectedQuestions.size
 
       if (needsRefresh) {
         dao.replaceCurriculum(expectedModules, expectedChapters, expectedQuestions)
@@ -256,6 +265,117 @@ class MeritPrepRepository(
     } catch (e: Exception) {
       Result.failure(e)
     }
+  }
+
+  suspend fun recordXpWithAutoStreak(
+    userId: String,
+    xpDelta: Long,
+    epochDay: Long = LocalDate.now().toEpochDay(),
+  ): Result<Unit> {
+    return try {
+      val now = System.currentTimeMillis()
+      val existing = dao.getProfileOnce(userId) ?: UserProfile(id = userId, userId = userId, createdAt = now)
+      val safeDelta = xpDelta.coerceIn(0L, 5000L)
+      val computedStreak =
+        preferencesRepository?.recordDailyActivityXp(
+          xpDelta = safeDelta,
+          currentStreakFallback = existing.streakDays,
+          epochDay = epochDay,
+        )?.first ?: existing.streakDays.coerceAtLeast(1L)
+      val updatedXp = (existing.totalXp + safeDelta).coerceIn(0L, 1_000_000L)
+      dao.upsertProfile(
+        existing.copy(
+          totalXp = updatedXp,
+          streakDays = computedStreak.coerceIn(1L, 3650L),
+          updatedAt = now,
+        )
+      )
+      preferencesRepository?.recordLessonSnapshot(
+        lessonId = "",
+        isCompleted = false,
+        totalXp = updatedXp,
+        streakDays = computedStreak,
+      )
+      Result.success(Unit)
+    } catch (e: CancellationException) {
+      throw e
+    } catch (e: Exception) {
+      Result.failure(e)
+    }
+  }
+
+  suspend fun recordCompletedLab(userId: String, labKey: String, xpDelta: Long = 25L): Result<Unit> {
+    return try {
+      preferencesRepository?.recordCompletedLab(labKey)
+      if (xpDelta > 0L) {
+        recordXpWithAutoStreak(userId = userId, xpDelta = xpDelta)
+      }
+      Result.success(Unit)
+    } catch (e: CancellationException) {
+      throw e
+    } catch (e: Exception) {
+      Result.failure(e)
+    }
+  }
+
+  // --- Paper 2 Theory Persistence ---
+
+  fun observePaper2Attempts(userId: String): Flow<List<Paper2AttemptEntity>> =
+    dao.observePaper2Attempts(userId)
+
+  suspend fun savePaper2Attempt(
+    userId: String,
+    promptId: String,
+    subjectId: String,
+    examBoard: String,
+    studentWorking: String,
+    checkedRubricIndices: List<Int>,
+    earnedMarks: Int,
+    maxMarks: Int,
+  ): Result<Unit> {
+    return try {
+      val now = System.currentTimeMillis()
+      val safeMax = maxMarks.coerceAtLeast(1)
+      val safeEarned = earnedMarks.coerceIn(0, safeMax)
+      val indicesJson = JSONArray(checkedRubricIndices.distinct().sorted()).toString()
+      dao.upsertPaper2Attempt(
+        Paper2AttemptEntity(
+          id = "${userId}_$promptId",
+          userId = userId,
+          promptId = promptId,
+          subjectId = subjectId.take(64),
+          topic = examBoard.take(64),
+          studentWorking = studentWorking.take(4000),
+          checkedStepIndicesJson = indicesJson,
+          earnedMarks = safeEarned,
+          totalMarks = safeMax,
+          updatedAtMillis = now,
+        )
+      )
+      val xpReward = (15L + safeEarned * 2L).coerceAtMost(60L)
+      recordXpWithAutoStreak(userId = userId, xpDelta = xpReward)
+      Result.success(Unit)
+    } catch (e: CancellationException) {
+      throw e
+    } catch (e: Exception) {
+      Result.failure(e)
+    }
+  }
+
+  // --- Interrupted CBT Session Recovery ---
+
+  fun observeActiveCbtSession(userId: String): Flow<ActiveCbtSessionEntity?> =
+    dao.observeActiveCbtSession(userId)
+
+  suspend fun getActiveCbtSessionOnce(userId: String): ActiveCbtSessionEntity? =
+    dao.getActiveCbtSessionOnce(userId)
+
+  suspend fun saveActiveCbtSession(session: ActiveCbtSessionEntity) {
+    runCatching { dao.upsertActiveCbtSession(session) }
+  }
+
+  suspend fun clearActiveCbtSession(userId: String) {
+    runCatching { dao.clearActiveCbtSession(userId) }
   }
 
   fun observeLessonProgress(userId: String): Flow<List<LessonProgress>> =
@@ -686,6 +806,7 @@ class MeritPrepRepository(
       val attemptsList = dao.getAllExamAttemptsOnce(userId)
       val notesList = dao.getAllStudyNotesOnce(userId)
       val cardsList = dao.getAllReviewCardsOnce(userId)
+      val paper2List = dao.getAllPaper2AttemptsOnce(userId)
       val snapshot = offlineSnapshot.first()
       val prefs = themePreferences.first()
 
@@ -803,6 +924,25 @@ class MeritPrepRepository(
                     put("dueAtMillis", c.dueAtMillis)
                     put("lastReviewedAtMillis", c.lastReviewedAtMillis)
                     put("updatedAtMillis", c.updatedAtMillis)
+                  }
+                )
+              }
+            },
+          )
+          put(
+            "paper2Attempts",
+            JSONArray().apply {
+              paper2List.forEach { p2 ->
+                put(
+                  JSONObject().apply {
+                    put("promptId", p2.promptId)
+                    put("subjectId", p2.subjectId)
+                    put("topic", p2.topic)
+                    put("studentWorking", p2.studentWorking)
+                    put("checkedStepIndicesJson", p2.checkedStepIndicesJson)
+                    put("earnedMarks", p2.earnedMarks)
+                    put("totalMarks", p2.totalMarks)
+                    put("updatedAtMillis", p2.updatedAtMillis)
                   }
                 )
               }
@@ -969,6 +1109,29 @@ class MeritPrepRepository(
         }
       }
 
+      root.optJSONArray("paper2Attempts")?.let { arr ->
+        for (i in 0 until arr.length()) {
+          val obj = arr.optJSONObject(i) ?: continue
+          val promptId = obj.optString("promptId")
+          if (promptId.isBlank()) continue
+          dao.upsertPaper2Attempt(
+            Paper2AttemptEntity(
+              id = "${userId}_$promptId",
+              userId = userId,
+              promptId = promptId,
+              subjectId = obj.optString("subjectId"),
+              topic = obj.optString("topic", obj.optString("examBoard", "WAEC")),
+              studentWorking = obj.optString("studentWorking"),
+              checkedStepIndicesJson = obj.optString("checkedStepIndicesJson", obj.optString("checkedIndicesCsv", "[]")),
+              earnedMarks = obj.optInt("earnedMarks", 0),
+              totalMarks = obj.optInt("totalMarks", obj.optInt("maxMarks", 1)).coerceAtLeast(1),
+              updatedAtMillis = obj.optLong("updatedAtMillis", obj.optLong("updatedAt", System.currentTimeMillis())),
+            )
+          )
+          restoredCount++
+        }
+      }
+
       val p = dao.getProfileOnce(userId)
       if (p != null) {
         preferencesRepository?.syncProgressIds(completedIds, p.totalXp, p.streakDays)
@@ -982,7 +1145,7 @@ class MeritPrepRepository(
   }
 
   internal companion object {
-    const val CURRENT_CURRICULUM_VERSION = 10
+    const val CURRENT_CURRICULUM_VERSION = 11
     private const val DAY_MILLIS = 86_400_000L
   }
 }

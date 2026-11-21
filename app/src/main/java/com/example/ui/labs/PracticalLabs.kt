@@ -51,6 +51,7 @@ fun PracticalLabWorkspace(
   labType: PracticalLabType,
   labBrief: String,
   externalResources: List<VerifiedExternalResource> = emptyList(),
+  onGamifiedRewardEarned: (xpDelta: Int, missionCompleted: Boolean) -> Unit = { _, _ -> },
   modifier: Modifier = Modifier,
 ) {
   val protocol = remember(lessonId, labType) { AcademyLabProtocols.protocolFor(lessonId, labType.title) }
@@ -127,7 +128,11 @@ fun PracticalLabWorkspace(
     }
 
     if (labMode == 1) {
-      GamifiedVirtualLab(lessonId = lessonId, labType = labType)
+      GamifiedVirtualLab(
+        lessonId = lessonId,
+        labType = labType,
+        onRewardEarned = onGamifiedRewardEarned,
+      )
       return
     }
 

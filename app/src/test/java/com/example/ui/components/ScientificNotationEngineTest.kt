@@ -141,4 +141,15 @@ class ScientificNotationEngineTest {
       ScientificNotationEngine.normalizeMarkup("""\det\begin{bmatrix} 2 & 1 \\ 4 & 3 \end{bmatrix}""")
     assertEquals("det[ 2 1 ; 4 3 ]", inlineNormalized)
   }
+
+  @Test
+  fun `scientific calculator supports DEG and RAD trig, inverse trig, factorial, and ten powers`() {
+    assertEquals(1.0, ScientificExpressionEvaluator.evaluate("sin(90)", isDegreeMode = true).getOrThrow(), 1e-6)
+    assertEquals(1.0, ScientificExpressionEvaluator.evaluate("sin(π÷2)", isDegreeMode = false).getOrThrow(), 1e-6)
+    assertEquals(30.0, ScientificExpressionEvaluator.evaluate("sin⁻¹(0.5)", isDegreeMode = true).getOrThrow(), 1e-6)
+    assertEquals(60.0, ScientificExpressionEvaluator.evaluate("cos⁻¹(0.5)", isDegreeMode = true).getOrThrow(), 1e-6)
+    assertEquals(45.0, ScientificExpressionEvaluator.evaluate("tan⁻¹(1)", isDegreeMode = true).getOrThrow(), 1e-6)
+    assertEquals(120.0, ScientificExpressionEvaluator.evaluate("5!").getOrThrow(), 1e-6)
+    assertEquals(2000.0, ScientificExpressionEvaluator.evaluate("2×10^3").getOrThrow(), 1e-6)
+  }
 }
