@@ -118,6 +118,7 @@ object CurriculumEntityMapper {
         guidedPractice = envelope.guidedPractice,
         masteryProject = envelope.masteryProject,
         cheatSheet = envelope.cheatSheet,
+        externalResources = envelope.externalResources,
       )
     return AcademyCurriculumEnricher.enrich(base)
   }
@@ -160,6 +161,23 @@ object CurriculumEntityMapper {
             put("mechanismWhyHow", c.mechanismWhyHow)
             put("examIntelligence", c.examIntelligence)
             put("recap", c.recap)
+            put("animationKey", c.animationKey)
+            put(
+              "microDrills",
+              JSONArray().apply {
+                c.microDrills.forEach { d ->
+                  put(
+                    JSONObject().apply {
+                      put("prompt", d.prompt)
+                      put("options", JSONArray(d.options))
+                      put("correctIndex", d.correctIndex)
+                      put("hint", d.hint)
+                      put("explanation", d.explanation)
+                    }
+                  )
+                }
+              },
+            )
           }
         )
       }
@@ -171,6 +189,18 @@ object CurriculumEntityMapper {
       List(arr.length()) { i ->
         val o = arr.getJSONObject(i)
         val kf = o.opt("keyFormula")
+        val drillsArr = o.optJSONArray("microDrills") ?: JSONArray()
+        val drills =
+          List(drillsArr.length()) { idx ->
+            val d = drillsArr.getJSONObject(idx)
+            MicroDrill(
+              prompt = d.optString("prompt", ""),
+              options = jsonArrayToStrings(d.optJSONArray("options")),
+              correctIndex = d.optInt("correctIndex", 0),
+              hint = d.optString("hint", ""),
+              explanation = d.optString("explanation", ""),
+            )
+          }
         ConceptBlock(
           heading = o.optString("heading", ""),
           explanation = o.optString("explanation", ""),
@@ -179,6 +209,8 @@ object CurriculumEntityMapper {
           mechanismWhyHow = o.optString("mechanismWhyHow", ""),
           examIntelligence = o.optString("examIntelligence", ""),
           recap = o.optString("recap", ""),
+          animationKey = o.optString("animationKey", ""),
+          microDrills = drills,
         )
       }
     }.getOrDefault(emptyList())
@@ -225,6 +257,7 @@ object CurriculumEntityMapper {
     val guidedPractice: GuidedPracticeTask? = null,
     val masteryProject: TopicMasteryProject? = null,
     val cheatSheet: TopicCheatSheet? = null,
+    val externalResources: List<VerifiedExternalResource> = emptyList(),
   )
 
   private fun encodeScenarioEnvelope(lesson: Lesson): String =
@@ -334,6 +367,24 @@ object CurriculumEntityMapper {
           },
         )
       }
+      if (lesson.externalResources.isNotEmpty()) {
+        put(
+          "externalResources",
+          JSONArray().apply {
+            lesson.externalResources.forEach { res ->
+              put(
+                JSONObject().apply {
+                  put("title", res.title)
+                  put("provider", res.provider)
+                  put("kind", res.kind)
+                  put("url", res.url)
+                  put("description", res.description)
+                }
+              )
+            }
+          },
+        )
+      }
     }.toString()
 
   private fun decodeScenarioEnvelope(raw: String): ScenarioEnvelope =
@@ -421,6 +472,18 @@ object CurriculumEntityMapper {
             spacedRevisionDays = days,
           )
         }
+      val extArr = obj.optJSONArray("externalResources") ?: JSONArray()
+      val externalResources =
+        List(extArr.length()) { idx ->
+          val e = extArr.getJSONObject(idx)
+          VerifiedExternalResource(
+            title = e.optString("title", ""),
+            provider = e.optString("provider", ""),
+            kind = e.optString("kind", ""),
+            url = e.optString("url", ""),
+            description = e.optString("description", ""),
+          )
+        }
       ScenarioEnvelope(
         scenarios = scenarios,
         prerequisites = prerequisites,
@@ -430,6 +493,7 @@ object CurriculumEntityMapper {
         guidedPractice = gp,
         masteryProject = mp,
         cheatSheet = cs,
+        externalResources = externalResources,
       )
     }.getOrDefault(ScenarioEnvelope(emptyList()))
 

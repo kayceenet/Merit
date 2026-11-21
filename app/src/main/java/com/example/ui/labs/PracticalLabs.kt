@@ -4,20 +4,28 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -26,9 +34,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.data.curriculum.PracticalLabType
+import com.example.data.curriculum.VerifiedExternalResource
+import com.example.data.curriculum.VerifiedResourceCatalog
 import com.example.ui.components.ScientificText
 import com.example.ui.theme.semanticColors
 
@@ -37,16 +50,95 @@ fun PracticalLabWorkspace(
   lessonId: String,
   labType: PracticalLabType,
   labBrief: String,
+  externalResources: List<VerifiedExternalResource> = emptyList(),
   modifier: Modifier = Modifier,
 ) {
   val protocol = remember(lessonId, labType) { AcademyLabProtocols.protocolFor(lessonId, labType.title) }
   var selectedHypothesis by remember(lessonId) { mutableIntStateOf(-1) }
+  var labMode by remember(lessonId) { mutableIntStateOf(0) }
+  val resolvedResources =
+    remember(lessonId, labType, externalResources) {
+      externalResources.ifEmpty { VerifiedResourceCatalog.forLabType(labType) }
+    }
+  val uriHandler = LocalUriHandler.current
   val semantics = MaterialTheme.semanticColors
 
   Column(
     modifier = modifier.fillMaxWidth(),
     verticalArrangement = Arrangement.spacedBy(14.dp),
   ) {
+    // 0. Triple-Mode Virtual Lab Switcher (Interactive Bench | Gamified Challenge | Verified External)
+    Row(
+      modifier =
+        Modifier.fillMaxWidth()
+          .clip(RoundedCornerShape(14.dp))
+          .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
+          .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(14.dp))
+          .padding(4.dp),
+      horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+      val tabs =
+        listOf(
+          Triple("Bench", Icons.Filled.Build, "lab_mode_bench"),
+          Triple("Gamified", Icons.Filled.EmojiEvents, "lab_mode_gamified"),
+          Triple("External", Icons.Filled.Language, "lab_mode_external"),
+        )
+      tabs.forEachIndexed { idx, (label, icon, tag) ->
+        val selected = labMode == idx
+        Surface(
+          color =
+            if (selected) MaterialTheme.colorScheme.primary
+            else MaterialTheme.colorScheme.surface.copy(alpha = 0f),
+          shape = RoundedCornerShape(10.dp),
+          modifier =
+            Modifier.weight(1f)
+              .clip(RoundedCornerShape(10.dp))
+              .minimumInteractiveComponentSize()
+              .clickable { labMode = idx }
+              .testTag(tag),
+        ) {
+          Row(
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+          ) {
+            Icon(
+              imageVector = icon,
+              contentDescription = label,
+              tint =
+                if (selected) MaterialTheme.colorScheme.onPrimary
+                else MaterialTheme.colorScheme.onSurfaceVariant,
+              modifier = Modifier.size(15.dp),
+            )
+            Text(
+              text = label,
+              style = MaterialTheme.typography.labelMedium,
+              color =
+                if (selected) MaterialTheme.colorScheme.onPrimary
+                else MaterialTheme.colorScheme.onSurfaceVariant,
+              fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold,
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis,
+              modifier = Modifier.padding(start = 5.dp),
+            )
+          }
+        }
+      }
+    }
+
+    if (labMode == 1) {
+      GamifiedVirtualLab(lessonId = lessonId, labType = labType)
+      return
+    }
+
+    if (labMode == 2) {
+      VerifiedExternalLabsSection(
+        labTitle = labType.title,
+        resources = resolvedResources,
+        onOpenUrl = { url -> runCatching { uriHandler.openUri(url) } },
+      )
+      return
+    }
     // 1. Academy Lab Header + Aim & Variables
     Column(
       modifier =
@@ -352,6 +444,120 @@ fun PracticalLabWorkspace(
           fontWeight = FontWeight.Medium,
           modifier = Modifier.padding(10.dp),
         )
+      }
+    }
+  }
+}
+
+@Composable
+private fun VerifiedExternalLabsSection(
+  labTitle: String,
+  resources: List<VerifiedExternalResource>,
+  onOpenUrl: (String) -> Unit,
+) {
+  Column(
+    modifier = Modifier.fillMaxWidth(),
+    verticalArrangement = Arrangement.spacedBy(12.dp),
+  ) {
+    Surface(
+      color = MaterialTheme.colorScheme.secondaryContainer,
+      shape = RoundedCornerShape(14.dp),
+      modifier = Modifier.fillMaxWidth(),
+    ) {
+      Column(
+        modifier = Modifier.padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+      ) {
+        Text(
+          text = "VERIFIED INTERACTIVE PORTALS & SIMULATIONS",
+          style = MaterialTheme.typography.labelSmall,
+          color = MaterialTheme.colorScheme.onSecondaryContainer,
+          fontWeight = FontWeight.Bold,
+        )
+        Text(
+          text = "Explore trusted third-party simulations, visualizations, and reference guides curated for $labTitle.",
+          style = MaterialTheme.typography.bodySmall,
+          color = MaterialTheme.colorScheme.onSecondaryContainer,
+        )
+      }
+    }
+
+    if (resources.isEmpty()) {
+      Box(
+        modifier =
+          Modifier.fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(14.dp))
+            .padding(16.dp),
+      ) {
+        Text(
+          text = "Use the built-in Interactive Bench and Gamified Challenge tabs above to run experiments offline anytime.",
+          style = MaterialTheme.typography.bodyMedium,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+      }
+    } else {
+      resources.forEachIndexed { idx, res ->
+        Column(
+          modifier =
+            Modifier.fillMaxWidth()
+              .clip(RoundedCornerShape(16.dp))
+              .background(MaterialTheme.colorScheme.surface)
+              .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
+              .padding(16.dp),
+          verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+          ) {
+            Surface(
+              color = MaterialTheme.colorScheme.primaryContainer,
+              shape = RoundedCornerShape(8.dp),
+            ) {
+              Text(
+                text = res.provider,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+              )
+            }
+            Text(
+              text = res.kind,
+              style = MaterialTheme.typography.labelSmall,
+              color = MaterialTheme.colorScheme.secondary,
+              fontWeight = FontWeight.SemiBold,
+            )
+          }
+          Text(
+            text = res.title,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight.Bold,
+          )
+          ScientificText(
+            text = res.description,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+          )
+          OutlinedButton(
+            onClick = { onOpenUrl(res.url) },
+            modifier =
+              Modifier.fillMaxWidth()
+                .heightIn(min = 48.dp)
+                .testTag("external_resource_open_$idx"),
+          ) {
+            Text("Launch ${res.provider}", fontWeight = FontWeight.SemiBold)
+            Icon(
+              imageVector = Icons.AutoMirrored.Filled.OpenInNew,
+              contentDescription = "Open ${res.title}",
+              modifier = Modifier.padding(start = 6.dp).size(16.dp),
+            )
+          }
+        }
       }
     }
   }

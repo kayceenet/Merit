@@ -319,6 +319,120 @@ object AcademyCurriculumEnricher {
         ),
     )
 
+  private val allBespokeProjectChecks: Map<String, List<ProjectVerificationTask>> by lazy {
+    buildMap {
+      putAll(bespokeProjectChecks)
+      putAll(BespokeProjectChecksPhysicsMath.checks)
+      putAll(BespokeProjectChecksChemBio.checks)
+      putAll(BespokeProjectChecksEngHum.checks)
+    }
+  }
+
+  private val shoutingProseWords: Map<String, String> =
+    listOf(
+      "ALWAYS",
+      "NEVER",
+      "ONLY",
+      "EVERY",
+      "BOTH",
+      "THREE",
+      "FOUR",
+      "FIVE",
+      "ZERO",
+      "MULTIPLY",
+      "SUBSTITUTION",
+      "DISSOLVE",
+      "STAYS",
+      "SAME",
+      "DIFFERENT",
+      "COLOURLESS",
+      "DIRTY",
+      "GREEN",
+      "REDDISH-BROWN",
+      "BLUE",
+      "WHITE",
+      "RED",
+      "EXCESS",
+      "MUST",
+      "WITHOUT",
+      "FIRST",
+      "SECOND",
+      "INSTANTLY",
+      "BEFORE",
+      "AFTER",
+      "COMPLETELY",
+      "STRICTLY",
+      "DIRECTLY",
+      "ABOVE",
+      "BELOW",
+      "INSIDE",
+      "OUTSIDE",
+      "SPREAD",
+      "UNCHANGED",
+      "CLASS",
+      "MIDPOINTS",
+      "AT",
+      "LEAST",
+      "ONE",
+      "FAIL",
+      "SUBTRACTED",
+      "ADDED",
+      "DEOXYGENATED",
+      "OXYGENATED",
+      "SHADED",
+      "SONS",
+      "DILUTE",
+      "SILENT",
+      "IN",
+      "FRONT",
+      "OPPOSITE",
+      "NEAREST",
+      "NEXT",
+    ).associateWith { it.lowercase() }
+
+  private val proseCapsPattern = Regex("""\b[A-Z]{2,}(?:-[A-Z]{2,})?\b""")
+  private val proseExclaimPattern = Regex("""([A-Za-z]{2,})!+""")
+  private val parenExclaimPattern = Regex("""([A-Za-z]{2,}\))!+""")
+
+  /**
+   * Standardizes informal exclamation marks and shouting uppercase prose fillers while strictly
+   * preserving chemical symbols, acronyms, Roman numerals, math factorials (e.g. 7!, n!), and
+   * English emphatic-stress capitalization drills.
+   */
+  fun editorialStandardize(raw: String, lessonId: String = ""): String {
+    if (raw.isBlank()) return raw
+    val isStressDrill = lessonId == "eng_14_stress_rhyme"
+    val normalizedCaps =
+      if (isStressDrill) {
+        raw
+      } else {
+        proseCapsPattern.replace(raw) { match ->
+          val token = match.value
+          // Skip quoted or parenthetical technical acronyms when ambiguous, only soften known shouting fillers
+          val replacement = shoutingProseWords[token] ?: return@replace token
+          val start = match.range.first
+          // Preserve if at start of sentence / string (capitalize first letter)
+          val atSentenceStart =
+            start == 0 ||
+              raw.substring(0, start).trimEnd().let { prefix ->
+                prefix.isEmpty() || prefix.endsWith(".") || prefix.endsWith("?") || prefix.endsWith(":") || prefix.endsWith("\n")
+              }
+          if (atSentenceStart) {
+            replacement.replaceFirstChar { it.titlecase() }
+          } else {
+            replacement
+          }
+        }
+      }
+    return normalizedCaps
+      .replace(parenExclaimPattern, "$1.")
+      .replace(proseExclaimPattern, "$1.")
+      .replace("?.", "?")
+      .replace("..", ".")
+      .replace(" .", ".")
+      .trim()
+  }
+
   private val citationRegex =
     Regex("""\b(JAMB|UTME|WAEC|WASSCE|NECO|SSCE)[^•\n]*\b(20\d{2})\b[^•\n]*""")
 
@@ -330,16 +444,18 @@ object AcademyCurriculumEnricher {
       else -> "JAMB UTME-Style Worked Problem"
     }
 
-  fun sanitizeText(raw: String): String {
+  fun sanitizeText(raw: String, lessonId: String = ""): String {
     if (raw.isBlank()) return raw
-    return raw
-      .replace(Regex("""\(\s*(?:JAMB|WAEC|NECO)[^)]*20\d{2}[^)]*\)"""), "")
-      .replace(citationRegex, "")
-      .replace(Regex("""\s{2,}"""), " ")
-      .trim()
+    val cleaned =
+      raw
+        .replace(Regex("""\(\s*(?:JAMB|WAEC|NECO)[^)]*20\d{2}[^)]*\)"""), "")
+        .replace(citationRegex, "")
+        .replace(Regex("""\s{2,}"""), " ")
+        .trim()
+    return editorialStandardize(cleaned, lessonId)
   }
 
-  fun sanitizeQuestion(q: PracticeQuestion, indexInLesson: Int = 0): PracticeQuestion {
+  fun sanitizeQuestion(q: PracticeQuestion, indexInLesson: Int = 0, lessonId: String = ""): PracticeQuestion {
     val normalizedBoard =
       when {
         q.examType.equals("NECO", ignoreCase = true) -> "NECO"
@@ -363,21 +479,21 @@ object AcademyCurriculumEnricher {
       }
     return q.copy(
       examType = normalizedBoard,
-      question = sanitizeText(q.question),
-      hint = sanitizeText(q.hint),
-      stepByStepSolution = sanitizeText(q.stepByStepSolution),
-      waecMarkingScheme = q.waecMarkingScheme?.let(::sanitizeText),
+      question = sanitizeText(q.question, lessonId),
+      hint = sanitizeText(q.hint, lessonId),
+      stepByStepSolution = sanitizeText(q.stepByStepSolution, lessonId),
+      waecMarkingScheme = q.waecMarkingScheme?.let { sanitizeText(it, lessonId) },
       cognitiveLevel = cogLevel,
-      remediationTip = remediation,
+      remediationTip = editorialStandardize(remediation, lessonId),
     )
   }
 
-  fun sanitizeWorkedExample(ex: WorkedExample): WorkedExample =
+  fun sanitizeWorkedExample(ex: WorkedExample, lessonId: String = ""): WorkedExample =
     ex.copy(
       examSource = sanitizeExamSource(ex.examSource),
-      problemStatement = sanitizeText(ex.problemStatement),
-      steps = ex.steps.map(::sanitizeText),
-      examinerTrap = sanitizeText(ex.examinerTrap),
+      problemStatement = sanitizeText(ex.problemStatement, lessonId),
+      steps = ex.steps.map { sanitizeText(it, lessonId) },
+      examinerTrap = sanitizeText(ex.examinerTrap, lessonId),
     )
 
   private fun buildVerificationTasksForProject(
@@ -387,7 +503,7 @@ object AcademyCurriculumEnricher {
     examples: List<WorkedExample>,
   ): List<ProjectVerificationTask> {
     if (project.verificationTasks.isNotEmpty()) return project.verificationTasks
-    bespokeProjectChecks[lesson.id]?.let { return it }
+    allBespokeProjectChecks[lesson.id]?.let { return it }
 
     val seed = (lesson.id.hashCode() and 0x7fffffff)
     val misc1 = misconceptions.getOrNull(0)
@@ -417,10 +533,8 @@ object AcademyCurriculumEnricher {
     }
 
     val tasks = mutableListOf<ProjectVerificationTask>()
-
-    // Criterion 1: Setup & Method Verification
     val crit1 = project.rubricCriteria.getOrNull(0) ?: "Core Principle & Parameter Selection"
-    val stage1 = project.stages.getOrNull(0) ?: crit1
+    val step1 = project.stages.getOrNull(0) ?: crit1
     val (opts1, idx1) =
       placeOptions(
         correct = crit1,
@@ -436,14 +550,12 @@ object AcademyCurriculumEnricher {
       ProjectVerificationTask(
         id = "vt_${lesson.id}_1",
         criterionTitle = "Checkpoint 1 • Protocol & Rule Setup",
-        prompt = "To implement Step 1 (${stage1}) in \"${project.title}\", which specification satisfies the engineering/academic standard?",
+        prompt = "To implement Step 1 ($step1) in \"${project.title}\", which specification satisfies the academic standard?",
         options = opts1,
         correctIndex = idx1,
         feedback = "$crit1." + (ex1?.examinerTrap?.let { " Key safeguard: $it" } ?: ""),
       )
     )
-
-    // Criterion 2: Misconception Audit in Applied Project Context
     if (misc1 != null) {
       val crit2 = project.rubricCriteria.getOrNull(1) ?: "Technical Error Audit"
       val (opts2, idx2) =
@@ -469,8 +581,6 @@ object AcademyCurriculumEnricher {
         )
       )
     }
-
-    // Criterion 3: Final Deliverable Quality Verification
     val crit3 = project.rubricCriteria.getOrNull(2) ?: project.rubricCriteria.lastOrNull() ?: "Final Verification"
     val targetCorrect3 = misc2?.correctUnderstanding ?: crit3
     val (opts3, idx3) =
@@ -492,56 +602,121 @@ object AcademyCurriculumEnricher {
           if (misc2 != null) {
             "Before submitting \"${project.title}\", verify why a draft warning flags: \"${misc2.wrongBelief}\". Select the valid sign-off standard:"
           } else {
-            "Select the condition that satisfies final verification (${crit3}) for \"${project.title}\":"
+            "Select the condition that satisfies final verification ($crit3) for \"${project.title}\":"
           },
         options = opts3,
         correctIndex = idx3,
         feedback = misc2?.avoidanceRule ?: crit3,
       )
     )
-
     return tasks
+  }
+
+  private fun drillsForSection(lessonId: String, sectionIndex: Int): List<MicroDrill> {
+    val p1 = ConceptMicroDrillsPart1.drillsFor(lessonId, sectionIndex)
+    if (p1.isNotEmpty()) return p1
+    return ConceptMicroDrillsPart2.drillsFor(lessonId, sectionIndex)
   }
 
   fun enrich(lesson: Lesson): Lesson {
     val spec = allPacks[lesson.id]
+    val footerMeta = TopicSectionFooters.forLesson(lesson.id)
+
     val enrichedBaseConcepts =
       lesson.concepts.mapIndexed { idx, block ->
         val mech =
           block.mechanismWhyHow.ifBlank {
             spec?.mechanismNotes?.getOrNull(idx)
-              ?: "Underlying mechanism: focus on how each variable or rule behaves physically or logically before memorizing a shortcut."
+              ?: "Underlying mechanism: examine how each physical or formal variable interacts before applying shortcuts."
           }
         val intel =
           block.examIntelligence.ifBlank {
             spec?.examIntelligenceNotes?.getOrNull(idx)
-              ?: "JAMB tests quick conceptual discrimination under time pressure; WAEC/NECO award marks for stating the guiding law, correct substitution, and proper unit/format."
+              ?: "JAMB tests rapid conceptual discrimination; WAEC/NECO award method marks for stating governing rules, clean substitutions, and accurate units."
           }
         val recap =
           block.recap.ifBlank {
             spec?.recaps?.getOrNull(idx)
-              ?: "Checkpoint: summarize '${block.heading}' clearly in your own words before advancing."
+              ?: "Checkpoint: summarize '${block.heading.replace(Regex("""^\d+\.\s+"""), "").trim()}' clearly in your own words."
           }
         block.copy(
           heading = block.heading.replace(Regex("""^\d+\.\s+"""), "").trim(),
-          mechanismWhyHow = mech,
-          examIntelligence = intel,
-          recap = recap,
+          explanation = editorialStandardize(block.explanation, lesson.id),
+          examTip = editorialStandardize(block.examTip, lesson.id),
+          mechanismWhyHow = editorialStandardize(mech, lesson.id),
+          examIntelligence = editorialStandardize(intel, lesson.id),
+          recap = editorialStandardize(recap, lesson.id),
         )
       }
 
-    val combinedConcepts =
-      if (enrichedBaseConcepts.size >= 5 || spec == null) {
-        enrichedBaseConcepts
+    // Apply topic-specific Section 4 & Section 5 footers onto pack extra sections (indices 3 & 4 overall)
+    val topicPackExtras =
+      if (spec == null || enrichedBaseConcepts.size >= 5) {
+        emptyList()
       } else {
-        (enrichedBaseConcepts + spec.extraSections).take(6).map { blk ->
-          blk.copy(heading = blk.heading.replace(Regex("""^\d+\.\s+"""), "").trim())
+        spec.extraSections.mapIndexed { extraIdx, blk ->
+          val cleanBlk = blk.copy(heading = blk.heading.replace(Regex("""^\d+\.\s+"""), "").trim())
+          val withFooter =
+            when {
+              extraIdx == 1 && footerMeta != null ->
+                cleanBlk.copy(
+                  mechanismWhyHow = footerMeta.sec4Mech,
+                  examIntelligence = footerMeta.sec4Intel,
+                  recap = footerMeta.sec4Recap,
+                )
+              extraIdx == 2 && footerMeta != null ->
+                cleanBlk.copy(
+                  mechanismWhyHow = footerMeta.sec5Mech,
+                  examIntelligence = footerMeta.sec5Intel,
+                  recap = footerMeta.sec5Recap,
+                )
+              else -> cleanBlk
+            }
+          withFooter.copy(
+            explanation = editorialStandardize(withFooter.explanation, lesson.id),
+            examTip = editorialStandardize(withFooter.examTip, lesson.id),
+            mechanismWhyHow = editorialStandardize(withFooter.mechanismWhyHow, lesson.id),
+            examIntelligence = editorialStandardize(withFooter.examIntelligence, lesson.id),
+            recap = editorialStandardize(withFooter.recap, lesson.id),
+          )
         }
       }
 
-    val cleanedExamples = lesson.workedExamples.map(::sanitizeWorkedExample)
+    // Flexible, syllabus-driven exhaustive sections appended idempotently with zero artificial count cap
+    val existingHeadings =
+      (enrichedBaseConcepts + topicPackExtras)
+        .map { it.heading.replace(Regex("""^\d+\.\s+"""), "").trim().lowercase() }
+        .toSet()
+
+    val exhaustiveExtras =
+      TopicExhaustiveSections.extraFor(lesson.id)
+        .filter { blk ->
+          val cleanHeading = blk.heading.replace(Regex("""^\d+\.\s+"""), "").trim().lowercase()
+          cleanHeading !in existingHeadings
+        }
+        .map { blk ->
+          blk.copy(
+            heading = blk.heading.replace(Regex("""^\d+\.\s+"""), "").trim(),
+            explanation = editorialStandardize(blk.explanation, lesson.id),
+            examTip = editorialStandardize(blk.examTip, lesson.id),
+            mechanismWhyHow = editorialStandardize(blk.mechanismWhyHow, lesson.id),
+            examIntelligence = editorialStandardize(blk.examIntelligence, lesson.id),
+            recap = editorialStandardize(blk.recap, lesson.id),
+          )
+        }
+
+    val combinedConcepts =
+      (enrichedBaseConcepts + topicPackExtras + exhaustiveExtras).mapIndexed { finalIdx, blk ->
+        val sectionDrills = blk.microDrills.ifEmpty { drillsForSection(lesson.id, finalIdx) }
+        blk.copy(
+          animationKey = blk.animationKey.ifBlank { "${lesson.id}_sec_$finalIdx" },
+          microDrills = sectionDrills,
+        )
+      }
+
+    val cleanedExamples = lesson.workedExamples.map { sanitizeWorkedExample(it, lesson.id) }
     val cleanedExercises =
-      lesson.exercises.mapIndexed { idx, q -> sanitizeQuestion(q, idx) }
+      lesson.exercises.mapIndexed { idx, q -> sanitizeQuestion(q, idx, lesson.id) }
 
     val resolvedMisconceptions = lesson.misconceptions.ifEmpty { spec?.misconceptions.orEmpty() }
     val baseProject = lesson.masteryProject ?: spec?.masteryProject
@@ -559,9 +734,11 @@ object AcademyCurriculumEnricher {
                 .replace(Regex("""^(?:Verified|Confirmed|Passed|Correct)\s*:\s*""", RegexOption.IGNORE_CASE), "")
                 .trim()
                 .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
-            task.copy(feedback = cleanFb)
+            task.copy(feedback = editorialStandardize(cleanFb, lesson.id))
           }
       )
+
+    val resolvedResources = lesson.externalResources.ifEmpty { VerifiedResourceCatalog.forLesson(lesson) }
 
     if (spec == null) {
       return lesson.copy(
@@ -570,6 +747,7 @@ object AcademyCurriculumEnricher {
         exercises = cleanedExercises,
         misconceptions = resolvedMisconceptions,
         masteryProject = verifiedProject,
+        externalResources = resolvedResources,
       )
     }
 
@@ -584,6 +762,7 @@ object AcademyCurriculumEnricher {
       guidedPractice = lesson.guidedPractice ?: spec.guidedPractice,
       masteryProject = verifiedProject,
       cheatSheet = lesson.cheatSheet ?: spec.cheatSheet,
+      externalResources = resolvedResources,
     )
   }
 }

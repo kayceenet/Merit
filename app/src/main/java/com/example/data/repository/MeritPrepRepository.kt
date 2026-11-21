@@ -982,7 +982,7 @@ class MeritPrepRepository(
   }
 
   internal companion object {
-    const val CURRENT_CURRICULUM_VERSION = 9
+    const val CURRENT_CURRICULUM_VERSION = 10
     private const val DAY_MILLIS = 86_400_000L
   }
 }

@@ -64,22 +64,12 @@ object PhysicsAcademyPacks {
             explanation = sec4Body,
             keyFormula = null,
             examTip = sec4Tip,
-            mechanismWhyHow =
-              "Notice how every laboratory law holds inside real Nigerian infrastructure—bridges, power lines, solar arrays, medical imaging, and transport.",
-            examIntelligence =
-              "WAEC/NECO Paper 2 theory frequently asks candidates to state one practical or industrial application directly tied to physical principles.",
-            recap = "Connect the abstract equation back to a tangible Nigerian engineering or everyday example.",
           ),
           ConceptBlock(
             heading = sec5Title,
             explanation = sec5Body,
             keyFormula = null,
             examTip = sec5Tip,
-            mechanismWhyHow =
-              "Most lost marks stem not from ignorance of the formula, but from hidden unit mismatches, wrong sign conventions, or misreading limiting conditions.",
-            examIntelligence =
-              "Across JAMB UTME, WAEC WASSCE, and NECO SSCE, distractor options B and C are deliberately built from single-step arithmetic slips.",
-            recap = "Perform a fast dimensional & reasonableness check on every numerical answer before committing.",
           ),
         ),
       misconceptions = listOf(misc1, misc2),

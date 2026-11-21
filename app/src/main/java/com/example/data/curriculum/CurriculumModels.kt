@@ -276,6 +276,22 @@ data class TopicCheatSheet(
   val spacedRevisionDays: List<Int> = listOf(1, 3, 7, 14, 30),
 )
 
+data class MicroDrill(
+  val prompt: String,
+  val options: List<String>,
+  val correctIndex: Int,
+  val hint: String,
+  val explanation: String,
+)
+
+data class VerifiedExternalResource(
+  val title: String,
+  val provider: String,
+  val kind: String,
+  val url: String,
+  val description: String,
+)
+
 data class ConceptBlock(
   val heading: String,
   val explanation: String,
@@ -284,6 +300,8 @@ data class ConceptBlock(
   val mechanismWhyHow: String = "",
   val examIntelligence: String = "",
   val recap: String = "",
+  val animationKey: String = "",
+  val microDrills: List<MicroDrill> = emptyList(),
 )
 
 data class WorkedExample(
@@ -348,6 +366,7 @@ data class Lesson(
   val guidedPractice: GuidedPracticeTask? = null,
   val masteryProject: TopicMasteryProject? = null,
   val cheatSheet: TopicCheatSheet? = null,
+  val externalResources: List<VerifiedExternalResource> = emptyList(),
 ) {
   companion object {
     const val ACADEMY_NANODEGREE =

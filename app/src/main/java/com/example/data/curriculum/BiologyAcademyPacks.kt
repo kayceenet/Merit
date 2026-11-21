@@ -64,22 +64,12 @@ object BiologyAcademyPacks {
             explanation = sec4Body,
             keyFormula = null,
             examTip = sec4Tip,
-            mechanismWhyHow =
-              "Biological principles explain Nigerian public health, sickle-cell genetic counselling, savanna/rainforest agriculture, and waterborne vector control directly.",
-            examIntelligence =
-              "WAEC/NECO Paper 2 essay questions value precise scientific names (e.g., Plasmodium, Rhizobium, Nitrosomonas) alongside Nigerian adaptive examples.",
-            recap = "Pair cellular mechanisms directly to real organism or agricultural survival benefits.",
           ),
           ConceptBlock(
             heading = sec5Title,
             explanation = sec5Body,
             keyFormula = null,
             examTip = sec5Tip,
-            mechanismWhyHow =
-              "Biology marks disappear most often from diagram/specimen misidentification, reversed vessel/valve directions, or forgetting binomial naming rules.",
-            examIntelligence =
-              "Always read anatomical arrows and microscope magnification formulas cleanly before locking objective options.",
-            recap = "Verify biological sequence direction, enzyme/hormone target, and binomial capitalization.",
           ),
         ),
       misconceptions = listOf(misc1, misc2),

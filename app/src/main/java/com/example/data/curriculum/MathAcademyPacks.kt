@@ -64,22 +64,12 @@ object MathAcademyPacks {
             explanation = sec4Body,
             keyFormula = null,
             examTip = sec4Tip,
-            mechanismWhyHow =
-              "Mathematics models Nigerian commerce, engineering surveying, demographic planning, and computer logic cleanly when variables map to real constraints.",
-            examIntelligence =
-              "WAEC/NECO Paper 2 word problems translate everyday banking, age, geometry, and business sentences into equations step-by-step.",
-            recap = "Translate each phrase into exact mathematical symbols before manipulating.",
           ),
           ConceptBlock(
             heading = sec5Title,
             explanation = sec5Body,
             keyFormula = null,
             examTip = sec5Tip,
-            mechanismWhyHow =
-              "Back-substituting candidate answers or testing edge values (x = 0, x = 1, vertex symmetry) catches sign flips instantly under JAMB CBT time pressure.",
-            examIntelligence =
-              "Always verify domain restrictions (no division by zero, base digits strictly less than base b, positive log arguments).",
-            recap = "Check sign, domain, and reasonableness before locking your final option.",
           ),
         ),
       misconceptions = listOf(misc1, misc2),

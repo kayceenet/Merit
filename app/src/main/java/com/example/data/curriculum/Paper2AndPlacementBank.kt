@@ -115,7 +115,7 @@ object Paper2AndPlacementBank {
           listOf(
             MarkingStep("p2_math_1_1", "M1/A1", "Factor perfect squares: \\sqrt{48} = 4\\sqrt{3}, \\sqrt{12} = 2\\sqrt{3}, giving \\frac{2\\sqrt{3}}{\\sqrt{3}} = 2.", 3),
             MarkingStep("p2_math_1_2", "M1", "Combine logs & replace 1 = \\log_{10} 10: \\log_{10}[(x+4)(x-2)] = \\log_{10} 20.", 2),
-            MarkingStep("p2_math_1_3", "M1", "Expand quadratic x^2 + 2x - 8 = 20 \\implies x^2 + 2x - 28 = 0 or check roots carefully; wait if equation solved properly use formula x = -1 \\pm \\sqrt{29} or factor cleanly.", 3),
+            MarkingStep("p2_math_1_3", "M1", "Expand quadratic x^2 + 2x - 8 = 20 \\implies x^2 + 2x - 28 = 0 and solve via quadratic formula x = -1 \\pm \\sqrt{29}.", 3),
             MarkingStep("p2_math_1_4", "B1/A1", "Identify x > 2 domain so x - 2 > 0, keeping only positive valid root x = \\sqrt{29} - 1.", 2),
           ),
         modelSolution =
@@ -160,7 +160,7 @@ object Paper2AndPlacementBank {
           listOf(
             MarkingStep("p2_math_3_1", "M1/A1", "Apply Alternate Segment Theorem: \\angle PRQ = \\angle TPQ = 58^\\circ.", 3),
             MarkingStep("p2_math_3_2", "B1/A1", "Angle at centre = 2 × angle at circumference: \\angle QPR = 34^\\circ \\implies \\angle QOR = 2(34^\\circ) = 68^\\circ.", 3),
-            MarkingStep("p2_math_3_3", "M1/A1", "Wait find \\angle PQR = 180^\\circ - (58^\\circ + 34^\\circ) = 88^\\circ, then opposite angles of cyclic quad: \\angle PSR = 180^\\circ - 88^\\circ = 92^\\circ.", 3),
+            MarkingStep("p2_math_3_3", "M1/A1", "Compute \\angle PQR = 180^\\circ - (58^\\circ + 34^\\circ) = 88^\\circ, then apply opposite angles of a cyclic quadrilateral: \\angle PSR = 180^\\circ - 88^\\circ = 92^\\circ.", 3),
           ),
         modelSolution =
           "(a) \\angle PRQ = \\angle TPQ = 58^\\circ (angle between tangent and chord equals angle in alternate segment).\n" +
@@ -377,11 +377,11 @@ object Paper2AndPlacementBank {
             MarkingStep("p2_eco_1_1", "M1", "Compute %ΔP = (50/200)×100 = +25% and %ΔQd = (−1,500/10,000)×100 = −15%.", 3),
             MarkingStep("p2_eco_1_2", "A1", "Obtain |PED| = 15% / 25% = 0.60 (Price Inelastic since 0.60 < 1).", 3),
             MarkingStep("p2_eco_1_3", "M1/A1", "Total Revenue rises from NGN 2,000,000 (200×10,000) to NGN 2,125,000 (250×8,500).", 2),
-            MarkingStep("p2_eco_1_4", "B1", "Because |PED| < 1 (inelastic necessity), CONSUMERS bear the larger share of an indirect excise tax.", 2),
+            MarkingStep("p2_eco_1_4", "B1", "Because |PED| < 1 (inelastic necessity), consumers bear the larger share of an indirect excise tax.", 2),
           ),
         modelSolution =
           "(a) %ΔP = +25%, %ΔQd = −15% → |PED| = 15 / 25 = 0.60 (Inelastic).\n" +
-            "(b) TR₀ = 200 × 10,000 = NGN 2,000,000; TR₁ = 250 × 8,500 = NGN 2,125,000 (TR rises!). With inelastic demand, buyers absorb most of the NGN 20 tax via higher retail price.",
+            "(b) TR₀ = 200 × 10,000 = NGN 2,000,000; TR₁ = 250 × 8,500 = NGN 2,125,000 (TR increases). With inelastic demand, buyers absorb most of the NGN 20 tax via higher retail price.",
       ),
       Paper2Prompt(
         id = "p2_eco_2",
@@ -396,7 +396,7 @@ object Paper2AndPlacementBank {
           listOf(
             MarkingStep("p2_eco_2_1", "M1/A1", "State k = 1 / MPS = 1 / 0.20 = 5.", 3),
             MarkingStep("p2_eco_2_2", "A1", "Compute ΔY = 5 × NGN 40B = NGN 200 billion.", 3),
-            MarkingStep("p2_eco_2_3", "B2", "Instrument 1: OMO — CBN SELLS Treasury Bills/bonds to banks and public to withdraw excess liquidity.", 2),
+            MarkingStep("p2_eco_2_3", "B2", "Instrument 1: OMO — CBN sells Treasury Bills/bonds to banks and public to withdraw excess liquidity.", 2),
             MarkingStep("p2_eco_2_4", "B2", "Instrument 2: Hike Monetary Policy Rate (MPR) and Cash Reserve Ratio (CRR) to raise loan cost and shrink bank credit multiplier.", 2),
           ),
         modelSolution =
@@ -416,7 +416,7 @@ object Paper2AndPlacementBank {
         totalMarks = 12,
         rubricSteps =
           listOf(
-            MarkingStep("p2_gov_1_1", "B3", "1963 split Dual Executive (Ceremonial President vs PM Balewa); 1999 fuses BOTH roles in Executive President.", 3),
+            MarkingStep("p2_gov_1_1", "B3", "1963 split Dual Executive (Ceremonial President vs PM Balewa); 1999 fuses both roles in Executive President.", 3),
             MarkingStep("p2_gov_1_2", "B3", "1963 fused Cabinet Ministers inside Parliament (MPs); 1999 bars sitting Ministers from National Assembly membership.", 3),
             MarkingStep("p2_gov_1_3", "B3", "Parliamentary PM removed anytime by simple Vote of No Confidence; Executive President enjoys fixed 4-yr tenure barring 2/3 impeachment.", 3),
             MarkingStep("p2_gov_1_4", "B3", "Parliamentary Collective Responsibility requires united Cabinet defense or resignation; Presidential Ministers answer President individually.", 3),
@@ -446,6 +446,142 @@ object Paper2AndPlacementBank {
         modelSolution =
           "(a) Northern Emirates possessed centralized hierarchy, courts, and regular direct taxation ready for Lugard's officers; Eastern Igboland was acephalous and egalitarian, so Britain's imposed Warrant Chiefs lacked legitimacy and triggered the 1929 Aba Women's War.\n" +
             "(b) 1922 Clifford introduced Nigeria's first Elective Principle (4 elected seats); 1954 Lyttelton established True Federalism with distinct central vs regional legislative powers.",
+      ),
+      Paper2Prompt(
+        id = "p2_phy_4",
+        subjectId = "physics",
+        examBoard = "WAEC Paper 2",
+        paperLabel = "Thermal & Gas Calorimetry",
+        topic = "Heat Capacity, Latent Heat & Mixtures",
+        prompt =
+          "50 g of ice at 0°C is dropped into 200 g of water at 30°C inside a copper calorimeter of mass 80 g (c_water = 4.2 J/g·K, c_copper = 0.40 J/g·K, L_fusion = 336 J/g).\n(a) State why mixing must be gentle and continuous.\n(b) Calculate the final steady equilibrium temperature θ of the mixture.",
+        totalMarks = 10,
+        rubricSteps =
+          listOf(
+            MarkingStep("p2_phy_4_1", "B1", "Gentle stirring ensures uniform temperature without splashing droplets out.", 2),
+            MarkingStep("p2_phy_4_2", "M1", "Heat gained by melting ice + warming meltwater = 50(336) + 50(4.2)(θ − 0).", 3),
+            MarkingStep("p2_phy_4_3", "M1", "Heat lost by water + copper calorimeter = [200(4.2) + 80(0.40)](30 − θ) = 872(30 − θ).", 3),
+            MarkingStep("p2_phy_4_4", "A1", "Solve 16800 + 210θ = 26160 − 872θ → 1082θ = 9360 → θ ≈ 8.65°C.", 2),
+          ),
+        modelSolution =
+          "Stirring keeps temperature uniform without spilling water.\n" +
+            "Heat Gained = 50(336) + 50(4.2)θ = 16,800 + 210θ.\n" +
+            "Heat Lost = [200(4.2) + 80(0.40)](30 − θ) = 872(30 − θ) = 26,160 − 872θ.\n" +
+            "Equating: 1082θ = 9,360 → θ = 8.65°C.",
+      ),
+      Paper2Prompt(
+        id = "p2_math_4",
+        subjectId = "mathematics",
+        examBoard = "WAEC Paper 2",
+        paperLabel = "Section B (Bearings & Trigonometry)",
+        topic = "Cosine Rule & Three-Figure Bearings",
+        prompt =
+          "An aircraft flies 120 km from Airport P on bearing 040° to waypoint Q, then turns and flies 160 km on bearing 130° to Airport R.\n(a) Sketch the flight path with North lines at P and Q showing ∠PQR = 90°.\n(b) Calculate straight distance PR and the bearing of R from P to the nearest degree.",
+        totalMarks = 10,
+        rubricSteps =
+          listOf(
+            MarkingStep("p2_math_4_1", "B2", "North-South co-interior at Q gives south leg 140°; 360° − 140° − 130° = 90° (right triangle at Q).", 3),
+            MarkingStep("p2_math_4_2", "M1/A1", "PR = √(120² + 160²) = 200 km.", 3),
+            MarkingStep("p2_math_4_3", "M1/A1", "tan ∠QPR = 160/120 = 4/3 → ∠QPR ≈ 53.1°, so bearing of R from P = 040° + 53° = 093°.", 4),
+          ),
+        modelSolution =
+          "At Q, back-bearing of P is 040° + 180° = 220°; angle between QP (220°) and QR (130°) is 220° − 130° = 90°.\n" +
+            "PR = √(120² + 160²) = 200 km.\n" +
+            "tan ∠QPR = 160 / 120 = 1.333 → ∠QPR ≈ 53°, giving bearing 040° + 53° = 093°.",
+      ),
+      Paper2Prompt(
+        id = "p2_chem_4",
+        subjectId = "chemistry",
+        examBoard = "WAEC Paper 2",
+        paperLabel = "Organic Chemistry & Energetics",
+        topic = "Hydrocarbons, Alkanols & Saponification",
+        prompt =
+          "(a) Describe one chemical laboratory test that distinguishes Ethene from Ethyne cleanly, stating expected observations.\n(b) Write a balanced equation for laboratory fermentation of glucose and explain why distillation concentrates ethanol.",
+        totalMarks = 8,
+        rubricSteps =
+          listOf(
+            MarkingStep("p2_chem_4_1", "B2", "Pass each gas through ammoniacal Copper(I) chloride (or AgNO₃): Ethyne gives brick-red (or yellow-white) ppt; Ethene shows no precipitate.", 4),
+            MarkingStep("p2_chem_4_2", "B1", "Equation: C₆H₁₂O₆(aq) → 2C₂H₅OH(aq) + 2CO₂(g) using yeast zymase at ~30°C.", 2),
+            MarkingStep("p2_chem_4_3", "B1", "Ethanol boils at 78°C vs water 100°C, allowing fractional distillation separation above ~14% yeast tolerance.", 2),
+          ),
+        modelSolution =
+          "(a) Pass separately into ammoniacal CuCl(aq): Ethyne precipitates red Cu₂C₂ while Ethene gives no reaction.\n" +
+            "(b) C₆H₁₂O₆ → 2C₂H₅OH + 2CO₂ (yeast zymase); fractional distillation separates 78°C ethanol from 100°C water.",
+      ),
+      Paper2Prompt(
+        id = "p2_bio_4",
+        subjectId = "biology",
+        examBoard = "WAEC Paper 2",
+        paperLabel = "Organ Physiology & Coordination",
+        topic = "Human Eye Accommodation & Defects",
+        prompt =
+          "Compare how the ciliary muscles, suspensory ligaments, and lens curvature adjust when shifting gaze from a distant mountain to reading text 25 cm away, and name the lens used to correct Myopia.",
+        totalMarks = 8,
+        rubricSteps =
+          listOf(
+            MarkingStep("p2_bio_4_1", "B2", "Near reading: ciliary muscles CONTRACT (ring narrows), slackening suspensory ligaments.", 3),
+            MarkingStep("p2_bio_4_2", "B2", "Elastic lens bulges thicker/more convex, increasing refractive bending onto the retina.", 3),
+            MarkingStep("p2_bio_4_3", "B1", "Myopia (short sight, focuses ahead of retina) is corrected using a biconcave (diverging) lens.", 2),
+          ),
+        modelSolution =
+          "Shifting to near text contracts ciliary muscles, slackens suspensory ligaments, and allows the elastic lens to bulge rounder for stronger convergence.\n" +
+            "Myopia is corrected with diverging biconcave spectacle lenses.",
+      ),
+      Paper2Prompt(
+        id = "p2_eng_4",
+        subjectId = "english",
+        examBoard = "NECO Paper 2",
+        paperLabel = "Section A: Speech & Article Writing",
+        topic = "Speech Salutations & Register Consistency",
+        prompt =
+          "You are the outgoing Senior Prefect delivering a farewell speech before the Principal, visiting Alumni Chairman, parents, teachers, and students.\nDraft the opening Title, protocol Vocatives, and first introductory paragraph setting an appreciative, dignified tone.",
+        totalMarks = 10,
+        rubricSteps =
+          listOf(
+            MarkingStep("p2_eng_4_1", "F2", "Clear formal Speech Title naming speaker, audience, and occasion.", 2),
+            MarkingStep("p2_eng_4_2", "F3", "Hierarchical vocatives in descending dignity ('Our respected Alumni Chairman, the Principal, Members of Staff, proud parents, and fellow graduands...').", 4),
+            MarkingStep("p2_eng_4_3", "E4", "Poised, contraction-appropriate ceremonial opening linking gratitude to shared school milestones.", 4),
+          ),
+        modelSolution =
+          "A VALEDICTORY ADDRESS DELIVERED BY THE OUTGOING SENIOR PREFECT ON SPEECH AND PRIZE-GIVING DAY\n\n" +
+            "Our esteemed Alumni Chairman, the Principal, Vice-Principals, Members of Staff, honoured parents, and fellow graduands, I stand before you this morning with deep gratitude...",
+      ),
+      Paper2Prompt(
+        id = "p2_eco_3",
+        subjectId = "economics",
+        examBoard = "WAEC Paper 2",
+        paperLabel = "International Trade & Comparative Advantage",
+        topic = "Comparative Cost Advantage & Terms of Trade",
+        prompt =
+          "With identical labour hours, Country X produces 30 tonnes rice or 15 tonnes cocoa; Country Y produces 12 tonnes rice or 12 tonnes cocoa.\n(a) Compute opportunity cost of 1 tonne rice in each country.\n(b) State which crop each nation should specialize in and name two obstacles limiting free trade in West Africa.",
+        totalMarks = 10,
+        rubricSteps =
+          listOf(
+            MarkingStep("p2_eco_3_1", "M2/A2", "Country X: 1 rice costs 15/30 = 0.5 cocoa. Country Y: 1 rice costs 12/12 = 1.0 cocoa.", 4),
+            MarkingStep("p2_eco_3_2", "B2", "Country X holds lower opportunity cost in Rice (specializes in Rice); Country Y specializes in Cocoa.", 3),
+            MarkingStep("p2_eco_3_3", "B2", "Obstacles: currency inconvertibility, poor cross-border rail/transport, non-tariff customs delays, similar raw commodity exports.", 3),
+          ),
+        modelSolution =
+          "(a) Country X gives up 0.5 cocoa per rice; Country Y gives up 1.0 cocoa per rice.\n" +
+            "(b) X specializes in Rice, Y specializes in Cocoa. Obstacles include differing currencies, highway checkpoints, and overlapping raw export baskets.",
+      ),
+      Paper2Prompt(
+        id = "p2_gov_3",
+        subjectId = "government",
+        examBoard = "WAEC Paper 2",
+        paperLabel = "Foreign Policy & Regional Integration",
+        topic = "ECOWAS Achievements & Challenges",
+        prompt =
+          "Discuss two major achievements of ECOWAS in West Africa and explain three structural challenges slowing full monetary and economic integration.",
+        totalMarks = 10,
+        rubricSteps =
+          listOf(
+            MarkingStep("p2_gov_3_1", "B2", "Achievements: Protocol on Free Movement of Citizens/visas; ECOMOG/ECOWAS regional peacekeeping.", 4),
+            MarkingStep("p2_gov_3_2", "B3", "Challenges: multiple non-convertible currencies, Anglophone/Francophone rivalries & CFA link, unpaid member dues, border insecurity.", 6),
+          ),
+        modelSolution =
+          "Achievements: Visa-free ECOWAS citizen protocol and regional ECOMOG peacekeeping interventions.\n" +
+            "Challenges: Currency fragmentation (Eco delays), colonial Anglophone/Francophone trade ties, member contribution arrears, and political instability.",
       ),
     )
 }

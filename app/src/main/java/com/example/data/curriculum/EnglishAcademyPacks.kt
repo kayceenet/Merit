@@ -64,22 +64,12 @@ object EnglishAcademyPacks {
             explanation = sec4Body,
             keyFormula = null,
             examTip = sec4Tip,
-            mechanismWhyHow =
-              "Nigerian English speakers meet daily interference between local idioms, colloquial expressions, and formal International Standard English expected by WAEC/JAMB/NECO.",
-            examIntelligence =
-              "Spotting distinctly Nigerian non-standard expressions ('equipments', 'off the light', 'more better') prevents automatic Lexis & Structure losses.",
-            recap = "Test everyday campus speech strictly against Standard British/Nigerian formal exam grammar.",
           ),
           ConceptBlock(
             heading = sec5Title,
             explanation = sec5Body,
             keyFormula = null,
             examTip = sec5Tip,
-            mechanismWhyHow =
-              "Rushing grammar or oral questions by 'what sounds familiar' misleads learners—always apply the underlying syntactic, phonological, or contextual rule explicitly.",
-            examIntelligence =
-              "Examiners build every wrong distractor from common spoken habits; structured rule checking catches traps effortlessly.",
-            recap = "Verify the grammatical function or IPA sound symbol—never rely solely on how a sentence sounds aloud.",
           ),
         ),
       misconceptions = listOf(misc1, misc2),

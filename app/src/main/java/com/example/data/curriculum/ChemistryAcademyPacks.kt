@@ -64,22 +64,12 @@ object ChemistryAcademyPacks {
             explanation = sec4Body,
             keyFormula = null,
             examTip = sec4Tip,
-            mechanismWhyHow =
-              "Chemical reactions inside Nigerian refineries, waterworks, agriculture, and battery shops obey the exact same particle, energy, and equilibrium rules studied at the lab bench.",
-            examIntelligence =
-              "WAEC/NECO theory frequently rewards naming real Nigerian chemical industries (e.g., petroleum refining, soap saponification, cement, Haber ammonia).",
-            recap = "Link industrial processes directly back to laboratory equations and conditions.",
           ),
           ConceptBlock(
             heading = sec5Title,
             explanation = sec5Body,
             keyFormula = null,
             examTip = sec5Tip,
-            mechanismWhyHow =
-              "Chemistry errors usually arise from unbalanced equations, wrong oxidation states, ignoring state symbols, or mixing molar volume units (dm³ vs cm³).",
-            examIntelligence =
-              "Always balance atoms AND charges before pulling mole ratios in JAMB/WAEC problems.",
-            recap = "Balance equation → check state symbols → check unit conversion (÷1000 cm³→dm³).",
           ),
         ),
       misconceptions = listOf(misc1, misc2),

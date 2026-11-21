@@ -37,6 +37,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.BookmarkAdd
 import androidx.compose.material.icons.filled.Build
@@ -45,10 +46,12 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.Stop
@@ -68,6 +71,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -81,6 +85,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -89,6 +94,7 @@ import com.example.data.curriculum.CurriculumProgression
 import com.example.data.curriculum.GuidedPracticeTask
 import com.example.data.curriculum.Lesson
 import com.example.data.curriculum.LessonPillar
+import com.example.data.curriculum.MicroDrill
 import com.example.data.curriculum.PracticeQuestion
 import com.example.data.curriculum.QuestionShuffler
 import com.example.data.curriculum.TopicMasteryProject
@@ -98,6 +104,7 @@ import com.example.data.local.ThemeMode
 import com.example.data.local.ThemePalette
 import com.example.data.local.ThemePreferences
 import com.example.data.model.LessonProgress
+import com.example.ui.components.ConceptSectionAnimationCard
 import com.example.ui.components.DisplaySettingsDialog
 import com.example.ui.components.EquationDisplayCard
 import com.example.ui.components.LessonSpeechFormatter
@@ -105,7 +112,6 @@ import com.example.ui.components.LessonTtsController
 import com.example.ui.components.ScientificCalculatorSheet
 import com.example.ui.components.ScientificText
 import com.example.ui.components.StudioActionTile
-import com.example.ui.components.TopicDiagramCard
 import com.example.ui.components.TopRightMenuButton
 import com.example.ui.components.rememberLessonTtsController
 import com.example.ui.labs.PracticalLabWorkspace
@@ -937,8 +943,6 @@ private fun LessonPillarBody(
           }
         }
 
-        TopicDiagramCard(lesson = lesson)
-
         lesson.concepts.forEachIndexed { idx, block ->
           val cleanHeading = block.heading.replace(Regex("""^\d+\.\s+"""), "").trim()
           val cardTtsKey = "concept_${lesson.id}_$idx"
@@ -1019,6 +1023,12 @@ private fun LessonPillarBody(
               style = MaterialTheme.typography.bodyLarge,
               color = MaterialTheme.colorScheme.onSurface,
             )
+            ConceptSectionAnimationCard(
+              lessonId = lesson.id,
+              sectionIndex = idx,
+              heading = cleanHeading,
+              labType = lesson.labType,
+            )
             if (block.mechanismWhyHow.isNotBlank()) {
               Surface(
                 color = MaterialTheme.colorScheme.background,
@@ -1043,6 +1053,16 @@ private fun LessonPillarBody(
                   onSaveNote("${lesson.title.take(26)} — ${block.heading.take(24)}", savedFormula)
                 },
               )
+            }
+            if (block.microDrills.isNotEmpty()) {
+              block.microDrills.forEachIndexed { drillIdx, drill ->
+                ConceptMicroDrillCard(
+                  lessonId = lesson.id,
+                  sectionIndex = idx,
+                  drillIndex = drillIdx,
+                  drill = drill,
+                )
+              }
             }
             if (block.examIntelligence.isNotBlank()) {
               Surface(
@@ -1601,6 +1621,72 @@ private fun LessonPillarBody(
             }
           }
         }
+
+        if (lesson.externalResources.isNotEmpty()) {
+          val uriHandler = LocalUriHandler.current
+          Column(
+            modifier =
+              Modifier.fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surface)
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(16.dp))
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+          ) {
+            Row(
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+              Icon(
+                imageVector = Icons.Filled.Language,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+              )
+              Text(
+                text = "VERIFIED STUDY & SIMULATION PORTALS",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+              )
+            }
+            lesson.externalResources.forEachIndexed { rIdx, res ->
+              Row(
+                modifier =
+                  Modifier.fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(12.dp))
+                    .minimumInteractiveComponentSize()
+                    .clickable { runCatching { uriHandler.openUri(res.url) } }
+                    .padding(12.dp)
+                    .testTag("scenario_resource_$rIdx"),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+              ) {
+                Column(modifier = Modifier.weight(1f).padding(end = 8.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                  Text(
+                    text = "${res.provider} • ${res.kind}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.Bold,
+                  )
+                  Text(
+                    text = res.title,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.SemiBold,
+                  )
+                }
+                Icon(
+                  imageVector = Icons.AutoMirrored.Filled.OpenInNew,
+                  contentDescription = "Open ${res.title}",
+                  tint = MaterialTheme.colorScheme.primary,
+                  modifier = Modifier.size(18.dp),
+                )
+              }
+            }
+          }
+        }
       }
 
       LessonPillar.LAB -> {
@@ -1608,6 +1694,7 @@ private fun LessonPillarBody(
           lessonId = lesson.id,
           labType = lesson.labType,
           labBrief = lesson.labBrief,
+          externalResources = lesson.externalResources,
         )
       }
 
@@ -2437,6 +2524,158 @@ private fun InlineExerciseSection(
             )
           }
         }
+      }
+    }
+  }
+}
+
+@Composable
+private fun ConceptMicroDrillCard(
+  lessonId: String,
+  sectionIndex: Int,
+  drillIndex: Int,
+  drill: MicroDrill,
+) {
+  var selectedOption by remember(lessonId, sectionIndex, drillIndex) { mutableIntStateOf(-1) }
+  var showHint by remember(lessonId, sectionIndex, drillIndex) { mutableStateOf(false) }
+  val semantics = MaterialTheme.semanticColors
+  val answered = selectedOption >= 0
+  val isCorrect = selectedOption == drill.correctIndex
+
+  Column(
+    modifier =
+      Modifier.fillMaxWidth()
+        .clip(RoundedCornerShape(12.dp))
+        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+        .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.35f), RoundedCornerShape(12.dp))
+        .padding(12.dp),
+    verticalArrangement = Arrangement.spacedBy(8.dp),
+  ) {
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+      ) {
+        Icon(
+          imageVector = Icons.Filled.Quiz,
+          contentDescription = null,
+          tint = MaterialTheme.colorScheme.primary,
+          modifier = Modifier.size(16.dp),
+        )
+        Text(
+          text = "CHECK YOUR UNDERSTANDING",
+          style = MaterialTheme.typography.labelSmall,
+          color = MaterialTheme.colorScheme.primary,
+          fontWeight = FontWeight.Bold,
+        )
+      }
+      if (drill.hint.isNotBlank()) {
+        Surface(
+          color = MaterialTheme.colorScheme.surface,
+          shape = RoundedCornerShape(99.dp),
+          modifier =
+            Modifier.clip(RoundedCornerShape(99.dp))
+              .clickable { showHint = !showHint }
+              .testTag("micro_drill_${sectionIndex}_${drillIndex}_hint"),
+        ) {
+          Text(
+            text = if (showHint) "Hide Hint" else "Hint",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp),
+          )
+        }
+      }
+    }
+
+    ScientificText(
+      text = drill.prompt,
+      style = MaterialTheme.typography.bodyMedium,
+      color = MaterialTheme.colorScheme.onSurface,
+      fontWeight = FontWeight.SemiBold,
+    )
+
+    AnimatedVisibility(visible = showHint && drill.hint.isNotBlank()) {
+      Surface(
+        color = MaterialTheme.colorScheme.tertiaryContainer,
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier.fillMaxWidth(),
+      ) {
+        ScientificText(
+          text = "Hint: ${drill.hint}",
+          style = MaterialTheme.typography.bodySmall,
+          color = MaterialTheme.colorScheme.onTertiaryContainer,
+          modifier = Modifier.padding(8.dp),
+        )
+      }
+    }
+
+    drill.options.forEachIndexed { optIdx, option ->
+      val picked = selectedOption == optIdx
+      val optionIsRight = optIdx == drill.correctIndex
+      val bg =
+        when {
+          answered && optionIsRight -> semantics.successContainer
+          answered && picked -> MaterialTheme.colorScheme.errorContainer
+          else -> MaterialTheme.colorScheme.surface
+        }
+      val fg =
+        when {
+          answered && optionIsRight -> semantics.onSuccessContainer
+          answered && picked -> MaterialTheme.colorScheme.onErrorContainer
+          else -> MaterialTheme.colorScheme.onSurface
+        }
+      val border =
+        when {
+          answered && optionIsRight -> semantics.success
+          answered && picked -> MaterialTheme.colorScheme.error
+          else -> MaterialTheme.colorScheme.outlineVariant
+        }
+      Row(
+        modifier =
+          Modifier.fillMaxWidth()
+            .clip(RoundedCornerShape(9.dp))
+            .background(bg)
+            .border(1.dp, border, RoundedCornerShape(9.dp))
+            .minimumInteractiveComponentSize()
+            .clickable { selectedOption = optIdx }
+            .padding(horizontal = 10.dp, vertical = 9.dp)
+            .testTag("micro_drill_${sectionIndex}_${drillIndex}_opt_$optIdx"),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+      ) {
+        Text(
+          text = "${'A' + optIdx}.",
+          style = MaterialTheme.typography.labelMedium,
+          color = fg,
+          fontWeight = FontWeight.Bold,
+        )
+        ScientificText(
+          text = option,
+          style = MaterialTheme.typography.bodySmall,
+          color = fg,
+          fontWeight = if (picked || (answered && optionIsRight)) FontWeight.SemiBold else FontWeight.Normal,
+        )
+      }
+    }
+
+    AnimatedVisibility(visible = answered) {
+      Surface(
+        color = if (isCorrect) semantics.successContainer else MaterialTheme.colorScheme.errorContainer,
+        shape = RoundedCornerShape(9.dp),
+        modifier = Modifier.fillMaxWidth(),
+      ) {
+        ScientificText(
+          text = (if (isCorrect) "Correct — " else "Review — ") + drill.explanation,
+          style = MaterialTheme.typography.bodySmall,
+          color = if (isCorrect) semantics.onSuccessContainer else MaterialTheme.colorScheme.onErrorContainer,
+          modifier = Modifier.padding(9.dp),
+        )
       }
     }
   }
